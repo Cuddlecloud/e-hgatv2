@@ -1,0 +1,171 @@
+"""Deterministic dual-cycling container-terminal instance (Module 1).
+
+Builds the canonical **10-task toy** used throughout the project. Grounded in
+Homayouni & Fontes (2022), Section 5 and Table 5:
+
+- Tasks belong to Quay Cranes (QCs). Each task is either a **LOAD** (export:
+  yard -> ship) or an **UNLOAD** (import: ship -> yard) operation.
+- A LOAD moves a container from an LU (storage) station to the QC, where the QC
+  lifts it onto the ship. The AGV's *loaded* leg is therefore ``LU -> QC``.
+- An UNLOAD moves a container the QC lifts off the ship onto a waiting AGV, which
+  carries it to an LU station. The *loaded* leg is therefore ``QC -> LU``.
+- Each QC handles its containers one at a time; handling time ``tau ~ U(30, 80)``
+  seconds (seeded -> deterministic).
+- AGVs start parked at LU station 1.
+
+The instance is intentionally small and fully reproducible so that the brute-force
+Oracle (``oracle.py``) can enumerate the *exact* Pareto front.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from enum import IntEnum
+
+from ehgat.environment.distance import DistanceMatrix, load_default_distance_matrix
+from ehgat.utils.seeding import make_rng
+
+__all__ = [
+    "EXACT_TOY_TASKS",
+    "Instance",
+    "Task",
+    "TaskKind",
+    "build_toy_instance",
+]
+
+# Task count for the canonical *exact* instance. Even with the smart speed Pareto DP
+# (which removes the 3^(2N) speed factor), the structure space grows ~ (N+1)!, so the
+# oracle is a compute-once artifact whose front is frozen as a golden JSON. N=5 runs in
+# well under a minute on commodity hardware; the N=10 instance is for scaling studies.
+EXACT_TOY_TASKS = 5
+
+
+class TaskKind(IntEnum):
+    """Container move type in a dual-cycling terminal."""
+
+    LOAD = 0  # export: yard (LU) -> ship; loaded leg LU -> QC
+    UNLOAD = 1  # import: ship -> yard (LU); loaded leg QC -> LU
+
+
+@dataclass(frozen=True, slots=True)
+class Task:
+    """A single container move bound to one QC and one LU station.
+
+    ``pickup``/``dropoff`` are the origin/destination of the AGV's *loaded* leg and
+    are derived from :class:`TaskKind`.
+    """
+
+    task_id: int
+    qc: str
+    lu: str
+    kind: TaskKind
+    handling_time: float  # tau (s): QC operation time for this container
+
+    @property
+    def pickup(self) -> str:
+        """Node where the AGV acquires the container (start of the loaded leg)."""
+        return self.lu if self.kind is TaskKind.LOAD else self.qc
+
+    @property
+    def dropoff(self) -> str:
+        """Node where the AGV releases the container (end of the loaded leg)."""
+        return self.qc if self.kind is TaskKind.LOAD else self.lu
+
+
+@dataclass(frozen=True, slots=True)
+class Instance:
+    """An immutable, validated dual-cycling scheduling instance."""
+
+    tasks: tuple[Task, ...]
+    qcs: tuple[str, ...]
+    num_agvs: int
+    agv_start: str
+    distance: DistanceMatrix
+
+    def __post_init__(self) -> None:
+        if self.num_agvs < 1:
+            raise ValueError(f"num_agvs must be >= 1, got {self.num_agvs}")
+        if not self.tasks:
+            raise ValueError("instance must contain at least one task")
+
+        nodes = set(self.distance.nodes)
+        if self.agv_start not in nodes:
+            raise ValueError(f"agv_start {self.agv_start!r} is not a known node")
+        for qc in self.qcs:
+            if qc not in nodes:
+                raise ValueError(f"QC {qc!r} is not a known node")
+
+        qc_set = set(self.qcs)
+        seen_ids: set[int] = set()
+        for t in self.tasks:
+            if t.task_id in seen_ids:
+                raise ValueError(f"duplicate task_id {t.task_id}")
+            seen_ids.add(t.task_id)
+            if t.qc not in qc_set:
+                raise ValueError(f"task {t.task_id} references unknown QC {t.qc!r}")
+            if t.lu not in nodes:
+                raise ValueError(f"task {t.task_id} references unknown LU {t.lu!r}")
+            if t.handling_time <= 0.0:
+                raise ValueError(f"task {t.task_id} handling_time must be > 0")
+        # task_ids must be a contiguous 0..N-1 range so they can index tuples/arrays.
+        if seen_ids != set(range(len(self.tasks))):
+            raise ValueError("task_ids must be a contiguous range 0..N-1")
+
+    @property
+    def num_tasks(self) -> int:
+        return len(self.tasks)
+
+    def task(self, task_id: int) -> Task:
+        return self.tasks[task_id]
+
+    def tasks_of_qc(self, qc: str) -> tuple[Task, ...]:
+        """Tasks bound to ``qc`` in ascending ``task_id`` order."""
+        return tuple(t for t in self.tasks if t.qc == qc)
+
+    def loaded_distance(self, task: Task) -> float:
+        """Distance (m) of the loaded leg ``pickup -> dropoff`` for ``task``."""
+        return self.distance.distance(task.pickup, task.dropoff)
+
+    def empty_distance(self, origin: str, task: Task) -> float:
+        """Distance (m) of the empty leg ``origin -> task.pickup``."""
+        return self.distance.distance(origin, task.pickup)
+
+
+def build_toy_instance(
+    seed: int = 0,
+    *,
+    num_tasks: int = 10,
+    qcs: tuple[str, ...] = ("QC1", "QC2", "QC3"),
+    num_agvs: int = 2,
+) -> Instance:
+    """Construct a deterministic dual-cycling toy instance.
+
+    Defaults give the **N=10 scaling instance** (3 QCs served by 2 SA-AGVs starting
+    at ``LU1``). Pass ``num_tasks=EXACT_TOY_TASKS`` for the small instance whose exact
+    Pareto front the oracle can enumerate.
+
+    Tasks alternate LOAD/UNLOAD for genuine dual-cycling; QC bindings and LU stations
+    follow a fixed round-robin pattern; handling times are drawn ``~ U(30, 80)``
+    seconds from a seeded RNG, so the entire instance is reproducible from ``seed``.
+    """
+    rng = make_rng(seed)
+    distance = load_default_distance_matrix()
+    lu_stations = ("LU1", "LU2", "LU3", "LU4", "LU5", "LU6")
+
+    tasks: list[Task] = []
+    for task_id in range(num_tasks):
+        qc = qcs[task_id % len(qcs)]
+        lu = lu_stations[task_id % len(lu_stations)]
+        kind = TaskKind.LOAD if task_id % 2 == 0 else TaskKind.UNLOAD
+        handling_time = float(int(rng.integers(30, 81)))  # U[30, 80] inclusive seconds
+        tasks.append(
+            Task(task_id=task_id, qc=qc, lu=lu, kind=kind, handling_time=handling_time)
+        )
+
+    return Instance(
+        tasks=tuple(tasks),
+        qcs=qcs,
+        num_agvs=num_agvs,
+        agv_start="LU1",
+        distance=distance,
+    )
