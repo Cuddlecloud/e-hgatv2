@@ -164,13 +164,15 @@ def _evaluate_method(
     reference: tuple[float, float],
     stat_rng: np.random.Generator,
 ) -> MethodResult:
+    print(f"{name}: starting {len(config.seeds)} seeds", flush=True)
     curves: list[list[float]] = []
     final_fronts: list[tuple[tuple[float, float], ...]] = []
     final_hv: list[float] = []
     final_igd: list[float] = []
     final_gd: list[float] = []
     final_spread: list[float] = []
-    for seed in config.seeds:
+    for index, seed in enumerate(config.seeds, start=1):
+        print(f"{name}: seed {index}/{len(config.seeds)} (seed={seed})", flush=True)
         history, final = run(seed)
         curves.append(_hv_curve(history, reference))
         final_fronts.append(tuple((float(m), float(e)) for m, e in final))
@@ -178,6 +180,7 @@ def _evaluate_method(
         final_igd.append(igd_plus(final, golden))
         final_gd.append(gd_plus(final, golden))
         final_spread.append(spread(final, golden))
+    print(f"{name}: complete", flush=True)
 
     curve_arr = np.asarray(curves, dtype=float)
     mean, lo, hi = _normal_band(curve_arr)
@@ -305,10 +308,16 @@ def run_benchmark(config: BenchmarkConfig | None = None) -> BenchmarkResult:
     reference = nadir_reference(golden, margin=config.hv_margin)
     golden_hv = hypervolume(golden, reference)
 
+    print(
+        f"Training surrogate: {config.surrogate_samples} samples x "
+        f"{config.surrogate_epochs} epochs",
+        flush=True,
+    )
     model = train_surrogate(
         instance,
         TrainConfig(num_samples=config.surrogate_samples, epochs=config.surrogate_epochs, seed=0),
     ).model
+    print("Training surrogate: complete", flush=True)
 
     stat_rng = make_rng(12345)  # dedicated stream for bootstrap, independent of search seeds
 
