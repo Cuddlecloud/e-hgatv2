@@ -18,7 +18,9 @@ a random-selection baseline. The surrogate is trained **once** and reused across
 from __future__ import annotations
 
 import math
+import os
 from collections.abc import Callable, Sequence
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import dataclass, field
 
 import numpy as np
@@ -75,6 +77,7 @@ class BenchmarkConfig:
     oracle_seeds: int = 100
     oracle_generations: int = 100
     oracle_pop_size: int | None = None
+    oracle_workers: int = 1
     surrogate_samples: int = 1000
     surrogate_epochs: int = 50
     hv_margin: float = 0.1
@@ -227,15 +230,51 @@ def _pareto_front_float(points: Sequence[tuple[float, float]]) -> tuple[tuple[fl
     return tuple(front)
 
 
+def _brkga_reference_points_for_seed(
+    num_tasks: int, pop_size: int, generations: int, seed: int
+) -> tuple[tuple[float, float], ...]:
+    """Build one BRKGA reference front in a subprocess-friendly worker."""
+    instance = build_toy_instance(num_tasks=num_tasks)
+    res = run_brkga(instance, BRKGAConfig(pop_size=pop_size, generations=generations, seed=seed))
+    return tuple((float(m), float(e)) for m, e in res.front)
+
+
 def _approximate_reference_front(
-    instance: Instance, *, seeds: int, generations: int, pop_size: int | None
+    instance: Instance,
+    *,
+    seeds: int,
+    generations: int,
+    pop_size: int | None,
+    workers: int = 1,
 ) -> tuple[tuple[float, float], ...]:
     """Approximate PF* with a multi-start BRKGA reference run for scaling instances."""
     pop = pop_size or 20 * instance.num_tasks
+    workers = max(1, min(workers, seeds, os.cpu_count() or 1))
     points: list[tuple[float, float]] = []
-    for seed in range(seeds):
-        res = run_brkga(instance, BRKGAConfig(pop_size=pop, generations=generations, seed=seed))
-        points.extend(res.front)
+
+    if workers == 1:
+        for seed in range(seeds):
+            points.extend(
+                _brkga_reference_points_for_seed(instance.num_tasks, pop, generations, seed)
+            )
+        return _pareto_front_float(points)
+
+    print(
+        f"Approximate oracle: {seeds} BRKGA seeds x {generations} gens x pop={pop} "
+        f"on {workers} workers",
+        flush=True,
+    )
+    with ProcessPoolExecutor(max_workers=workers) as executor:
+        futures = {
+            executor.submit(
+                _brkga_reference_points_for_seed, instance.num_tasks, pop, generations, seed
+            ): seed
+            for seed in range(seeds)
+        }
+        for completed, future in enumerate(as_completed(futures), start=1):
+            points.extend(future.result())
+            if completed == seeds or completed % max(1, seeds // 10) == 0:
+                print(f"Approximate oracle progress: {completed}/{seeds}", flush=True)
     return _pareto_front_float(points)
 
 
@@ -261,6 +300,7 @@ def run_benchmark(config: BenchmarkConfig | None = None) -> BenchmarkResult:
             seeds=config.oracle_seeds,
             generations=config.oracle_generations,
             pop_size=config.oracle_pop_size,
+            workers=config.oracle_workers,
         )
     reference = nadir_reference(golden, margin=config.hv_margin)
     golden_hv = hypervolume(golden, reference)

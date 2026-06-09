@@ -110,6 +110,7 @@ def _save_json(result: BenchmarkResult, out: Path) -> Path:
             "oracle_seeds": result.config.oracle_seeds,
             "oracle_generations": result.config.oracle_generations,
             "oracle_pop_size": result.config.oracle_pop_size,
+            "oracle_workers": result.config.oracle_workers,
             "surrogate_samples": result.config.surrogate_samples,
             "surrogate_epochs": result.config.surrogate_epochs,
         },
@@ -169,6 +170,7 @@ def main(args: list[str] | None = None) -> None:
     parser.add_argument("--oracle-seeds", type=int, default=100)
     parser.add_argument("--oracle-gens", type=int, default=100)
     parser.add_argument("--oracle-pop", type=int, default=None)
+    parser.add_argument("--oracle-workers", type=int, default=1)
     parser.add_argument("--surrogate-samples", type=int, default=500)
     parser.add_argument("--surrogate-epochs", type=int, default=30)
     parser.add_argument("--out", type=str, default=str(OUT_DIR))
@@ -183,6 +185,7 @@ def main(args: list[str] | None = None) -> None:
         oracle_seeds=ns.oracle_seeds,
         oracle_generations=ns.oracle_gens,
         oracle_pop_size=ns.oracle_pop,
+        oracle_workers=ns.oracle_workers,
         surrogate_samples=ns.surrogate_samples,
         surrogate_epochs=ns.surrogate_epochs,
     )
