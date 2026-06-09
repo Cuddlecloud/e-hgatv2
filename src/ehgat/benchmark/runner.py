@@ -71,6 +71,10 @@ class BenchmarkConfig:
     pop_size: int | None = None  # default 20N (matches BRKGA + attention search)
     num_seeds: int = 10
     base_seed: int = 0
+    oracle: str = "auto"  # "exact", "approx", or "auto" (exact for N<=5, approx otherwise)
+    oracle_seeds: int = 100
+    oracle_generations: int = 100
+    oracle_pop_size: int | None = None
     surrogate_samples: int = 1000
     surrogate_epochs: int = 50
     hv_margin: float = 0.1
@@ -204,6 +208,37 @@ def _random_precision_at_1(
     return total / n_samples
 
 
+def _pareto_front_float(points: Sequence[tuple[float, float]]) -> tuple[tuple[float, float], ...]:
+    """Non-dominated minimisation front over float ``(makespan, energy)`` points."""
+    seen: set[tuple[float, float]] = set()
+    unique: list[tuple[float, float]] = []
+    for makespan, energy in points:
+        key = (round(float(makespan), 6), round(float(energy), 6))
+        if key not in seen:
+            seen.add(key)
+            unique.append((float(makespan), float(energy)))
+
+    front: list[tuple[float, float]] = []
+    best_energy: float | None = None
+    for makespan, energy in sorted(unique):
+        if best_energy is None or energy < best_energy:
+            front.append((makespan, energy))
+            best_energy = energy
+    return tuple(front)
+
+
+def _approximate_reference_front(
+    instance: Instance, *, seeds: int, generations: int, pop_size: int | None
+) -> tuple[tuple[float, float], ...]:
+    """Approximate PF* with a multi-start BRKGA reference run for scaling instances."""
+    pop = pop_size or 20 * instance.num_tasks
+    points: list[tuple[float, float]] = []
+    for seed in range(seeds):
+        res = run_brkga(instance, BRKGAConfig(pop_size=pop, generations=generations, seed=seed))
+        points.extend(res.front)
+    return _pareto_front_float(points)
+
+
 def run_benchmark(config: BenchmarkConfig | None = None) -> BenchmarkResult:
     """Run the full multi-seed effectiveness benchmark and return its aggregate result."""
     config = config or BenchmarkConfig()
@@ -211,8 +246,22 @@ def run_benchmark(config: BenchmarkConfig | None = None) -> BenchmarkResult:
     pop_size = config.pop_size or 20 * instance.num_tasks
     generations = config.generations
 
-    oracle = exact_pareto_front(instance)
-    golden = tuple((float(m), float(e)) for m, e in oracle.front)
+    oracle_mode = config.oracle
+    if oracle_mode not in {"auto", "exact", "approx"}:
+        raise ValueError("oracle must be one of: auto, exact, approx")
+    if oracle_mode == "auto":
+        oracle_mode = "exact" if instance.num_tasks <= EXACT_TOY_TASKS else "approx"
+
+    if oracle_mode == "exact":
+        oracle = exact_pareto_front(instance)
+        golden = tuple((float(m), float(e)) for m, e in oracle.front)
+    else:
+        golden = _approximate_reference_front(
+            instance,
+            seeds=config.oracle_seeds,
+            generations=config.oracle_generations,
+            pop_size=config.oracle_pop_size,
+        )
     reference = nadir_reference(golden, margin=config.hv_margin)
     golden_hv = hypervolume(golden, reference)
 

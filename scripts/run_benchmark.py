@@ -106,6 +106,12 @@ def _save_json(result: BenchmarkResult, out: Path) -> Path:
             "pop_size": result.pop_size,
             "generations": result.generations,
             "seeds": list(result.config.seeds),
+            "oracle": result.config.oracle,
+            "oracle_seeds": result.config.oracle_seeds,
+            "oracle_generations": result.config.oracle_generations,
+            "oracle_pop_size": result.config.oracle_pop_size,
+            "surrogate_samples": result.config.surrogate_samples,
+            "surrogate_epochs": result.config.surrogate_epochs,
         },
         "golden_hv": result.golden_hv,
         "reference_point": list(result.reference_point),
@@ -150,25 +156,41 @@ def _save_json(result: BenchmarkResult, out: Path) -> Path:
 
 def main(args: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="E-HGATv2 effectiveness benchmark")
+    parser.add_argument("--tasks", type=int, default=5, help="number of tasks/nodes")
     parser.add_argument("--seeds", type=int, default=5, help="number of seeds (default 5)")
     parser.add_argument("--gens", type=int, default=40, help="generations (default 40)")
     parser.add_argument("--pop", type=int, default=None, help="population size (default 20N)")
+    parser.add_argument(
+        "--oracle",
+        choices=("auto", "exact", "approx"),
+        default="auto",
+        help="reference front strategy: exact for N<=5, approx otherwise by default",
+    )
+    parser.add_argument("--oracle-seeds", type=int, default=100)
+    parser.add_argument("--oracle-gens", type=int, default=100)
+    parser.add_argument("--oracle-pop", type=int, default=None)
     parser.add_argument("--surrogate-samples", type=int, default=500)
     parser.add_argument("--surrogate-epochs", type=int, default=30)
     parser.add_argument("--out", type=str, default=str(OUT_DIR))
     ns = parser.parse_args(args)
 
     config = BenchmarkConfig(
+        num_tasks=ns.tasks,
         num_seeds=ns.seeds,
         generations=ns.gens,
         pop_size=ns.pop,
+        oracle=ns.oracle,
+        oracle_seeds=ns.oracle_seeds,
+        oracle_generations=ns.oracle_gens,
+        oracle_pop_size=ns.oracle_pop,
         surrogate_samples=ns.surrogate_samples,
         surrogate_epochs=ns.surrogate_epochs,
     )
 
     console.print(
-        f"[bold]Running benchmark[/bold]: {ns.seeds} seeds x {ns.gens} gens  "
-        f"(surrogate: {ns.surrogate_samples} samples / {ns.surrogate_epochs} epochs)"
+        f"[bold]Running benchmark[/bold]: N={ns.tasks}, {ns.seeds} seeds x {ns.gens} gens  "
+        f"(surrogate: {ns.surrogate_samples} samples / {ns.surrogate_epochs} epochs, "
+        f"oracle={ns.oracle})"
     )
     with console.status("Training surrogate + running all seeds..."):
         result = run_benchmark(config)
