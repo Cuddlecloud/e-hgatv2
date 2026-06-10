@@ -27,7 +27,7 @@ dependencies = [
 # Heavy numerical / learning stack. Kept separate so the environment + oracle
 # (Phase 1) and BRKGA (Phase 2) can be developed and tested without Torch.
 learn = [
-    "torch>=2.2,<2.7",
+    "torch>=2.2",
     "torch-geometric>=2.5",
     "xgboost>=2.0",
     "shap>=0.45",

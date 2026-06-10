@@ -78,6 +78,8 @@ class BenchmarkConfig:
     oracle_generations: int = 100
     oracle_pop_size: int | None = None
     oracle_workers: int = 1
+    search_workers: int = 1  # parallel processes for the 3 methods x N seeds search runs
+    torch_threads: int = 1  # intra-op threads; 1 is fastest for these tiny graphs
     surrogate_samples: int = 1000
     surrogate_epochs: int = 50
     hv_margin: float = 0.1
@@ -155,32 +157,29 @@ def _hv_curve(history: Sequence[Front], reference: tuple[float, float]) -> list[
     return [hypervolume(front, reference) for front in history]
 
 
-def _evaluate_method(
+def _aggregate_method(
     name: str,
-    run: Callable[[int], tuple[Sequence[Front], Front]],
+    per_seed: Sequence[tuple[Sequence[Front], Front]],
     *,
     config: BenchmarkConfig,
     golden: Front,
     reference: tuple[float, float],
     stat_rng: np.random.Generator,
 ) -> MethodResult:
-    print(f"{name}: starting {len(config.seeds)} seeds", flush=True)
+    """Build a :class:`MethodResult` from already-collected per-seed ``(history, final)``."""
     curves: list[list[float]] = []
     final_fronts: list[tuple[tuple[float, float], ...]] = []
     final_hv: list[float] = []
     final_igd: list[float] = []
     final_gd: list[float] = []
     final_spread: list[float] = []
-    for index, seed in enumerate(config.seeds, start=1):
-        print(f"{name}: seed {index}/{len(config.seeds)} (seed={seed})", flush=True)
-        history, final = run(seed)
+    for history, final in per_seed:
         curves.append(_hv_curve(history, reference))
         final_fronts.append(tuple((float(m), float(e)) for m, e in final))
         final_hv.append(hypervolume(final, reference))
         final_igd.append(igd_plus(final, golden))
         final_gd.append(gd_plus(final, golden))
         final_spread.append(spread(final, golden))
-    print(f"{name}: complete", flush=True)
 
     curve_arr = np.asarray(curves, dtype=float)
     mean, lo, hi = _normal_band(curve_arr)
@@ -198,6 +197,108 @@ def _evaluate_method(
         final_spread=_bootstrap_ci(np.asarray(final_spread), resamples=_rsp, ci=_ci, rng=stat_rng),
         final_fronts=tuple(final_fronts),
     )
+
+
+def _evaluate_method(
+    name: str,
+    run: Callable[[int], tuple[Sequence[Front], Front]],
+    *,
+    config: BenchmarkConfig,
+    golden: Front,
+    reference: tuple[float, float],
+    stat_rng: np.random.Generator,
+) -> MethodResult:
+    """Serial path: run every seed in-process, then aggregate."""
+    print(f"{name}: starting {len(config.seeds)} seeds", flush=True)
+    per_seed: list[tuple[Sequence[Front], Front]] = []
+    for index, seed in enumerate(config.seeds, start=1):
+        print(f"{name}: seed {index}/{len(config.seeds)} (seed={seed})", flush=True)
+        per_seed.append(run(seed))
+    print(f"{name}: complete", flush=True)
+    return _aggregate_method(
+        name, per_seed, config=config, golden=golden, reference=reference, stat_rng=stat_rng
+    )
+
+
+# --------------------------------------------------------------------------------------
+# Parallel search across CPU cores (the 3 methods x N seeds are independent runs)
+# --------------------------------------------------------------------------------------
+_SEARCH_INSTANCE: Instance | None = None
+_SEARCH_MODEL: EHGATv2 | None = None
+
+
+def _search_worker_init(instance: Instance, model: EHGATv2) -> None:
+    """Per-process setup: pin Torch to 1 thread (avoid oversubscription) and cache state."""
+    import torch
+
+    torch.set_num_threads(1)  # CRITICAL: N processes x N threads each would thrash the box
+    global _SEARCH_INSTANCE, _SEARCH_MODEL
+    _SEARCH_INSTANCE = instance
+    model.eval()
+    _SEARCH_MODEL = model
+
+
+def _run_search_task(
+    spec: tuple[str, int, int, int],
+) -> tuple[str, int, tuple[Front, ...], Front]:
+    """Run a single (method, seed) search in a worker; returns (name, seed, history, final)."""
+    name, seed, pop_size, generations = spec
+    assert _SEARCH_INSTANCE is not None and _SEARCH_MODEL is not None
+    instance, model = _SEARCH_INSTANCE, _SEARCH_MODEL
+    if name == _BRKGA:
+        brkga = run_brkga(
+            instance, BRKGAConfig(pop_size=pop_size, generations=generations, seed=seed)
+        )
+        raw_history, raw_final = brkga.front_history, brkga.front
+    else:
+        cfg = AttentionNSGA2Config(
+            pop_size, generations, seed=seed, random_mutation=(name == _RANDOM)
+        )
+        nsga = run_attention_nsga2(instance, model, cfg)
+        raw_history, raw_final = nsga.front_history, nsga.front
+    history = tuple(tuple((float(m), float(e)) for m, e in front) for front in raw_history)
+    final = tuple((float(m), float(e)) for m, e in raw_final)
+    return name, seed, history, final
+
+
+def _run_methods_parallel(
+    instance: Instance,
+    model: EHGATv2,
+    *,
+    pop_size: int,
+    generations: int,
+    config: BenchmarkConfig,
+    golden: Front,
+    reference: tuple[float, float],
+    stat_rng: np.random.Generator,
+) -> dict[str, MethodResult]:
+    """Distribute all (method, seed) runs across worker processes, then aggregate per method."""
+    names = (_BRKGA, _GUIDED, _RANDOM)
+    specs = [(name, seed, pop_size, generations) for name in names for seed in config.seeds]
+    workers = max(1, min(config.search_workers, len(specs), os.cpu_count() or 1))
+    print(f"Parallel search: {len(specs)} runs on {workers} workers", flush=True)
+
+    collected: dict[str, dict[int, tuple[Sequence[Front], Front]]] = {n: {} for n in names}
+    with ProcessPoolExecutor(
+        max_workers=workers, initializer=_search_worker_init, initargs=(instance, model)
+    ) as executor:
+        futures = {executor.submit(_run_search_task, spec): spec for spec in specs}
+        for done, future in enumerate(as_completed(futures), start=1):
+            name, seed, history, final = future.result()
+            collected[name][seed] = (history, final)
+            print(f"Search progress: {done}/{len(specs)}", flush=True)
+
+    return {
+        name: _aggregate_method(
+            name,
+            [collected[name][seed] for seed in config.seeds],
+            config=config,
+            golden=golden,
+            reference=reference,
+            stat_rng=stat_rng,
+        )
+        for name in names
+    }
 
 
 def _random_precision_at_1(
@@ -284,6 +385,19 @@ def _approximate_reference_front(
 def run_benchmark(config: BenchmarkConfig | None = None) -> BenchmarkResult:
     """Run the full multi-seed effectiveness benchmark and return its aggregate result."""
     config = config or BenchmarkConfig()
+
+    # CRITICAL on many-core boxes: pin Torch intra-op threads. The graphs are tiny
+    # (<=N nodes), so 32 threads per op thrash instead of help -- this is what made
+    # surrogate training hang for hours at ~2700% CPU on a 32-vCPU VM.
+    import contextlib
+
+    import torch
+
+    torch.set_num_threads(max(1, config.torch_threads))
+    with contextlib.suppress(RuntimeError):
+        # raises if Torch's interop pool already started; intra-op pinning is what matters
+        torch.set_num_interop_threads(1)
+
     instance = build_toy_instance(num_tasks=config.num_tasks)
     pop_size = config.pop_size or 20 * instance.num_tasks
     generations = config.generations
@@ -341,12 +455,24 @@ def run_benchmark(config: BenchmarkConfig | None = None) -> BenchmarkResult:
         )
         return res.front_history, res.front
 
-    methods = {
-        name: _evaluate_method(
-            name, run, config=config, golden=golden, reference=reference, stat_rng=stat_rng
+    if config.search_workers and config.search_workers > 1:
+        methods = _run_methods_parallel(
+            instance,
+            model,
+            pop_size=pop_size,
+            generations=generations,
+            config=config,
+            golden=golden,
+            reference=reference,
+            stat_rng=stat_rng,
         )
-        for name, run in ((_BRKGA, brkga_run), (_GUIDED, guided_run), (_RANDOM, random_run))
-    }
+    else:
+        methods = {
+            name: _evaluate_method(
+                name, run, config=config, golden=golden, reference=reference, stat_rng=stat_rng
+            )
+            for name, run in ((_BRKGA, brkga_run), (_GUIDED, guided_run), (_RANDOM, random_run))
+        }
 
     faith_rng = make_rng(999)
     chrom_len = NUM_BLOCKS * instance.num_tasks
