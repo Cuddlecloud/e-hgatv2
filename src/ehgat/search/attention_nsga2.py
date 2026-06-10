@@ -38,6 +38,7 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 
 import numpy as np
+from torch_geometric.data import Batch
 
 from ehgat.environment.decoder import NUM_BLOCKS, Schedule, decode, encode_canonical
 from ehgat.environment.evaluator import ScheduleCycleError, build_precedence, evaluate
@@ -56,6 +57,7 @@ __all__ = [
     "AttentionNSGA2Config",
     "AttentionNSGA2Result",
     "attention_bottleneck_task",
+    "attention_task_probabilities",
     "default_config",
     "mutate_reassign_agv",
     "mutate_speed",
@@ -80,6 +82,8 @@ class AttentionNSGA2Config:
     inherit_prob: float = 0.7  # biased uniform crossover bias toward parent A
     tournament_size: int = 2
     random_mutation: bool = False  # H2 ablation: select a random task instead of max-alpha
+    mutation_temperature: float = 0.25  # softmax temperature for soft bottleneck sampling
+    screening_factor: int = 1  # generate k*lambda offspring, surrogate-screen to lambda (1=off)
     seed: int = 0
 
 
@@ -121,6 +125,29 @@ def attention_bottleneck_task(
         return 0
     best = int(alpha.argmax().item())
     return int(edge_index[1, best].item())
+
+
+def attention_task_probabilities(
+    schedule: Schedule, instance: Instance, model: EHGATv2, *, temperature: float = 0.25
+) -> np.ndarray:
+    """Per-task mutation probabilities from the surrogate's AGV-arc attention.
+
+    A temperature-scaled softmax over each task's incoming-arc attention. This is the
+    **soft** alternative to :func:`attention_bottleneck_task`: high-attention tasks are
+    favoured, but every task keeps a non-zero probability, preserving search diversity
+    (a hard argmax concentrates ~all mutations on 1-2 tasks and collapses exploration).
+    """
+    n = instance.num_tasks
+    data = build_hetero_graph(schedule, instance)
+    edge_index, alpha = model.attention(data)[AGV_EDGE[1]]
+    if alpha.numel() == 0:
+        return np.full(n, 1.0 / n)
+    scores = np.zeros(n)
+    tasks = edge_index[1].numpy()
+    scores[tasks] = alpha.numpy()
+    logits = (scores - scores.max()) / max(temperature, 1e-6)
+    probs = np.exp(logits)
+    return np.asarray(probs / probs.sum())
 
 
 # --------------------------------------------------------------------------------------
@@ -195,6 +222,21 @@ def mutate_swap_on_agv(
     return replace(schedule, agv_sequences=tuple(agv_sequences), global_order=topo)
 
 
+def _predict_objectives(
+    schedules: list[Schedule], instance: Instance, model: EHGATv2
+) -> list[Objectives]:
+    """Batched surrogate prediction of (makespan, energy) for candidate schedules.
+
+    Used by offspring **screening**: the surrogate's near-exact regression
+    (not its attention) pre-filters a k-times larger candidate pool, so the
+    expensive exact evaluations are spent only on predicted-dominant offspring.
+    """
+    graphs = [build_hetero_graph(s, instance) for s in schedules]
+    batch = Batch.from_data_list(graphs)
+    preds = model.predict(batch)
+    return [(float(m), float(e)) for m, e in preds.tolist()]
+
+
 def _mutate(
     schedule: Schedule,
     instance: Instance,
@@ -202,15 +244,20 @@ def _mutate(
     rng: np.random.Generator,
     *,
     guided: bool = True,
+    temperature: float = 0.25,
 ) -> tuple[Schedule, bool]:
     """Apply one mutation operator. Returns ``(schedule, deadlock_rejected)``.
 
-    With ``guided`` the target is the surrogate's max-attention bottleneck task; the H2
-    ablation (``guided=False``) instead picks a uniformly random task on the otherwise
-    identical NSGA-II skeleton, isolating the causal effect of attention guidance.
+    With ``guided`` the target task is **sampled** from the surrogate's attention
+    distribution (temperature-scaled softmax over per-arc attention); the H2 ablation
+    (``guided=False``) instead picks a uniformly random task on the otherwise identical
+    NSGA-II skeleton, isolating the causal effect of attention guidance.
     """
     if guided:
-        task = attention_bottleneck_task(schedule, instance, model)
+        probs = attention_task_probabilities(
+            schedule, instance, model, temperature=temperature
+        )
+        task = int(rng.choice(instance.num_tasks, p=probs))
     else:
         task = int(rng.integers(instance.num_tasks))
     op = _MUTATION_OPS[int(rng.integers(len(_MUTATION_OPS)))]
@@ -329,10 +376,10 @@ def run_attention_nsga2(
         if gen == config.generations:
             break
 
-        # ---- create lambda offspring ----
-        offspring: list[Schedule] = []
-        off_obj: list[Objectives] = []
-        while len(offspring) < config.pop_size:
+        # ---- create lambda offspring (optionally surrogate-screened from k*lambda) ----
+        num_candidates = config.pop_size * max(1, config.screening_factor)
+        candidates: list[Schedule] = []
+        while len(candidates) < num_candidates:
             pa = population[_tournament(rank, crowd, rng, config.tournament_size)]
             if rng.random() < config.crossover_prob:
                 pb = population[_tournament(rank, crowd, rng, config.tournament_size)]
@@ -341,12 +388,24 @@ def run_attention_nsga2(
                 child = pa
             if rng.random() < config.mutation_prob:
                 child, rejected = _mutate(
-                    child, instance, model, rng, guided=not config.random_mutation
+                    child,
+                    instance,
+                    model,
+                    rng,
+                    guided=not config.random_mutation,
+                    temperature=config.mutation_temperature,
                 )
                 deadlocks_rejected += int(rejected)
-            offspring.append(child)
-            off_obj.append(evaluate(child, instance).objectives)
-            evaluations += 1
+            candidates.append(child)
+        if config.screening_factor > 1:
+            predicted = _predict_objectives(candidates, instance, model)
+            pred_fronts = fast_non_dominated_sort(predicted)
+            keep = order_by_rank_crowding(predicted, pred_fronts)[: config.pop_size]
+            offspring = [candidates[i] for i in keep]
+        else:
+            offspring = candidates
+        off_obj = [evaluate(child, instance).objectives for child in offspring]
+        evaluations += len(offspring)
 
         # ---- (mu + lambda) environmental selection ----
         combined = population + offspring

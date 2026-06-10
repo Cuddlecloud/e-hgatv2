@@ -80,6 +80,8 @@ class BenchmarkConfig:
     oracle_workers: int = 1
     search_workers: int = 1  # parallel processes for the 3 methods x N seeds search runs
     torch_threads: int = 1  # intra-op threads; 1 is fastest for these tiny graphs
+    mutation_temperature: float = 0.25  # softmax temperature for soft bottleneck sampling
+    screening_factor: int = 4  # guided method: surrogate-screen k*lambda offspring (1=off)
     surrogate_samples: int = 1000
     surrogate_epochs: int = 50
     hv_margin: float = 0.1
@@ -239,10 +241,10 @@ def _search_worker_init(instance: Instance, model: EHGATv2) -> None:
 
 
 def _run_search_task(
-    spec: tuple[str, int, int, int],
+    spec: tuple[str, int, int, int, float, int],
 ) -> tuple[str, int, tuple[Front, ...], Front]:
     """Run a single (method, seed) search in a worker; returns (name, seed, history, final)."""
-    name, seed, pop_size, generations = spec
+    name, seed, pop_size, generations, temperature, screening = spec
     assert _SEARCH_INSTANCE is not None and _SEARCH_MODEL is not None
     instance, model = _SEARCH_INSTANCE, _SEARCH_MODEL
     if name == _BRKGA:
@@ -252,7 +254,12 @@ def _run_search_task(
         raw_history, raw_final = brkga.front_history, brkga.front
     else:
         cfg = AttentionNSGA2Config(
-            pop_size, generations, seed=seed, random_mutation=(name == _RANDOM)
+            pop_size,
+            generations,
+            seed=seed,
+            random_mutation=(name == _RANDOM),
+            mutation_temperature=temperature,
+            screening_factor=screening if name == _GUIDED else 1,
         )
         nsga = run_attention_nsga2(instance, model, cfg)
         raw_history, raw_final = nsga.front_history, nsga.front
@@ -274,7 +281,11 @@ def _run_methods_parallel(
 ) -> dict[str, MethodResult]:
     """Distribute all (method, seed) runs across worker processes, then aggregate per method."""
     names = (_BRKGA, _GUIDED, _RANDOM)
-    specs = [(name, seed, pop_size, generations) for name in names for seed in config.seeds]
+    specs = [
+        (name, seed, pop_size, generations, config.mutation_temperature, config.screening_factor)
+        for name in names
+        for seed in config.seeds
+    ]
     workers = max(1, min(config.search_workers, len(specs), os.cpu_count() or 1))
     print(f"Parallel search: {len(specs)} runs on {workers} workers", flush=True)
 
@@ -443,7 +454,15 @@ def run_benchmark(config: BenchmarkConfig | None = None) -> BenchmarkResult:
 
     def guided_run(seed: int) -> tuple[Sequence[Front], Front]:
         res = run_attention_nsga2(
-            instance, model, AttentionNSGA2Config(pop_size, generations, seed=seed)
+            instance,
+            model,
+            AttentionNSGA2Config(
+                pop_size,
+                generations,
+                seed=seed,
+                mutation_temperature=config.mutation_temperature,
+                screening_factor=config.screening_factor,
+            ),
         )
         return res.front_history, res.front
 
