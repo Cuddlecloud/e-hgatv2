@@ -183,6 +183,18 @@ def main(args: list[str] | None = None) -> None:
         default=1,
         help="Torch intra-op threads (keep at 1: tiny graphs thrash with many threads)",
     )
+    parser.add_argument(
+        "--temperature",
+        type=float,
+        default=0.25,
+        help="softmax temperature for soft attention bottleneck sampling",
+    )
+    parser.add_argument(
+        "--screening",
+        type=int,
+        default=4,
+        help="surrogate offspring screening factor for the guided method (1=off)",
+    )
     parser.add_argument("--surrogate-samples", type=int, default=500)
     parser.add_argument("--surrogate-epochs", type=int, default=30)
     parser.add_argument("--out", type=str, default=str(OUT_DIR))
@@ -200,6 +212,8 @@ def main(args: list[str] | None = None) -> None:
         oracle_workers=ns.oracle_workers,
         search_workers=ns.workers,
         torch_threads=ns.torch_threads,
+        mutation_temperature=ns.temperature,
+        screening_factor=ns.screening,
         surrogate_samples=ns.surrogate_samples,
         surrogate_epochs=ns.surrogate_epochs,
     )
