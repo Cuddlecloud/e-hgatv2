@@ -69,8 +69,8 @@ def test_fused_training_recovers_physics_and_is_faithful() -> None:
     from ehgat.explain.train_fused import FusedTrainConfig, build_core, train_fused
 
     inst = build_toy_instance(num_tasks=6)
-    core = build_core(inst, seed=0, num_samples=600, epochs=40)
-    result = train_fused(inst, core, FusedTrainConfig(num_samples=300, epochs=25, seed=0))
+    core = build_core(inst, seed=0, num_samples=700, epochs=50)
+    result = train_fused(inst, core, FusedTrainConfig(num_samples=400, epochs=30, seed=0))
 
     assert result.metrics["r2_makespan"] >= 0.9
     assert result.metrics["r2_energy"] >= 0.95

@@ -175,6 +175,16 @@ def train_fused(
     train_samples = samples[n_val:]
     scales = _scales(train_samples)
 
+    # De-normalisation buffers so the heads predict O(1) residuals (stable, fast to fit).
+    train_legs = torch.cat([s.legs for s in train_samples], dim=0)
+    train_tau = torch.cat([s.tau for s in train_samples], dim=0)
+    model.set_leg_normalization(
+        leg_mean=train_legs.mean(dim=0),
+        leg_std=train_legs.std(dim=0),
+        tau_mean=train_tau.mean(),
+        tau_std=train_tau.std(),
+    )
+
     optimizer = torch.optim.Adam(
         model.head_parameters(), lr=config.lr, weight_decay=config.weight_decay
     )

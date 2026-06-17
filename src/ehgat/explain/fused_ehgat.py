@@ -33,16 +33,17 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 import torch
-import torch.nn.functional as F
 from torch import Tensor, nn
 from torch_geometric.data import HeteroData
 
 from ehgat.explain.event_dag import EventDag, assemble_event_dag, extract_precedence
 from ehgat.explain.tropical_dp import tropical_longest_path
-from ehgat.surrogate.ehgatv2 import EHGATv2
+from ehgat.surrogate.ehgatv2 import EDGE_DIM, EHGATv2
 from ehgat.surrogate.graph import AGV_EDGE, NODE_TYPE, QC_EDGE
 
 __all__ = ["FusedEHGATv2", "FusedPrediction"]
+
+_N_LEGS = 4  # (empty_t, loaded_t, empty_e, loaded_e)
 
 
 @dataclass(slots=True)
@@ -74,15 +75,49 @@ class FusedPrediction:
 
 
 class FusedEHGATv2(nn.Module):
-    """Wrap a trained :class:`EHGATv2` core with tropical-DP makespan + additive energy."""
+    """Wrap a trained :class:`EHGATv2` core with tropical-DP makespan + additive energy.
+
+    **Physics-anchored / residual heads.** The projection heads are fed not only the frozen
+    structural embeddings but the **raw physical priors** that closed-form-determine the
+    targets -- the AGV arc's ``(travel_time, empty_e, loaded_e)`` and the node's handling
+    time -- standardised with the core's own buffers. They predict in *standardised* leg
+    space and are de-normalised by registered ``leg_*`` / ``tau_*`` buffers (set from
+    training stats by :func:`~ehgat.explain.train_fused.train_fused`), so the head only has
+    to learn an ``O(1)`` residual rather than reach physical scale from a cold ``softplus``.
+    This makes the otherwise non-injective max-plus map identifiable and dense-gradient.
+    """
+
+    leg_mean: Tensor
+    leg_std: Tensor
+    tau_mean: Tensor
+    tau_std: Tensor
 
     def __init__(self, core: EHGATv2) -> None:
         super().__init__()
         self.core = core
         hidden = core.config.hidden
-        # Local physical attribute projections off the frozen structural embeddings.
-        self.leg_head = nn.Linear(2 * hidden, 4)   # empty_t, loaded_t, empty_e, loaded_e
-        self.delay_head = nn.Linear(hidden, 1)     # node delay d_v (anchored to tau)
+        # Heads see [h_src || h_dst || standardised arc priors] and [h || handling prior].
+        self.leg_head = nn.Sequential(
+            nn.Linear(2 * hidden + EDGE_DIM, hidden), nn.ReLU(), nn.Linear(hidden, _N_LEGS)
+        )
+        self.delay_head = nn.Sequential(
+            nn.Linear(hidden + 1, hidden), nn.ReLU(), nn.Linear(hidden, 1)
+        )
+        # De-normalisation of standardised head outputs into physical units.
+        self.register_buffer("leg_mean", torch.zeros(_N_LEGS))
+        self.register_buffer("leg_std", torch.ones(_N_LEGS))
+        self.register_buffer("tau_mean", torch.zeros(1))
+        self.register_buffer("tau_std", torch.ones(1))
+
+    def set_leg_normalization(
+        self, *, leg_mean: Tensor, leg_std: Tensor, tau_mean: Tensor, tau_std: Tensor
+    ) -> None:
+        """Populate leg/delay de-normalisation buffers from training-set statistics."""
+        eps = 1e-6
+        self.leg_mean.copy_(leg_mean)
+        self.leg_std.copy_(leg_std.clamp_min(eps))
+        self.tau_mean.copy_(tau_mean.reshape(1))
+        self.tau_std.copy_(tau_std.reshape(1).clamp_min(eps))
 
     def freeze_core(self) -> None:
         """Lock the heterogeneous message-passing layers; train only the new heads."""
@@ -95,16 +130,25 @@ class FusedEHGATv2(nn.Module):
         return list(self.leg_head.parameters()) + list(self.delay_head.parameters())
 
     def _local_attributes(self, data: HeteroData) -> tuple[Tensor, Tensor, Tensor, Tensor, Tensor]:
-        """Project node embeddings to non-negative ``(empty_t, loaded_t, empty_e, loaded_e, d)``."""
+        """Project embeddings + physics priors to ``(empty_t, loaded_t, empty_e, loaded_e, d)``."""
         h = self.core.encode(data)  # [N, hidden]
+        x = data[NODE_TYPE].x
         agv_index = data[AGV_EDGE].edge_index
+        agv_attr = data[AGV_EDGE].edge_attr
+        # Standardise the physical priors with the frozen core's own statistics.
+        agv_prior = (agv_attr - self.core.agv_mean) / self.core.agv_std
+        hand_prior = (x[:, 0:1] - self.core.node_mean[0]) / self.core.node_std[0]
+
         # One AGV arc per task with dst = j; order by dst so row k <-> task k.
         order = torch.argsort(agv_index[1])
         src = agv_index[0][order]
         dst = agv_index[1][order]
-        leg_in = torch.cat([h[src], h[dst]], dim=-1)            # [N, 2H]
-        legs = F.softplus(self.leg_head(leg_in))                 # [N, 4] non-negative times/energies
-        node_delay = F.softplus(self.delay_head(h)).squeeze(-1)  # [N]
+        leg_in = torch.cat([h[src], h[dst], agv_prior[order]], dim=-1)  # [N, 2H + 3]
+        legs = (self.leg_head(leg_in) * self.leg_std + self.leg_mean).clamp_min(0.0)  # [N, 4]
+        delay_in = torch.cat([h, hand_prior], dim=-1)                    # [N, H + 1]
+        node_delay = (
+            self.delay_head(delay_in).squeeze(-1) * self.tau_std + self.tau_mean
+        ).clamp_min(0.0)
         return legs[:, 0], legs[:, 1], legs[:, 2], legs[:, 3], node_delay
 
     def forward(self, data: HeteroData) -> FusedPrediction:
