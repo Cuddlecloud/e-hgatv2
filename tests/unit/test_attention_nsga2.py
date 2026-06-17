@@ -268,6 +268,20 @@ def test_operator_probabilities_simplex_and_bias() -> None:
     np.testing.assert_allclose(p_hot, np.full(k, 1.0 / k), atol=1e-2)  # tau -> infinity = uniform
 
 
+def test_operator_probabilities_speed_not_crowded_out() -> None:
+    """Regression: at high agv_bias the corrected weighting keeps `speed` >= uniform share.
+
+    The original 0.5 baseline pushed `speed` BELOW the uniform 1/k when AGV-bound, starving
+    the operator that drives the makespan<->energy spread HV rewards (the diagnosed null).
+    """
+    k = len(_MUTATION_OPS)
+    p = operator_probabilities(0.84, temperature=0.5)  # the observed AGV-bound regime
+    assert p[0] >= 1.0 / k  # speed not below uniform under the default speed_weight=1.0
+    p_old = operator_probabilities(0.84, temperature=0.5, speed_weight=0.5)  # old behaviour
+    assert p_old[0] < p[0]  # old design gives `speed` strictly less mass
+    assert p_old[0] < 1.0 / k  # ... and below the uniform share (the crowd-out)
+
+
 @pytest.mark.parametrize("source", ["attention", "oracle"])
 @pytest.mark.parametrize("window", ["full", "front", "best"])
 def test_aos_modes_run_feasible_and_deterministic(trained_model, source, window) -> None:

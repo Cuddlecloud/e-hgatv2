@@ -117,6 +117,12 @@ def main(args: list[str] | None = None) -> None:
     parser.add_argument("--mutation-temp", type=float, default=0.25, help="Channel-A softmax tau")
     parser.add_argument("--operator-temp", type=float, default=0.5, help="Channel-B operator tau")
     parser.add_argument(
+        "--speed-weight",
+        type=float,
+        default=1.0,
+        help="`speed` operator score (>=structural; 1.0 fixes the crowd-out, 0.5 = old behaviour)",
+    )
+    parser.add_argument(
         "--aggregation-window",
         choices=("full", "front", "best"),
         default="front",
@@ -157,6 +163,7 @@ def main(args: list[str] | None = None) -> None:
         random_task=ns.random_task,
         mutation_temperature=ns.mutation_temp,
         operator_temperature=ns.operator_temp,
+        operator_speed_weight=ns.speed_weight,
         aggregation_window=ns.aggregation_window,
         screening_factor=ns.screening,
         threshold_fraction=ns.threshold,

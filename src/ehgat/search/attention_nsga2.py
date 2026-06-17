@@ -73,7 +73,11 @@ Objectives = tuple[float, float]
 _SPEED_LEVELS: tuple[SpeedLevel, ...] = tuple(SpeedLevel)
 _ARCHIVE_ROUND = 6  # dedup objective-key precision (mirrors the BRKGA archive)
 _MUTATION_OPS = ("speed", "reassign", "swap_agv", "swap_qc")
-_SPEED_BASELINE = 0.5  # neutral operator score for `speed` (drives the C_max/E trade-off)
+# `speed` is the universal makespan<->energy lever (it also tunes AGV travel time, the
+# makespan driver when AGV-bound), so its score is held >= the structural operators' to
+# avoid crowd-out: at high agv_bias the old 0.5 baseline pushed speed BELOW uniform, which
+# starved the operator that generates the very HV spread we optimise. Default 1.0.
+_SPEED_WEIGHT = 1.0
 _OPERATOR_SOURCES = ("random", "attention", "oracle")
 _AGGREGATION_WINDOWS = ("full", "front", "best")
 
@@ -93,6 +97,7 @@ class AttentionNSGA2Config:
     screening_factor: int = 1  # generate k*lambda offspring, surrogate-screen to lambda (1=off)
     operator_selection: str = "random"  # Channel-B AOS source: random | attention | oracle
     operator_temperature: float = 1.0  # softmax tau for operator probs (exploitation knob)
+    operator_speed_weight: float = _SPEED_WEIGHT  # `speed` op score (>=structural; anti-crowd-out)
     aggregation_window: str = "front"  # bottleneck-type readout source: full | front | best
     seed: int = 0
 
@@ -299,19 +304,22 @@ def _predict_objectives(
 # --------------------------------------------------------------------------------------
 # Channel-B: XAI-driven adaptive operator selection (AOS)
 # --------------------------------------------------------------------------------------
-def operator_probabilities(agv_bias: float, temperature: float) -> np.ndarray:
+def operator_probabilities(
+    agv_bias: float, temperature: float, *, speed_weight: float = _SPEED_WEIGHT
+) -> np.ndarray:
     """Operator distribution over ``_MUTATION_OPS`` from an AGV-vs-QC bottleneck bias.
 
     ``agv_bias`` in ``[0, 1]`` is the share of the bottleneck attributable to the AGV
-    resource (vs the QC chain). It biases the **operator** choice (Channel B): high ->
-    favour the AGV-structural operators (``reassign``, ``swap_agv``); low -> favour
-    ``swap_qc``. ``speed`` keeps a neutral baseline because it drives the makespan/energy
-    trade-off regardless of which resource binds. ``temperature`` is the exploitation knob
-    (low -> sharpen toward the bottleneck type; high -> toward a uniform, diversity-
-    preserving distribution -- the limit recovers random AOS).
+    resource (vs the QC chain). It routes the **structural** operators (Channel B): high ->
+    favour ``reassign``/``swap_agv``; low -> favour ``swap_qc``. ``speed`` carries a fixed
+    ``speed_weight`` score because it is the universal makespan<->energy lever (and tunes
+    AGV travel time -- the makespan driver when AGV-bound); keeping it ``>=`` the structural
+    scores prevents the crowd-out that, at high ``agv_bias``, previously pushed ``speed``
+    below the uniform share and starved HV spread. ``temperature`` is the exploitation knob
+    (low -> sharpen; high -> uniform, recovering random AOS).
     """
     b = float(np.clip(agv_bias, 0.0, 1.0))
-    scores = np.array([_SPEED_BASELINE, b, b, 1.0 - b])  # speed, reassign, swap_agv, swap_qc
+    scores = np.array([speed_weight, b, b, 1.0 - b])  # speed, reassign, swap_agv, swap_qc
     logits = (scores - scores.max()) / max(temperature, 1e-6)
     probs = np.exp(logits)
     return np.asarray(probs / probs.sum())
@@ -383,7 +391,9 @@ def _operator_distribution(
         source=config.operator_selection,
         temperature=config.mutation_temperature,
     )
-    return operator_probabilities(bias, config.operator_temperature)
+    return operator_probabilities(
+        bias, config.operator_temperature, speed_weight=config.operator_speed_weight
+    )
 
 
 def _mutate(
