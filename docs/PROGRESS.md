@@ -35,6 +35,31 @@ Core module is Torch/xgboost-free (Sobol+cascade+Pareto pure numpy/scipy); the T
 foil (`tabular_failure_boundary`) lazily imports xgboost+shap. Cascade tests need the pod
 (critical_path_binding transitively imports Torch); Sobol/Pareto tests run on the Mac too.
 
+## AOS null is REAL, not a harness bug — operator-utility diagnostic (decisive)
+`scripts/diagnose_operator_utility.py` measures each operator's Pareto-dominance credit on
+the **exact evaluator** (ground truth), and whether utility is conditional on the task's
+exact bottleneck type (the oracle's premise). Run N=10/20/50, far-from-front vs near-front
+parents. (Pod has only ~1.5 GB RAM — keep `--pool` ≤ ~1000 or the Pareto sort OOM-kills.)
+
+Verdict: **the null is genuine, and the oracle tie is mathematically forced near the front.**
+- Operators differ a lot in utility (reassign≈speed ≫ swap_agv ≫ swap_qc); `swap_qc` is
+  near-dead (reward≈0, only 30–41% feasible — deadlock rejection). So the harness CAN
+  express operator effects (not a dead-pipe bug).
+- `utility_gain` (best-op oracle vs random) = +0.18…+0.27 at every N/regime.
+- `type_gain` (perfect bottleneck-type oracle vs random): +0.11–0.13 far-from-front but
+  **≈0 near the front** (−0.017 / +0.022 / +0.042 at N=10/20/50). Final HV is decided near
+  the front → a type-oracle carries ~no usable signal there → **oracle MUST tie random.**
+- Mechanism: for AGV-bound near-front tasks the best operator is **`speed`** (≈0.48), not the
+  AGV structural ops the oracle picks (reassign 0.25–0.44, swap_agv 0.10–0.28); `reassign` is
+  a generalist; `swap_qc` is dead. The type→operator map is simply the wrong map near the
+  front. The ablation arms only re-route the low-utility structural ops by type ⇒ no HV move.
+- **Takeaway:** the lever is operator *utility*, not bottleneck *type* (utility_gain ≫
+  type_gain≈0). Claim 1 (attention faithful to the bottleneck) is untouched — this shows
+  faithfulness ≠ usefulness for operator selection. Corrects the earlier note below that
+  called reward a clear win: on final HV / IGD+ the reward arm is only **directional**
+  (Holm-corrected p=0.12–0.33; the one significant cell is reward>attention GD+ at N=10,
+  p≈0.05). Its benefit is convergence-speed (HV-AUC), consistent with utility_gain.
+
 ## Key findings so far (Claim 2 investigation)
 1. **N=10 ablation, Channel-B isolated (screening off), old design** -> **null**: random/
    attention/oracle HV are statistically indistinguishable (all Holm-Wilcoxon p > 0.05;
