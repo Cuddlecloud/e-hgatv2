@@ -42,11 +42,24 @@ DONE. Investigating whether Channel-B operator routing helps at scale (#5 above)
   Holm-Wilcoxon + rank-biserial + bootstrap CIs over `aos_ablation.json`.
 - **Step 6 (in progress):** does Channel-B beat random at scale? (N=20/50 running).
 
+## Two redesigns of Channel-B (both implemented)
+1. **speed-weight fix** (`operator_speed_weight`, default 1.0): stops `speed` crowd-out.
+   Scale results (scalar/population bias): N=10 -0.6%, N=20 **-2.5%** vs random, all ns.
+   The N=10->N=20 worsening = the population-AVERAGE is the real flaw.
+2. **per-task routing** (`operator_granularity=per_task`): route each mutation from the
+   chosen task's OWN bottleneck (attention `w_agv[j]/(w_agv+w_qc)` via fused single-pass
+   `_attention_signals`; oracle exact critical-path membership). Cost-neutral. Being tested.
+
+## Experiment map (experiments/)
+- `aos_n10/` old null (sw=0.5, population). `aos_v2_n{10,20,50}/` sw=1.0, population.
+- `aos_pt_n{10,20,50}/` sw=1.0, **per_task** (the new mechanism).
+- Compare: per_task attention-vs-random AND per_task-vs-population at each N.
+- Analyse any: `python scripts/run_aos_stats.py --input experiments/<dir>/aos_ablation.json`
+
 ## Currently running on the pod
-Scale ablations (redesigned, `speed_weight=1.0`), chained + detached (SCALE_PID wrapper):
-- `experiments/aos_v2_n20/` (log `aos_v2_n20.log`) then `experiments/aos_v2_n50/`.
-- Done: `experiments/aos_n10/` (old null, sw=0.5) + `experiments/aos_v2_n10/` (redesigned).
-- Analyse: `python scripts/run_aos_stats.py --input experiments/<dir>/aos_ablation.json`
+- Scalar/population scale chain (PID 3134): N=50 in progress (`aos_v2_n50.log`); N=10/20 done.
+- **Queued** per_task chain (PID 4881): waits for 3134, then runs `aos_pt_n{10,20,50}`.
+- Check: `ps -p 3134; ps -p 4881; grep -c AOS.progress experiments/aos_*_n*.log`
 
 ## Infra (see also the saved memory)
 - **All compute on the RunPod VM**, never the Mac (8-core). Pod = NVIDIA **L40S 46GB**,
