@@ -18,16 +18,21 @@ import pytest
 torch = pytest.importorskip("torch")
 pytest.importorskip("torch_geometric")
 
+from ehgat.benchmark.faithfulness import critical_agv_arcs, critical_path_binding  # noqa: E402
 from ehgat.environment.decoder import NUM_BLOCKS, decode  # noqa: E402
 from ehgat.environment.evaluator import build_precedence, evaluate  # noqa: E402
 from ehgat.environment.instance import EXACT_TOY_TASKS, build_toy_instance  # noqa: E402
 from ehgat.search.attention_nsga2 import (  # noqa: E402
+    _MUTATION_OPS,
     AttentionNSGA2Config,
     attention_bottleneck_task,
+    attention_bottleneck_type,
     default_config,
     mutate_reassign_agv,
     mutate_speed,
     mutate_swap_on_agv,
+    mutate_swap_on_qc,
+    operator_probabilities,
     run_attention_nsga2,
 )
 from ehgat.surrogate.train import TrainConfig, train_surrogate  # noqa: E402
@@ -116,6 +121,35 @@ def test_swap_no_deadlock_invariant_property() -> None:
             evaluate(mutated, inst)
 
 
+def test_swap_on_qc_no_deadlock_invariant_property() -> None:
+    """Over many schedules x tasks, every non-None QC-swap result is acyclic + feasible."""
+    inst = _instance()
+    n = inst.num_tasks
+    for seed in range(60):
+        sched = decode(make_rng(seed).random(NUM_BLOCKS * n), inst)
+        for task in range(n):
+            mutated = mutate_swap_on_qc(sched, inst, task)
+            if mutated is None:
+                continue
+            assert mutated.qc_sequences != sched.qc_sequences  # QC order actually changed
+            build_precedence(mutated.agv_sequences, mutated.qc_sequences, n)
+            evaluate(mutated, inst)
+
+
+def test_swap_on_qc_rejects_genuine_deadlock() -> None:
+    """A non-head QC swap that contradicts the AGV order is Kahn-rejected (returns None)."""
+    inst = _instance()
+    sched = _deadlock_prone_schedule(inst)
+    # Fixture precondition: tasks 0 and 3 share a QC (0 immediately before 3) AND the same
+    # AGV (0 -> 3); reversing their QC order creates an AGV/QC cycle.
+    qc_idx = next(i for i, s in enumerate(sched.qc_sequences) if 0 in s and 3 in s)
+    seq = sched.qc_sequences[qc_idx]
+    assert seq.index(0) + 1 == seq.index(3)
+    assert sched.assignment[0] == sched.assignment[3]
+    assert mutate_swap_on_qc(sched, inst, 3) is None  # genuine deadlock
+    assert mutate_swap_on_qc(sched, inst, seq[0]) is None  # head of QC chain -> no predecessor
+
+
 # --------------------------------------------------------------------------------------
 # Attention bottleneck + full search
 # --------------------------------------------------------------------------------------
@@ -124,6 +158,34 @@ def test_bottleneck_task_is_valid(trained_model) -> None:
     sched = decode(make_rng(5).random(NUM_BLOCKS * inst.num_tasks), inst)
     task = attention_bottleneck_task(sched, inst, trained_model)
     assert 0 <= task < inst.num_tasks
+
+
+def test_attention_bottleneck_type_is_per_task_simplex(trained_model) -> None:
+    """``w_agv`` and ``w_qc`` are a per-task softmax over the two relations -> sum to 1."""
+    inst = _instance()
+    n = inst.num_tasks
+    sched = decode(make_rng(5).random(NUM_BLOCKS * n), inst)
+    w_agv, w_qc = attention_bottleneck_type(sched, inst, trained_model)
+    assert w_agv.shape == (n,) and w_qc.shape == (n,)
+    assert np.all(w_agv >= -1e-6) and np.all(w_agv <= 1 + 1e-6)
+    assert np.all(w_qc >= -1e-6) and np.all(w_qc <= 1 + 1e-6)
+    np.testing.assert_allclose(w_agv + w_qc, np.ones(n), atol=1e-5)
+
+
+def test_critical_path_binding_partitions_disjointly() -> None:
+    """The exact bottleneck-type oracle: agv/qc-bound sets are disjoint, AGV side matches
+    ``critical_agv_arcs``, and the makespan-defining task is bound by exactly one resource.
+    """
+    inst = _instance()
+    n = inst.num_tasks
+    for seed in range(20):
+        sched = decode(make_rng(seed).random(NUM_BLOCKS * n), inst)
+        agv_bound, qc_bound = critical_path_binding(sched, inst)
+        assert agv_bound.isdisjoint(qc_bound)
+        assert agv_bound == critical_agv_arcs(sched, inst)
+        last = int(np.argmax(evaluate(sched, inst).completion))
+        assert last in (agv_bound | qc_bound)
+        assert all(0 <= t < n for t in agv_bound | qc_bound)
 
 
 def test_run_is_deterministic(trained_model) -> None:
@@ -187,3 +249,55 @@ def test_swap_operator_is_exercised(trained_model) -> None:
     inst = _instance()
     res = run_attention_nsga2(inst, trained_model, default_config(inst, generations=40, seed=0))
     assert res.deadlocks_rejected > 0
+
+
+# --------------------------------------------------------------------------------------
+# Channel-B adaptive operator selection (AOS)
+# --------------------------------------------------------------------------------------
+def test_operator_probabilities_simplex_and_bias() -> None:
+    """Bottleneck bias steers operator mass; high temperature recovers a uniform policy."""
+    k = len(_MUTATION_OPS)  # order: speed, reassign, swap_agv, swap_qc
+    p_agv = operator_probabilities(1.0, temperature=0.1)
+    assert p_agv.shape == (k,)
+    np.testing.assert_allclose(p_agv.sum(), 1.0)
+    assert np.all(p_agv >= 0.0)
+    assert p_agv[1] > p_agv[3] and p_agv[2] > p_agv[3]  # AGV-bound -> AGV ops over swap_qc
+    p_qc = operator_probabilities(0.0, temperature=0.1)
+    assert p_qc[3] > p_qc[1] and p_qc[3] > p_qc[2]  # QC-bound -> swap_qc dominates
+    p_hot = operator_probabilities(1.0, temperature=100.0)
+    np.testing.assert_allclose(p_hot, np.full(k, 1.0 / k), atol=1e-2)  # tau -> infinity = uniform
+
+
+@pytest.mark.parametrize("source", ["attention", "oracle"])
+@pytest.mark.parametrize("window", ["full", "front", "best"])
+def test_aos_modes_run_feasible_and_deterministic(trained_model, source, window) -> None:
+    inst = _instance()
+    cfg = AttentionNSGA2Config(
+        pop_size=12,
+        generations=4,
+        seed=3,
+        operator_selection=source,
+        aggregation_window=window,
+        operator_temperature=0.5,
+    )
+    a = run_attention_nsga2(inst, trained_model, cfg)
+    b = run_attention_nsga2(inst, trained_model, cfg)
+    assert a.front == b.front  # deterministic under a fixed seed
+    for sched, obj in zip(a.schedules, a.front, strict=True):
+        assert evaluate(sched, inst).objectives == pytest.approx(obj)  # exact-feasible
+
+
+def test_invalid_aos_config_raises(trained_model) -> None:
+    inst = _instance()
+    with pytest.raises(ValueError, match="operator_selection"):
+        run_attention_nsga2(
+            inst,
+            trained_model,
+            AttentionNSGA2Config(pop_size=8, generations=2, operator_selection="bogus"),
+        )
+    with pytest.raises(ValueError, match="aggregation_window"):
+        run_attention_nsga2(
+            inst,
+            trained_model,
+            AttentionNSGA2Config(pop_size=8, generations=2, aggregation_window="bogus"),
+        )

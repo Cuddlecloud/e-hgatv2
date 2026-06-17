@@ -35,6 +35,7 @@ __all__ = [
     "FaithfulnessResult",
     "attention_per_task",
     "critical_agv_arcs",
+    "critical_path_binding",
     "evaluate_faithfulness",
     "marginal_makespan_speedup",
 ]
@@ -51,19 +52,22 @@ class FaithfulnessResult:
     num_schedules: int
 
 
-def critical_agv_arcs(schedule: Schedule, instance: Instance) -> set[int]:
-    """Destination tasks of the AGV arcs lying on the exact makespan critical path.
+def critical_path_binding(schedule: Schedule, instance: Instance) -> tuple[set[int], set[int]]:
+    """Partition critical-path tasks by binding resource: ``(agv_bound, qc_bound)``.
 
     Backtracks from the makespan-defining task through its **binding** predecessor at each
     step (the AGV chain when the AGV-ready term meets/exceeds the QC-ready term, else the
-    QC chain). Each step whose binding resource is the AGV marks that task's incoming AGV
-    arc (the graph stores exactly one per task, keyed by destination) as critical.
+    QC chain). ``agv_bound`` collects tasks gated by their incoming AGV arc; ``qc_bound``
+    those gated by the QC serialisation chain. The two sets are disjoint (each step picks
+    exactly one binding resource). This is the exact Max-Plus **bottleneck-type oracle**
+    the Channel-B operator-selection controller is graded against.
     """
     n = instance.num_tasks
     agv_prev, qc_prev, _ = build_precedence(schedule.agv_sequences, schedule.qc_sequences, n)
     ev = evaluate(schedule, instance)
 
-    arcs: set[int] = set()
+    agv_bound: set[int] = set()
+    qc_bound: set[int] = set()
     j: int | None = int(np.argmax(ev.completion))
     while j is not None:
         task = instance.tasks[j]
@@ -75,11 +79,21 @@ def critical_agv_arcs(schedule: Schedule, instance: Instance) -> set[int]:
         else:
             agv_term = agv_ready + ev.empty_time[j]  # == arr_pickup
         if agv_term >= qc_ready:  # AGV chain binds -> j's incoming AGV arc is critical
-            arcs.add(j)
+            agv_bound.add(j)
             j = ap if ap >= 0 else None
         else:  # QC chain binds
+            qc_bound.add(j)
             j = qp if qp >= 0 else None
-    return arcs
+    return agv_bound, qc_bound
+
+
+def critical_agv_arcs(schedule: Schedule, instance: Instance) -> set[int]:
+    """Destination tasks of the AGV arcs lying on the exact makespan critical path.
+
+    Thin wrapper over :func:`critical_path_binding` (its AGV-bound partition); the graph
+    stores exactly one AGV arc per task, keyed by destination.
+    """
+    return critical_path_binding(schedule, instance)[0]
 
 
 def marginal_makespan_speedup(schedule: Schedule, instance: Instance) -> np.ndarray:
