@@ -7,9 +7,27 @@ saved Cascade memories (infra/workflow). To pull the live conversation into a ne
 
 _Last updated: 2026-06-17._
 
+## Key findings so far (Claim 2 investigation)
+1. **N=10 ablation, Channel-B isolated (screening off), old design** -> **null**: random/
+   attention/oracle HV are statistically indistinguishable (all Holm-Wilcoxon p > 0.05;
+   attention-random HV median -11.6k, p=0.74, r=-0.25). So the prior "H2 win" is driven by
+   **Channel-A task selection + surrogate screening**, not operator-type routing.
+2. **Diagnostic refuted the washout hypothesis**: the bottleneck signal is sharp AND
+   correct -- attention agv_bias 0.90 ~ oracle 0.84, both correctly find the **AGV** is the
+   dominant bottleneck (2 AGVs vs 3 QCs). Strong support for **Claim 1 (faithfulness)**.
+3. **Root cause of the null = operator crowd-out**: at high agv_bias the old
+   `_SPEED_BASELINE=0.5` pushed the `speed` operator BELOW the uniform 1/4 share, starving
+   the makespan<->energy lever that generates HV spread. **Fix:** `speed` score is now a
+   configurable `operator_speed_weight` (default 1.0, >= structural ops).
+4. **Redesign helped but is still a tie at N=10**: attention HV -1.6% -> -0.6% vs random;
+   oracle -0.3%; HV-AUC flipped (oracle 0.713 > random 0.707). Still ns -- N=10 is too
+   small (AGV is always the bottleneck; random already covers the tiny operator space).
+5. **=> Scaling is the real test.** Redesigned ablation running at N=20 and N=50, where the
+   AGV/QC structure is richer. (`scripts/diagnose_aos_bias.py` reproduces finding #2.)
+
 ## Where we are
-Implementing the NeurIPS plan, currently **Step 4 → Step 6** (the headline Claim 2:
-XAI-driven Adaptive Operator Selection works).
+Implementing the NeurIPS plan, currently **Step 4 → Step 6** (Claim 2). Step 5 (stats)
+DONE. Investigating whether Channel-B operator routing helps at scale (#5 above).
 
 - **Step 4 (DONE, in verification):** AOS Channel-B ablation harness.
   - `src/ehgat/benchmark/aos_ablation.py` — 3 arms (`random` / `attention` / `oracle`)
@@ -19,14 +37,16 @@ XAI-driven Adaptive Operator Selection works).
   - `scripts/run_aos_ablation.py` — CLI entrypoint.
   - `tests/unit/test_aos_ablation.py` — 11 tests (model-free metric tests + e2e smoke on
     exact N=5). **All 11 pass on the pod** with torch 2.6.0+cu124.
-- **Step 5 (NEXT):** stats module — Friedman + Holm-Wilcoxon + bootstrap CIs +
-  rank-biserial effect size + per-instance P@1 paired test, consuming `aos_ablation.json`.
-- **Step 6:** confirm `attention > random`, approaching `oracle` (headline result).
+- **Step 5 (DONE):** `src/ehgat/benchmark/stats.py` + `scripts/run_aos_stats.py` +
+  `tests/unit/test_stats.py` (14 pure numpy/scipy tests, pass on pod) — Friedman +
+  Holm-Wilcoxon + rank-biserial + bootstrap CIs over `aos_ablation.json`.
+- **Step 6 (in progress):** does Channel-B beat random at scale? (N=20/50 running).
 
 ## Currently running on the pod
-Headline ablation: `N=10, 30 seeds × 60 gens × 3 arms`, 14 workers, detached via nohup.
-- Output: `/workspace/e-hgatv2/experiments/aos_n10/aos_ablation.json`
-- Log: `/workspace/e-hgatv2/experiments/aos_n10.log`
+Scale ablations (redesigned, `speed_weight=1.0`), chained + detached (SCALE_PID wrapper):
+- `experiments/aos_v2_n20/` (log `aos_v2_n20.log`) then `experiments/aos_v2_n50/`.
+- Done: `experiments/aos_n10/` (old null, sw=0.5) + `experiments/aos_v2_n10/` (redesigned).
+- Analyse: `python scripts/run_aos_stats.py --input experiments/<dir>/aos_ablation.json`
 
 ## Infra (see also the saved memory)
 - **All compute on the RunPod VM**, never the Mac (8-core). Pod = NVIDIA **L40S 46GB**,
