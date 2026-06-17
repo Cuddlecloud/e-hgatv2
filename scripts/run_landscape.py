@@ -88,12 +88,16 @@ def _print_summary(payload: dict[str, object]) -> None:
 
     if "tabular_boundary" in payload:
         boundary = payload["tabular_boundary"]["boundary"]  # type: ignore[index]
-        console.print("[bold yellow]Claim 3 -- TreeSHAP vs exact Sobol' (L1 profile gap):[/bold yellow]")
+        console.print(
+            "[bold yellow]Claim 3 -- exact Sobol' vs TreeSHAP topological importance:[/bold yellow]"
+        )
         for obj in OBJECTIVES:
             b = boundary[obj]
             console.print(
-                f"  {obj}: structural gap = [bold]{b['structural_l1_gap']:.3f}[/bold]  "
-                f"speed gap = {b['speed_l1_gap']:.3f}"
+                f"  {obj}: structural mass  Sobol=[bold]{b['sobol_structural_mass']:.2f}[/bold] "
+                f"vs TreeSHAP={b['shap_structural_mass']:.2f}  "
+                f"(underweight [bold]{b['structural_underweight']:+.2f}[/bold], "
+                f"TV={b['total_variation']:.2f})"
             )
 
 

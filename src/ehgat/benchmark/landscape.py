@@ -392,14 +392,19 @@ def tabular_failure_boundary(
         sobol_profile = _family_normalised(
             {fam: sobol.indices[obj][fam].total_order for fam in FEATURE_FAMILIES}
         )
-        # L1 disagreement, split into the speed (kinematic) vs structural (topological) regions.
-        struct_gap = sum(abs(shap_profile[f] - sobol_profile[f]) for f in _STRUCTURAL_FAMILIES)
-        speed_gap = sum(abs(shap_profile[f] - sobol_profile[f]) for f in _SPEED_FAMILIES)
+        # The exact (Sobol) vs fitted (TreeSHAP) importance mass on the topological region.
+        sobol_struct = sum(sobol_profile[f] for f in _STRUCTURAL_FAMILIES)
+        shap_struct = sum(shap_profile[f] for f in _STRUCTURAL_FAMILIES)
         boundary[obj] = {
             "shap_profile": shap_profile,
             "sobol_profile": sobol_profile,
-            "structural_l1_gap": float(struct_gap),
-            "speed_l1_gap": float(speed_gap),
+            "sobol_structural_mass": float(sobol_struct),
+            "shap_structural_mass": float(shap_struct),
+            # >0 => TreeSHAP misses topological importance, spreading it onto the speed knobs.
+            "structural_underweight": float(sobol_struct - shap_struct),
+            "total_variation": float(
+                0.5 * sum(abs(shap_profile[f] - sobol_profile[f]) for f in FEATURE_FAMILIES)
+            ),
         }
     out["boundary"] = boundary
     return out
