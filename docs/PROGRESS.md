@@ -7,6 +7,34 @@ saved Cascade memories (infra/workflow). To pull the live conversation into a ne
 
 _Last updated: 2026-06-17._
 
+## Req 2 — landscape / feature-importance (DONE, headline results) — Module 6
+`src/ehgat/benchmark/landscape.py` + `scripts/run_landscape.py` + `tests/unit/test_landscape.py`
+(11 tests pass on pod). Computed **on the exact Max-Plus evaluator** (the SCM from decision
+variables → `(C_max, E)`), not a surrogate. Artifacts: `experiments/landscape/landscape_n{10,20,50}.json`.
+
+Run: `OMP_NUM_THREADS=1 .venv/bin/python scripts/run_landscape.py --tasks 10 20 50 \
+--sobol-base 4096 --cascade-samples 512 --contrast-samples 2048 --shap --shap-samples 3000`
+
+**Findings (stable across N=10/20/50):**
+1. **Both objectives are topology-dominated.** Grouped Sobol' total-order: makespan
+   ST(sequence)+ST(assignment) ≈ 1.5–1.66 vs speed ≈ 0.05; energy structural ST ≈ 1.34–1.39
+   vs speed ≈ 0.12. **Counterintuitive headline:** *energy* is governed by routing
+   (empty-leg repositioning distance), NOT the speed knobs — loaded distance is fixed and
+   empty_speed barely moves energy (ST≈0.01).
+2. **AGVs are the dominant bottleneck:** ~79–84% of exact critical-path mass is AGV-bound
+   (2 AGVs vs 3 QCs) at every N. Consistent with Claim 1.
+3. **Why Pareto-optimal:** AGV **load balance** is the discriminator — Cliff's δ on
+   `agv_load_imbalance` is consistently strongly negative (−0.39 … −0.59; front = balanced).
+   Speed descriptors are the weak/secondary trade-off axis.
+4. **Claim 3 (TreeSHAP failure boundary), quantified & stable:** exact Sobol' puts
+   **0.91–0.97** of importance mass on the topological families; TreeSHAP recovers only
+   **0.46–0.56**, underweighting topology by **+0.39 … +0.45** (TV distance ≈ same), spilling
+   that mass onto the kinematic speed knobs. This *is* the tabular-flattening failure region.
+
+Core module is Torch/xgboost-free (Sobol+cascade+Pareto pure numpy/scipy); the TreeSHAP
+foil (`tabular_failure_boundary`) lazily imports xgboost+shap. Cascade tests need the pod
+(critical_path_binding transitively imports Torch); Sobol/Pareto tests run on the Mac too.
+
 ## Key findings so far (Claim 2 investigation)
 1. **N=10 ablation, Channel-B isolated (screening off), old design** -> **null**: random/
    attention/oracle HV are statistically indistinguishable (all Holm-Wilcoxon p > 0.05;
@@ -73,7 +101,8 @@ DONE. Investigating whether Channel-B operator routing helps at scale (#5 above)
 ## Remaining plan (high → low)
 5. Stats module (Friedman/Wilcoxon/bootstrap/effect size).
 6. Run + verify the N=10 AOS ablation (Claim 2).
-7. Req2 landscape module (grouped Sobol on exact evaluator + critical-path attribution).
+7. ~~Req2 landscape module (grouped Sobol on exact evaluator + critical-path attribution).~~
+   **DONE** — see the "Req 2 — landscape" section at the top.
 8. Surrogate aggregation ablation (max vs mean vs sum).
 9. PGExplainer baseline (faithfulness + optimizer arms only).
 10. Scaling matrix N ∈ {10,20,50,100}.
