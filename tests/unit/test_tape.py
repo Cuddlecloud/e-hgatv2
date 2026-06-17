@@ -1,0 +1,51 @@
+"""Tests for the Tropical-Algebraic Pareto Explainer."""
+
+from __future__ import annotations
+
+import torch
+
+from ehgat.environment.decoder import NUM_BLOCKS, decode
+from ehgat.environment.evaluator import evaluate
+from ehgat.environment.instance import build_toy_instance
+from ehgat.explain.pts_calculator import ParetoPoint, pareto_tension_scores
+from ehgat.explain.tape_explainer import explain_schedule
+from ehgat.explain.tropical_dp import tropical_longest_path
+from ehgat.utils.seeding import make_rng
+
+
+def test_tropical_backward_routes_only_argmax_path() -> None:
+    node_w = torch.zeros(4, dtype=torch.float64, requires_grad=True)
+    edge_index = torch.tensor([[0, 0, 1, 2], [1, 2, 3, 3]])
+    edge_w = torch.tensor([2.0, 5.0, 10.0, 1.0], dtype=torch.float64, requires_grad=True)
+    x = tropical_longest_path(node_w, edge_index, edge_w)
+    x[3].backward()
+    # Node 3 chooses path 0->1->3 (12), not 0->2->3 (6).
+    assert edge_w.grad.tolist() == [1.0, 0.0, 1.0, 0.0]
+    assert node_w.grad.tolist() == [1.0, 1.0, 0.0, 1.0]
+
+
+def test_tape_matches_exact_evaluator_objectives() -> None:
+    inst = build_toy_instance(num_tasks=6)
+    schedule = decode(make_rng(0).random(NUM_BLOCKS * inst.num_tasks), inst)
+    exact = evaluate(schedule, inst)
+    ex = explain_schedule(schedule, inst)
+    assert abs(ex.makespan - exact.makespan) < 1e-9
+    assert abs(ex.energy - exact.energy) < 1e-9
+    assert len(ex.empty_time_grad) == inst.num_tasks
+    assert len(ex.loaded_time_grad) == inst.num_tasks
+    assert max(ex.event_edge_grad) == 1.0
+
+
+def test_pts_output_is_json_shaped() -> None:
+    inst = build_toy_instance(num_tasks=4)
+    rng = make_rng(1)
+    pts = []
+    for i in range(2):
+        schedule = decode(rng.random(NUM_BLOCKS * inst.num_tasks), inst)
+        ex = explain_schedule(schedule, inst)
+        pts.append(ParetoPoint(str(i), ex.makespan, ex.energy, ex))
+    out = pareto_tension_scores(pts)
+    assert len(out) == 2
+    assert "lambda" in out[0]
+    assert out[0]["tasks"]
+    assert out[0]["event_arcs"]
