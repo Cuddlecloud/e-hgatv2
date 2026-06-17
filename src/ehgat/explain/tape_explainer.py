@@ -127,6 +127,7 @@ def explain_schedule(
     makespan = x[completion_nodes].max()
     energy = (empty_e + loaded_e).sum()
 
+    edge_w.retain_grad()
     makespan.backward(retain_graph=True)
     node_grad = tuple(float(v) for v in node_w.grad.detach())
     edge_grad = tuple(float(v) for v in edge_w.grad.detach())
