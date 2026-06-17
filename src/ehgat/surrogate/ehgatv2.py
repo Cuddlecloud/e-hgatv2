@@ -263,6 +263,33 @@ class EHGATv2(nn.Module):
         out: Tensor = self.readout(pooled)
         return out, attention
 
+    def encode(self, data: HeteroData) -> Tensor:
+        """Return per-node embeddings ``h`` ``[N, hidden]`` after max-plus message passing.
+
+        This exposes the frozen structural representation that the **fused tropical head**
+        (:mod:`ehgat.explain.fused_ehgat`) projects into local physical attributes. It runs
+        the same standardisation + residual GATv2 stack as :meth:`forward` but stops before
+        the scalar readout, so the existing ``(C_max, E)`` pipeline is untouched.
+        """
+        assert_graph_semantics(data)
+        x = data[NODE_TYPE].x
+        agv_index = data[AGV_EDGE].edge_index
+        agv_attr = data[AGV_EDGE].edge_attr
+        qc_index = data[QC_EDGE].edge_index
+        qc_attr = data[QC_EDGE].edge_attr
+        assert_node_features(x, name="encode.task.x")
+        assert_edge_features(agv_attr, name="encode.agv.edge_attr")
+        assert_edge_features(qc_attr, name="encode.qc.edge_attr")
+
+        x = (x - self.node_mean) / self.node_std
+        agv_attr = (agv_attr - self.agv_mean) / self.agv_std
+
+        h = self.act(self.node_encoder(x))
+        for layer in self.layers:
+            message, _ = layer(h, agv_index, agv_attr, qc_index, qc_attr, return_attention=False)
+            h = h + self.act(message)
+        return h
+
     @torch.no_grad()
     def predict(self, data: HeteroData) -> Tensor:
         """Return the physical ``[num_graphs, out_dim]`` ``(C_max, E)`` prediction."""

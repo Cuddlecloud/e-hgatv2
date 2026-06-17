@@ -12,6 +12,7 @@ from ehgat.environment.decoder import Schedule
 from ehgat.environment.evaluator import build_precedence
 from ehgat.environment.instance import Instance, TaskKind
 from ehgat.environment.physics import leg_energy, travel_time
+from ehgat.explain.event_dag import assemble_event_dag
 from ehgat.explain.tropical_dp import tropical_longest_path
 from ehgat.surrogate.graph import AGV_EDGE, NODE_TYPE, QC_EDGE, build_hetero_graph
 
@@ -68,69 +69,38 @@ def _leg_tensors(schedule: Schedule, instance: Instance, *, dtype: torch.dtype) 
     return tuple(leaves)  # type: ignore[return-value]
 
 
-def _event_dag(
-    schedule: Schedule, instance: Instance, empty_t: Tensor, loaded_t: Tensor, *, dtype: torch.dtype
-) -> tuple[Tensor, Tensor, Tensor, list[dict[str, Any]], Tensor]:
-    """Expanded exact DAG: source plus per-task max, QC-finish and AGV-free events."""
-    n = instance.num_tasks
-    agv_prev, qc_prev, _ = build_precedence(schedule.agv_sequences, schedule.qc_sequences, n)
-    source = 0
-
-    def m(j: int) -> int: return 1 + 3 * j
-    def q(j: int) -> int: return 1 + 3 * j + 1
-    def a(j: int) -> int: return 1 + 3 * j + 2
-    def prev_a(j: int) -> int: return source if agv_prev[j] < 0 else a(agv_prev[j])
-    def prev_q(j: int) -> int: return source if qc_prev[j] < 0 else q(qc_prev[j])
-
-    edge_src: list[int] = []
-    edge_dst: list[int] = []
-    weights: list[Tensor] = []
-    meta: list[dict[str, Any]] = []
-    completion_nodes: list[int] = []
-    node_weights = torch.zeros(1 + 3 * n, dtype=dtype)
-    for j, task in enumerate(instance.tasks):
-        node_weights[q(j)] = task.handling_time
-        if task.kind is TaskKind.LOAD:
-            agv_arrival = empty_t[j] + loaded_t[j]
-            completion_nodes.append(q(j))
-            arcs = [
-                (prev_a(j), m(j), agv_arrival, "agv_to_gate"),
-                (prev_q(j), m(j), empty_t.new_zeros(()), "qc_to_gate"),
-                (m(j), q(j), empty_t.new_zeros(()), "handling"),
-                (prev_a(j), a(j), agv_arrival, "agv_free_load"),
-            ]
-        else:
-            completion_nodes.append(a(j))
-            arcs = [
-                (prev_a(j), m(j), empty_t[j], "agv_to_gate"),
-                (prev_q(j), m(j), empty_t.new_zeros(()), "qc_to_gate"),
-                (m(j), q(j), empty_t.new_zeros(()), "handling"),
-                (q(j), a(j), loaded_t[j], "agv_free_unload"),
-            ]
-        for u, v, w, kind in arcs:
-            edge_src.append(u); edge_dst.append(v); weights.append(w)
-            meta.append({"src": u, "dst": v, "task": j, "kind": kind})
-    edge_index = torch.tensor([edge_src, edge_dst], dtype=torch.long)
-    edge_weights = torch.stack(weights)
-    return node_weights.requires_grad_(True), edge_index, edge_weights, meta, torch.tensor(completion_nodes)
+def _tau_tensor(instance: Instance, *, dtype: torch.dtype) -> Tensor:
+    """Per-task quay-crane handling delay ``tau`` as a differentiable leaf ``[N]``."""
+    handling = [float(task.handling_time) for task in instance.tasks]
+    return torch.tensor(handling, dtype=dtype, requires_grad=True)
 
 
 def explain_schedule(
     schedule: Schedule, instance: Instance, model: nn.Module | None = None, *, dtype: torch.dtype = torch.float64
 ) -> TapeExplanation:
-    """Extract exact TAPE gradients; optionally attach frozen-surrogate feature gradients."""
+    """Extract exact TAPE gradients; optionally attach frozen-surrogate feature gradients.
+
+    The makespan path is the **exact** max-plus longest path; its subgradients w.r.t. the
+    per-task leg times (``empty_time_grad``/``loaded_time_grad``), node handling
+    (``node_grad`` = ``dC/dtau``) and event arcs are binary critical-path indicators. The
+    energy is exact-additive, so its leg gradients are all ``1``.
+    """
     empty_t, loaded_t, empty_e, loaded_e = _leg_tensors(schedule, instance, dtype=dtype)
-    node_w, edge_index, edge_w, meta, completion_nodes = _event_dag(
-        schedule, instance, empty_t, loaded_t, dtype=dtype
+    tau = _tau_tensor(instance, dtype=dtype)
+    agv_prev, qc_prev, _ = build_precedence(schedule.agv_sequences, schedule.qc_sequences, instance.num_tasks)
+    is_load = torch.tensor(
+        [task.kind is TaskKind.LOAD for task in instance.tasks], dtype=torch.bool
     )
-    x = tropical_longest_path(node_w, edge_index, edge_w)
-    makespan = x[completion_nodes].max()
+    dag = assemble_event_dag(is_load, agv_prev, qc_prev, empty_t, loaded_t, tau)
+
+    x = tropical_longest_path(dag.node_weights, dag.edge_index, dag.edge_weights)
+    makespan = x[dag.completion_nodes].max()
     energy = (empty_e + loaded_e).sum()
 
-    edge_w.retain_grad()
+    dag.edge_weights.retain_grad()
     makespan.backward(retain_graph=True)
-    node_grad = tuple(float(v) for v in node_w.grad.detach())
-    edge_grad = tuple(float(v) for v in edge_w.grad.detach())
+    node_grad = tuple(float(v) for v in tau.grad.detach())
+    edge_grad = tuple(float(v) for v in dag.edge_weights.grad.detach())
     empty_time_grad = tuple(float(v) for v in empty_t.grad.detach())
     loaded_time_grad = tuple(float(v) for v in loaded_t.grad.detach())
 
@@ -143,9 +113,9 @@ def explain_schedule(
         loaded_time_grad=loaded_time_grad,
         empty_energy_grad=tuple(float(v) for v in empty_e.grad.detach()),
         loaded_energy_grad=tuple(float(v) for v in loaded_e.grad.detach()),
-        event_edges=tuple(meta),
+        event_edges=tuple(dag.meta),
         event_edge_grad=edge_grad,
-        completion_nodes=tuple(int(v) for v in completion_nodes.tolist()),
+        completion_nodes=tuple(int(v) for v in dag.completion_nodes.tolist()),
         surrogate_grad=surrogate_feature_gradients(model, schedule, instance) if model is not None else None,
     )
 
