@@ -29,7 +29,7 @@ else
   echo "WARNING: /workspace not found -> using $HOME, which is NOT persistent across"
   echo "         a pod relaunch. Attach a RunPod network volume at /workspace to fix this."
 fi
-REPO_DIR="$WORKDIR/E-HGATv2"
+REPO_DIR="$WORKDIR/e-hgatv2"  # matches `git clone` default from the lowercase slug
 echo "==> Workdir: $REPO_DIR (persistent=$([ "$WORKDIR" = /workspace ] && echo yes || echo NO))"
 
 # 2. Clone or update the repo.
