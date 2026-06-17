@@ -73,6 +73,11 @@ fi
 echo "==> Installing E-HGATv2 with [learn,viz] extras"
 pip install -e ".[learn,viz]"
 
+# 5b. Test tooling. pytest lives in [dependency-groups] (PEP 735), which the editable
+#     extras install skips, so install it explicitly for on-pod verification.
+echo "==> Installing test tooling (pytest, hypothesis)"
+pip install "pytest>=8.0" "pytest-cov>=5.0" "hypothesis>=6.100"
+
 # 6. Smoke check: imports + a 1-line surrogate-free sanity import.
 python - <<'PY'
 import torch, torch_geometric
