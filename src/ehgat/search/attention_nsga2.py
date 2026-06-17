@@ -55,6 +55,7 @@ from ehgat.surrogate.graph import AGV_EDGE, QC_EDGE, build_hetero_graph
 from ehgat.utils.seeding import make_rng
 
 __all__ = [
+    "AdaptivePursuit",
     "AttentionNSGA2Config",
     "AttentionNSGA2Result",
     "attention_bottleneck_task",
@@ -66,6 +67,7 @@ __all__ = [
     "mutate_swap_on_agv",
     "mutate_swap_on_qc",
     "operator_probabilities",
+    "operator_reward",
     "run_attention_nsga2",
 ]
 
@@ -78,12 +80,24 @@ _MUTATION_OPS = ("speed", "reassign", "swap_agv", "swap_qc")
 # avoid crowd-out: at high agv_bias the old 0.5 baseline pushed speed BELOW uniform, which
 # starved the operator that generates the very HV spread we optimise. Default 1.0.
 _SPEED_WEIGHT = 1.0
-_OPERATOR_SOURCES = ("random", "attention", "oracle")
+# Channel-B operator-selection sources. ``random`` is the uniform null; ``attention`` /
+# ``oracle`` are *structural priors* that map a bottleneck-type signal to operator scores;
+# ``reward`` is the field-standard online AOS (Thierens 2005 Adaptive Pursuit driven by a
+# measured fitness-improvement credit) -- the genuine operator-utility baseline/ceiling,
+# distinct from the bottleneck-identity oracle (which assumes the bottleneck->operator map).
+_OPERATOR_SOURCES = ("random", "attention", "oracle", "reward")
 _AGGREGATION_WINDOWS = ("full", "front", "best")
 # Channel-B granularity: a single population-averaged bias per generation ("population")
 # vs the per-task bottleneck of the individual being mutated ("per_task"). The latter
 # avoids the averaging that mis-routes offspring whose own bottleneck differs from the mean.
 _OPERATOR_GRANULARITIES = ("population", "per_task")
+# Adaptive Pursuit (Thierens, "An adaptive pursuit strategy for allocating operator
+# probabilities", GECCO 2005) hyper-parameters for the ``reward`` AOS arm. ``alpha`` is the
+# recency weight of the operator-quality estimate, ``beta`` the pursuit rate of the
+# selection probabilities toward the current best (``p_max``) / the floor (``p_min``).
+_AP_ALPHA = 0.3
+_AP_BETA = 0.3
+_AP_PMIN = 0.05
 
 
 @dataclass(frozen=True, slots=True)
@@ -359,6 +373,79 @@ def operator_probabilities(
     return np.asarray(probs / probs.sum())
 
 
+def operator_reward(parent: Objectives, child: Objectives) -> float:
+    """Pareto-dominance credit in ``[0, 1]`` for a mutation (child vs its primary parent).
+
+    The bounded multi-objective analogue of the scalar fitness-improvement credit used by
+    the canonical AOS literature (Thierens 2005; Da Costa, Fialho, Schoenauer & Sebag 2008):
+    ``1.0`` if the child **dominates** the parent (an unambiguous win), ``0.5`` if the two
+    are **mutually non-dominated** (a new makespan<->energy trade-off, still valuable in a
+    Pareto search), and ``0.0`` if the parent dominates the child or the two are equal (no
+    progress -- including a deadlock-rejected swap, which returns the parent unchanged). It
+    needs no extra exact evaluations: the parent objective is already known from the
+    population and the child objective from the offspring evaluation.
+    """
+    pm, pe = parent
+    cm, ce = child
+    better = cm < pm or ce < pe
+    worse = cm > pm or ce > pe
+    if better and not worse:
+        return 1.0  # child dominates parent
+    if better and worse:
+        return 0.5  # incomparable (new trade-off)
+    return 0.0  # parent dominates, or equal
+
+
+class AdaptivePursuit:
+    """Adaptive Pursuit operator selection over ``_MUTATION_OPS`` (Thierens, GECCO 2005).
+
+    The field-standard *online* AOS that the ``reward`` arm uses as the genuine
+    operator-utility baseline/ceiling -- distinct from the bottleneck-identity ``oracle``,
+    which *assumes* the bottleneck-type -> operator map. It maintains an exponential-recency
+    quality estimate ``q`` per operator (learning rate ``alpha``) updated from the measured
+    :func:`operator_reward`, and a selection distribution ``p`` that **pursues** the current
+    best operator at rate ``beta`` toward ``p_max = 1 - (K - 1) * p_min`` while every other
+    operator decays toward the exploration floor ``p_min``. Because each update is a convex
+    move toward a point on the simplex, ``p`` stays a valid distribution with every mass in
+    ``[p_min, p_max]`` (guaranteed exploration). The controller is stateful across
+    generations within a single run and fully deterministic given the search seed.
+    """
+
+    __slots__ = ("k", "alpha", "beta", "p_min", "p_max", "q", "p")
+
+    def __init__(self, k: int, *, alpha: float, beta: float, p_min: float) -> None:
+        self.k = k
+        self.alpha = alpha
+        self.beta = beta
+        self.p_min = p_min
+        self.p_max = 1.0 - (k - 1) * p_min
+        self.q = np.zeros(k)
+        self.p = np.full(k, 1.0 / k)
+
+    def probabilities(self) -> np.ndarray:
+        """Current selection distribution over ``_MUTATION_OPS`` (a defensive copy)."""
+        return self.p.copy()
+
+    def update(self, rewards_per_op: list[list[float]]) -> None:
+        """Fold one generation's per-operator rewards into ``q`` then pursue the best ``p``.
+
+        ``rewards_per_op[a]`` holds every :func:`operator_reward` observed for operator
+        ``a`` this generation. Operators that did not fire keep their previous quality (and
+        so do not move the selection probabilities until they are sampled again).
+        """
+        fired = False
+        for a, rewards in enumerate(rewards_per_op):
+            if rewards:
+                fired = True
+                self.q[a] += self.alpha * (float(np.mean(rewards)) - self.q[a])
+        if not fired:
+            return
+        best = int(np.argmax(self.q))  # ties -> lowest index (deterministic)
+        for a in range(self.k):
+            target = self.p_max if a == best else self.p_min
+            self.p[a] += self.beta * (target - self.p[a])
+
+
 def _aggregation_window(
     population: list[Schedule], front0: list[int], objectives: list[Objectives], mode: str
 ) -> list[Schedule]:
@@ -469,15 +556,17 @@ def _mutate(
     temperature: float = 0.25,
     op_probs: np.ndarray | None = None,
     per_task: tuple[str, float, float] | None = None,
-) -> tuple[Schedule, bool]:
-    """Apply one mutation operator. Returns ``(schedule, deadlock_rejected)``.
+) -> tuple[Schedule, bool, int]:
+    """Apply one mutation operator. Returns ``(schedule, deadlock_rejected, op_index)``.
 
     ``guided`` controls **Channel A** (which task): the target is sampled from the
     surrogate's attention distribution, else uniformly at random (the H2 ablation).
     **Channel B** (which operator) has three modes: ``per_task`` (``(source, op_tau,
     speed_weight)``) routes the operator from the *chosen task's own* bottleneck type;
-    else ``op_probs`` (a fixed per-generation distribution) is the population-mode bias;
-    else ``None`` => uniform operator choice (random AOS).
+    else ``op_probs`` (a fixed per-generation distribution) is the population-mode bias
+    (also how the ``reward`` controller injects its current policy); else ``None`` =>
+    uniform operator choice (random AOS). ``op_index`` is the index into ``_MUTATION_OPS``
+    of the operator that fired, so the caller can assign credit (the ``reward`` arm).
     """
     w_agv = w_qc = None
     if guided:
@@ -494,22 +583,23 @@ def _mutate(
         source, op_tau, speed_weight = per_task
         bias = _per_task_bias(schedule, instance, model, task, source, w_agv=w_agv, w_qc=w_qc)
         local = operator_probabilities(bias, op_tau, speed_weight=speed_weight)
-        op = _MUTATION_OPS[int(rng.choice(len(_MUTATION_OPS), p=local))]
+        op_index = int(rng.choice(len(_MUTATION_OPS), p=local))
     elif op_probs is None:
-        op = _MUTATION_OPS[int(rng.integers(len(_MUTATION_OPS)))]
+        op_index = int(rng.integers(len(_MUTATION_OPS)))
     else:
-        op = _MUTATION_OPS[int(rng.choice(len(_MUTATION_OPS), p=op_probs))]
+        op_index = int(rng.choice(len(_MUTATION_OPS), p=op_probs))
+    op = _MUTATION_OPS[op_index]
     if op == "speed":
-        return mutate_speed(schedule, task, rng), False
+        return mutate_speed(schedule, task, rng), False, op_index
     if op == "reassign":
-        return mutate_reassign_agv(schedule, instance, task, rng), False
+        return mutate_reassign_agv(schedule, instance, task, rng), False, op_index
     if op == "swap_agv":
         mutated = mutate_swap_on_agv(schedule, instance, task)
     else:  # swap_qc
         mutated = mutate_swap_on_qc(schedule, instance, task)
     if mutated is None:
-        return schedule, True
-    return mutated, False
+        return schedule, True, op_index
+    return mutated, False, op_index
 
 
 # --------------------------------------------------------------------------------------
@@ -619,10 +709,21 @@ def run_attention_nsga2(
     deadlocks_rejected = 0
 
     # Channel-B per-task routing replaces the per-generation population bias with the
-    # individual's own bottleneck type, evaluated lazily inside `_mutate`.
+    # individual's own bottleneck type, evaluated lazily inside `_mutate`. Only the
+    # bottleneck-type sources (`attention` / `oracle`) support per-task scope; the `reward`
+    # arm is an online controller with a single global policy (population scope by nature).
     per_task = (
         (config.operator_selection, config.operator_temperature, config.operator_speed_weight)
-        if config.operator_selection != "random" and config.operator_granularity == "per_task"
+        if config.operator_selection in ("attention", "oracle")
+        and config.operator_granularity == "per_task"
+        else None
+    )
+    # Channel-B `reward` arm: the field-standard online AOS (Adaptive Pursuit driven by a
+    # measured fitness-improvement credit). Its policy replaces the structural-bias
+    # `op_probs` and is updated from each generation's offspring credit below.
+    controller = (
+        AdaptivePursuit(len(_MUTATION_OPS), alpha=_AP_ALPHA, beta=_AP_BETA, p_min=_AP_PMIN)
+        if config.operator_selection == "reward"
         else None
     )
 
@@ -640,24 +741,31 @@ def run_attention_nsga2(
         if gen == config.generations:
             break
 
-        op_probs = (
-            None
-            if per_task is not None
-            else _operator_distribution(population, front0, objectives, instance, model, config)
-        )
+        if controller is not None:
+            op_probs = controller.probabilities()
+        elif per_task is not None:
+            op_probs = None
+        else:
+            op_probs = _operator_distribution(
+                population, front0, objectives, instance, model, config
+            )
 
         # ---- create lambda offspring (optionally surrogate-screened from k*lambda) ----
         num_candidates = config.pop_size * max(1, config.screening_factor)
         candidates: list[Schedule] = []
+        cand_ops: list[int] = []  # operator fired per candidate (reward credit); -1 if none
+        cand_parent_obj: list[Objectives] = []  # primary-parent objectives (reward baseline)
         while len(candidates) < num_candidates:
-            pa = population[_tournament(rank, crowd, rng, config.tournament_size)]
+            pa_idx = _tournament(rank, crowd, rng, config.tournament_size)
+            pa = population[pa_idx]
             if rng.random() < config.crossover_prob:
                 pb = population[_tournament(rank, crowd, rng, config.tournament_size)]
                 child = _crossover(pa, pb, instance, rng, config.inherit_prob)
             else:
                 child = pa
+            op_index = -1
             if rng.random() < config.mutation_prob:
-                child, rejected = _mutate(
+                child, rejected, op_index = _mutate(
                     child,
                     instance,
                     model,
@@ -669,15 +777,31 @@ def run_attention_nsga2(
                 )
                 deadlocks_rejected += int(rejected)
             candidates.append(child)
+            if controller is not None:
+                cand_ops.append(op_index)
+                cand_parent_obj.append(objectives[pa_idx])
         if config.screening_factor > 1:
             predicted = _predict_objectives(candidates, instance, model)
             pred_fronts = fast_non_dominated_sort(predicted)
             keep = order_by_rank_crowding(predicted, pred_fronts)[: config.pop_size]
             offspring = [candidates[i] for i in keep]
+            sel_ops = [cand_ops[i] for i in keep] if controller is not None else []
+            sel_parent_obj = [cand_parent_obj[i] for i in keep] if controller is not None else []
         else:
             offspring = candidates
+            sel_ops, sel_parent_obj = cand_ops, cand_parent_obj
         off_obj = [evaluate(child, instance).objectives for child in offspring]
         evaluations += len(offspring)
+
+        # ---- reward credit assignment: fold offspring utility into the AOS controller ----
+        if controller is not None:
+            rewards_per_op: list[list[float]] = [[] for _ in _MUTATION_OPS]
+            for op_index, parent_obj, child_obj in zip(
+                sel_ops, sel_parent_obj, off_obj, strict=True
+            ):
+                if op_index >= 0:
+                    rewards_per_op[op_index].append(operator_reward(parent_obj, child_obj))
+            controller.update(rewards_per_op)
 
         # ---- (mu + lambda) environmental selection ----
         combined = population + offspring

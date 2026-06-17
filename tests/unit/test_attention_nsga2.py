@@ -24,6 +24,7 @@ from ehgat.environment.evaluator import build_precedence, evaluate  # noqa: E402
 from ehgat.environment.instance import EXACT_TOY_TASKS, build_toy_instance  # noqa: E402
 from ehgat.search.attention_nsga2 import (  # noqa: E402
     _MUTATION_OPS,
+    AdaptivePursuit,
     AttentionNSGA2Config,
     attention_bottleneck_task,
     attention_bottleneck_type,
@@ -33,6 +34,7 @@ from ehgat.search.attention_nsga2 import (  # noqa: E402
     mutate_swap_on_agv,
     mutate_swap_on_qc,
     operator_probabilities,
+    operator_reward,
     run_attention_nsga2,
 )
 from ehgat.surrogate.train import TrainConfig, train_surrogate  # noqa: E402
@@ -282,7 +284,36 @@ def test_operator_probabilities_speed_not_crowded_out() -> None:
     assert p_old[0] < 1.0 / k  # ... and below the uniform share (the crowd-out)
 
 
-@pytest.mark.parametrize("source", ["attention", "oracle"])
+def test_operator_reward_dominance_credit() -> None:
+    """The MO credit: 1.0 if child dominates, 0.5 if incomparable, 0.0 if not better."""
+    parent = (100.0, 50.0)
+    assert operator_reward(parent, (90.0, 45.0)) == 1.0  # child dominates (both better)
+    assert operator_reward(parent, (90.0, 50.0)) == 1.0  # better on makespan, ties energy
+    assert operator_reward(parent, (90.0, 60.0)) == 0.5  # better makespan, worse energy
+    assert operator_reward(parent, (110.0, 60.0)) == 0.0  # parent dominates child
+    assert operator_reward(parent, (100.0, 50.0)) == 0.0  # equal -> no progress
+
+
+def test_adaptive_pursuit_simplex_and_pursues_best() -> None:
+    """Adaptive Pursuit keeps a valid simplex and chases the highest-reward operator."""
+    k = len(_MUTATION_OPS)
+    ap = AdaptivePursuit(k, alpha=0.3, beta=0.3, p_min=0.05)
+    np.testing.assert_allclose(ap.probabilities(), np.full(k, 1.0 / k))
+    # Operator index 1 consistently earns the maximal reward; the others earn nothing.
+    for _ in range(50):
+        ap.update([[0.0], [1.0], [0.0], [0.0]])
+    p = ap.probabilities()
+    np.testing.assert_allclose(p.sum(), 1.0)
+    assert np.all(p >= 0.05 - 1e-9) and np.all(p <= 1.0 - (k - 1) * 0.05 + 1e-9)
+    assert int(np.argmax(p)) == 1  # pursued the best operator
+    assert p[1] > 1.0 / k  # ... above the uniform baseline
+    # Operators that never fire must not move the policy.
+    ap2 = AdaptivePursuit(k, alpha=0.3, beta=0.3, p_min=0.05)
+    ap2.update([[], [], [], []])
+    np.testing.assert_allclose(ap2.probabilities(), np.full(k, 1.0 / k))
+
+
+@pytest.mark.parametrize("source", ["attention", "oracle", "reward"])
 @pytest.mark.parametrize("window", ["full", "front", "best"])
 def test_aos_modes_run_feasible_and_deterministic(trained_model, source, window) -> None:
     inst = _instance()

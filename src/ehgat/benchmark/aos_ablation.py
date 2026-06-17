@@ -1,17 +1,23 @@
 """AOS ablation (Module 5b): isolate the Channel-B operator-selection signal.
 
-The headline evidence for **Claim 2** (the XAI feedback loop). Three arms share an
+The headline evidence for **Claim 2** (the XAI feedback loop). Four arms share an
 *identical* NSGA-II skeleton -- the same Channel-A attention task selection, surrogate
 screening, temperatures, population and generation budget -- and differ in **exactly one
-variable**: the bottleneck-type SOURCE that biases which mutation *operator* is applied:
+variable**: the SOURCE that decides which mutation *operator* is applied:
 
 - ``random``    -- uniform operator selection (the null / lower bound);
 - ``attention`` -- the surrogate's semantic AGV-vs-QC readout (the method under test);
-- ``oracle``    -- the exact Max-Plus critical-path binding (the achievable upper bound).
+- ``oracle``    -- the exact Max-Plus critical-path binding (the *structural* upper bound,
+  which assumes the bottleneck-type -> operator map);
+- ``reward``    -- field-standard online AOS (Adaptive Pursuit + measured fitness-improvement
+  credit; Thierens 2005): the genuine *operator-utility* baseline/ceiling that **learns**
+  which operator actually helps, settling whether the null is intrinsic to the problem.
 
-If ``attention`` beats ``random`` and approaches ``oracle`` with statistical significance
-(Step 5 stats module), the learned explanation is *causally useful* for search, not merely
-faithful. Because only ``operator_selection`` changes, the contrast is apples-to-apples.
+If ``attention`` beats ``random`` and approaches the ``oracle`` / ``reward`` ceiling with
+statistical significance (Step 5 stats module), the learned explanation is *causally useful*
+for search, not merely faithful. If even ``reward`` ties ``random``, the null is bulletproof:
+no AOS -- learned or structural -- helps under elitist selection on this problem. Because
+only ``operator_selection`` changes, the contrast is apples-to-apples.
 
 Per seed it records final HV, HV-AUC (anytime convergence), IGD+, GD+, spread,
 evaluations-to-threshold, wall-clock, exact evaluations and deadlock rejections, and
@@ -56,7 +62,14 @@ Front = Sequence[tuple[float, float]]
 _RANDOM = "random"
 _ATTENTION = "attention"
 _ORACLE = "oracle"
-AOS_ARMS: tuple[str, ...] = (_RANDOM, _ATTENTION, _ORACLE)
+# ``reward`` is the field-standard online AOS (Adaptive Pursuit + measured
+# fitness-improvement credit; Thierens 2005): the genuine operator-utility baseline/ceiling
+# that *learns* which operator helps, vs the ``oracle`` arm that *assumes* the
+# bottleneck-type -> operator map. If even ``reward`` ties ``random`` the null is bulletproof
+# (no AOS can help under elitist selection); if ``attention`` matches ``reward`` the
+# explanation recovers the learned routing for free.
+_REWARD = "reward"
+AOS_ARMS: tuple[str, ...] = (_RANDOM, _ATTENTION, _ORACLE, _REWARD)
 
 
 @dataclass(frozen=True, slots=True)

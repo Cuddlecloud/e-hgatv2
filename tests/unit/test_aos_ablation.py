@@ -2,7 +2,7 @@
 
 Two layers: (1) fast, model-free unit tests of the metric helpers (``_hv_auc`` and the
 ``evals_to_threshold`` / HV-AUC logic in ``_seed_record``); (2) a ``learn``-marked
-end-to-end smoke test that trains a tiny surrogate, runs all three arms on the exact
+end-to-end smoke test that trains a tiny surrogate, runs all AOS arms on the exact
 N=5 oracle, and checks structure, oracle-bound soundness, and JSON round-tripping.
 """
 
@@ -123,7 +123,7 @@ def ablation_result():
     return run_aos_ablation(config)
 
 
-def test_ablation_has_all_three_arms(ablation_result) -> None:
+def test_ablation_has_all_arms(ablation_result) -> None:
     assert set(ablation_result.arms) == set(AOS_ARMS)
 
 

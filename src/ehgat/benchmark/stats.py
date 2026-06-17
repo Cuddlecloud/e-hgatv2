@@ -3,10 +3,11 @@
 Consumes the ``aos_ablation.json`` artifact (or its in-memory dict) and produces the
 paper-grade statistics for **Claim 2**:
 
-- **Friedman** omnibus across the three arms (paired by seed) per metric -- a single
+- **Friedman** omnibus across the arms (paired by seed) per metric -- a single
   non-parametric test for "do the arms differ at all?" before any pairwise comparison;
 - post-hoc **pairwise Wilcoxon signed-rank** (attention-vs-random, oracle-vs-random,
-  attention-vs-oracle) with **Holm-Bonferroni** correction within each metric's family;
+  reward-vs-random, attention-vs-oracle, attention-vs-reward) with **Holm-Bonferroni**
+  correction within each metric's family (pairs absent from the artifact are skipped);
 - **matched-pairs rank-biserial** effect size (Kerby 2014) for each pairwise test, so we
   report magnitude not just significance;
 - **bootstrap CI** of the paired median difference, in the arms' native units.
@@ -46,13 +47,18 @@ METRIC_ORIENTATION: dict[str, bool] = {
     "gd_plus": False,
     "spread": False,
 }
-# Canonical arm order (lower bound -> method -> upper bound).
-ARM_ORDER: tuple[str, ...] = ("random", "attention", "oracle")
-# Post-hoc pairs: (a, b) tested as a - b. The headline pair is (attention, random).
+# Canonical arm order (null -> method -> structural ceiling -> learned-utility ceiling).
+ARM_ORDER: tuple[str, ...] = ("random", "attention", "oracle", "reward")
+# Post-hoc pairs: (a, b) tested as a - b. The headline pair is (attention, random); the
+# (reward, random) pair settles whether *any* AOS beats the null (a bulletproof check),
+# and (attention, reward) asks whether the explanation matches the learned-utility ceiling.
+# Pairs whose arms are absent from the data are skipped, so 3-arm artifacts still analyse.
 DEFAULT_PAIRS: tuple[tuple[str, str], ...] = (
     ("attention", "random"),
     ("oracle", "random"),
+    ("reward", "random"),
     ("attention", "oracle"),
+    ("attention", "reward"),
 )
 
 
