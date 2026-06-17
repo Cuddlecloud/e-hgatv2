@@ -123,10 +123,16 @@ def main(args: list[str] | None = None) -> None:
         help="`speed` operator score (>=structural; 1.0 fixes the crowd-out, 0.5 = old behaviour)",
     )
     parser.add_argument(
+        "--operator-granularity",
+        choices=("population", "per_task"),
+        default="population",
+        help="Channel-B bias scope: population-averaged per generation, or per-task routing",
+    )
+    parser.add_argument(
         "--aggregation-window",
         choices=("full", "front", "best"),
         default="front",
-        help="bottleneck-type readout window",
+        help="bottleneck-type readout window (population mode only)",
     )
     parser.add_argument(
         "--screening",
@@ -164,6 +170,7 @@ def main(args: list[str] | None = None) -> None:
         mutation_temperature=ns.mutation_temp,
         operator_temperature=ns.operator_temp,
         operator_speed_weight=ns.speed_weight,
+        operator_granularity=ns.operator_granularity,
         aggregation_window=ns.aggregation_window,
         screening_factor=ns.screening,
         threshold_fraction=ns.threshold,

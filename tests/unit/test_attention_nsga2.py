@@ -301,8 +301,33 @@ def test_aos_modes_run_feasible_and_deterministic(trained_model, source, window)
         assert evaluate(sched, inst).objectives == pytest.approx(obj)  # exact-feasible
 
 
+@pytest.mark.parametrize("source", ["attention", "oracle"])
+def test_aos_per_task_routing_feasible_and_deterministic(trained_model, source) -> None:
+    """Per-task Channel-B routing stays exact-feasible and deterministic under a fixed seed."""
+    inst = _instance()
+    cfg = AttentionNSGA2Config(
+        pop_size=12,
+        generations=4,
+        seed=3,
+        operator_selection=source,
+        operator_granularity="per_task",
+        operator_temperature=0.5,
+    )
+    a = run_attention_nsga2(inst, trained_model, cfg)
+    b = run_attention_nsga2(inst, trained_model, cfg)
+    assert a.front == b.front  # deterministic
+    for sched, obj in zip(a.schedules, a.front, strict=True):
+        assert evaluate(sched, inst).objectives == pytest.approx(obj)  # exact-feasible
+
+
 def test_invalid_aos_config_raises(trained_model) -> None:
     inst = _instance()
+    with pytest.raises(ValueError, match="operator_granularity"):
+        run_attention_nsga2(
+            inst,
+            trained_model,
+            AttentionNSGA2Config(pop_size=8, generations=2, operator_granularity="bogus"),
+        )
     with pytest.raises(ValueError, match="operator_selection"):
         run_attention_nsga2(
             inst,

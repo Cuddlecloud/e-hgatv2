@@ -80,6 +80,10 @@ _MUTATION_OPS = ("speed", "reassign", "swap_agv", "swap_qc")
 _SPEED_WEIGHT = 1.0
 _OPERATOR_SOURCES = ("random", "attention", "oracle")
 _AGGREGATION_WINDOWS = ("full", "front", "best")
+# Channel-B granularity: a single population-averaged bias per generation ("population")
+# vs the per-task bottleneck of the individual being mutated ("per_task"). The latter
+# avoids the averaging that mis-routes offspring whose own bottleneck differs from the mean.
+_OPERATOR_GRANULARITIES = ("population", "per_task")
 
 
 @dataclass(frozen=True, slots=True)
@@ -98,6 +102,7 @@ class AttentionNSGA2Config:
     operator_selection: str = "random"  # Channel-B AOS source: random | attention | oracle
     operator_temperature: float = 1.0  # softmax tau for operator probs (exploitation knob)
     operator_speed_weight: float = _SPEED_WEIGHT  # `speed` op score (>=structural; anti-crowd-out)
+    operator_granularity: str = "population"  # Channel-B bias scope: population | per_task
     aggregation_window: str = "front"  # bottleneck-type readout source: full | front | best
     seed: int = 0
 
@@ -186,6 +191,35 @@ def attention_bottleneck_type(
     if qc_alpha.numel() > 0:
         w_qc[qc_index[1].cpu().numpy()] = qc_alpha.cpu().numpy()
     return w_agv, w_qc
+
+
+def _attention_signals(
+    schedule: Schedule, instance: Instance, model: EHGATv2, temperature: float
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Fused single-forward-pass readout: ``(task_probs, w_agv, w_qc)``.
+
+    The which-task signal (:func:`attention_task_probabilities`) and the bottleneck-type
+    signal (:func:`attention_bottleneck_type`) both consume the same HAN attention dict, so
+    per-task Channel-B routing reuses one ``model.attention`` call -- it is cost-neutral
+    versus the population-mode guided mutation, which already pays for one pass per child.
+    """
+    n = instance.num_tasks
+    attn = model.attention(build_hetero_graph(schedule, instance))
+    agv_index, agv_alpha = attn[AGV_EDGE[1]]
+    w_agv = np.zeros(n)
+    if agv_alpha.numel() > 0:
+        w_agv[agv_index[1].cpu().numpy()] = agv_alpha.cpu().numpy()
+    w_qc = np.zeros(n)
+    qc_index, qc_alpha = attn[QC_EDGE[1]]
+    if qc_alpha.numel() > 0:
+        w_qc[qc_index[1].cpu().numpy()] = qc_alpha.cpu().numpy()
+    if agv_alpha.numel() == 0:
+        task_probs = np.full(n, 1.0 / n)
+    else:
+        logits = (w_agv - w_agv.max()) / max(temperature, 1e-6)
+        probs = np.exp(logits)
+        task_probs = np.asarray(probs / probs.sum())
+    return task_probs, w_agv, w_qc
 
 
 # --------------------------------------------------------------------------------------
@@ -396,6 +430,35 @@ def _operator_distribution(
     )
 
 
+def _per_task_bias(
+    schedule: Schedule,
+    instance: Instance,
+    model: EHGATv2,
+    task: int,
+    source: str,
+    *,
+    w_agv: np.ndarray | None = None,
+    w_qc: np.ndarray | None = None,
+) -> float:
+    """AGV-vs-QC bias for a **single** task (per-task Channel-B routing).
+
+    ``attention`` reads the task's own semantic weights ``w_agv[task] / (w_agv+w_qc)``
+    (reusing the fused readout when available); ``oracle`` uses the exact critical-path
+    membership (1.0 if AGV-bound, 0.0 if QC-bound, 0.5 if the task gates neither).
+    """
+    if source == "attention":
+        if w_agv is None or w_qc is None:
+            _, w_agv, w_qc = _attention_signals(schedule, instance, model, 1.0)
+        denom = float(w_agv[task] + w_qc[task])
+        return float(w_agv[task] / denom) if denom > 0.0 else 0.5
+    agv_bound, qc_bound = critical_path_binding(schedule, instance)
+    if task in agv_bound:
+        return 1.0
+    if task in qc_bound:
+        return 0.0
+    return 0.5
+
+
 def _mutate(
     schedule: Schedule,
     instance: Instance,
@@ -405,21 +468,34 @@ def _mutate(
     guided: bool = True,
     temperature: float = 0.25,
     op_probs: np.ndarray | None = None,
+    per_task: tuple[str, float, float] | None = None,
 ) -> tuple[Schedule, bool]:
     """Apply one mutation operator. Returns ``(schedule, deadlock_rejected)``.
 
     ``guided`` controls **Channel A** (which task): the target is sampled from the
     surrogate's attention distribution, else uniformly at random (the H2 ablation).
-    ``op_probs`` controls **Channel B** (which operator): ``None`` => uniform operator
-    choice (random AOS); otherwise the operator is sampled from the bottleneck-type-biased
-    distribution of :func:`operator_probabilities`.
+    **Channel B** (which operator) has three modes: ``per_task`` (``(source, op_tau,
+    speed_weight)``) routes the operator from the *chosen task's own* bottleneck type;
+    else ``op_probs`` (a fixed per-generation distribution) is the population-mode bias;
+    else ``None`` => uniform operator choice (random AOS).
     """
+    w_agv = w_qc = None
     if guided:
-        probs = attention_task_probabilities(schedule, instance, model, temperature=temperature)
+        if per_task is not None and per_task[0] == "attention":
+            probs, w_agv, w_qc = _attention_signals(schedule, instance, model, temperature)
+        else:
+            probs = attention_task_probabilities(
+                schedule, instance, model, temperature=temperature
+            )
         task = int(rng.choice(instance.num_tasks, p=probs))
     else:
         task = int(rng.integers(instance.num_tasks))
-    if op_probs is None:
+    if per_task is not None:
+        source, op_tau, speed_weight = per_task
+        bias = _per_task_bias(schedule, instance, model, task, source, w_agv=w_agv, w_qc=w_qc)
+        local = operator_probabilities(bias, op_tau, speed_weight=speed_weight)
+        op = _MUTATION_OPS[int(rng.choice(len(_MUTATION_OPS), p=local))]
+    elif op_probs is None:
         op = _MUTATION_OPS[int(rng.integers(len(_MUTATION_OPS)))]
     else:
         op = _MUTATION_OPS[int(rng.choice(len(_MUTATION_OPS), p=op_probs))]
@@ -524,6 +600,11 @@ def run_attention_nsga2(
             f"aggregation_window must be one of {_AGGREGATION_WINDOWS}, "
             f"got {config.aggregation_window!r}"
         )
+    if config.operator_granularity not in _OPERATOR_GRANULARITIES:
+        raise ValueError(
+            f"operator_granularity must be one of {_OPERATOR_GRANULARITIES}, "
+            f"got {config.operator_granularity!r}"
+        )
     model.eval()
     rng = make_rng(config.seed)
     chrom_len = NUM_BLOCKS * instance.num_tasks
@@ -536,6 +617,14 @@ def run_attention_nsga2(
     archive_sched: list[Schedule] = []
     history: list[tuple[Objectives, ...]] = []
     deadlocks_rejected = 0
+
+    # Channel-B per-task routing replaces the per-generation population bias with the
+    # individual's own bottleneck type, evaluated lazily inside `_mutate`.
+    per_task = (
+        (config.operator_selection, config.operator_temperature, config.operator_speed_weight)
+        if config.operator_selection != "random" and config.operator_granularity == "per_task"
+        else None
+    )
 
     for gen in range(config.generations + 1):
         fronts, rank, crowd = _rank_and_crowding(objectives)
@@ -551,7 +640,11 @@ def run_attention_nsga2(
         if gen == config.generations:
             break
 
-        op_probs = _operator_distribution(population, front0, objectives, instance, model, config)
+        op_probs = (
+            None
+            if per_task is not None
+            else _operator_distribution(population, front0, objectives, instance, model, config)
+        )
 
         # ---- create lambda offspring (optionally surrogate-screened from k*lambda) ----
         num_candidates = config.pop_size * max(1, config.screening_factor)
@@ -572,6 +665,7 @@ def run_attention_nsga2(
                     guided=not config.random_mutation,
                     temperature=config.mutation_temperature,
                     op_probs=op_probs,
+                    per_task=per_task,
                 )
                 deadlocks_rejected += int(rejected)
             candidates.append(child)

@@ -79,6 +79,7 @@ class AOSAblationConfig:
     mutation_temperature: float = 0.25  # Channel-A softmax temperature
     operator_temperature: float = 0.5  # Channel-B operator softmax tau
     operator_speed_weight: float = 1.0  # `speed` op score (>=structural; anti-crowd-out)
+    operator_granularity: str = "population"  # Channel-B bias scope: population | per_task
     aggregation_window: str = "front"  # bottleneck readout window: full | front | best
     screening_factor: int = 1  # surrogate offspring screening (held equal across arms)
 
@@ -254,6 +255,7 @@ def _arm_config(
         operator_selection=arm,
         operator_temperature=config.operator_temperature,
         operator_speed_weight=config.operator_speed_weight,
+        operator_granularity=config.operator_granularity,
         aggregation_window=config.aggregation_window,
     )
 
@@ -469,6 +471,7 @@ def to_json_dict(result: AOSAblationResult) -> dict[str, object]:
             "mutation_temperature": cfg.mutation_temperature,
             "operator_temperature": cfg.operator_temperature,
             "operator_speed_weight": cfg.operator_speed_weight,
+            "operator_granularity": cfg.operator_granularity,
             "aggregation_window": cfg.aggregation_window,
             "screening_factor": cfg.screening_factor,
             "oracle": cfg.oracle,
