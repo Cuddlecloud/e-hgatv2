@@ -1,0 +1,40 @@
+---
+description: How to run any compute (tests, training, experiments) for E-HGATv2 — always on the RunPod L40S VM via git sync
+alwaysApply: true
+---
+
+# Compute Workflow: edit on Mac, run on the VM
+
+ALL compute — pytest, surrogate training, AOS/benchmark experiments, simulations —
+runs on the RunPod **L40S** pod, **never** the local Mac (the Mac's sandbox blocks
+OpenMP/shared-memory, and it is only an 8-core dev box).
+
+## The sync loop (always use git, never scp)
+
+1. Make code edits locally on the Mac.
+2. Commit locally and `git push origin main`.
+3. SSH to the pod, `cd /workspace/e-hgatv2`, `git pull --ff-only origin main`, then run.
+
+Do **not** attempt `scp`/`sftp` or piping file contents over SSH: the RunPod proxy is
+**PTY-only** (it rejects non-PTY exec and the SFTP subsystem), and piping data into a
+`-tt` PTY **corrupts** it (line-discipline echo/wrapping). Git is the only reliable
+transfer. Committing+pushing to sync the pod is expected and authorized for this repo.
+
+## SSH
+
+- Key: `~/.ssh/e_hgatv2_instance_ed25519` (NOT `~/.ssh/id_ed25519` — that key is rejected).
+- Host/user change on every pod relaunch; current form:
+  `ssh -tt -o IdentitiesOnly=yes -i ~/.ssh/e_hgatv2_instance_ed25519 <user>@ssh.runpod.io`
+- Proxy is interactive-only: pipe commands then `exit`, e.g.
+  `printf '%s\n' 'cd /workspace/e-hgatv2 && <cmd>' 'exit' | ssh -tt ... <user>@ssh.runpod.io`
+- These commands need network/sandbox-disabled, so request `required_permissions: ["all"]`.
+
+## Pod facts
+
+- Repo + venv persist at `/workspace/e-hgatv2` (only `/workspace` survives relaunch).
+- Run Python via `.venv/bin/python` (e.g. `.venv/bin/python -m pytest ...`).
+- Pod is **16 vCPU** (cgroup-limited despite a higher reported nproc) — keep `--workers ≤ 14`.
+- Launch long runs detached so they survive disconnect:
+  `OMP_NUM_THREADS=1 setsid .venv/bin/python <script> > experiments/<name>.log 2>&1 < /dev/null &`
+  then poll the log with `tail` (note: a backgrounded `cd ... &` leaves the foreground
+  shell in `/`, so reference the full `/workspace/e-hgatv2/...` path when polling).
