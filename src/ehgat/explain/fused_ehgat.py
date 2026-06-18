@@ -49,19 +49,28 @@ _T_TRAVEL_COL = 0  # EDGE_FEATURES index of Travel_Time (= empty_t + loaded_t)
 _E_EMPTY_COL = 1  # EDGE_FEATURES index of Empty_Energy
 _E_LOADED_COL = 2  # EDGE_FEATURES index of Loaded_Energy
 
-# Loaded/empty power ratio is constant across all speed levels (physics.py), so the
-# empty/loaded *time* split is a closed form of (Travel_Time, Empty_Energy, Loaded_Energy):
-#     t_loaded = T / (1 + ratio * e_empty / e_loaded),   t_empty = T - t_loaded
-# This exact prior anchors the leg head, which then only learns an O(1) residual.
-_POWER_RATIO = SPEED_TABLE[SpeedLevel.NOMINAL].loaded_power / SPEED_TABLE[SpeedLevel.NOMINAL].empty_power
-_EPS = 1e-6
+# Empty/loaded legs use *independent* speed levels, so the time split is not a smooth
+# function of the arc features -- but it is exactly recoverable. Each leg's energy pins its
+# level (``empty_t = empty_e / empty_power(level)``); the true (empty_level, loaded_level)
+# pair is the one whose leg times sum to the arc's Travel_Time. We invert this exactly over
+# the 3x3 discrete level grid; the selected branch stays differentiable w.r.t. the energies.
+_EMPTY_POWERS = tuple(SPEED_TABLE[lvl].empty_power for lvl in SpeedLevel)   # (7.8, 10, 13.2)
+_LOADED_POWERS = tuple(SPEED_TABLE[lvl].loaded_power for lvl in SpeedLevel)  # (11.7, 15, 19.8)
 
 
 def _leg_time_prior(travel_time: Tensor, empty_e: Tensor, loaded_e: Tensor) -> tuple[Tensor, Tensor]:
-    """Exact closed-form ``(empty_t, loaded_t)`` split from the input arc features."""
-    loaded_t = travel_time / (1.0 + _POWER_RATIO * empty_e / (loaded_e + _EPS))
-    empty_t = (travel_time - loaded_t).clamp_min(0.0)
-    return empty_t, loaded_t.clamp_min(0.0)
+    """Exact ``(empty_t, loaded_t)`` split via discrete inversion of the per-leg powers."""
+    pe = travel_time.new_tensor(_EMPTY_POWERS)   # [3]
+    pl = travel_time.new_tensor(_LOADED_POWERS)  # [3]
+    empty_cand = empty_e[:, None] / pe[None, :]   # [N, 3] candidate empty times
+    loaded_cand = loaded_e[:, None] / pl[None, :]  # [N, 3] candidate loaded times
+    total = empty_cand[:, :, None] + loaded_cand[:, None, :]            # [N, 3, 3]
+    n = travel_time.shape[0]
+    flat = (total - travel_time[:, None, None]).abs().reshape(n, 9).argmin(dim=1)  # [N]
+    ei, li = flat // 3, flat % 3
+    empty_t = empty_cand.gather(1, ei[:, None]).squeeze(1)
+    loaded_t = loaded_cand.gather(1, li[:, None]).squeeze(1)
+    return empty_t, loaded_t
 
 
 @dataclass(slots=True)
