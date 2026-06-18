@@ -117,7 +117,7 @@ def build_samples(instance: Instance, num_samples: int, *, seed: int = 0) -> lis
 def _scales(samples: list[FusedSample]) -> dict[str, Tensor]:
     """Per-quantity training std used to balance the anchoring/objective loss terms."""
     eps = 1e-6
-    legs = torch.cat([s.legs for s in samples], dim=0)            # [sum N, 4]
+    legs = torch.cat([s.legs[:, :2] for s in samples], dim=0)     # [sum N, 2] times only
     tau = torch.cat([s.tau for s in samples], dim=0)              # [sum N]
     objs = torch.stack([s.objectives for s in samples], dim=0)    # [S, 2]
     return {
@@ -176,11 +176,11 @@ def train_fused(
     scales = _scales(train_samples)
 
     # De-normalisation buffers so the heads predict O(1) residuals (stable, fast to fit).
-    train_legs = torch.cat([s.legs for s in train_samples], dim=0)
+    train_times = torch.cat([s.legs[:, :2] for s in train_samples], dim=0)
     train_tau = torch.cat([s.tau for s in train_samples], dim=0)
     model.set_leg_normalization(
-        leg_mean=train_legs.mean(dim=0),
-        leg_std=train_legs.std(dim=0),
+        leg_mean=train_times.mean(dim=0),
+        leg_std=train_times.std(dim=0),
         tau_mean=train_tau.mean(),
         tau_std=train_tau.std(),
     )
@@ -206,7 +206,7 @@ def train_fused(
             for idx in chunk:
                 s = train_samples[idx]
                 out = model(s.data)
-                leg_term = (((out.legs - s.legs) / scales["leg"]) ** 2).mean()
+                leg_term = (((out.leg_times - s.legs[:, :2]) / scales["leg"]) ** 2).mean()
                 tau_term = (((out.node_delay - s.tau) / scales["tau"]) ** 2).mean()
                 cmax_term = ((out.makespan - s.objectives[0]) / scales["makespan"]) ** 2
                 e_term = ((out.energy - s.objectives[1]) / scales["energy"]) ** 2

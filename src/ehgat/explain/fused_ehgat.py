@@ -43,7 +43,9 @@ from ehgat.surrogate.graph import AGV_EDGE, NODE_TYPE, QC_EDGE
 
 __all__ = ["FusedEHGATv2", "FusedPrediction"]
 
-_N_LEGS = 4  # (empty_t, loaded_t, empty_e, loaded_e)
+_N_LEG_TIMES = 2  # (empty_t, loaded_t) -- the GNN-predicted transport overheads
+_E_EMPTY_COL = 1  # EDGE_FEATURES index of Empty_Energy
+_E_LOADED_COL = 2  # EDGE_FEATURES index of Loaded_Energy
 
 
 @dataclass(slots=True)
@@ -69,9 +71,9 @@ class FusedPrediction:
         return torch.stack([self.makespan, self.energy])
 
     @property
-    def legs(self) -> Tensor:
-        """``[N, 4]`` predicted ``(empty_t, loaded_t, empty_e, loaded_e)`` for anchoring."""
-        return torch.stack([self.empty_t, self.loaded_t, self.empty_e, self.loaded_e], dim=-1)
+    def leg_times(self) -> Tensor:
+        """``[N, 2]`` GNN-predicted ``(empty_t, loaded_t)`` for time anchoring."""
+        return torch.stack([self.empty_t, self.loaded_t], dim=-1)
 
 
 class FusedEHGATv2(nn.Module):
@@ -97,15 +99,16 @@ class FusedEHGATv2(nn.Module):
         self.core = core
         hidden = core.config.hidden
         # Heads see [h_src || h_dst || standardised arc priors] and [h || handling prior].
+        # Only the *leg times* are learned; leg energies are read exactly from the inputs.
         self.leg_head = nn.Sequential(
-            nn.Linear(2 * hidden + EDGE_DIM, hidden), nn.ReLU(), nn.Linear(hidden, _N_LEGS)
+            nn.Linear(2 * hidden + EDGE_DIM, hidden), nn.ReLU(), nn.Linear(hidden, _N_LEG_TIMES)
         )
         self.delay_head = nn.Sequential(
             nn.Linear(hidden + 1, hidden), nn.ReLU(), nn.Linear(hidden, 1)
         )
         # De-normalisation of standardised head outputs into physical units.
-        self.register_buffer("leg_mean", torch.zeros(_N_LEGS))
-        self.register_buffer("leg_std", torch.ones(_N_LEGS))
+        self.register_buffer("leg_mean", torch.zeros(_N_LEG_TIMES))
+        self.register_buffer("leg_std", torch.ones(_N_LEG_TIMES))
         self.register_buffer("tau_mean", torch.zeros(1))
         self.register_buffer("tau_std", torch.ones(1))
 
@@ -130,7 +133,12 @@ class FusedEHGATv2(nn.Module):
         return list(self.leg_head.parameters()) + list(self.delay_head.parameters())
 
     def _local_attributes(self, data: HeteroData) -> tuple[Tensor, Tensor, Tensor, Tensor, Tensor]:
-        """Project embeddings + physics priors to ``(empty_t, loaded_t, empty_e, loaded_e, d)``."""
+        """Project embeddings + physics priors to ``(empty_t, loaded_t, empty_e, loaded_e, d)``.
+
+        Leg *times* are GNN-predicted (anchored, de-normalised); leg *energies* are read
+        **exactly** from the input AGV arc features (Empty_Energy / Loaded_Energy), so the
+        energy objective is strictly exact and additive (``dE/d(leg energy) = 1``).
+        """
         h = self.core.encode(data)  # [N, hidden]
         x = data[NODE_TYPE].x
         agv_index = data[AGV_EDGE].edge_index
@@ -144,12 +152,16 @@ class FusedEHGATv2(nn.Module):
         src = agv_index[0][order]
         dst = agv_index[1][order]
         leg_in = torch.cat([h[src], h[dst], agv_prior[order]], dim=-1)  # [N, 2H + 3]
-        legs = (self.leg_head(leg_in) * self.leg_std + self.leg_mean).clamp_min(0.0)  # [N, 4]
+        times = (self.leg_head(leg_in) * self.leg_std + self.leg_mean).clamp_min(0.0)  # [N, 2]
         delay_in = torch.cat([h, hand_prior], dim=-1)                    # [N, H + 1]
         node_delay = (
             self.delay_head(delay_in).squeeze(-1) * self.tau_std + self.tau_mean
         ).clamp_min(0.0)
-        return legs[:, 0], legs[:, 1], legs[:, 2], legs[:, 3], node_delay
+        # Exact additive leg energies straight from the (physical) input arc features.
+        arc_energy = agv_attr[order]
+        empty_e = arc_energy[:, _E_EMPTY_COL]
+        loaded_e = arc_energy[:, _E_LOADED_COL]
+        return times[:, 0], times[:, 1], empty_e, loaded_e, node_delay
 
     def forward(self, data: HeteroData) -> FusedPrediction:
         """Predict one graph's ``(C_max, E)`` via tropical DP + additive energy.

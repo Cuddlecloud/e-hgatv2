@@ -23,7 +23,7 @@ from ehgat.environment.instance import Instance
 from ehgat.explain.fused_ehgat import FusedEHGATv2
 from ehgat.explain.pts_calculator import ParetoPoint, pareto_tension_scores
 from ehgat.explain.tape_explainer import TapeExplanation, explain_schedule
-from ehgat.surrogate.graph import build_hetero_graph
+from ehgat.surrogate.graph import AGV_EDGE, build_hetero_graph
 
 __all__ = [
     "FaithfulnessReport",
@@ -51,6 +51,9 @@ def explain_fused(
     """
     model.eval()
     data = build_hetero_graph(schedule, instance)
+    # Leg energies are read straight from the input arc features; make them differentiable
+    # so dE/d(leg energy) propagates (it is exactly 1 by additive construction).
+    data[AGV_EDGE].edge_attr.requires_grad_(True)
     out = model(data)
 
     for leaf in (out.empty_t, out.loaded_t, out.empty_e, out.loaded_e, out.node_delay):
