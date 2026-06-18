@@ -33,10 +33,13 @@ Files (all tests green on pod): `explain/event_dag.py`, `explain/tropical_dp.py`
 - `train_fused.py`: freezes the core, fits only the heads (anchored leg/`tau` loss +
   `(C_max,E)` MSE), `CosineAnnealingLR` 1e-3→1e-5, logs val R².
 
-**Validated on pod (N=6 integration test PASSED):** makespan R² ≥ 0.98, energy R² ≥ 0.99
-(restores the ≥0.99 calibration the directive required), fused critical path agrees with the
-exact TAPE oracle. The point vs Module-6 Sobol: this is **model-native and scalable** —
-the GNN's own gradients give per-leg/edge Pareto Tension Scores (PTS) in one backward pass.
+**Validated on pod (N=6, `run_fused_tape.py`, `experiments/fused_tape/fused_tape_n6.json`):**
+makespan **R²=0.9995** (MAE 1.98 s), energy **R²=1.0000** (MAE 3e-4 kJ — exact by construction),
+restoring the ≥0.99 calibration the directive required. Faithfulness vs the exact simulator
+TAPE oracle: **leg- and arc-critical Jaccard = 1.00** (the fused model's native critical path
+is identical to the exact max-plus critical path — faithful by construction, no smearing).
+The point vs Module-6 Sobol: this is **model-native and scalable** — the GNN's own gradients
+give per-leg/edge Pareto Tension Scores (PTS) in one backward pass.
 Run: `python scripts/run_fused_tape.py --tasks 6 10 20` → `experiments/fused_tape/fused_tape_n{N}.json`.
 
 ## Req 2 — landscape / feature-importance (DONE, headline results) — Module 6
