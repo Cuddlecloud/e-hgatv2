@@ -75,7 +75,7 @@ def _summary(num_tasks: int, args: argparse.Namespace) -> dict[str, object]:
         "instance": {
             "num_tasks": instance.num_tasks,
             "num_agvs": instance.num_agvs,
-            "num_qcs": instance.num_qcs,
+            "num_qcs": len(instance.qcs),
         },
         "calibration": result.metrics,
         "history": result.history,
