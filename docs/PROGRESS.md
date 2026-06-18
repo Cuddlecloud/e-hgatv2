@@ -5,7 +5,39 @@ full context. Pair this with `docs/NEURIPS_PAPER_PLAN.md` (the scientific plan) 
 saved Cascade memories (infra/workflow). To pull the live conversation into a new window,
 `@mention` the originating Cascade conversation.
 
-_Last updated: 2026-06-17._
+_Last updated: 2026-06-18._
+
+## Req 2 — Physics-Fused TAPE (DONE, the model-native explainer) — Modules in `src/ehgat/explain/`
+The novel, GNN-centric answer to Req 2: a **faithful-by-construction** explainer built by
+transplanting the surrogate's makespan head with a **differentiable Max-Plus DP layer**.
+Files (all tests green on pod): `explain/event_dag.py`, `explain/tropical_dp.py`,
+`explain/fused_ehgat.py`, `explain/fused_explainer.py`, `explain/train_fused.py`,
+`explain/tape_explainer.py` (exact simulator oracle) + `scripts/run_fused_tape.py`,
+`tests/unit/test_fused.py` (7) + `tests/unit/test_tape.py` (3).
+
+**Architecture (non-destructive — the scalar `(C_max,E)` head still works):**
+- `event_dag.py` is the single shared physics: one expanded max-plus event DAG (per task:
+  gate `m(j)`, QC-finish `q(j)`, AGV-free `a(j)`) used by BOTH the exact oracle and the model.
+- `tropical_dp.py` is a custom `autograd.Function`: max-plus longest path forward; backward
+  routes the subgradient **only along the physical argmax/critical path** → gradients are
+  exact binary critical-path indicators (no MLP smearing).
+- `fused_ehgat.py` (`FusedEHGATv2`) wraps the **frozen** EHGATv2 core (`core.encode()` exposes
+  node embeddings) and adds physics-anchored heads:
+  - leg-time head predicts an **O(1) residual around the exact closed-form leg split**
+    (empty/loaded legs use independent speed levels, so the split is recovered by discrete
+    inversion over the 3×3 power grid — `_leg_time_prior`), piped into the tropical DP for `C_max`.
+  - **Energy is strictly exact & additive**: sum of the input arc leg energies (`dE/dleg=1`).
+  - node delay = residual around the known handling time.
+- `fused_explainer.py`: the model's native gradients ARE the explanation; `faithfulness_report`
+  compares the fused critical path to the exact oracle (leg/arc critical Jaccard).
+- `train_fused.py`: freezes the core, fits only the heads (anchored leg/`tau` loss +
+  `(C_max,E)` MSE), `CosineAnnealingLR` 1e-3→1e-5, logs val R².
+
+**Validated on pod (N=6 integration test PASSED):** makespan R² ≥ 0.98, energy R² ≥ 0.99
+(restores the ≥0.99 calibration the directive required), fused critical path agrees with the
+exact TAPE oracle. The point vs Module-6 Sobol: this is **model-native and scalable** —
+the GNN's own gradients give per-leg/edge Pareto Tension Scores (PTS) in one backward pass.
+Run: `python scripts/run_fused_tape.py --tasks 6 10 20` → `experiments/fused_tape/fused_tape_n{N}.json`.
 
 ## Req 2 — landscape / feature-importance (DONE, headline results) — Module 6
 `src/ehgat/benchmark/landscape.py` + `scripts/run_landscape.py` + `tests/unit/test_landscape.py`
