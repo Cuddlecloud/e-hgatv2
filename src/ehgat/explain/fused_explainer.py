@@ -66,6 +66,10 @@ def explain_fused(
     loaded_time_grad = _grad_tuple(out.loaded_t)
     event_edge_grad = _grad_tuple(out.dag.edge_weights)
 
+    # Leg energies feed both the makespan (via the leg-time prior) and the energy, so clear
+    # their accumulated makespan grads before the energy pass to read a clean dE/d(leg)=1.
+    for leaf in (out.empty_e, out.loaded_e):
+        leaf.grad = None
     out.energy.backward()
     return TapeExplanation(
         makespan=float(out.makespan.detach()),
