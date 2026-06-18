@@ -119,9 +119,15 @@ class FusedEHGATv2(nn.Module):
     tau_mean: Tensor
     tau_std: Tensor
 
-    def __init__(self, core: EHGATv2) -> None:
+    def __init__(self, core: EHGATv2, *, use_physics_prior: bool = False) -> None:
         super().__init__()
         self.core = core
+        # When True the leg head learns a residual around the exact closed-form leg split
+        # (faithful-by-construction *baseline*, but the GNN barely contributes). When False
+        # (default) the GNN must predict the leg times itself from its embeddings + the
+        # standardised arc priors -- the GNN does the real lifting; the max-plus layer still
+        # guarantees faithful critical-path gradients regardless.
+        self.use_physics_prior = use_physics_prior
         hidden = core.config.hidden
         # Heads see [h_src || h_dst || standardised arc priors] and [h || handling prior].
         # Only the *leg times* are learned; leg energies are read exactly from the inputs.
@@ -180,17 +186,24 @@ class FusedEHGATv2(nn.Module):
         empty_e = arc[:, _E_EMPTY_COL]
         loaded_e = arc[:, _E_LOADED_COL]
 
-        # Residual learning around the exact physics prior -> head only refines an O(1) term,
-        # so C_max (composed by the tropical DP) restores to ~0.99 while staying GNN-driven.
-        empty_prior, loaded_prior = _leg_time_prior(arc[:, _T_TRAVEL_COL], empty_e, loaded_e)
         leg_in = torch.cat([h[src], h[dst], agv_prior[order]], dim=-1)   # [N, 2H + 3]
-        resid = self.leg_head(leg_in) * self.leg_std                      # physical-scale residual
-        empty_t = (empty_prior + resid[:, 0]).clamp_min(0.0)
-        loaded_t = (loaded_prior + resid[:, 1]).clamp_min(0.0)
-
         delay_in = torch.cat([h, hand_prior], dim=-1)                    # [N, H + 1]
-        # Residual around the known handling time (node feature 0).
-        node_delay = (x[:, 0] + self.delay_head(delay_in).squeeze(-1) * self.tau_std).clamp_min(0.0)
+        if self.use_physics_prior:
+            # Baseline: residual around the exact closed-form split (GNN barely contributes).
+            empty_prior, loaded_prior = _leg_time_prior(arc[:, _T_TRAVEL_COL], empty_e, loaded_e)
+            resid = self.leg_head(leg_in) * self.leg_std
+            empty_t = (empty_prior + resid[:, 0]).clamp_min(0.0)
+            loaded_t = (loaded_prior + resid[:, 1]).clamp_min(0.0)
+            node_delay = (x[:, 0] + self.delay_head(delay_in).squeeze(-1) * self.tau_std).clamp_min(0.0)
+        else:
+            # GNN-does-the-work: predict the leg times / delay from embeddings (+ priors as
+            # input features), de-normalised by the leg/tau buffers. The split is a learnable
+            # function of (Travel_Time, energies); the GNN must infer it.
+            times = (self.leg_head(leg_in) * self.leg_std + self.leg_mean).clamp_min(0.0)
+            empty_t, loaded_t = times[:, 0], times[:, 1]
+            node_delay = (
+                self.delay_head(delay_in).squeeze(-1) * self.tau_std + self.tau_mean
+            ).clamp_min(0.0)
         return empty_t, loaded_t, empty_e, loaded_e, node_delay
 
     def forward(self, data: HeteroData) -> FusedPrediction:

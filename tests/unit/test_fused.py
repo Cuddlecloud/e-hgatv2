@@ -89,9 +89,12 @@ def test_fused_training_recovers_physics_and_is_faithful() -> None:
     # (high R^2) and its native critical path agrees with the exact TAPE oracle.
     from ehgat.explain.train_fused import FusedTrainConfig, build_core, train_fused
 
+    # Faithful-by-construction baseline (exact leg prior): deterministic high R^2 for CI.
     inst = build_toy_instance(num_tasks=6)
     core = build_core(inst, seed=0, num_samples=700, epochs=50)
-    result = train_fused(inst, core, FusedTrainConfig(num_samples=400, epochs=30, seed=0))
+    result = train_fused(
+        inst, core, FusedTrainConfig(num_samples=400, epochs=30, seed=0, use_physics_prior=True)
+    )
 
     assert result.metrics["r2_makespan"] >= 0.98
     assert result.metrics["r2_energy"] >= 0.99

@@ -58,6 +58,7 @@ class FusedTrainConfig:
     val_frac: float = 0.2
     alpha_makespan: float = 1.0
     beta_energy: float = 1.0
+    use_physics_prior: bool = False  # False = GNN predicts legs; True = exact-prior baseline
     seed: int = 0
 
 
@@ -163,7 +164,7 @@ def train_fused(
     if core is None:
         core = build_core(instance, seed=config.seed)
 
-    model = FusedEHGATv2(core)
+    model = FusedEHGATv2(core, use_physics_prior=config.use_physics_prior)
     model.freeze_core()
 
     samples = build_samples(instance, config.num_samples, seed=config.seed)

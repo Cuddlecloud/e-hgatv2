@@ -53,6 +53,7 @@ def _summary(num_tasks: int, args: argparse.Namespace) -> dict[str, object]:
             num_samples=args.fused_samples,
             epochs=args.fused_epochs,
             seed=args.seed,
+            use_physics_prior=args.physics_prior,
         ),
     )
 
@@ -77,6 +78,7 @@ def _summary(num_tasks: int, args: argparse.Namespace) -> dict[str, object]:
             "num_agvs": instance.num_agvs,
             "num_qcs": len(instance.qcs),
         },
+        "mode": "physics_prior" if args.physics_prior else "gnn_predicts_legs",
         "calibration": result.metrics,
         "history": result.history,
         "faithfulness": faith,
@@ -114,6 +116,12 @@ def main() -> None:
     parser.add_argument("--fused-samples", type=int, default=800)
     parser.add_argument("--fused-epochs", type=int, default=30)
     parser.add_argument("--explain-samples", type=int, default=32)
+    parser.add_argument(
+        "--physics-prior",
+        action="store_true",
+        help="Use the exact closed-form leg prior (faithful baseline) instead of letting "
+        "the GNN predict the leg times itself (default).",
+    )
     parser.add_argument("--seed", type=int, default=0)
     args = parser.parse_args()
 
