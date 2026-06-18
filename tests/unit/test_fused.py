@@ -42,6 +42,27 @@ def test_fused_makespan_gradients_are_binary_critical_path() -> None:
     assert all(abs(g - 1.0) < 1e-6 for g in ex.loaded_energy_grad)
 
 
+def test_leg_time_prior_is_exact() -> None:
+    # The closed-form empty/loaded split (constant loaded/empty power ratio) must reproduce
+    # the exact physical leg times from the input arc features -- the basis for C_max ~ 0.99.
+    import torch
+
+    from ehgat.explain.fused_ehgat import _leg_time_prior
+    from ehgat.explain.train_fused import _exact_legs
+    from ehgat.surrogate.graph import AGV_EDGE, build_hetero_graph
+
+    inst = build_toy_instance(num_tasks=8)
+    schedule = decode(make_rng(5).random(NUM_BLOCKS * inst.num_tasks), inst)
+    legs, _ = _exact_legs(schedule, inst)  # [N, 4] exact (empty_t, loaded_t, empty_e, loaded_e)
+    data = build_hetero_graph(schedule, inst)
+    arc = data[AGV_EDGE].edge_attr
+    order = torch.argsort(data[AGV_EDGE].edge_index[1])
+    arc = arc[order]
+    empty_p, loaded_p = _leg_time_prior(arc[:, 0], arc[:, 1], arc[:, 2])
+    assert torch.allclose(empty_p, legs[:, 0], atol=1e-4)
+    assert torch.allclose(loaded_p, legs[:, 1], atol=1e-4)
+
+
 def test_fused_pts_is_json_shaped() -> None:
     inst = build_toy_instance(num_tasks=4)
     rng = make_rng(1)
@@ -72,8 +93,8 @@ def test_fused_training_recovers_physics_and_is_faithful() -> None:
     core = build_core(inst, seed=0, num_samples=700, epochs=50)
     result = train_fused(inst, core, FusedTrainConfig(num_samples=400, epochs=30, seed=0))
 
-    assert result.metrics["r2_makespan"] >= 0.9
-    assert result.metrics["r2_energy"] >= 0.95
+    assert result.metrics["r2_makespan"] >= 0.98
+    assert result.metrics["r2_energy"] >= 0.99
 
     rng = make_rng(99)
     schedule = decode(rng.random(NUM_BLOCKS * inst.num_tasks), inst)

@@ -36,6 +36,7 @@ import torch
 from torch import Tensor, nn
 from torch_geometric.data import HeteroData
 
+from ehgat.environment.physics import SPEED_TABLE, SpeedLevel
 from ehgat.explain.event_dag import EventDag, assemble_event_dag, extract_precedence
 from ehgat.explain.tropical_dp import tropical_longest_path
 from ehgat.surrogate.ehgatv2 import EDGE_DIM, EHGATv2
@@ -44,8 +45,23 @@ from ehgat.surrogate.graph import AGV_EDGE, NODE_TYPE, QC_EDGE
 __all__ = ["FusedEHGATv2", "FusedPrediction"]
 
 _N_LEG_TIMES = 2  # (empty_t, loaded_t) -- the GNN-predicted transport overheads
+_T_TRAVEL_COL = 0  # EDGE_FEATURES index of Travel_Time (= empty_t + loaded_t)
 _E_EMPTY_COL = 1  # EDGE_FEATURES index of Empty_Energy
 _E_LOADED_COL = 2  # EDGE_FEATURES index of Loaded_Energy
+
+# Loaded/empty power ratio is constant across all speed levels (physics.py), so the
+# empty/loaded *time* split is a closed form of (Travel_Time, Empty_Energy, Loaded_Energy):
+#     t_loaded = T / (1 + ratio * e_empty / e_loaded),   t_empty = T - t_loaded
+# This exact prior anchors the leg head, which then only learns an O(1) residual.
+_POWER_RATIO = SPEED_TABLE[SpeedLevel.NOMINAL].loaded_power / SPEED_TABLE[SpeedLevel.NOMINAL].empty_power
+_EPS = 1e-6
+
+
+def _leg_time_prior(travel_time: Tensor, empty_e: Tensor, loaded_e: Tensor) -> tuple[Tensor, Tensor]:
+    """Exact closed-form ``(empty_t, loaded_t)`` split from the input arc features."""
+    loaded_t = travel_time / (1.0 + _POWER_RATIO * empty_e / (loaded_e + _EPS))
+    empty_t = (travel_time - loaded_t).clamp_min(0.0)
+    return empty_t, loaded_t.clamp_min(0.0)
 
 
 @dataclass(slots=True)
@@ -151,17 +167,22 @@ class FusedEHGATv2(nn.Module):
         order = torch.argsort(agv_index[1])
         src = agv_index[0][order]
         dst = agv_index[1][order]
-        leg_in = torch.cat([h[src], h[dst], agv_prior[order]], dim=-1)  # [N, 2H + 3]
-        times = (self.leg_head(leg_in) * self.leg_std + self.leg_mean).clamp_min(0.0)  # [N, 2]
+        arc = agv_attr[order]
+        empty_e = arc[:, _E_EMPTY_COL]
+        loaded_e = arc[:, _E_LOADED_COL]
+
+        # Residual learning around the exact physics prior -> head only refines an O(1) term,
+        # so C_max (composed by the tropical DP) restores to ~0.99 while staying GNN-driven.
+        empty_prior, loaded_prior = _leg_time_prior(arc[:, _T_TRAVEL_COL], empty_e, loaded_e)
+        leg_in = torch.cat([h[src], h[dst], agv_prior[order]], dim=-1)   # [N, 2H + 3]
+        resid = self.leg_head(leg_in) * self.leg_std                      # physical-scale residual
+        empty_t = (empty_prior + resid[:, 0]).clamp_min(0.0)
+        loaded_t = (loaded_prior + resid[:, 1]).clamp_min(0.0)
+
         delay_in = torch.cat([h, hand_prior], dim=-1)                    # [N, H + 1]
-        node_delay = (
-            self.delay_head(delay_in).squeeze(-1) * self.tau_std + self.tau_mean
-        ).clamp_min(0.0)
-        # Exact additive leg energies straight from the (physical) input arc features.
-        arc_energy = agv_attr[order]
-        empty_e = arc_energy[:, _E_EMPTY_COL]
-        loaded_e = arc_energy[:, _E_LOADED_COL]
-        return times[:, 0], times[:, 1], empty_e, loaded_e, node_delay
+        # Residual around the known handling time (node feature 0).
+        node_delay = (x[:, 0] + self.delay_head(delay_in).squeeze(-1) * self.tau_std).clamp_min(0.0)
+        return empty_t, loaded_t, empty_e, loaded_e, node_delay
 
     def forward(self, data: HeteroData) -> FusedPrediction:
         """Predict one graph's ``(C_max, E)`` via tropical DP + additive energy.
