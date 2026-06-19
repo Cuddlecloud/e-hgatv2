@@ -192,10 +192,12 @@ def train_fused_batched(
         wait_mean=tr_w.mean(0), wait_std=tr_w.std(0),
     )
 
-    dev = torch.device(device)
-    model = model.to(dev)
+    # Build the batch (frozen-core encode + static features) while everything is on CPU,
+    # THEN move the model and the batched tensors to the target device.
     train_b = build_batch(model, train_samples, instance)
     val_b = build_batch(model, val_samples, instance) if val_samples else None
+    dev = torch.device(device)
+    model = model.to(dev)
 
     def _to(b: BatchedFused) -> None:
         b.leg_in = b.leg_in.to(dev); b.delay_in = b.delay_in.to(dev)
