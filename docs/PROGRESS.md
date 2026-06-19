@@ -72,6 +72,26 @@ magnitude is only approximate** (residual C_max MAE ≈ 26 s comes from per-leg 
 error, which is hard to learn from a static graph). This is the clean ablation that the GNN +
 max-plus layer is load-bearing exactly where the problem stops being separable.
 
+### Scaling study (parallel, `scripts/run_scaling.py`) — the gap WIDENS with N
+Runner fans independent `(N, peak_power, seed)` jobs across a CPU process pool (1 BLAS thread
+each); also `FusedEHGATv2.encode_cached` caches the **frozen** core embeddings across epochs
+(~1.5× faster training, identical R²). 8 jobs (N∈{6,8,10,12} × 2 seeds) finished in ~5 min
+wall (vs ~20+ min sequential). Artifact: `experiments/scaling/scaling_pp30.json`.
+
+Per-N means at peak_power=30 kW (black-box core scalar head vs fused tropical head):
+
+| N | core r²_Cmax | fused r²_Cmax | fused r²_E | leg-Jaccard | Cmax MAE |
+|---|---|---|---|---|---|
+| 6 | 0.523 | 0.868 | 1.000 | 0.875 | 29.7 |
+| 8 | 0.175 | 0.867 | 1.000 | 0.978 | 35.8 |
+| 10 | **−0.276** | 0.853 | 1.000 | 0.937 | 38.0 |
+| 12 | **−0.278** | 0.845 | 1.000 | 0.932 | 52.2 |
+
+Reading: the **black-box MLP head degrades with N and goes negative (worse than the mean) at
+N≥10**, while the **physics-fused head holds ~0.85 flat**, energy exact, attribution faithful
+(Jaccard 0.87–0.98). The fused−core gap widens with scale (0.34→0.69→1.13→1.12) — exactly the
+"GNN + max-plus is load-bearing and *scales*; the black-box collapses" evidence the thesis needs.
+
 Honest scope: Tier-1 eval is still polynomial/cheap, so the surrogate is justified by
 generalization/guidance + faithful attribution, not yet by "amortizing an expensive solve".
 Closing the makespan-magnitude gap to 0.99 (and making per-candidate eval genuinely expensive)
