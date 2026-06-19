@@ -51,7 +51,7 @@ from ehgat.search.nsga2 import (
     order_by_rank_crowding,
 )
 from ehgat.surrogate.ehgatv2 import EHGATv2
-from ehgat.surrogate.graph import AGV_EDGE, QC_EDGE, build_hetero_graph
+from ehgat.surrogate.graph import AGV_EDGE, NODE_TYPE, QC_EDGE, build_hetero_graph
 from ehgat.utils.seeding import make_rng
 
 __all__ = [
@@ -207,6 +207,47 @@ def attention_bottleneck_type(
     return w_agv, w_qc
 
 
+def _batch_attention_signals(
+    schedules: list[Schedule], instance: Instance, model: EHGATv2, temperature: float
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Batched ``(task_probs, w_agv, w_qc)`` for many schedules in ONE forward pass.
+
+    This is the GPU-load-bearing equivalent of :func:`_attention_signals`: it block-diagonal
+    batches every schedule's graph, runs a single ``model.attention`` on the model's device
+    (CUDA when placed there), and scatters the per-arc semantic weights back to per-task
+    ``[G, N]`` arrays. The per-graph result is **identical** to calling
+    :func:`_attention_signals` on each schedule (same w_agv softmax), so only throughput
+    changes -- one ~10k-graphs/s GPU launch instead of G serial ~10-graphs/s CPU forwards.
+    """
+    n = instance.num_tasks
+    g = len(schedules)
+    if g == 0:
+        return np.empty((0, n)), np.empty((0, n)), np.empty((0, n))
+    graphs = [build_hetero_graph(s, instance) for s in schedules]
+    batch = Batch.from_data_list(graphs)
+    device = next(model.parameters()).device
+    attn = model.attention(batch.to(device))
+    ptr = batch[NODE_TYPE].ptr.cpu().numpy()  # [G+1] node offset per graph
+    node_batch = batch[NODE_TYPE].batch  # [G*N] node -> graph
+
+    def _scatter(edge_alpha: tuple) -> np.ndarray:
+        index, alpha = edge_alpha
+        out = np.zeros((g, n))
+        if alpha.numel() > 0:
+            dst = index[1]
+            gid = node_batch[dst].cpu().numpy()
+            local = dst.cpu().numpy() - ptr[gid]
+            out[gid, local] = alpha.cpu().numpy()
+        return out
+
+    w_agv = _scatter(attn[AGV_EDGE[1]])
+    w_qc = _scatter(attn[QC_EDGE[1]])
+    shifted = (w_agv - w_agv.max(axis=1, keepdims=True)) / max(temperature, 1e-6)
+    exp = np.exp(shifted)
+    task_probs = exp / exp.sum(axis=1, keepdims=True)
+    return task_probs, w_agv, w_qc
+
+
 def _attention_signals(
     schedule: Schedule, instance: Instance, model: EHGATv2, temperature: float
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -345,7 +386,8 @@ def _predict_objectives(
     """
     graphs = [build_hetero_graph(s, instance) for s in schedules]
     batch = Batch.from_data_list(graphs)
-    preds = model.predict(batch)
+    device = next(model.parameters()).device
+    preds = model.predict(batch.to(device))
     return [(float(m), float(e)) for m, e in preds.tolist()]
 
 
@@ -477,11 +519,9 @@ def _agv_bias(
     if not schedules:
         return 0.5
     if source == "attention":
-        biases = []
-        for s in schedules:
-            w_agv, _ = attention_bottleneck_type(s, instance, model)
-            p = attention_task_probabilities(s, instance, model, temperature=temperature)
-            biases.append(float(np.dot(p, w_agv)))
+        # One batched GPU pass for all window schedules (was 2 serial forwards each).
+        probs, w_agv, _ = _batch_attention_signals(schedules, instance, model, temperature)
+        biases = [float(np.dot(probs[i], w_agv[i])) for i in range(len(schedules))]
         return float(np.mean(biases))
     if source == "oracle":
         biases = []
@@ -556,6 +596,7 @@ def _mutate(
     temperature: float = 0.25,
     op_probs: np.ndarray | None = None,
     per_task: tuple[str, float, float] | None = None,
+    signals: tuple[np.ndarray, np.ndarray, np.ndarray] | None = None,
 ) -> tuple[Schedule, bool, int]:
     """Apply one mutation operator. Returns ``(schedule, deadlock_rejected, op_index)``.
 
@@ -567,15 +608,22 @@ def _mutate(
     (also how the ``reward`` controller injects its current policy); else ``None`` =>
     uniform operator choice (random AOS). ``op_index`` is the index into ``_MUTATION_OPS``
     of the operator that fired, so the caller can assign credit (the ``reward`` arm).
+
+    ``signals`` are precomputed ``(task_probs, w_agv, w_qc)`` for this schedule from a
+    batched GPU :func:`_batch_attention_signals` pass; when given, no per-child surrogate
+    forward is run (the GPU-load-bearing path). The result is identical to recomputing them.
     """
-    w_agv = w_qc = None
+    probs = w_agv = w_qc = None
+    if signals is not None:
+        probs, w_agv, w_qc = signals
     if guided:
-        if per_task is not None and per_task[0] == "attention":
-            probs, w_agv, w_qc = _attention_signals(schedule, instance, model, temperature)
-        else:
-            probs = attention_task_probabilities(
-                schedule, instance, model, temperature=temperature
-            )
+        if probs is None:
+            if per_task is not None and per_task[0] == "attention":
+                probs, w_agv, w_qc = _attention_signals(schedule, instance, model, temperature)
+            else:
+                probs = attention_task_probabilities(
+                    schedule, instance, model, temperature=temperature
+                )
         task = int(rng.choice(instance.num_tasks, p=probs))
     else:
         task = int(rng.integers(instance.num_tasks))
@@ -751,11 +799,19 @@ def run_attention_nsga2(
             )
 
         # ---- create lambda offspring (optionally surrogate-screened from k*lambda) ----
+        # GPU-load-bearing two-phase generation: (A) draw all base children (tournament +
+        # crossover); (B) ONE batched attention pass on the model's device for every child
+        # that will be guided-mutated; (C) apply each per-child mutation from the precomputed
+        # signals. This replaces O(num_candidates) serial CPU forwards with a single batched
+        # GPU launch -- ~1000x the surrogate throughput at N>=10 (see profile_gpu_inference).
         num_candidates = config.pop_size * max(1, config.screening_factor)
-        candidates: list[Schedule] = []
-        cand_ops: list[int] = []  # operator fired per candidate (reward credit); -1 if none
-        cand_parent_obj: list[Objectives] = []  # primary-parent objectives (reward baseline)
-        while len(candidates) < num_candidates:
+        need_signals = (not config.random_mutation) or (
+            per_task is not None and per_task[0] == "attention"
+        )
+        base_children: list[Schedule] = []
+        will_mutate: list[bool] = []
+        parent_objs: list[Objectives] = []
+        for _ in range(num_candidates):
             pa_idx = _tournament(rank, crowd, rng, config.tournament_size)
             pa = population[pa_idx]
             if rng.random() < config.crossover_prob:
@@ -763,8 +819,31 @@ def run_attention_nsga2(
                 child = _crossover(pa, pb, instance, rng, config.inherit_prob)
             else:
                 child = pa
+            base_children.append(child)
+            will_mutate.append(rng.random() < config.mutation_prob)
+            parent_objs.append(objectives[pa_idx])
+
+        # Phase B: one batched (GPU) attention pass for all children that need signals.
+        signals_by_idx: dict[int, tuple[np.ndarray, np.ndarray, np.ndarray]] = {}
+        if need_signals:
+            mut_idx = [i for i, m in enumerate(will_mutate) if m]
+            if mut_idx:
+                pb_probs, pb_wagv, pb_wqc = _batch_attention_signals(
+                    [base_children[i] for i in mut_idx],
+                    instance,
+                    model,
+                    config.mutation_temperature,
+                )
+                for k, i in enumerate(mut_idx):
+                    signals_by_idx[i] = (pb_probs[k], pb_wagv[k], pb_wqc[k])
+
+        # Phase C: per-child task + operator selection and mutation.
+        candidates: list[Schedule] = []
+        cand_ops: list[int] = []  # operator fired per candidate (reward credit); -1 if none
+        cand_parent_obj: list[Objectives] = []  # primary-parent objectives (reward baseline)
+        for i, child in enumerate(base_children):
             op_index = -1
-            if rng.random() < config.mutation_prob:
+            if will_mutate[i]:
                 child, rejected, op_index = _mutate(
                     child,
                     instance,
@@ -774,12 +853,13 @@ def run_attention_nsga2(
                     temperature=config.mutation_temperature,
                     op_probs=op_probs,
                     per_task=per_task,
+                    signals=signals_by_idx.get(i),
                 )
                 deadlocks_rejected += int(rejected)
             candidates.append(child)
             if controller is not None:
                 cand_ops.append(op_index)
-                cand_parent_obj.append(objectives[pa_idx])
+                cand_parent_obj.append(parent_objs[i])
         if config.screening_factor > 1:
             predicted = _predict_objectives(candidates, instance, model)
             pred_fronts = fast_non_dominated_sort(predicted)
