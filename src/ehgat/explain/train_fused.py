@@ -186,6 +186,13 @@ def train_fused(
         tau_std=train_tau.std(),
     )
 
+    # Under peak-power coupling the true makespan exceeds the precedence-only longest
+    # path (resource waits with no closed form). Anchoring tau rigidly to the handling
+    # time would then fight the makespan target, so we free the node delays to ABSORB
+    # the power-induced waits (the "effective delay" model). Leg travel times + energy
+    # stay anchored (they are exact regardless of the budget).
+    coupled = instance.peak_power is not None
+
     optimizer = torch.optim.Adam(
         model.head_parameters(), lr=config.lr, weight_decay=config.weight_decay
     )
@@ -208,12 +215,15 @@ def train_fused(
                 s = train_samples[idx]
                 out = model(s.data)
                 leg_term = (((out.leg_times - s.legs[:, :2]) / scales["leg"]) ** 2).mean()
-                tau_term = (((out.node_delay - s.tau) / scales["tau"]) ** 2).mean()
                 cmax_term = ((out.makespan - s.objectives[0]) / scales["makespan"]) ** 2
                 e_term = ((out.energy - s.objectives[1]) / scales["energy"]) ** 2
                 batch_loss = batch_loss + (
-                    leg_term + tau_term + config.alpha_makespan * cmax_term + config.beta_energy * e_term
+                    leg_term + config.alpha_makespan * cmax_term + config.beta_energy * e_term
                 )
+                if not coupled:
+                    # Uncoupled: tau == handling time exactly, so anchor it for identifiability.
+                    tau_term = (((out.node_delay - s.tau) / scales["tau"]) ** 2).mean()
+                    batch_loss = batch_loss + tau_term
             batch_loss = batch_loss / max(len(chunk), 1)
             batch_loss.backward()
             optimizer.step()

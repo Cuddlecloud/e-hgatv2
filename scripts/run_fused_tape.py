@@ -42,7 +42,7 @@ OUT_DIR = Path(__file__).resolve().parents[1] / "experiments" / "fused_tape"
 
 
 def _summary(num_tasks: int, args: argparse.Namespace) -> dict[str, object]:
-    instance = build_toy_instance(num_tasks=num_tasks)
+    instance = build_toy_instance(num_tasks=num_tasks, peak_power=args.peak_power)
     core = build_core(
         instance, seed=args.seed, num_samples=args.core_samples, epochs=args.core_epochs
     )
@@ -79,6 +79,7 @@ def _summary(num_tasks: int, args: argparse.Namespace) -> dict[str, object]:
             "num_qcs": len(instance.qcs),
         },
         "mode": "physics_prior" if args.physics_prior else "gnn_predicts_legs",
+        "peak_power": args.peak_power,
         "calibration": result.metrics,
         "history": result.history,
         "faithfulness": faith,
@@ -122,6 +123,13 @@ def main() -> None:
         help="Use the exact closed-form leg prior (faithful baseline) instead of letting "
         "the GNN predict the leg times itself (default).",
     )
+    parser.add_argument(
+        "--peak-power",
+        type=float,
+        default=None,
+        help="Fleet-wide instantaneous power budget (kW). Omit for the uncoupled "
+        "(closed-form) physics; set it to engage the nonlinear power-coupled simulator.",
+    )
     parser.add_argument("--seed", type=int, default=0)
     args = parser.parse_args()
 
@@ -129,7 +137,8 @@ def main() -> None:
     for num_tasks in args.tasks:
         payload = _summary(num_tasks, args)
         _print(payload)
-        out_path = OUT_DIR / f"fused_tape_n{num_tasks}.json"
+        tag = f"_pp{args.peak_power:g}" if args.peak_power is not None else ""
+        out_path = OUT_DIR / f"fused_tape_n{num_tasks}{tag}.json"
         out_path.write_text(json.dumps(payload, indent=2))
         console.print(f"[green]wrote[/green] {out_path}")
 
