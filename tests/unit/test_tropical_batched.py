@@ -27,18 +27,19 @@ def _random_dag(n: int, gen: torch.Generator) -> tuple[torch.Tensor, torch.Tenso
 def test_batched_matches_reference_values_and_grads() -> None:
     gen = torch.Generator().manual_seed(0)
     sizes = [4, 7, 5, 9, 6]
-    node_ws, edge_ws, edge_indices = [], [], []
+    node_ws, edge_ws, local_eis, offset_eis = [], [], [], []
     offset = 0
     for n in sizes:
         nw, ei, ew = _random_dag(n, gen)
         node_ws.append(nw)
         edge_ws.append(ew)
-        edge_indices.append(ei + offset)
+        local_eis.append(ei)
+        offset_eis.append(ei + offset)
         offset += n
 
-    # Per-graph reference: run each DAG independently, collect values + grads.
+    # Per-graph reference: run each DAG independently (LOCAL indices), collect values + grads.
     ref_x, ref_gn, ref_ge = [], [], []
-    for nw, ei, ew in zip([n.clone() for n in node_ws], edge_indices, edge_ws, strict=True):
+    for nw, ei, ew in zip(node_ws, local_eis, edge_ws, strict=True):
         nwv = nw.clone().requires_grad_(True)
         ewv = ew.clone().requires_grad_(True)
         x = tropical_longest_path(nwv, ei, ewv)
@@ -50,10 +51,10 @@ def test_batched_matches_reference_values_and_grads() -> None:
     ref_gn = torch.cat(ref_gn)
     ref_ge = torch.cat(ref_ge)
 
-    # Batched: one block-diagonal graph.
+    # Batched: one block-diagonal graph (OFFSET indices).
     bnw = torch.cat(node_ws).clone().requires_grad_(True)
     bew = torch.cat(edge_ws).clone().requires_grad_(True)
-    bei = torch.cat(edge_indices, dim=1)
+    bei = torch.cat(offset_eis, dim=1)
     sched = build_batch_schedule(bei, bnw.numel())
     bx = batched_longest_path(bnw, bew, sched)
     bx.sum().backward()
