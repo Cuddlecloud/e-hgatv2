@@ -62,7 +62,11 @@ def explain_fused(
 
     for leaf in (out.empty_t, out.loaded_t, out.empty_e, out.loaded_e, out.node_delay):
         leaf.retain_grad()
-    out.dag.edge_weights.retain_grad()
+    # In the coupled DAG leg times are NODE weights and the edges are zero-weight structural
+    # arcs (requires_grad=False) -- the critical-path signal lives in the leg-time grads, so
+    # only retain edge grads when they actually carry gradient (uncoupled leg-on-edge DAG).
+    if out.dag.edge_weights.requires_grad:
+        out.dag.edge_weights.retain_grad()
 
     out.makespan.backward(retain_graph=True)
     node_grad = _grad_tuple(out.node_delay)

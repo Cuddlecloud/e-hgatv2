@@ -155,10 +155,16 @@ def explain_schedule_coupled(
     makespan = x[dag.completion_nodes].max()
     energy = (empty_e + loaded_e).sum()
 
-    dag.edge_weights.retain_grad()
+    # Coupled DAG: leg times are node weights; structural edges carry no gradient.
+    if dag.edge_weights.requires_grad:
+        dag.edge_weights.retain_grad()
     makespan.backward(retain_graph=True)
     node_grad = tuple(float(v) for v in tau.grad.detach())
-    edge_grad = tuple(float(v) for v in dag.edge_weights.grad.detach())
+    edge_grad = (
+        tuple(float(v) for v in dag.edge_weights.grad.detach())
+        if dag.edge_weights.grad is not None
+        else tuple(0.0 for _ in range(dag.edge_weights.numel()))
+    )
     empty_time_grad = tuple(float(v) for v in empty_t.grad.detach())
     loaded_time_grad = tuple(float(v) for v in loaded_t.grad.detach())
 
