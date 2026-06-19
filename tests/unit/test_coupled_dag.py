@@ -64,6 +64,36 @@ def test_coupled_dag_reproduces_simulator_makespan() -> None:
             )
 
 
+def test_effective_leg_waits_reproduce_makespan_without_arcs() -> None:
+    """leg_time + power_wait as the leg duration reproduces makespan over precedence only.
+
+    This is the learnable formulation: the surrogate predicts a continuous per-leg wait
+    instead of a discrete resolution-arc set, yet the max-plus longest path is still exact.
+    """
+    base = build_toy_instance(num_tasks=8)
+    for budget in (25.0, 30.0, 45.0):
+        inst = dataclasses.replace(base, peak_power=budget)
+        rng = make_rng(int(budget) + 100)
+        for _ in range(30):
+            sched = decode(rng.random(4 * inst.num_tasks), inst)
+            ev = evaluate(sched, inst)
+            agv_prev, qc_prev, _ = build_precedence(
+                sched.agv_sequences, sched.qc_sequences, inst.num_tasks
+            )
+            is_load = torch.tensor(
+                [t.kind is TaskKind.LOAD for t in inst.tasks], dtype=torch.bool
+            )
+            empty_t, loaded_t, tau = _legs_tau(sched, inst)
+            empty_eff = empty_t + torch.tensor(ev.wait_empty, dtype=torch.float64)
+            loaded_eff = loaded_t + torch.tensor(ev.wait_loaded, dtype=torch.float64)
+            dag = assemble_coupled_event_dag(
+                is_load, agv_prev, qc_prev, empty_eff, loaded_eff, tau, []  # no power arcs
+            )
+            x = tropical_longest_path(dag.node_weights, dag.edge_index, dag.edge_weights)
+            makespan = float(x[dag.completion_nodes].max())
+            assert abs(makespan - ev.makespan) < 1e-6, f"budget={budget}: {makespan} vs {ev.makespan}"
+
+
 def test_coupled_dag_gradient_is_binary_critical_path() -> None:
     """dC_max/d(leg/tau) is 1 on the coupled critical path, 0 off it (faithful)."""
     base = build_toy_instance(num_tasks=8)

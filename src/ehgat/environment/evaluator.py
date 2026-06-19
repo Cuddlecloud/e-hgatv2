@@ -81,6 +81,12 @@ class Evaluation:
     empty_start: tuple[float, ...] = ()
     loaded_start: tuple[float, ...] = ()
     power_arcs: tuple[tuple[int, int, int, int], ...] = ()
+    # Per-leg power wait = realized leg start minus its precedence-ready time (>=0). Adding
+    # it to the leg's travel time as an *effective* duration lets the precedence-only
+    # activity DAG reproduce the coupled makespan exactly -- a continuous, learnable target
+    # for the surrogate (no need to predict discrete resolution arcs).
+    wait_empty: tuple[float, ...] = ()
+    wait_loaded: tuple[float, ...] = ()
 
     @property
     def objectives(self) -> tuple[float, float]:
@@ -371,15 +377,21 @@ def _evaluate_power_coupled(schedule: Schedule, instance: Instance) -> Evaluatio
     arr_dropoff = [0.0] * n
     completion = [0.0] * n
     agv_free_after = [0.0] * n
+    wait_empty = [0.0] * n
+    wait_loaded = [0.0] * n
     for j in range(n):
+        prec_e = 0.0 if agv_prev[j] < 0 else finish[(agv_prev[j], "L")]
+        wait_empty[j] = max(0.0, start[(j, "E")] - prec_e)
         if instance.tasks[j].kind is TaskKind.LOAD:
             arr_dropoff[j] = finish[(j, "L")]
             qc_finish[j] = finish[(j, "H")]
             completion[j] = qc_finish[j]
+            wait_loaded[j] = max(0.0, start[(j, "L")] - finish[(j, "E")])
         else:
             qc_finish[j] = finish[(j, "H")]
             arr_dropoff[j] = finish[(j, "L")]
             completion[j] = arr_dropoff[j]
+            wait_loaded[j] = max(0.0, start[(j, "L")] - finish[(j, "H")])
         agv_free_after[j] = finish[(j, "L")]
 
     return Evaluation(
@@ -398,4 +410,6 @@ def _evaluate_power_coupled(schedule: Schedule, instance: Instance) -> Evaluatio
         empty_start=tuple(start[(j, "E")] for j in range(n)),
         loaded_start=tuple(start[(j, "L")] for j in range(n)),
         power_arcs=tuple(power_arcs),
+        wait_empty=tuple(wait_empty),
+        wait_loaded=tuple(wait_loaded),
     )
