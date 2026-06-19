@@ -42,6 +42,44 @@ The point vs Module-6 Sobol: this is **model-native and scalable** — the GNN's
 give per-leg/edge Pareto Tension Scores (PTS) in one backward pass.
 Run: `python scripts/run_fused_tape.py --tasks 6 10 20` → `experiments/fused_tape/fused_tape_n{N}.json`.
 
+### Tier-1 nonlinear extension — peak-power coupling (the "GNN is load-bearing" ablation)
+To make the surrogate genuinely necessary we added a **nonlinear, non-separable** objective: a
+fleet-wide instantaneous power budget (`Instance.peak_power`). A deterministic event-driven
+simulator (`environment/evaluator.py::_evaluate_power_coupled`) resolves the resulting resource
+contention (greedy SGS; exhibits the classic **Graham anomaly**, so makespan is non-monotone in
+the budget). The coupled makespan has **no closed form** — it is the longest path over an
+activity DAG *plus* power-resolution waits.
+
+Faithful composition WITHOUT discrete arcs: each leg's **effective** max-plus weight is
+`leg_time + power_wait`, which lets the precedence-only coupled activity DAG
+(`event_dag.py::assemble_coupled_event_dag`) reproduce the coupled makespan **exactly** (proven
+in `tests/unit/test_coupled_dag.py`). The GNN therefore predicts a continuous **per-leg power
+wait** (`fused_ehgat.py::wait_head`) anchored to the simulator's true waits; the coupled oracle
+(`tape_explainer.py::explain_schedule_coupled`) provides the ground-truth coupled critical path.
+
+**Validated on pod (N=8, peak_power=30 kW, `scripts/diag_coupled.py`):**
+
+| model | r2_makespan | r2_energy | leg-critical Jaccard |
+|---|---|---|---|
+| frozen core **black-box MLP head** | **0.235** | 0.999 | — |
+| **fused tropical wait-head** | **0.872** | 1.000 | **1.000** |
+
+Reading: under genuine nonlinear coupling the black-box scalar head **collapses to R²≈0.23**,
+while the physics-fused tropical composition lifts makespan to **0.87** and — crucially — gives a
+**leg-critical Jaccard of 1.00**, i.e. the model's critical path is *exactly* the coupled
+oracle's on every test schedule. **Attribution is faithful-by-construction even when makespan
+magnitude is only approximate** (residual C_max MAE ≈ 26 s comes from per-leg wait-magnitude
+error, which is hard to learn from a static graph). This is the clean ablation that the GNN +
+max-plus layer is load-bearing exactly where the problem stops being separable.
+
+Honest scope: Tier-1 eval is still polynomial/cheap, so the surrogate is justified by
+generalization/guidance + faithful attribution, not yet by "amortizing an expensive solve".
+Closing the makespan-magnitude gap to 0.99 (and making per-candidate eval genuinely expensive)
+is the **Tier-2** step: an inner optimal-timing solve under cumulative power (RCPSP/CP-SAT
+labels) or stochastic replications. `oracle.py` (exact Pareto front) is **uncoupled-only** — its
+speed-DP separability breaks under coupling; the per-schedule simulator is the coupled ground
+truth.
+
 ## Req 2 — landscape / feature-importance (DONE, headline results) — Module 6
 `src/ehgat/benchmark/landscape.py` + `scripts/run_landscape.py` + `tests/unit/test_landscape.py`
 (11 tests pass on pod). Computed **on the exact Max-Plus evaluator** (the SCM from decision
