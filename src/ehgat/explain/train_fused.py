@@ -43,6 +43,7 @@ class FusedSample:
     legs: Tensor          # [N, 4] exact (empty_t, loaded_t, empty_e, loaded_e)
     tau: Tensor           # [N] exact handling delay
     objectives: Tensor    # [2] exact (C_max, E)
+    waits: Tensor         # [N, 2] exact (empty_wait, loaded_wait); zeros when uncoupled
 
 
 @dataclass(frozen=True)
@@ -104,12 +105,20 @@ def build_samples(instance: Instance, num_samples: int, *, seed: int = 0) -> lis
         schedule = decode(keys, instance)
         evaluation = evaluate(schedule, instance)
         legs, tau = _exact_legs(schedule, instance)
+        if evaluation.wait_empty:
+            waits = torch.tensor(
+                list(zip(evaluation.wait_empty, evaluation.wait_loaded, strict=True)),
+                dtype=torch.float32,
+            )
+        else:
+            waits = torch.zeros((n, 2), dtype=torch.float32)
         samples.append(
             FusedSample(
                 data=build_hetero_graph(schedule, instance),
                 legs=legs,
                 tau=tau,
                 objectives=torch.tensor(list(evaluation.objectives), dtype=torch.float32),
+                waits=waits,
             )
         )
     return samples
@@ -120,10 +129,12 @@ def _scales(samples: list[FusedSample]) -> dict[str, Tensor]:
     eps = 1e-6
     legs = torch.cat([s.legs[:, :2] for s in samples], dim=0)     # [sum N, 2] times only
     tau = torch.cat([s.tau for s in samples], dim=0)              # [sum N]
+    waits = torch.cat([s.waits for s in samples], dim=0)          # [sum N, 2]
     objs = torch.stack([s.objectives for s in samples], dim=0)    # [S, 2]
     return {
         "leg": legs.std(dim=0).clamp_min(eps),
         "tau": tau.std().clamp_min(eps),
+        "wait": waits.std(dim=0).clamp_min(eps),
         "makespan": objs[:, 0].std().clamp_min(eps),
         "energy": objs[:, 1].std().clamp_min(eps),
     }
@@ -164,7 +175,13 @@ def train_fused(
     if core is None:
         core = build_core(instance, seed=config.seed)
 
-    model = FusedEHGATv2(core, use_physics_prior=config.use_physics_prior)
+    # Under peak-power coupling the GNN predicts an explicit per-leg power wait; the leg's
+    # effective max-plus weight (leg_time + wait) lets the precedence-only coupled DAG
+    # reproduce the coupled makespan exactly. tau (QC handling) stays exact either way --
+    # only AGV legs contend for power -- so it is anchored in both modes.
+    coupled = instance.peak_power is not None
+
+    model = FusedEHGATv2(core, use_physics_prior=config.use_physics_prior, coupled=coupled)
     model.freeze_core()
 
     samples = build_samples(instance, config.num_samples, seed=config.seed)
@@ -179,19 +196,15 @@ def train_fused(
     # De-normalisation buffers so the heads predict O(1) residuals (stable, fast to fit).
     train_times = torch.cat([s.legs[:, :2] for s in train_samples], dim=0)
     train_tau = torch.cat([s.tau for s in train_samples], dim=0)
+    train_waits = torch.cat([s.waits for s in train_samples], dim=0)
     model.set_leg_normalization(
         leg_mean=train_times.mean(dim=0),
         leg_std=train_times.std(dim=0),
         tau_mean=train_tau.mean(),
         tau_std=train_tau.std(),
+        wait_mean=train_waits.mean(dim=0),
+        wait_std=train_waits.std(dim=0),
     )
-
-    # Under peak-power coupling the true makespan exceeds the precedence-only longest
-    # path (resource waits with no closed form). Anchoring tau rigidly to the handling
-    # time would then fight the makespan target, so we free the node delays to ABSORB
-    # the power-induced waits (the "effective delay" model). Leg travel times + energy
-    # stay anchored (they are exact regardless of the budget).
-    coupled = instance.peak_power is not None
 
     optimizer = torch.optim.Adam(
         model.head_parameters(), lr=config.lr, weight_decay=config.weight_decay
@@ -215,15 +228,20 @@ def train_fused(
                 s = train_samples[idx]
                 out = model(s.data)
                 leg_term = (((out.leg_times - s.legs[:, :2]) / scales["leg"]) ** 2).mean()
+                tau_term = (((out.node_delay - s.tau) / scales["tau"]) ** 2).mean()
                 cmax_term = ((out.makespan - s.objectives[0]) / scales["makespan"]) ** 2
                 e_term = ((out.energy - s.objectives[1]) / scales["energy"]) ** 2
                 batch_loss = batch_loss + (
-                    leg_term + config.alpha_makespan * cmax_term + config.beta_energy * e_term
+                    leg_term
+                    + tau_term
+                    + config.alpha_makespan * cmax_term
+                    + config.beta_energy * e_term
                 )
-                if not coupled:
-                    # Uncoupled: tau == handling time exactly, so anchor it for identifiability.
-                    tau_term = (((out.node_delay - s.tau) / scales["tau"]) ** 2).mean()
-                    batch_loss = batch_loss + tau_term
+                if coupled:
+                    # Anchor the per-leg power waits to the simulator's exact resource delays
+                    # so the effective leg weights recover the coupled critical path densely.
+                    wait_term = (((out.leg_waits - s.waits) / scales["wait"]) ** 2).mean()
+                    batch_loss = batch_loss + wait_term
             batch_loss = batch_loss / max(len(chunk), 1)
             batch_loss.backward()
             optimizer.step()

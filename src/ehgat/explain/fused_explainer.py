@@ -22,7 +22,11 @@ from ehgat.environment.decoder import Schedule
 from ehgat.environment.instance import Instance
 from ehgat.explain.fused_ehgat import FusedEHGATv2
 from ehgat.explain.pts_calculator import ParetoPoint, pareto_tension_scores
-from ehgat.explain.tape_explainer import TapeExplanation, explain_schedule
+from ehgat.explain.tape_explainer import (
+    TapeExplanation,
+    explain_schedule,
+    explain_schedule_coupled,
+)
 from ehgat.surrogate.graph import AGV_EDGE, build_hetero_graph
 
 __all__ = [
@@ -143,7 +147,12 @@ def faithfulness_report(
     the local physical attributes are anchored.
     """
     fused = explain_fused(model, schedule, instance)
-    exact = explain_schedule(schedule, instance)
+    # Under coupling the true critical path runs over the coupled activity DAG (leg+wait
+    # effective weights); compare against the matching coupled oracle, not the uncoupled one.
+    if instance.peak_power is not None:
+        exact = explain_schedule_coupled(schedule, instance)
+    else:
+        exact = explain_schedule(schedule, instance)
 
     fused_legs = _critical_set(fused.empty_time_grad) | {
         i + len(fused.empty_time_grad) for i in _critical_set(fused.loaded_time_grad)

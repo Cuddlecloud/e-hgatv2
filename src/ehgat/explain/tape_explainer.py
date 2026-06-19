@@ -9,14 +9,20 @@ import torch
 from torch import Tensor, nn
 
 from ehgat.environment.decoder import Schedule
-from ehgat.environment.evaluator import build_precedence
+from ehgat.environment.evaluator import build_precedence, evaluate
 from ehgat.environment.instance import Instance, TaskKind
 from ehgat.environment.physics import leg_energy, travel_time
-from ehgat.explain.event_dag import assemble_event_dag
+from ehgat.explain.event_dag import assemble_coupled_event_dag, assemble_event_dag
 from ehgat.explain.tropical_dp import tropical_longest_path
 from ehgat.surrogate.graph import AGV_EDGE, NODE_TYPE, QC_EDGE, build_hetero_graph
 
-__all__ = ["TapeExplanation", "explain_schedule", "explain_schedules", "surrogate_feature_gradients"]
+__all__ = [
+    "TapeExplanation",
+    "explain_schedule",
+    "explain_schedule_coupled",
+    "explain_schedules",
+    "surrogate_feature_gradients",
+]
 
 
 @dataclass(frozen=True, slots=True)
@@ -117,6 +123,58 @@ def explain_schedule(
         event_edge_grad=edge_grad,
         completion_nodes=tuple(int(v) for v in dag.completion_nodes.tolist()),
         surrogate_grad=surrogate_feature_gradients(model, schedule, instance) if model is not None else None,
+    )
+
+
+def explain_schedule_coupled(
+    schedule: Schedule, instance: Instance, *, dtype: torch.dtype = torch.float64
+) -> TapeExplanation:
+    """Exact TAPE oracle under peak-power coupling.
+
+    The simulator's per-leg power waits are folded into each leg's effective duration
+    (``leg_time + wait``) so the precedence-only coupled activity DAG reproduces the coupled
+    makespan exactly; its subgradients w.r.t. the leg *times* are the true coupled
+    critical-path indicators. ``tau`` (QC handling) stays exact and differentiable.
+    """
+    ev = evaluate(schedule, instance)
+    empty_t, loaded_t, empty_e, loaded_e = _leg_tensors(schedule, instance, dtype=dtype)
+    tau = _tau_tensor(instance, dtype=dtype)
+    agv_prev, qc_prev, _ = build_precedence(
+        schedule.agv_sequences, schedule.qc_sequences, instance.num_tasks
+    )
+    is_load = torch.tensor(
+        [task.kind is TaskKind.LOAD for task in instance.tasks], dtype=torch.bool
+    )
+    wait_e = torch.tensor(ev.wait_empty, dtype=dtype)
+    wait_l = torch.tensor(ev.wait_loaded, dtype=dtype)
+    dag = assemble_coupled_event_dag(
+        is_load, agv_prev, qc_prev, empty_t + wait_e, loaded_t + wait_l, tau, []
+    )
+
+    x = tropical_longest_path(dag.node_weights, dag.edge_index, dag.edge_weights)
+    makespan = x[dag.completion_nodes].max()
+    energy = (empty_e + loaded_e).sum()
+
+    dag.edge_weights.retain_grad()
+    makespan.backward(retain_graph=True)
+    node_grad = tuple(float(v) for v in tau.grad.detach())
+    edge_grad = tuple(float(v) for v in dag.edge_weights.grad.detach())
+    empty_time_grad = tuple(float(v) for v in empty_t.grad.detach())
+    loaded_time_grad = tuple(float(v) for v in loaded_t.grad.detach())
+
+    energy.backward()
+    return TapeExplanation(
+        makespan=float(makespan.detach()),
+        energy=float(energy.detach()),
+        node_grad=node_grad,
+        empty_time_grad=empty_time_grad,
+        loaded_time_grad=loaded_time_grad,
+        empty_energy_grad=tuple(float(v) for v in empty_e.grad.detach()),
+        loaded_energy_grad=tuple(float(v) for v in loaded_e.grad.detach()),
+        event_edges=tuple(dag.meta),
+        event_edge_grad=edge_grad,
+        completion_nodes=tuple(int(v) for v in dag.completion_nodes.tolist()),
+        surrogate_grad=None,
     )
 
 

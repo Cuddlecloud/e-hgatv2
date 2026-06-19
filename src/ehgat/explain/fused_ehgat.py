@@ -37,7 +37,12 @@ from torch import Tensor, nn
 from torch_geometric.data import HeteroData
 
 from ehgat.environment.physics import SPEED_TABLE, SpeedLevel
-from ehgat.explain.event_dag import EventDag, assemble_event_dag, extract_precedence
+from ehgat.explain.event_dag import (
+    EventDag,
+    assemble_coupled_event_dag,
+    assemble_event_dag,
+    extract_precedence,
+)
 from ehgat.explain.tropical_dp import tropical_longest_path
 from ehgat.surrogate.ehgatv2 import EDGE_DIM, EHGATv2
 from ehgat.surrogate.graph import AGV_EDGE, NODE_TYPE, QC_EDGE
@@ -89,6 +94,8 @@ class FusedPrediction:
     empty_e: Tensor           # [N]
     loaded_e: Tensor          # [N]
     dag: EventDag             # assembled event DAG (edge_weights carry leg-time grads)
+    wait_empty: Tensor        # [N]  predicted empty-leg power wait (0 when uncoupled)
+    wait_loaded: Tensor       # [N]  predicted loaded-leg power wait (0 when uncoupled)
 
     @property
     def objectives(self) -> Tensor:
@@ -99,6 +106,11 @@ class FusedPrediction:
     def leg_times(self) -> Tensor:
         """``[N, 2]`` GNN-predicted ``(empty_t, loaded_t)`` for time anchoring."""
         return torch.stack([self.empty_t, self.loaded_t], dim=-1)
+
+    @property
+    def leg_waits(self) -> Tensor:
+        """``[N, 2]`` GNN-predicted ``(empty_wait, loaded_wait)`` for power-wait anchoring."""
+        return torch.stack([self.wait_empty, self.wait_loaded], dim=-1)
 
 
 class FusedEHGATv2(nn.Module):
@@ -118,8 +130,12 @@ class FusedEHGATv2(nn.Module):
     leg_std: Tensor
     tau_mean: Tensor
     tau_std: Tensor
+    wait_mean: Tensor
+    wait_std: Tensor
 
-    def __init__(self, core: EHGATv2, *, use_physics_prior: bool = False) -> None:
+    def __init__(
+        self, core: EHGATv2, *, use_physics_prior: bool = False, coupled: bool = False
+    ) -> None:
         super().__init__()
         self.core = core
         # When True the leg head learns a residual around the exact closed-form leg split
@@ -128,6 +144,11 @@ class FusedEHGATv2(nn.Module):
         # standardised arc priors -- the GNN does the real lifting; the max-plus layer still
         # guarantees faithful critical-path gradients regardless.
         self.use_physics_prior = use_physics_prior
+        # Under peak-power coupling the GNN additionally predicts a per-leg *power wait*; the
+        # leg's effective max-plus weight is ``leg_time + wait`` and the makespan is composed
+        # over the precedence-only coupled activity DAG (no explicit resolution arcs needed --
+        # the continuous waits reproduce the coupled critical path exactly when correct).
+        self.coupled = coupled
         hidden = core.config.hidden
         # Heads see [h_src || h_dst || standardised arc priors] and [h || handling prior].
         # Only the *leg times* are learned; leg energies are read exactly from the inputs.
@@ -137,21 +158,39 @@ class FusedEHGATv2(nn.Module):
         self.delay_head = nn.Sequential(
             nn.Linear(hidden + 1, hidden), nn.ReLU(), nn.Linear(hidden, 1)
         )
+        # Power-wait head: a per-leg (empty, loaded) resource-contention delay. Same context
+        # as the leg head; the wait is a global concurrency quantity the message passing must
+        # infer from the schedule structure.
+        self.wait_head = nn.Sequential(
+            nn.Linear(2 * hidden + EDGE_DIM, hidden), nn.ReLU(), nn.Linear(hidden, _N_LEG_TIMES)
+        )
         # De-normalisation of standardised head outputs into physical units.
         self.register_buffer("leg_mean", torch.zeros(_N_LEG_TIMES))
         self.register_buffer("leg_std", torch.ones(_N_LEG_TIMES))
         self.register_buffer("tau_mean", torch.zeros(1))
         self.register_buffer("tau_std", torch.ones(1))
+        self.register_buffer("wait_mean", torch.zeros(_N_LEG_TIMES))
+        self.register_buffer("wait_std", torch.ones(_N_LEG_TIMES))
 
     def set_leg_normalization(
-        self, *, leg_mean: Tensor, leg_std: Tensor, tau_mean: Tensor, tau_std: Tensor
+        self,
+        *,
+        leg_mean: Tensor,
+        leg_std: Tensor,
+        tau_mean: Tensor,
+        tau_std: Tensor,
+        wait_mean: Tensor | None = None,
+        wait_std: Tensor | None = None,
     ) -> None:
-        """Populate leg/delay de-normalisation buffers from training-set statistics."""
+        """Populate leg/delay (and optional wait) de-normalisation buffers from train stats."""
         eps = 1e-6
         self.leg_mean.copy_(leg_mean)
         self.leg_std.copy_(leg_std.clamp_min(eps))
         self.tau_mean.copy_(tau_mean.reshape(1))
         self.tau_std.copy_(tau_std.reshape(1).clamp_min(eps))
+        if wait_mean is not None and wait_std is not None:
+            self.wait_mean.copy_(wait_mean)
+            self.wait_std.copy_(wait_std.clamp_min(eps))
 
     def freeze_core(self) -> None:
         """Lock the heterogeneous message-passing layers; train only the new heads."""
@@ -161,14 +200,22 @@ class FusedEHGATv2(nn.Module):
 
     def head_parameters(self) -> list[nn.Parameter]:
         """Trainable projection-head parameters (the only ones the fine-tuner optimises)."""
-        return list(self.leg_head.parameters()) + list(self.delay_head.parameters())
+        params = list(self.leg_head.parameters()) + list(self.delay_head.parameters())
+        if self.coupled:
+            params += list(self.wait_head.parameters())
+        return params
 
-    def _local_attributes(self, data: HeteroData) -> tuple[Tensor, Tensor, Tensor, Tensor, Tensor]:
-        """Project embeddings + physics priors to ``(empty_t, loaded_t, empty_e, loaded_e, d)``.
+    def _local_attributes(
+        self, data: HeteroData
+    ) -> tuple[Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor]:
+        """Project embeddings + physics priors to local physical attributes.
+
+        Returns ``(empty_t, loaded_t, empty_e, loaded_e, d, wait_empty, wait_loaded)``.
 
         Leg *times* are GNN-predicted (anchored, de-normalised); leg *energies* are read
         **exactly** from the input AGV arc features (Empty_Energy / Loaded_Energy), so the
-        energy objective is strictly exact and additive (``dE/d(leg energy) = 1``).
+        energy objective is strictly exact and additive (``dE/d(leg energy) = 1``). The
+        per-leg power *waits* are predicted only when ``self.coupled`` (else zero).
         """
         h = self.core.encode(data)  # [N, hidden]
         x = data[NODE_TYPE].x
@@ -204,7 +251,14 @@ class FusedEHGATv2(nn.Module):
             node_delay = (
                 self.delay_head(delay_in).squeeze(-1) * self.tau_std + self.tau_mean
             ).clamp_min(0.0)
-        return empty_t, loaded_t, empty_e, loaded_e, node_delay
+
+        if self.coupled:
+            waits = (self.wait_head(leg_in) * self.wait_std + self.wait_mean).clamp_min(0.0)
+            wait_empty, wait_loaded = waits[:, 0], waits[:, 1]
+        else:
+            zeros = empty_t.new_zeros(empty_t.shape[0])
+            wait_empty, wait_loaded = zeros, zeros
+        return empty_t, loaded_t, empty_e, loaded_e, node_delay, wait_empty, wait_loaded
 
     def forward(self, data: HeteroData) -> FusedPrediction:
         """Predict one graph's ``(C_max, E)`` via tropical DP + additive energy.
@@ -217,9 +271,21 @@ class FusedEHGATv2(nn.Module):
         agv_prev, qc_prev = extract_precedence(
             data[AGV_EDGE].edge_index, data[QC_EDGE].edge_index, n
         )
-        empty_t, loaded_t, empty_e, loaded_e, node_delay = self._local_attributes(data)
+        (empty_t, loaded_t, empty_e, loaded_e, node_delay, wait_empty, wait_loaded) = (
+            self._local_attributes(data)
+        )
 
-        dag = assemble_event_dag(is_load, agv_prev, qc_prev, empty_t, loaded_t, node_delay)
+        if self.coupled:
+            # Effective leg durations fold the predicted power wait into the travel time, so
+            # the precedence-only coupled activity DAG reproduces the coupled makespan exactly
+            # (no resolution arcs). Handling tau stays exact -- only AGV legs wait for power.
+            empty_eff = empty_t + wait_empty
+            loaded_eff = loaded_t + wait_loaded
+            dag = assemble_coupled_event_dag(
+                is_load, agv_prev, qc_prev, empty_eff, loaded_eff, node_delay, []
+            )
+        else:
+            dag = assemble_event_dag(is_load, agv_prev, qc_prev, empty_t, loaded_t, node_delay)
         completion = tropical_longest_path(dag.node_weights, dag.edge_index, dag.edge_weights)
         makespan = completion[dag.completion_nodes].max()
         energy = (empty_e + loaded_e).sum()  # strictly additive -> exact, dE/d(leg_e) = 1
@@ -232,4 +298,6 @@ class FusedEHGATv2(nn.Module):
             empty_e=empty_e,
             loaded_e=loaded_e,
             dag=dag,
+            wait_empty=wait_empty,
+            wait_loaded=wait_loaded,
         )
