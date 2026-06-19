@@ -192,9 +192,14 @@ def train_fused_batched(
         wait_mean=tr_w.mean(0), wait_std=tr_w.std(0),
     )
 
-    # Build the batch (frozen-core encode + static features) while everything is on CPU,
-    # THEN move the model and the batched tensors to the target device.
-    train_b = build_batch(model, train_samples, instance)
+    # Build batches (frozen-core encode + static features) while on CPU, THEN move to device.
+    # Mini-batch the samples (group of ``batch_size`` per step) so the optimiser takes many
+    # noisy steps per epoch (mirrors the per-graph SGD), each step still fully vectorised.
+    gs = max(1, config.batch_size)
+    train_groups = [
+        build_batch(model, train_samples[i : i + gs], instance)
+        for i in range(0, len(train_samples), gs)
+    ]
     val_b = build_batch(model, val_samples, instance) if val_samples else None
     dev = torch.device(device)
     model = model.to(dev)
@@ -211,7 +216,8 @@ def train_fused_batched(
             edge_index=b.schedule.edge_index.to(dev), num_nodes=b.schedule.num_nodes,
             layers=tuple((a.to(dev), c.to(dev), d.to(dev)) for a, c, d in b.schedule.layers),
         )
-    _to(train_b)
+    for g in train_groups:
+        _to(g)
     if val_b is not None:
         _to(val_b)
     s_leg = scales["leg"].to(dev); s_tau = scales["tau"].to(dev)
@@ -221,20 +227,26 @@ def train_fused_batched(
     sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=config.epochs, eta_min=config.eta_min)
 
     result = FusedTrainResult(model=model)
+    gen = torch.Generator().manual_seed(config.seed)
     for epoch in range(config.epochs):
         model.train(); model.core.eval()
-        opt.zero_grad()
-        times, tau, waits, makespan, energy = _forward_batch(model, train_b, coupled)
-        leg_term = (((times - train_b.leg_true) / s_leg) ** 2).mean()
-        tau_term = (((tau - train_b.tau_true) / s_tau) ** 2).mean()
-        cmax_term = (((makespan - train_b.mk_true) / s_mk) ** 2).mean()
-        e_term = (((energy - train_b.energy_true.to(dev)) / s_e) ** 2).mean()
-        loss = leg_term + tau_term + config.alpha_makespan * cmax_term + config.beta_energy * e_term
-        if coupled:
-            loss = loss + (((waits - train_b.wait_true) / s_w) ** 2).mean()
-        loss.backward(); opt.step(); sched.step()
+        epoch_loss = 0.0
+        for gi in torch.randperm(len(train_groups), generator=gen).tolist():
+            tb = train_groups[gi]
+            opt.zero_grad()
+            times, tau, waits, makespan, energy = _forward_batch(model, tb, coupled)
+            leg_term = (((times - tb.leg_true) / s_leg) ** 2).mean()
+            tau_term = (((tau - tb.tau_true) / s_tau) ** 2).mean()
+            cmax_term = (((makespan - tb.mk_true) / s_mk) ** 2).mean()
+            e_term = (((energy - tb.energy_true.to(dev)) / s_e) ** 2).mean()
+            loss = leg_term + tau_term + config.alpha_makespan * cmax_term + config.beta_energy * e_term
+            if coupled:
+                loss = loss + (((waits - tb.wait_true) / s_w) ** 2).mean()
+            loss.backward(); opt.step()
+            epoch_loss += float(loss)
+        sched.step()
 
-        record = {"epoch": float(epoch), "train_loss": float(loss)}
+        record = {"epoch": float(epoch), "train_loss": epoch_loss / max(len(train_groups), 1)}
         if val_b is not None:
             with torch.no_grad():
                 model.eval()
@@ -243,14 +255,17 @@ def train_fused_batched(
                 record["r2_energy"] = _r2(ven, val_b.energy_true.to(dev))
         result.history.append(record)
 
-    eb = val_b if val_b is not None else train_b
     with torch.no_grad():
         model.eval()
-        _, _, _, mk, en = _forward_batch(model, eb, coupled)
+        eval_batches = [val_b] if val_b is not None else train_groups
+        mk = torch.cat([_forward_batch(model, b, coupled)[3] for b in eval_batches])
+        en = torch.cat([_forward_batch(model, b, coupled)[4] for b in eval_batches])
+        mk_true = torch.cat([b.mk_true for b in eval_batches])
+        en_true = torch.cat([b.energy_true.to(dev) for b in eval_batches])
         result.metrics = {
-            "r2_makespan": _r2(mk, eb.mk_true),
-            "r2_energy": _r2(en, eb.energy_true.to(dev)),
-            "mae_makespan": float((mk - eb.mk_true).abs().mean()),
+            "r2_makespan": _r2(mk, mk_true),
+            "r2_energy": _r2(en, en_true),
+            "mae_makespan": float((mk - mk_true).abs().mean()),
         }
     model = model.to("cpu")
     return result
