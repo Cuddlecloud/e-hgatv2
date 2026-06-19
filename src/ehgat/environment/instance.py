@@ -23,7 +23,13 @@ from dataclasses import dataclass
 from enum import IntEnum
 
 from ehgat.environment.distance import DistanceMatrix, load_default_distance_matrix
+from ehgat.environment.physics import SPEED_TABLE
 from ehgat.utils.seeding import make_rng
+
+# Largest power any single travel leg can draw (loaded leg at the highest speed level).
+# A peak-power budget below this would make some legs individually infeasible, so it is
+# the hard lower bound for a valid ``Instance.peak_power``.
+_MAX_LEG_POWER = max(spec.loaded_power for spec in SPEED_TABLE.values())
 
 __all__ = [
     "EXACT_TOY_TASKS",
@@ -81,12 +87,23 @@ class Instance:
     num_agvs: int
     agv_start: str
     distance: DistanceMatrix
+    # Fleet-wide instantaneous power budget (kW): the sum of the powers of all AGV
+    # travel legs running at any instant may not exceed this. ``None`` (default) means
+    # uncoupled physics -- the original max-plus longest-path model. When set, makespan
+    # is resolved by the power-coupled event simulator (see ``evaluator.py``), which has
+    # no closed form: this is the regime where the learned surrogate earns its place.
+    peak_power: float | None = None
 
     def __post_init__(self) -> None:
         if self.num_agvs < 1:
             raise ValueError(f"num_agvs must be >= 1, got {self.num_agvs}")
         if not self.tasks:
             raise ValueError("instance must contain at least one task")
+        if self.peak_power is not None and self.peak_power < _MAX_LEG_POWER:
+            raise ValueError(
+                f"peak_power {self.peak_power} kW is below the max single-leg power "
+                f"{_MAX_LEG_POWER} kW; some legs would be individually infeasible"
+            )
 
         nodes = set(self.distance.nodes)
         if self.agv_start not in nodes:
@@ -137,6 +154,7 @@ def build_toy_instance(
     num_tasks: int = 10,
     qcs: tuple[str, ...] = ("QC1", "QC2", "QC3"),
     num_agvs: int = 2,
+    peak_power: float | None = None,
 ) -> Instance:
     """Construct a deterministic dual-cycling toy instance.
 
@@ -168,4 +186,5 @@ def build_toy_instance(
         num_agvs=num_agvs,
         agv_start="LU1",
         distance=distance,
+        peak_power=peak_power,
     )
