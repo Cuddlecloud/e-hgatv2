@@ -74,11 +74,13 @@ class Evaluation:
     topo_order: tuple[int, ...]
     # Resolved travel-leg start times (filled by the power-coupled simulator; under the
     # uncoupled model each leg starts as early as precedence allows). ``power_arcs`` are
-    # the extra ``(blocker_task, blocked_task)`` precedences the power budget induced --
-    # the structure that has no closed form and that TAPE must attribute over.
+    # the extra precedences the power budget induced, each as
+    # ``(blocker_task, blocker_loaded, blocked_task, blocked_loaded)`` with the leg flag
+    # 0=empty, 1=loaded -- the structure that has no closed form and that TAPE attributes
+    # over (a power-delayed leg could only start once the blocker leg freed the budget).
     empty_start: tuple[float, ...] = ()
     loaded_start: tuple[float, ...] = ()
-    power_arcs: tuple[tuple[int, int], ...] = ()
+    power_arcs: tuple[tuple[int, int, int, int], ...] = ()
 
     @property
     def objectives(self) -> tuple[float, float]:
@@ -305,8 +307,11 @@ def _evaluate_power_coupled(schedule: Schedule, instance: Instance) -> Evaluatio
     finish_heap: list[tuple[float, int, Act]] = []
     ready_travel: list[Act] = []
     power_used = 0.0
-    power_arcs: list[tuple[int, int]] = []
+    power_arcs: list[tuple[int, int, int, int]] = []
     seq = 0  # tie-break/order counter for the finish heap
+
+    def _leg_flag(a: Act) -> int:
+        return 0 if a[1] == "E" else 1
 
     def _schedule_zero_power(a: Act, t: float) -> None:
         nonlocal seq
@@ -315,7 +320,7 @@ def _evaluate_power_coupled(schedule: Schedule, instance: Instance) -> Evaluatio
         heapq.heappush(finish_heap, (finish[a], seq, a))
         seq += 1
 
-    def _try_start(t: float, trigger: int | None) -> None:
+    def _try_start(t: float, trigger: Act | None) -> None:
         nonlocal power_used, seq
         ready_travel.sort(key=lambda a: (avail[a], a[0], 0 if a[1] == "E" else 1))
         remaining: list[Act] = []
@@ -328,7 +333,7 @@ def _evaluate_power_coupled(schedule: Schedule, instance: Instance) -> Evaluatio
                 seq += 1
                 power_used += p
                 if trigger is not None and t > avail[a] + _EPS:
-                    power_arcs.append((trigger, a[0]))
+                    power_arcs.append((trigger[0], _leg_flag(trigger), a[0], _leg_flag(a)))
             else:
                 remaining.append(a)
         ready_travel[:] = remaining
@@ -344,12 +349,12 @@ def _evaluate_power_coupled(schedule: Schedule, instance: Instance) -> Evaluatio
 
     while finish_heap:
         t = finish_heap[0][0]
-        trigger: int | None = None
+        trigger: Act | None = None
         while finish_heap and finish_heap[0][0] <= t + _EPS:
             _, _, a = heapq.heappop(finish_heap)
             if a[1] in ("E", "L"):
                 power_used -= _power(a)
-                trigger = a[0]
+                trigger = a
             for s in succ[a]:
                 pred_count[s] -= 1
                 if finish[a] > avail[s]:
