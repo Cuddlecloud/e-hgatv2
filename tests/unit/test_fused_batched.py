@@ -24,7 +24,8 @@ def test_batched_forward_matches_per_graph() -> None:
     for i, s in enumerate(samples):
         out = model(s.data)
         assert abs(float(out.makespan) - float(mk[i])) < 1e-4, f"makespan mismatch @ {i}"
-        assert abs(float(out.energy) - float(en[i])) < 1e-4, f"energy mismatch @ {i}"
+        # Energy ~ O(1e4); float32 summation order differs negligibly -> relative tolerance.
+        assert abs(float(out.energy) - float(en[i])) <= 1e-4 * abs(float(en[i])), f"energy @ {i}"
 
 
 def test_batched_training_runs_and_fits_energy() -> None:
