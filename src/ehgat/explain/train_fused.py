@@ -141,11 +141,16 @@ def _scales(samples: list[FusedSample]) -> dict[str, Tensor]:
 
 
 @torch.no_grad()
-def _evaluate(model: FusedEHGATv2, samples: list[FusedSample]) -> dict[str, float]:
+def _evaluate(
+    model: FusedEHGATv2,
+    samples: list[FusedSample],
+    embeddings: list[Tensor] | None = None,
+) -> dict[str, float]:
     model.eval()
     preds, trues = [], []
-    for s in samples:
-        out = model(s.data)
+    for i, s in enumerate(samples):
+        h = embeddings[i] if embeddings is not None else None
+        out = model(s.data, h=h)
         preds.append(out.objectives.detach())
         trues.append(s.objectives)
     pred = torch.stack(preds, dim=0)
@@ -213,6 +218,11 @@ def train_fused(
         optimizer, T_max=config.epochs, eta_min=config.eta_min
     )
 
+    # Cache frozen-core embeddings ONCE -- they are identical every epoch, so this removes
+    # the GNN message passing (~half the per-graph step) from the inner training loop.
+    train_h = [model.encode_cached(s.data) for s in train_samples]
+    val_h = [model.encode_cached(s.data) for s in val_samples]
+
     result = FusedTrainResult(model=model)
     gen = torch.Generator().manual_seed(config.seed)
     for epoch in range(config.epochs):
@@ -226,7 +236,7 @@ def train_fused(
             batch_loss = torch.zeros((), dtype=torch.float32)
             for idx in chunk:
                 s = train_samples[idx]
-                out = model(s.data)
+                out = model(s.data, h=train_h[idx])
                 leg_term = (((out.leg_times - s.legs[:, :2]) / scales["leg"]) ** 2).mean()
                 tau_term = (((out.node_delay - s.tau) / scales["tau"]) ** 2).mean()
                 cmax_term = ((out.makespan - s.objectives[0]) / scales["makespan"]) ** 2
@@ -254,11 +264,14 @@ def train_fused(
             "lr": float(scheduler.get_last_lr()[0]),
         }
         if val_samples:
-            val_metrics = _evaluate(model, val_samples)
+            val_metrics = _evaluate(model, val_samples, val_h)
             record["r2_makespan"] = val_metrics["r2_makespan"]
             record["r2_energy"] = val_metrics["r2_energy"]
             record["mae_overall"] = val_metrics["mae_overall"]
         result.history.append(record)
 
-    result.metrics = _evaluate(model, val_samples or train_samples)
+    if val_samples:
+        result.metrics = _evaluate(model, val_samples, val_h)
+    else:
+        result.metrics = _evaluate(model, train_samples, train_h)
     return result

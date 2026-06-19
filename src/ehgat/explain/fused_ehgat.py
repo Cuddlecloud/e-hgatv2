@@ -205,8 +205,19 @@ class FusedEHGATv2(nn.Module):
             params += list(self.wait_head.parameters())
         return params
 
+    @torch.no_grad()
+    def encode_cached(self, data: HeteroData) -> Tensor:
+        """Frozen-core node embeddings ``h`` ``[N, hidden]``, detached for reuse.
+
+        The core is frozen, so ``h`` is identical across every fine-tuning epoch -- caching
+        it once and passing it to ``forward(data, h=...)`` skips the GNN message passing (the
+        single most expensive part of the per-graph step) on every subsequent epoch.
+        """
+        self.core.eval()
+        return self.core.encode(data).detach()
+
     def _local_attributes(
-        self, data: HeteroData
+        self, data: HeteroData, h: Tensor | None = None
     ) -> tuple[Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor]:
         """Project embeddings + physics priors to local physical attributes.
 
@@ -216,8 +227,12 @@ class FusedEHGATv2(nn.Module):
         **exactly** from the input AGV arc features (Empty_Energy / Loaded_Energy), so the
         energy objective is strictly exact and additive (``dE/d(leg energy) = 1``). The
         per-leg power *waits* are predicted only when ``self.coupled`` (else zero).
+
+        ``h`` may be a precomputed (cached) frozen-core embedding; if ``None`` it is computed
+        on the fly. Heads still backprop into their own parameters either way.
         """
-        h = self.core.encode(data)  # [N, hidden]
+        if h is None:
+            h = self.core.encode(data)  # [N, hidden]
         x = data[NODE_TYPE].x
         agv_index = data[AGV_EDGE].edge_index
         agv_attr = data[AGV_EDGE].edge_attr
@@ -260,11 +275,12 @@ class FusedEHGATv2(nn.Module):
             wait_empty, wait_loaded = zeros, zeros
         return empty_t, loaded_t, empty_e, loaded_e, node_delay, wait_empty, wait_loaded
 
-    def forward(self, data: HeteroData) -> FusedPrediction:
+    def forward(self, data: HeteroData, h: Tensor | None = None) -> FusedPrediction:
         """Predict one graph's ``(C_max, E)`` via tropical DP + additive energy.
 
         ``data`` must be a single :class:`HeteroData` (the tropical DP is assembled per
-        graph). Batching is handled by iterating graphs in the trainer/explainer.
+        graph). Batching is handled by iterating graphs in the trainer/explainer. ``h`` is an
+        optional cached frozen-core embedding (see :meth:`encode_cached`).
         """
         n = int(data[NODE_TYPE].x.shape[0])
         is_load = data[NODE_TYPE].x[:, 1] > 0.5
@@ -272,7 +288,7 @@ class FusedEHGATv2(nn.Module):
             data[AGV_EDGE].edge_index, data[QC_EDGE].edge_index, n
         )
         (empty_t, loaded_t, empty_e, loaded_e, node_delay, wait_empty, wait_loaded) = (
-            self._local_attributes(data)
+            self._local_attributes(data, h=h)
         )
 
         if self.coupled:
