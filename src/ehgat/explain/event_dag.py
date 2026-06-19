@@ -117,23 +117,31 @@ def assemble_event_dag(
     weights: list[Tensor] = []
     meta: list[dict[str, Any]] = []
     completion: list[int] = []
+    load_q: list[int] = []  # q-nodes that carry +tau on the node (LOAD only)
     for j in range(n):
         if bool(is_load[j]):
+            # m = max(arr_dropoff, qc_ready); q = m + tau (node weight); the AGV is freed
+            # at the QC pickup a = m = c_j - tau (NOT at delivery -- FSMJ Eq 12).
             agv_arrival = empty_t[j] + loaded_t[j]
             arcs = [
                 (prev_a(j), m(j), agv_arrival, "agv_to_gate"),
                 (prev_q(j), m(j), zero, "qc_to_gate"),
                 (m(j), q(j), zero, "handling"),
-                (prev_a(j), a(j), agv_arrival, "agv_free_load"),
+                (m(j), a(j), zero, "agv_free_load"),
             ]
             completion.append(q(j))
+            load_q.append(q(j))
         else:
+            # Handling overlaps travel: m = arr_pickup; q = max(m, qc_ready + tau) with the
+            # +tau on the QC-chain edge (and omitted on the first crane task), NOT a node
+            # weight; the AGV is freed at the yard a = q + loaded = r_j.
             arcs = [
                 (prev_a(j), m(j), empty_t[j], "agv_to_gate"),
-                (prev_q(j), m(j), zero, "qc_to_gate"),
-                (m(j), q(j), zero, "handling"),
+                (m(j), q(j), zero, "arrival"),
                 (q(j), a(j), loaded_t[j], "agv_free_unload"),
             ]
+            if qc_prev[j] >= 0:
+                arcs.append((prev_q(j), q(j), node_delay[j], "qc_chain"))
             completion.append(a(j))
         for u, v, w, kind in arcs:
             edge_src.append(u)
@@ -142,8 +150,11 @@ def assemble_event_dag(
             meta.append({"src": u, "dst": v, "task": j, "kind": kind})
 
     num_nodes = 1 + 3 * n
-    q_idx = torch.tensor([q(j) for j in range(n)], dtype=torch.long, device=device)
-    node_weights = torch.zeros(num_nodes, dtype=dtype, device=device).index_add(0, q_idx, node_delay)
+    node_weights = torch.zeros(num_nodes, dtype=dtype, device=device)
+    if load_q:
+        q_idx = torch.tensor(load_q, dtype=torch.long, device=device)
+        node_weights = node_weights.index_add(0, q_idx, node_delay[torch.tensor(
+            [j for j in range(n) if bool(is_load[j])], dtype=torch.long, device=device)])
     edge_index = torch.tensor([edge_src, edge_dst], dtype=torch.long, device=device)
     edge_weights = torch.stack(weights)
     completion_nodes = torch.tensor(completion, dtype=torch.long, device=device)
@@ -181,52 +192,67 @@ def assemble_coupled_event_dag(
     node_delay = node_delay.to(dtype)
     source = 0
 
+    # Four node slots per task: E (empty leg), L (loaded leg), H (QC handling, dur tau),
+    # and slot R/C: R = LOAD AGV release at QC pickup (dur 0), C = UNLOAD completion
+    # (container on AGV, dur 0). This mirrors evaluator._evaluate_power_coupled exactly.
     def e(j: int) -> int:
-        return 1 + 3 * j
-
-    def h(j: int) -> int:
-        return 1 + 3 * j + 1
+        return 1 + 4 * j
 
     def ll(j: int) -> int:
-        return 1 + 3 * j + 2
+        return 1 + 4 * j + 1
+
+    def h(j: int) -> int:
+        return 1 + 4 * j + 2
+
+    def rc(j: int) -> int:  # R for a LOAD, C for an UNLOAD
+        return 1 + 4 * j + 3
 
     def leg_node(task: int, flag: int) -> int:
         return e(task) if flag == 0 else ll(task)
 
-    def prev_agv_free(j: int) -> int:
-        # The AGV becomes free at the end of the previous task's loaded leg.
-        return source if agv_prev[j] < 0 else ll(agv_prev[j])
+    def qc_done(j: int) -> int:
+        return h(j) if bool(is_load[j]) else rc(j)
 
-    def prev_qc(j: int) -> int:
-        return source if qc_prev[j] < 0 else h(qc_prev[j])
+    def agv_release(j: int) -> int:
+        return rc(j) if bool(is_load[j]) else ll(j)
+
+    def prev_agv_free(j: int) -> int:
+        return source if agv_prev[j] < 0 else agv_release(agv_prev[j])
 
     edge_src: list[int] = []
     edge_dst: list[int] = []
     meta: list[dict[str, Any]] = []
     completion: list[int] = []
+
+    def _edge(u: int, v: int, j: int, kind: str) -> None:
+        edge_src.append(u); edge_dst.append(v)
+        meta.append({"src": u, "dst": v, "task": j, "kind": kind})
+
     for j in range(n):
-        edge_src.append(prev_agv_free(j)); edge_dst.append(e(j))
-        meta.append({"src": prev_agv_free(j), "dst": e(j), "task": j, "kind": "agv_chain"})
+        _edge(prev_agv_free(j), e(j), j, "agv_chain")
         if bool(is_load[j]):
-            # empty -> loaded -> QC handling; completion is the QC finish.
-            pairs = [(e(j), ll(j), "load_travel"), (ll(j), h(j), "deliver"),
-                     (prev_qc(j), h(j), "qc_chain")]
+            # empty -> loaded; AGV released at R = max(arrival, qc_ready); H = R + tau.
+            _edge(e(j), ll(j), j, "load_travel")
+            _edge(ll(j), rc(j), j, "deliver")
+            if qc_prev[j] >= 0:
+                _edge(qc_done(qc_prev[j]), rc(j), j, "qc_chain")
+            _edge(rc(j), h(j), j, "handling")
             completion.append(h(j))
         else:
-            # empty -> QC handling -> loaded; completion is the AGV delivery.
-            pairs = [(e(j), h(j), "pick_at_qc"), (prev_qc(j), h(j), "qc_chain"),
-                     (h(j), ll(j), "unload_travel")]
+            # QC handling overlaps travel: H gated by the QC chain only (omitted on the
+            # first crane task); C = max(arrival, qc_ready + tau); loaded leg follows C.
+            if qc_prev[j] >= 0:
+                _edge(qc_done(qc_prev[j]), h(j), j, "qc_chain")
+                _edge(h(j), rc(j), j, "qc_ready")
+            _edge(e(j), rc(j), j, "pick_at_qc")
+            _edge(rc(j), ll(j), j, "unload_travel")
             completion.append(ll(j))
-        for u, v, kind in pairs:
-            edge_src.append(u); edge_dst.append(v)
-            meta.append({"src": u, "dst": v, "task": j, "kind": kind})
 
     for b_task, b_flag, v_task, v_flag in power_arcs:
         u, v = leg_node(b_task, b_flag), leg_node(v_task, v_flag)
-        edge_src.append(u); edge_dst.append(v)
-        meta.append({"src": u, "dst": v, "task": v_task, "kind": "power"})
+        _edge(u, v, v_task, "power")
 
-    num_nodes = 1 + 3 * n
+    num_nodes = 1 + 4 * n
     idx = torch.tensor(
         [e(j) for j in range(n)] + [ll(j) for j in range(n)] + [h(j) for j in range(n)],
         dtype=torch.long, device=device,

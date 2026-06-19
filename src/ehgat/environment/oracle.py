@@ -146,7 +146,7 @@ def evaluate_speeds(
     """
     n = instance.num_tasks
     qc_index = {qc: i for i, qc in enumerate(instance.qcs)}
-    agv_prev, _qc_prev, order = build_precedence(
+    agv_prev, qc_prev, order = build_precedence(
         structure.agv_sequences, structure.qc_sequences, n
     )
     agv_of = structure.assignment
@@ -171,15 +171,20 @@ def evaluate_speeds(
         )
         tau = _TIME_SCALE * round(task.handling_time)
         arr_pickup = agv_free[a] + empty_time
+        # Matches evaluator._evaluate_uncoupled (FSMJ Eqs 10-18): a LOAD AGV is released at
+        # the QC pickup (c_j - tau), and an UNLOAD's handling overlaps AGV travel (the +tau
+        # floor applies only along the QC chain, not on the first task of a crane).
         if task.kind is TaskKind.LOAD:
-            arr_dropoff = arr_pickup + loaded_time
-            qc_f = max(arr_dropoff, qc_finish[q]) + tau
-            completion = qc_f
+            arr_dropoff = arr_pickup + loaded_time  # r_j
+            qc_f = max(arr_dropoff, qc_finish[q]) + tau  # c_j (Eq 10/11)
+            completion = qc_f  # Eq 2
+            agv_free[a] = qc_f - tau  # Eq 12: c_i - tau_i
         else:
-            qc_f = max(arr_pickup, qc_finish[q]) + tau
-            arr_dropoff = qc_f + loaded_time
-            completion = arr_dropoff
-        agv_free[a] = arr_dropoff
+            qc_floor = qc_finish[q] + tau if qc_prev[j] >= 0 else 0  # Eq 10 only
+            qc_f = max(arr_pickup, qc_floor)  # c_j (Eq 14/15/17)
+            arr_dropoff = qc_f + loaded_time  # r_j (Eq 16)
+            completion = arr_dropoff  # Eq 3
+            agv_free[a] = arr_dropoff  # r_j (Eq 14/18)
         qc_finish[q] = qc_f
         if completion > makespan:
             makespan = completion
@@ -242,7 +247,7 @@ def _structure_speed_front_int(
     qc_index = {qc: i for i, qc in enumerate(instance.qcs)}
     n_qc = len(instance.qcs)
 
-    agv_prev, _qc_prev, order = build_precedence(
+    agv_prev, qc_prev, order = build_precedence(
         structure.agv_sequences, structure.qc_sequences, n
     )
     agv_of = structure.assignment
@@ -288,19 +293,23 @@ def _structure_speed_front_int(
             for empty_time, empty_energy in empty_opts[j]:
                 arr_pickup = agv_free + empty_time
                 for loaded_time, loaded_energy in loaded_opts[j]:
+                    # See evaluate_speeds / evaluator._evaluate_uncoupled (FSMJ Eqs 10-18).
                     if is_load:
-                        arr_dropoff = arr_pickup + loaded_time
-                        qc_finish = max(arr_dropoff, qc_finish_prev) + tau
+                        arr_dropoff = arr_pickup + loaded_time  # r_j
+                        qc_finish = max(arr_dropoff, qc_finish_prev) + tau  # c_j
                         completion = qc_finish
+                        agv_free_new = qc_finish - tau  # Eq 12: c_i - tau_i
                     else:
-                        qc_finish = max(arr_pickup, qc_finish_prev) + tau
-                        arr_dropoff = qc_finish + loaded_time
+                        qc_floor = qc_finish_prev + tau if qc_prev[j] >= 0 else 0  # Eq 10 only
+                        qc_finish = max(arr_pickup, qc_floor)  # c_j (Eq 14/15/17)
+                        arr_dropoff = qc_finish + loaded_time  # r_j (Eq 16)
                         completion = arr_dropoff
+                        agv_free_new = arr_dropoff  # Eq 14/18
 
                     new = list(st)
                     new[0] = st[0] if st[0] >= completion else completion
                     new[1] = st[1] + empty_energy + loaded_energy
-                    new[agv_idx] = arr_dropoff
+                    new[agv_idx] = agv_free_new
                     new[qc_idx] = qc_finish
                     for aa in done_agv:
                         new[2 + aa] = 0

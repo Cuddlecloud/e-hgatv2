@@ -100,15 +100,16 @@ def build_batch(model: FusedEHGATv2, samples: list[FusedSample], instance: Insta
         comp_batch_l.append(torch.full((n,), s_i, dtype=torch.long))
         task_batch_l.append(torch.full((n,), s_i, dtype=torch.long))
 
+        # Four node slots per task (E, L, H, R/C) -- see assemble_coupled_event_dag.
         base = node_off + 1  # node 0 of this sample is its source
         j = torch.arange(n, dtype=torch.long)
-        idx_empty_l.append(base + 3 * j)
-        idx_loaded_l.append(base + 3 * j + 2)
-        idx_tau_l.append(base + 3 * j + 1)
+        idx_empty_l.append(base + 4 * j)
+        idx_loaded_l.append(base + 4 * j + 1)
+        idx_tau_l.append(base + 4 * j + 2)
 
         leg_true_l.append(s.legs[:, :2]); tau_true_l.append(s.tau); wait_true_l.append(s.waits)
         mk_true_l.append(s.objectives[0]); e_true_l.append(s.objectives[1])
-        node_off += 1 + 3 * n
+        node_off += 1 + 4 * n
 
     edge_index = torch.stack([torch.cat(edge_src_l), torch.cat(edge_dst_l)], dim=0)
     idx_all = torch.cat(idx_empty_l + idx_loaded_l + idx_tau_l)

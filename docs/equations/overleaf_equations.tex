@@ -1,0 +1,624 @@
+\documentclass[11pt]{article}
+
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{mathtools}
+\usepackage{hyperref}
+
+\title{Container Terminal Scheduling Equations}
+\author{Prepared for E-HGATv2 Context}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{2023 FSMJ Journal Model}
+
+\subsection{Forbidden Pairs}
+
+\[
+F =
+\{(i,i), i \in J\}
+\cup
+\{(i,j) : j \le i,\ \text{with } i,j \in J_k \text{ and } k \in K\}.
+\]
+
+\subsection{MILP}
+
+\begin{equation}
+\begin{aligned}
+\text{Minimize}\quad Z_1 &= C_{\max},\\
+Z_2 &= E.
+\end{aligned}
+\tag{1}
+\end{equation}
+
+\begin{equation}
+C_{\max} \ge c_j, \qquad \forall j \in \mathcal{L}.
+\tag{2}
+\end{equation}
+
+\begin{equation}
+C_{\max} \ge r_j, \qquad \forall j \in \mathcal{U}.
+\tag{3}
+\end{equation}
+
+\begin{equation}
+E =
+\sum_{j\in J}
+\left(
+    \sum_{i\in J}\sum_{v\in V}
+        \left(x_{ij}^{v}\theta_{ij}^{v}e^{v}\right)
+    +
+    \sum_{v\in V}
+        \left(\chi_{j}^{v}\vartheta_{j}^{v}\varepsilon^{v}\right)
+    +
+    \sum_{a\in A}\sum_{v\in V}
+        \left(y_{aj}^{v}\theta_{aj}^{v}e^{v}\right)
+\right).
+\tag{4}
+\end{equation}
+
+\begin{equation}
+\sum_{j\in J}\sum_{v\in V} y_{aj}^{v} \le 1,
+\qquad \forall a \in A.
+\tag{5}
+\end{equation}
+
+\begin{equation}
+\sum_{j\in J} w_j
+=
+\sum_{a\in A}\sum_{j\in J}\sum_{v\in V} y_{aj}^{v}.
+\tag{6}
+\end{equation}
+
+\begin{equation}
+\sum_{i\in J}\sum_{v\in V} x_{ij}^{v}
++
+\sum_{v\in V}\sum_{a\in A} y_{aj}^{v}
+= 1,
+\qquad \forall j \in J.
+\tag{7}
+\end{equation}
+
+\begin{equation}
+\sum_{i\in J}\sum_{v\in V} x_{ji}^{v} + w_j = 1,
+\qquad \forall j \in J.
+\tag{8}
+\end{equation}
+
+\begin{equation}
+\sum_{v\in V} \chi_j^{v} = 1,
+\qquad \forall j \in J.
+\tag{9}
+\end{equation}
+
+\begin{equation}
+c_j \ge c_{j-1} + \tau_j,
+\qquad \forall j \in J_k;\ k \in K.
+\tag{10}
+\end{equation}
+
+\begin{equation}
+c_j \ge r_j + \tau_j,
+\qquad \forall j \in \mathcal{L}.
+\tag{11}
+\end{equation}
+
+\begin{equation}
+r_j
+\ge
+c_i - \tau_i
++
+\sum_{v\in V}\theta_{ij}^{v}x_{ij}^{v}
++
+\sum_{\omega\in V}\vartheta_j^{\omega}\chi_j^{\omega}
++
+M\left(\sum_{v\in V}x_{ij}^{v}-1\right),
+\qquad \forall i,j \in \mathcal{L}.
+\tag{12}
+\end{equation}
+
+\begin{equation}
+r_j
+\ge
+\sum_{v\in V}\theta_{aj}^{v}y_{aj}^{v}
++
+\sum_{\omega\in V}\vartheta_j^{\omega}\chi_j^{\omega}
++
+M\left(\sum_{v\in V}y_{aj}^{v}-1\right),
+\qquad \forall j \in \mathcal{L};\ a \in A.
+\tag{13}
+\end{equation}
+
+\begin{equation}
+c_j
+\ge
+r_i
++
+\sum_{v\in V}\theta_{ij}^{v}x_{ij}^{v}
++
+M\left(\sum_{v\in V}x_{ij}^{v}-1\right),
+\qquad \forall i,j \in \mathcal{U}.
+\tag{14}
+\end{equation}
+
+\begin{equation}
+c_j
+\ge
+\sum_{v\in V}\theta_{aj}^{v}y_{aj}^{v}
++
+M\left(\sum_{v\in V}y_{aj}^{v}-1\right),
+\qquad \forall j \in \mathcal{U};\ a \in A.
+\tag{15}
+\end{equation}
+
+\begin{equation}
+r_j
+\ge
+c_j
++
+\sum_{v\in V}\vartheta_j^{v}\chi_j^{v},
+\qquad \forall j \in \mathcal{U}.
+\tag{16}
+\end{equation}
+
+\begin{equation}
+c_j
+\ge
+c_i - \tau_i
++
+\sum_{v\in V}\theta_{ij}^{v}x_{ij}^{v}
++
+M\left(\sum_{v\in V}x_{ij}^{v}-1\right),
+\qquad \forall j \in \mathcal{U};\ i \in \mathcal{L}.
+\tag{17}
+\end{equation}
+
+\begin{equation}
+r_j
+\ge
+r_i
++
+\sum_{v\in V}\theta_{ij}^{v}x_{ij}^{v}
++
+\sum_{\omega\in V}\vartheta_j^{\omega}\chi_j^{\omega}
++
+M\left(\sum_{v\in V}x_{ij}^{v}-1\right),
+\qquad \forall j \in \mathcal{L};\ i \in \mathcal{U}.
+\tag{18}
+\end{equation}
+
+\begin{equation}
+x_{ij}^{v},\ \chi_j^{v},\ y_{aj}^{v},\ w_j \in \{0,1\},
+\qquad \forall i,j \in J;\ v \in V;\ a \in A.
+\tag{19}
+\end{equation}
+
+\begin{equation}
+C_{\max},\ c_j,\ r_j,\ E \ge 0,
+\qquad \forall j \in J.
+\tag{20}
+\end{equation}
+
+\subsection{Performance Indicators}
+
+\[
+CD_l = \sum_{\omega=1}^{\Omega} CD_l^{\omega}.
+\]
+
+\begin{equation}
+CD_l^{\omega}
+=
+\frac{f_{l+1}^{\omega}-f_{l-1}^{\omega}}
+     {f_{\max}^{\omega}-f_{\min}^{\omega}}.
+\tag{21}
+\end{equation}
+
+\begin{equation}
+GD^{+}(PF)
+=
+\frac{1}{n}
+\sum_{i=1}^{n}
+\left(
+    \min_{j\in PF^{*}}\left\{d_{(i,j)}^{+}\right\}
+\right).
+\tag{22a}
+\end{equation}
+
+\begin{equation}
+d_{(i,j)}^{+}
+=
+\sqrt{
+    \left(\max\left\{f_1^{i}-f_1^{j},0\right\}\right)^2
+    +
+    \left(\max\left\{f_2^{i}-f_2^{j},0\right\}\right)^2
+}.
+\tag{22b}
+\end{equation}
+
+\begin{equation}
+\Delta(PF)
+=
+\frac{
+    d_u+d_b+\sum_{i=1}^{n-1}\left|d_i-\bar{d}\right|
+}{
+    d_u+d_b+\bar{d}(n-1)
+}.
+\tag{23}
+\end{equation}
+
+\begin{equation}
+f_1^{N}
+=
+\frac{f_1-f_1^{\min}}{f_1^{\max}-f_1^{\min}},
+\qquad
+f_2^{N}
+=
+\frac{f_2-f_2^{\min}}{f_2^{\max}-f_2^{\min}}.
+\tag{24}
+\end{equation}
+
+\[
+\delta_C
+=
+\frac{C_{\max}-C_{\max}^{*}}{C_{\max}^{*}}
+\times 100,
+\qquad
+\delta_E
+=
+\frac{E-E^{*}}{E^{*}}
+\times 100.
+\]
+
+\section{2022 Book Chapter Models}
+
+\subsection{Loading-Task MILP}
+
+\begin{equation}
+\begin{aligned}
+\text{Minimize}\quad z_1 &= c_{\max},\\
+z_2 &= \mathcal{E}.
+\end{aligned}
+\tag{B1}
+\end{equation}
+
+\begin{equation}
+\sum_{i\in I}\sum_{j\in J_i}\sum_{v\in V} y_a^{ijv} \le 1,
+\qquad \forall a \in A.
+\tag{B2}
+\end{equation}
+
+\begin{equation}
+\sum_{i\in I}\sum_{j\in J_i} w_{ij}
+=
+\sum_{a\in A}\sum_{i\in I}\sum_{j\in J_i}\sum_{v\in V} y_a^{ijv}.
+\tag{B3}
+\end{equation}
+
+\begin{equation}
+\sum_{k\in I\setminus\{i\}}\sum_{l\in J_k}\sum_{v\in V} x_{kl}^{ijv}
++
+\sum_{\substack{l<j\\ l\in J_i}}\sum_{v\in V} x_{il}^{ijv}
++
+\sum_{v\in V}\sum_{a\in A} y_a^{ijv}
+= 1,
+\qquad \forall i \in I;\ j \in J_i.
+\tag{B4}
+\end{equation}
+
+\begin{equation}
+\sum_{k\in I\setminus\{i\}}\sum_{l\in J_k}\sum_{v\in V} x_{ij}^{klv}
++
+\sum_{\substack{l>j\\ l\in J_i}}\sum_{v\in V} x_{ij}^{ilv}
++
+w_{ij}
+= 1,
+\qquad \forall i \in I;\ j \in J_i.
+\tag{B5}
+\end{equation}
+
+\begin{equation}
+\sum_{v\in V}\chi_{ij}^{v} = 1,
+\qquad \forall i \in I;\ j \in J_i.
+\tag{B6}
+\end{equation}
+
+\begin{equation}
+c_{ij} \ge c_{i(j-1)} + \tau_{ij},
+\qquad \forall i \in I;\ j \in J_i\setminus\{1\}.
+\tag{B7}
+\end{equation}
+
+\begin{equation}
+c_{i1} \ge \tau_{i1},
+\qquad \forall i \in I.
+\tag{B8}
+\end{equation}
+
+\begin{equation}
+c_{ij} \ge r_{ij} + \tau_{ij},
+\qquad \forall i \in I;\ j \in J_i.
+\tag{B9}
+\end{equation}
+
+\begin{equation}
+\begin{aligned}
+r_{ij}
+&\ge
+c_{kl}-\tau_{kl}
++
+\theta_{kl}^{ijv}
++
+\vartheta_{ij}^{\omega}
++
+M\left(x_{kl}^{ijv}+\chi_{ij}^{\omega}-2\right),\\
+&\qquad
+\forall i,k \in I;\ j \in J_i;\ l \in J_k\ ( \text{if } i=k:\ j>l );
+\ v,\omega \in V.
+\end{aligned}
+\tag{B10}
+\end{equation}
+
+\begin{equation}
+r_{ij}
+\ge
+\theta_a^{ijv}
++
+\vartheta_{ij}^{\omega}
++
+M\left(y_a^{ijv}+\chi_{ij}^{\omega}-2\right),
+\qquad
+\forall i \in I;\ j \in J_i;\ a \in A;\ v,\omega \in V.
+\tag{B11}
+\end{equation}
+
+\begin{equation}
+c_{\max} \ge c_{in_i},
+\qquad \forall i \in I.
+\tag{B12}
+\end{equation}
+
+\begin{equation}
+\mathcal{E}
+=
+\sum_{i\in I}\sum_{j\in J_i}
+\left(
+    \sum_{k\in I}\sum_{l\in J_k}\sum_{v\in V}
+        \left(x_{kl}^{ijv}\theta_{kl}^{ijv}e^{v}\right)
+    +
+    \sum_{v\in V}
+        \left(\chi_{ij}^{v}\vartheta_{ij}^{v}\varepsilon^{v}\right)
+    +
+    \sum_{a\in A}\sum_{v\in V}
+        \left(y_a^{ijv}\theta_a^{ijv}e^{v}\right)
+\right).
+\tag{B13}
+\end{equation}
+
+\begin{equation}
+x_{kl}^{ijv},\ \chi_{ij}^{v},\ y_a^{ijv},\ w_{ij} \in \{0,1\},
+\qquad
+\forall i,k \in I;\ j \in J_i;\ l \in J_k;\ v \in V;\ a \in A.
+\tag{B14}
+\end{equation}
+
+\begin{equation}
+c_{\max},\ c_{ij},\ r_{ij},\ e_{ij} \ge 0,
+\qquad \forall i \in I;\ j \in J_i.
+\tag{B15}
+\end{equation}
+
+\subsection{Unloading-Task Replacement Constraints}
+
+\begin{equation}
+\begin{aligned}
+c_{ij}
+&\ge
+r_{kl}
++
+\theta_{kl}^{ijv}
++
+M\left(x_{kl}^{ijv}-1\right),\\
+&\qquad
+\forall i,k \in I;\ j \in J_i;\ l \in J_k\ ( \text{if } i=k:\ j>l );
+\ v \in V.
+\end{aligned}
+\tag{B16}
+\end{equation}
+
+\begin{equation}
+c_{ij}
+\ge
+\theta_a^{ijv}
++
+M\left(y_a^{ijv}-1\right),
+\qquad
+\forall i \in I;\ j \in J_i;\ a \in A;\ v \in V.
+\tag{B17}
+\end{equation}
+
+\begin{equation}
+r_{ij}
+\ge
+c_{ij}
++
+\vartheta_{ij}^{v}
++
+M\left(\chi_{ij}^{v}-1\right),
+\qquad
+\forall i \in I;\ j \in J_i;\ v \in V.
+\tag{B18}
+\end{equation}
+
+\begin{equation}
+c_{\max} \ge r_{in_i},
+\qquad \forall i \in I.
+\tag{B19}
+\end{equation}
+
+\subsection{Dual-Cycling Replacement Constraints}
+
+\begin{equation}
+c_{ij} \ge r_{ij}+\tau_{ij},
+\qquad \forall i \in I;\ j \in J_i;\ T_{ij}\in\mathcal{L}.
+\tag{B20}
+\end{equation}
+
+\begin{equation}
+\begin{aligned}
+r_{ij}
+&\ge
+c_{kl}-\tau_{kl}
++
+\theta_{kl}^{ijv}
++
+\vartheta_{ij}^{\omega}
++
+M\left(x_{kl}^{ijv}+\chi_{ij}^{\omega}-2\right),\\
+&\qquad
+\forall i,k \in I;\ j \in J_i;\ l \in J_k;\ v,\omega \in V;
+T_{ij},T_{kl}\in\mathcal{L}.
+\end{aligned}
+\tag{B21}
+\end{equation}
+
+\begin{equation}
+\begin{aligned}
+r_{ij}
+&\ge
+\theta_a^{ijv}
++
+\vartheta_{ij}^{\omega}
++
+M\left(y_a^{ijv}+\chi_{ij}^{\omega}-2\right),\\
+&\qquad
+\forall i \in I;\ j \in J_i;\ a \in A;\ v,\omega \in V;
+T_{ij}\in\mathcal{L}.
+\end{aligned}
+\tag{B22}
+\end{equation}
+
+\begin{equation}
+\begin{aligned}
+c_{ij}
+&\ge
+r_{kl}
++
+\theta_{kl}^{ijv}
++
+M\left(x_{kl}^{ijv}-1\right),\\
+&\qquad
+\forall i,k \in I;\ j \in J_i;\ l \in J_k;\ v \in V;
+T_{ij},T_{kl}\in\mathcal{U}.
+\end{aligned}
+\tag{B23}
+\end{equation}
+
+\begin{equation}
+c_{ij}
+\ge
+\theta_a^{ijv}
++
+M\left(y_a^{ijv}-1\right),
+\qquad
+\forall i \in I;\ j \in J_i;\ a \in A;\ v \in V;
+T_{ij}\in\mathcal{U}.
+\tag{B24}
+\end{equation}
+
+\begin{equation}
+r_{ij}
+\ge
+c_{ij}
++
+\vartheta_{ij}^{v}
++
+M\left(\chi_{ij}^{v}-1\right),
+\qquad
+\forall i \in I;\ j \in J_i;\ v \in V;
+T_{ij}\in\mathcal{U}.
+\tag{B25}
+\end{equation}
+
+\begin{equation}
+\begin{aligned}
+c_{ij}
+&\ge
+c_{kl}-\tau_{kl}
++
+\theta_{kl}^{ijv}
++
+M\left(x_{kl}^{ijv}-1\right),\\
+&\qquad
+\forall i,k \in I;\ j \in J_i;\ l \in J_k;\ v \in V;
+T_{ij}\in\mathcal{U},\ T_{kl}\in\mathcal{L}.
+\end{aligned}
+\tag{B26}
+\end{equation}
+
+\begin{equation}
+\begin{aligned}
+r_{ij}
+&\ge
+r_{kl}
++
+\theta_{kl}^{ijv}
++
+\vartheta_{ij}^{\omega}
++
+M\left(x_{kl}^{ijv}+\chi_{ij}^{\omega}-2\right),\\
+&\qquad
+\forall i,k \in I;\ j \in J_i;\ l \in J_k;\ v,\omega \in V;
+T_{ij}\in\mathcal{L},\ T_{kl}\in\mathcal{U}.
+\end{aligned}
+\tag{B27}
+\end{equation}
+
+\begin{equation}
+c_{\max} \ge c_{in_i},
+\qquad \forall i \in I;\ T_{in_i}\in\mathcal{L}.
+\tag{B28}
+\end{equation}
+
+\begin{equation}
+c_{\max} \ge r_{in_i},
+\qquad \forall i \in I;\ T_{in_i}\in\mathcal{U}.
+\tag{B29}
+\end{equation}
+
+\subsection{GAP Formulas}
+
+\begin{equation}
+GAP_{\mathcal{E}^{*}}
+=
+\frac{
+    \mathcal{E}_{(\mathrm{Scen.}L\sim N)}^{*}
+    -
+    \mathcal{E}_{(\mathrm{Scen.}N)}^{*}
+}{
+    \mathcal{E}_{(\mathrm{Scen.}N)}^{*}
+}
+\times 100.
+\tag{B30}
+\end{equation}
+
+\begin{equation}
+GAP_{\mathcal{E}_{(D)}^{*}}
+=
+\frac{
+    \mathcal{E}_{(D)}^{*}
+    -
+    \left(\mathcal{E}_{(L)}^{*}+\mathcal{E}_{(U)}^{*}\right)
+}{
+    \mathcal{E}_{(L)}^{*}+\mathcal{E}_{(U)}^{*}
+}
+\times 100.
+\tag{B31}
+\end{equation}
+
+\section{Homayouni XAI+MOO Note}
+
+No displayed equations were found in the 2-page note. The note mentions a periodic explainability interval \(T\), NSGA-II, XGBoost, SHAP, and TreeSHAP.
+
+\end{document}

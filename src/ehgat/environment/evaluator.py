@@ -1,31 +1,36 @@
 """Schedule evaluator: makespan ``C_max`` and total AGV energy ``E`` (Module 1).
 
 This is the **physical ground truth** every other component is measured against, so
-the timing model is stated explicitly. It operationalises the MILP recurrences of
-Homayouni & Fontes (2022) (loading eqs. 1-15, unloading eqs. 16-19) and the
-dual-cycling completion/precedence relations.
+the timing model is stated explicitly. It is a faithful forward evaluation of the
+single-indexed MILP of Fontes & Homayouni (2023) -- the timing constraints Eqs (2)-(4)
+and (10)-(18) with the schedule's binaries fixed -- cross-validated to 0 discrepancy
+against an independent fixed-point longest-path solver and an OR-Tools GLOP LP.
 
-Per task ``j`` (assigned to one AGV; its QC processes containers one at a time):
+Per task ``j`` (assigned to one AGV; its QC processes containers one at a time).
+``qc_ready`` is the completion ``c`` of the previous task on ``j``'s crane (Eq 10):
 
 - The AGV first drives **empty** from its current position to ``pickup(j)``, then
   **loaded** from ``pickup(j)`` to ``dropoff(j)``.
-- **LOAD** (export, yard -> ship): loaded leg ``LU -> QC``. The AGV delivers and is
-  immediately free; the QC then lifts the container onto the ship::
+- **LOAD** (export, yard -> ship): loaded leg ``LU -> QC``. The AGV delivers the
+  container to the quay (``r_j``) and is **held until the QC lifts it off** (Eq 11/12)::
 
-      arr_dropoff = agv_ready + empty_time + loaded_time          # delivery to QC
-      c_j         = max(arr_dropoff, qc_prev_finish) + tau        # QC completion
-      completion  = c_j                                           # Cmax >= c_j
+      arr_dropoff = agv_ready + empty_time + loaded_time          # r_j: delivery to QC
+      c_j         = max(arr_dropoff, qc_ready) + tau              # Eq 11/10: QC completion
+      completion  = c_j                                           # Eq 2: Cmax >= c_j
+      agv_free    = c_j - tau = max(arr_dropoff, qc_ready)        # Eq 12: released at pickup
 
-- **UNLOAD** (import, ship -> yard): loaded leg ``QC -> LU``. The QC lifts the
-  container onto a *waiting* AGV (so the QC op needs both the QC free and the AGV
-  present), then the AGV carries it to the yard::
+- **UNLOAD** (import, ship -> yard): loaded leg ``QC -> LU``. The QC handling overlaps
+  the AGV's travel (Eqs 14/15/17 carry **no** ``+tau`` on arrival; the ``+tau`` accrues
+  only along the QC chain via Eq 10, so the first task on a crane is not charged ``tau``)::
 
       arr_pickup  = agv_ready + empty_time                        # AGV reaches QC
-      c_j         = max(arr_pickup, qc_prev_finish) + tau         # container on AGV
-      arr_dropoff = c_j + loaded_time                             # delivery to yard
-      completion  = arr_dropoff                                   # Cmax >= r_j
+      c_j         = max(arr_pickup, qc_ready + tau)               # Eq 14/15/17 + 10
+      arr_dropoff = c_j + loaded_time                             # r_j: delivery to yard (Eq 16)
+      completion  = arr_dropoff                                   # Eq 3: Cmax >= r_j
+      agv_free    = arr_dropoff                                   # released at the yard
 
-In both cases the AGV becomes free at ``arr_dropoff`` positioned at ``dropoff(j)``.
+A LOAD frees its AGV at the QC pickup (``c_j - tau``); an UNLOAD frees it at the yard
+(``arr_dropoff``).
 
 ``C_max = max_j completion[j]``. Energy ``E = sum_j (empty_energy[j] + loaded_energy[j])``.
 
@@ -205,17 +210,25 @@ def _evaluate_uncoupled(schedule: Schedule, instance: Instance) -> Evaluation:
 
         arr_pickup[j] = agv_ready + empty_time[j]
         if task.kind is TaskKind.LOAD:
-            # Deliver to the QC first, then the QC loads onto the ship.
-            arr_dropoff[j] = arr_pickup[j] + loaded_time[j]
-            qc_finish[j] = max(arr_dropoff[j], qc_ready) + task.handling_time
-            completion[j] = qc_finish[j]
+            # AGV delivers to the quay (r_j, Eq 12/13/18); the QC then lifts onto the ship
+            # (Eq 11: c_j >= r_j + tau; Eq 10: c_j >= qc_ready + tau). The AGV is held at the
+            # quay until the QC takes the container, so it is released at c_j - tau =
+            # max(arrival, qc_ready) -- the term Eq 12/17 use for the next task (NOT arrival).
+            arr_dropoff[j] = arr_pickup[j] + loaded_time[j]  # r_j
+            qc_finish[j] = max(arr_dropoff[j], qc_ready) + task.handling_time  # c_j (Eq 10/11)
+            completion[j] = qc_finish[j]  # Eq 2: C_max >= c_j
+            agv_free_after[j] = qc_finish[j] - task.handling_time  # Eq 12: c_i - tau_i
         else:
-            # QC lifts onto the waiting AGV, then the AGV carries it to the yard.
-            qc_finish[j] = max(arr_pickup[j], qc_ready) + task.handling_time
-            arr_dropoff[j] = qc_finish[j] + loaded_time[j]
-            completion[j] = arr_dropoff[j]
-
-        agv_free_after[j] = arr_dropoff[j]
+            # QC lifts off the ship onto the waiting AGV, then the AGV carries it to the yard.
+            # Eq 14/15/17 bound c_j by the AGV arrival with NO +tau (the QC handling overlaps
+            # the AGV's travel); the handling is charged only along the QC chain (Eq 10:
+            # c_j >= qc_ready + tau). So c_j = max(arrival, qc_ready + tau), with no QC-chain
+            # floor for the first task on a crane (qc_prev < 0).
+            qc_floor = qc_ready + task.handling_time if qp >= 0 else 0.0
+            qc_finish[j] = max(arr_pickup[j], qc_floor)  # c_j (Eq 10/14/15/17)
+            arr_dropoff[j] = qc_finish[j] + loaded_time[j]  # r_j (Eq 16)
+            completion[j] = arr_dropoff[j]  # Eq 3: C_max >= r_j
+            agv_free_after[j] = arr_dropoff[j]  # r_j (Eq 14/18)
 
     makespan = max(completion)
     energy = sum(empty_energy) + sum(loaded_energy)
@@ -277,22 +290,38 @@ def _evaluate_power_coupled(schedule: Schedule, instance: Instance) -> Evaluatio
         empty_power[j] = SPEED_TABLE[schedule.empty_speed[j]].empty_power
         loaded_power[j] = SPEED_TABLE[schedule.loaded_speed[j]].loaded_power
 
-    # Activity model: (task, kind) with kind in {"E" empty travel, "H" QC handling,
-    # "L" loaded travel}. Precedence edges encode AGV serialisation, the LOAD/UNLOAD
-    # QC interleaving, and per-QC serialisation; only E and L consume power.
+    # Activity model. Kinds: power-consuming travel legs "E" (empty) and "L" (loaded),
+    # plus zero-power timing nodes "R" (LOAD AGV release at QC pickup, dur 0), "H" (QC
+    # handling, dur tau) and "C" (UNLOAD completion = container-on-AGV, dur 0). The
+    # precedence reproduces the corrected uncoupled recurrence (FSMJ Eqs 10-18) exactly;
+    # only E and L draw power. Per task the "QC completion" node is H (load) / C (unload)
+    # and the "AGV release" node is R (load) / L (unload).
     Act = tuple[int, str]
+
+    def qc_done(j: int) -> Act:
+        return (j, "H") if instance.tasks[j].kind is TaskKind.LOAD else (j, "C")
+
+    def agv_rel(j: int) -> Act:
+        return (j, "R") if instance.tasks[j].kind is TaskKind.LOAD else (j, "L")
+
     preds: dict[Act, list[Act]] = {}
     for j in range(n):
-        e, h, ll = (j, "E"), (j, "H"), (j, "L")
-        e_preds: list[Act] = [] if agv_prev[j] < 0 else [(agv_prev[j], "L")]
-        qc_chain: list[Act] = [] if qc_prev[j] < 0 else [(qc_prev[j], "H")]
-        preds[e] = e_preds
+        e_preds: list[Act] = [] if agv_prev[j] < 0 else [agv_rel(agv_prev[j])]
+        qc_chain: list[Act] = [] if qc_prev[j] < 0 else [qc_done(qc_prev[j])]
+        preds[(j, "E")] = e_preds
         if instance.tasks[j].kind is TaskKind.LOAD:
-            preds[ll] = [e]
-            preds[h] = [ll, *qc_chain]
+            preds[(j, "L")] = [(j, "E")]
+            preds[(j, "R")] = [(j, "L"), *qc_chain]  # released at max(arrival, qc_ready)
+            preds[(j, "H")] = [(j, "R")]  # c_j = release + tau
         else:
-            preds[h] = [e, *qc_chain]
-            preds[ll] = [h]
+            # QC handling overlaps AGV travel: H is gated by the QC chain only (no E), and
+            # is omitted for the first task on a crane so it is not charged tau (Eq 14/15).
+            if qc_prev[j] >= 0:
+                preds[(j, "H")] = [*qc_chain]
+                preds[(j, "C")] = [(j, "E"), (j, "H")]  # c_j = max(arrival, qc_ready + tau)
+            else:
+                preds[(j, "C")] = [(j, "E")]  # c_j = arrival
+            preds[(j, "L")] = [(j, "C")]
 
     succ: dict[Act, list[Act]] = {a: [] for a in preds}
     pred_count: dict[Act, int] = {a: len(p) for a, p in preds.items()}
@@ -304,11 +333,17 @@ def _evaluate_power_coupled(schedule: Schedule, instance: Instance) -> Evaluatio
     start: dict[Act, float] = {}
     finish: dict[Act, float] = {}
 
+    def _is_power(a: Act) -> bool:
+        return a[1] in ("E", "L")
+
     def _power(a: Act) -> float:
         return empty_power[a[0]] if a[1] == "E" else loaded_power[a[0]]
 
     def _dur(a: Act) -> float:
         return empty_time[a[0]] if a[1] == "E" else loaded_time[a[0]]
+
+    def _zero_dur(a: Act) -> float:
+        return instance.tasks[a[0]].handling_time if a[1] == "H" else 0.0
 
     finish_heap: list[tuple[float, int, Act]] = []
     ready_travel: list[Act] = []
@@ -322,7 +357,7 @@ def _evaluate_power_coupled(schedule: Schedule, instance: Instance) -> Evaluatio
     def _schedule_zero_power(a: Act, t: float) -> None:
         nonlocal seq
         start[a] = t
-        finish[a] = t + instance.tasks[a[0]].handling_time
+        finish[a] = t + _zero_dur(a)
         heapq.heappush(finish_heap, (finish[a], seq, a))
         seq += 1
 
@@ -347,10 +382,10 @@ def _evaluate_power_coupled(schedule: Schedule, instance: Instance) -> Evaluatio
     # Seed: activities with no predecessors (first empty leg of each AGV).
     for a, c in pred_count.items():
         if c == 0:
-            if a[1] == "H":
-                _schedule_zero_power(a, 0.0)
-            else:
+            if _is_power(a):
                 ready_travel.append(a)
+            else:
+                _schedule_zero_power(a, 0.0)
     _try_start(0.0, None)
 
     while finish_heap:
@@ -358,7 +393,7 @@ def _evaluate_power_coupled(schedule: Schedule, instance: Instance) -> Evaluatio
         trigger: Act | None = None
         while finish_heap and finish_heap[0][0] <= t + _EPS:
             _, _, a = heapq.heappop(finish_heap)
-            if a[1] in ("E", "L"):
+            if _is_power(a):
                 power_used -= _power(a)
                 trigger = a
             for s in succ[a]:
@@ -366,10 +401,10 @@ def _evaluate_power_coupled(schedule: Schedule, instance: Instance) -> Evaluatio
                 if finish[a] > avail[s]:
                     avail[s] = finish[a]
                 if pred_count[s] == 0:
-                    if s[1] == "H":
-                        _schedule_zero_power(s, avail[s])
-                    else:
+                    if _is_power(s):
                         ready_travel.append(s)
+                    else:
+                        _schedule_zero_power(s, avail[s])
         _try_start(t, trigger)
 
     arr_pickup = [finish[(j, "E")] for j in range(n)]
@@ -380,19 +415,20 @@ def _evaluate_power_coupled(schedule: Schedule, instance: Instance) -> Evaluatio
     wait_empty = [0.0] * n
     wait_loaded = [0.0] * n
     for j in range(n):
-        prec_e = 0.0 if agv_prev[j] < 0 else finish[(agv_prev[j], "L")]
+        prec_e = 0.0 if agv_prev[j] < 0 else finish[agv_rel(agv_prev[j])]
         wait_empty[j] = max(0.0, start[(j, "E")] - prec_e)
         if instance.tasks[j].kind is TaskKind.LOAD:
-            arr_dropoff[j] = finish[(j, "L")]
-            qc_finish[j] = finish[(j, "H")]
+            arr_dropoff[j] = finish[(j, "L")]  # r_j
+            qc_finish[j] = finish[(j, "H")]  # c_j
             completion[j] = qc_finish[j]
+            agv_free_after[j] = finish[(j, "R")]  # released at QC pickup
             wait_loaded[j] = max(0.0, start[(j, "L")] - finish[(j, "E")])
         else:
-            qc_finish[j] = finish[(j, "H")]
-            arr_dropoff[j] = finish[(j, "L")]
+            qc_finish[j] = finish[(j, "C")]  # c_j
+            arr_dropoff[j] = finish[(j, "L")]  # r_j
             completion[j] = arr_dropoff[j]
-            wait_loaded[j] = max(0.0, start[(j, "L")] - finish[(j, "H")])
-        agv_free_after[j] = finish[(j, "L")]
+            agv_free_after[j] = finish[(j, "L")]  # released at the yard
+            wait_loaded[j] = max(0.0, start[(j, "L")] - finish[(j, "C")])
 
     return Evaluation(
         makespan=max(completion),

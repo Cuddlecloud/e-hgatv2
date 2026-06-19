@@ -74,11 +74,13 @@ def test_single_unload_task_timing_and_energy() -> None:
         loaded_speed=(NOM,),
     )
     ev = evaluate(sched, inst)
-    # empty: 120/6 = 20 s, 200; QC op: max(20,0)+40 = 60; loaded: 90/3 = 30 -> delivery 90.
+    # empty: 120/6 = 20 s, 200. First task on QC1, so Eq (15) gives c_j = arrival = 20 with
+    # NO tau (Eq 10 charges tau only between consecutive crane tasks); loaded 90/3 = 30 ->
+    # delivery r_j = 50.
     assert ev.arr_pickup[0] == pytest.approx(20.0)
-    assert ev.qc_finish[0] == pytest.approx(60.0)
-    assert ev.arr_dropoff[0] == pytest.approx(90.0)
-    assert ev.makespan == pytest.approx(90.0)  # Cmax >= r_j (delivery) for unload
+    assert ev.qc_finish[0] == pytest.approx(20.0)  # first crane task: no tau floor (Eq 15)
+    assert ev.arr_dropoff[0] == pytest.approx(50.0)
+    assert ev.makespan == pytest.approx(50.0)  # Cmax >= r_j (delivery) for unload
     assert ev.energy == pytest.approx(650.0)
 
 

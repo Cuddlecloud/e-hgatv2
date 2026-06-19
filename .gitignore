@@ -24,6 +24,16 @@ htmlcov/
 .vscode/
 .DS_Store
 
+# Secrets / local env (NEVER commit)
+.env
+*.env
+secrets/
+
+# Reference papers / advisor materials (local only, never commit)
+*.pdf
+refs/
+typeset_equations/
+
 # Experiment artifacts (heavy / regenerable). Golden references are tracked.
 experiments/**/runs/
 experiments/**/*.pt
