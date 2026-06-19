@@ -44,6 +44,7 @@ class FusedSample:
     tau: Tensor           # [N] exact handling delay
     objectives: Tensor    # [2] exact (C_max, E)
     waits: Tensor         # [N, 2] exact (empty_wait, loaded_wait); zeros when uncoupled
+    power_arcs: tuple[tuple[int, int, int, int], ...] = ()  # simulator binding power arcs
 
 
 @dataclass(frozen=True)
@@ -119,6 +120,7 @@ def build_samples(instance: Instance, num_samples: int, *, seed: int = 0) -> lis
                 tau=tau,
                 objectives=torch.tensor(list(evaluation.objectives), dtype=torch.float32),
                 waits=waits,
+                power_arcs=tuple(evaluation.power_arcs),
             )
         )
     return samples

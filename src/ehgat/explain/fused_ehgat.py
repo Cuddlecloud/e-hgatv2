@@ -205,6 +205,31 @@ class FusedEHGATv2(nn.Module):
             params += list(self.wait_head.parameters())
         return params
 
+    def static_features(
+        self, data: HeteroData, h: Tensor
+    ) -> tuple[Tensor, Tensor, Tensor, Tensor, Tensor]:
+        """Embedding+prior features that DON'T depend on the heads (so they can be cached).
+
+        Returns ``(leg_in, delay_in, empty_e, loaded_e, arc)`` with rows in task order
+        (AGV arc per task, sorted by dst). ``leg_in`` feeds the leg/wait heads, ``delay_in``
+        the tau head; ``empty_e``/``loaded_e`` are the exact arc leg energies.
+        """
+        x = data[NODE_TYPE].x
+        agv_index = data[AGV_EDGE].edge_index
+        agv_attr = data[AGV_EDGE].edge_attr
+        agv_prior = (agv_attr - self.core.agv_mean) / self.core.agv_std
+        hand_prior = (x[:, 0:1] - self.core.node_mean[0]) / self.core.node_std[0]
+
+        order = torch.argsort(agv_index[1])  # row k <-> task k
+        src = agv_index[0][order]
+        dst = agv_index[1][order]
+        arc = agv_attr[order]
+        empty_e = arc[:, _E_EMPTY_COL]
+        loaded_e = arc[:, _E_LOADED_COL]
+        leg_in = torch.cat([h[src], h[dst], agv_prior[order]], dim=-1)  # [N, 2H + EDGE_DIM]
+        delay_in = torch.cat([h, hand_prior], dim=-1)                   # [N, H + 1]
+        return leg_in, delay_in, empty_e, loaded_e, arc
+
     @torch.no_grad()
     def encode_cached(self, data: HeteroData) -> Tensor:
         """Frozen-core node embeddings ``h`` ``[N, hidden]``, detached for reuse.
@@ -233,30 +258,15 @@ class FusedEHGATv2(nn.Module):
         """
         if h is None:
             h = self.core.encode(data)  # [N, hidden]
-        x = data[NODE_TYPE].x
-        agv_index = data[AGV_EDGE].edge_index
-        agv_attr = data[AGV_EDGE].edge_attr
-        # Standardise the physical priors with the frozen core's own statistics.
-        agv_prior = (agv_attr - self.core.agv_mean) / self.core.agv_std
-        hand_prior = (x[:, 0:1] - self.core.node_mean[0]) / self.core.node_std[0]
-
-        # One AGV arc per task with dst = j; order by dst so row k <-> task k.
-        order = torch.argsort(agv_index[1])
-        src = agv_index[0][order]
-        dst = agv_index[1][order]
-        arc = agv_attr[order]
-        empty_e = arc[:, _E_EMPTY_COL]
-        loaded_e = arc[:, _E_LOADED_COL]
-
-        leg_in = torch.cat([h[src], h[dst], agv_prior[order]], dim=-1)   # [N, 2H + 3]
-        delay_in = torch.cat([h, hand_prior], dim=-1)                    # [N, H + 1]
+        leg_in, delay_in, empty_e, loaded_e, arc = self.static_features(data, h)
         if self.use_physics_prior:
             # Baseline: residual around the exact closed-form split (GNN barely contributes).
+            handling = data[NODE_TYPE].x[:, 0]
             empty_prior, loaded_prior = _leg_time_prior(arc[:, _T_TRAVEL_COL], empty_e, loaded_e)
             resid = self.leg_head(leg_in) * self.leg_std
             empty_t = (empty_prior + resid[:, 0]).clamp_min(0.0)
             loaded_t = (loaded_prior + resid[:, 1]).clamp_min(0.0)
-            node_delay = (x[:, 0] + self.delay_head(delay_in).squeeze(-1) * self.tau_std).clamp_min(0.0)
+            node_delay = (handling + self.delay_head(delay_in).squeeze(-1) * self.tau_std).clamp_min(0.0)
         else:
             # GNN-does-the-work: predict the leg times / delay from embeddings (+ priors as
             # input features), de-normalised by the leg/tau buffers. The split is a learnable
