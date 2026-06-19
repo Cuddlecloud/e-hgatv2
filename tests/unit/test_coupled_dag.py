@@ -43,7 +43,7 @@ def test_coupled_dag_reproduces_simulator_makespan() -> None:
     base = build_toy_instance(num_tasks=8)
     for budget in (25.0, 30.0, 45.0):
         inst = dataclasses.replace(base, peak_power=budget)
-        rng = make_rng(budget)  # vary schedules per budget
+        rng = make_rng(int(budget))  # vary schedules per budget
         for _ in range(30):
             sched = decode(rng.random(4 * inst.num_tasks), inst)
             ev = evaluate(sched, inst)
