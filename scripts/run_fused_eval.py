@@ -60,12 +60,17 @@ class Job:
 
 
 def _run_one(job: Job, args_dict: dict) -> dict:
-    """Worker: one (N, seed) fused-TAPE run -> flat metric dict. Pinned to one thread."""
-    os.environ.setdefault("OMP_NUM_THREADS", "1")
-    os.environ.setdefault("MKL_NUM_THREADS", "1")
+    """Worker: one (N, seed) fused-TAPE run -> flat metric dict.
+
+    Threads per worker come from ``THREADS_PER_WORKER`` (default 1) so a many-core box can
+    trade a little per-worker BLAS parallelism against running every (N, seed) concurrently.
+    """
+    nthr = int(os.environ.get("THREADS_PER_WORKER", "1"))
+    os.environ.setdefault("OMP_NUM_THREADS", str(nthr))
+    os.environ.setdefault("MKL_NUM_THREADS", str(nthr))
     import torch
 
-    torch.set_num_threads(1)
+    torch.set_num_threads(nthr)
 
     from ehgat.environment.decoder import NUM_BLOCKS, decode
     from ehgat.environment.instance import build_toy_instance
