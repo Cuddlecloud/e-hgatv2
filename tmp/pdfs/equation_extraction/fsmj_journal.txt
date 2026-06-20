@@ -1,0 +1,1595 @@
+
+
+===== PAGE 1 =====
+                                                             
+                                                             
+                                                             
+       Flexible Services and Manufacturing Journal (2023) 35:241–268
+       https://doi.org/10.1007/s10696-022-09467-6            
+                                                             
+                                                             
+       A bi‑objective multi‑population biased random key genetic
+       algorithm for joint scheduling quay cranes and speed  
+       adjustable vehicles in container terminals            
+                                                             
+                                                             
+       Dalila B. M. M. Fontes1,2 · S. Mahdi Homayouni1       
+                                                             
+       Accepted: 27 August 2022 / Published online: 14 September 2022
+       © The Author(s), under exclusive licence to Springer Science+Business Media, LLC, part of Springer Nature
+       2022                                                  
+                                                             
+       Abstract                                              
+       This work formulates a mixed-integer linear programming (MILP) model and pro-
+       poses a bi-objective multi-population biased random key genetic algorithm (mp-
+       BRKGA) for the joint scheduling of quay cranes and speed adjustable vehicles in
+       container terminals considering the dual-cycling strategy. Under such a strategy,
+       a combination of loading and unloading containers are handled by a set of cranes
+       (moved between ships and vehicles) and transported by a set of vehicles (transported
+       between the quayside and the storage area). The problem consists of four compo-
+       nents: crane scheduling, vehicle assignment, vehicle scheduling, and speed assign-
+       ment both for empty and loaded journey legs. The results show that an approximated
+       true Pareto front can be found by solving the proposed MILP model and that the mp-
+       BRKGA finds uniformly distributed Pareto fronts, close to the true ones. Addition-
+       ally, the results clearly demonstrate the advantages of considering speed adjustable
+       vehicles since both the makespan and the energy consumption can be considerably
+       reduced.                                              
+       Keywords Joint scheduling · Container terminal · Speed adjustable vehicles ·
+       Quay cranes · Energy efficiency · Biased random key genetic algorithm · MILP ·
+       Bi-objective                                          
+                                                             
+       Supported by ERDF - European Regional Development Fund, COMPETE 2020 - Operational
+       Programme for Competitiveness and Internationalisation, and by National Fundsthrough FCT -
+       Fundação para a Ciência e a Tecnologia within projects POCI-01-0145-FEDER-031821-PTDC/
+       EGE-OGE/31821/2017 and POCI-01-0145-FEDER-031447-PTDC/EEI-AUT/31447/2017.
+       *                                                     
+         S. Mahdi Homayouni                                  
+         smh@inesctec.pt                                     
+         Dalila B. M. M. Fontes                              
+         fontes@fep.up.pt                                    
+       1 LIAAD, INESC TEC, Porto, Portugal                   
+       2 Faculdade de Economia, Universidade do Porto, Porto, Portugal
+                                             Vol.:(012134 536789)
+                                                             
+
+===== PAGE 2 =====
+                                                             
+                                                             
+                                                             
+       242                             D. B. M. M. Fontes, S. M. Homayouni
+       1 Introduction                                        
+                                                             
+                                                             
+       The introduction of containers facilitated standardization of maritime transporta-
+       tion (ship loading and unloading and cargo transportation within and in and out
+       of seaports), which in turn led to more efficient scheduling and controlling of
+       seaport operations.                                   
+         A typical container handling system consists of a set of quay cranes (QCs)
+       located at the quayside, a set of yard cranes (YCs) located at the storage yard,
+       and a set of horizontal transport vehicles (vehicles) that connect the quayside and
+       the storage yard. Usually, QCs are allocated exclusively to a single ship that has
+       several QCs allocated to it while vehicles are shared among several ships, that is,
+       each ship is served by several vehicles and each vehicle serves several ships. The
+       handling sequence starts when a container ship moors at a container terminal.
+       Several QCs are assigned to unload the importing containers from the ship onto
+       vehicles, one at a time. Then the vehicles transport the containers to one of the
+       load/unload stations (LU stations) in the storage yard. The reverse process takes
+       place when the vehicles transport the exporting containers from the LU stations
+       to the quayside and then the QCs pick them up from the vehicles and load them
+       into the ship.                                        
+         Container terminals, at least modern ones (e.g., Euromax CT in Rotterdam and
+       Pasir Panjang Terminal in Singapore), employ automated guided vehicles (AGVs)
+       to transport containers between the quayside and the storage area since AGVs
+       provide a higher degree of reliability while at the same time allow for labor cost
+       savings (Schmidt et al. 2015; Ma et al. 2021). AGVs are usually classified as pas-
+       sive vehicles as they are not able to lift the containers. Thus, an AGV arriving
+       at the quayside is loaded or unloaded by a QC. Nevertheless, AGVs may have
+       to wait at the quayside as a QC may not be readily available. On the other hand,
+       QCs may have to wait for the arrival of an AGV (to the quayside) before picking
+       up or dropping off a container. Hence, handling and transport tasks performed by
+       the QCs and the AGVs, respectively, are tightly intertwined. Therefore, they have
+       to be jointly optimized. Recent reviews on joint scheduling methods in container
+       terminals can be found in (Homayouni and Fontes 2018; Kizilay et al. 2021).
+         It is common practice to unload all importing containers first and then to load
+       all exporting containers; such a strategy is known as the single-cycling strat-
+       egy. As expected using a dual-cycling strategy, i.e., combining the loading and
+       unloading processes, results in a more complex and harder to solve optimization
+       problem. However, such a strategy can, potentially, increase the efficiency of the
+       container terminal as a whole by reducing empty travel distances as well as idle
+       times of both QCs and AGVs (Homayouni and Fontes 2021a; Homayouni et al.
+       2014).                                                
+         Although many factors influence the productivity and efficiency of ports, envi-
+       ronmental awareness and stern regulation have significantly increased the impor-
+       tance and relevance of sustainability issues. This work, following such a trend,
+       considers not only the usual economic metric (makespan) but also an environ-
+       mental metric (energy efficiency). Energy efficiency entails providing the same
+       1 3                                                   
+
+===== PAGE 3 =====
+                                                             
+                                                             
+                                                             
+       A bi‑objective multi‑population biased random key genetic… 243
+                                                             
+       level of service while consuming less energy, which in turn results in lower emis-
+       sions; this way contributes to increasing port sustainability. Although several
+       works have been reported on the simultaneous scheduling of QCs and AGVs,
+       almost all optimize only time related measures (see, e.g.,Kizilay et al. 2021; Yue
+       et al. 2021and the references therein).               
+         In this work, energy efficiency is studied by analyzing trade-offs between the
+       time required to conclude all handling and transporting tasks (makespan) and the
+       total AGV energy consumption. Better coordination of QCs and AGVs may reduce
+       the required idle times and lead to solutions in which both objectives are improved.
+       Additionally, time and/or energy gains may be achieved by having the AGVs travel
+       at different speeds. Time gains can be achieved by having the AGVs travel faster,
+       while energy consumption may be reduced by having them travel slower. The AGVs
+       considered can autonomously adjust their speed and, hence, can travel faster in some
+       journeys or journey legs and slower in some others. Hereafter, we refer to this type
+       of AGVs as speed adjustable AGVs (SA-AGVs).           
+         Although, speed adjustable vehicles have already been considered in other con-
+       texts, such as ship routing (Dulebenets et al. 2021; Yu et al. 2019) and manufac-
+       turing systems (Homayouni and Fontes 2021b; Riazi et al. 2020), in this context
+       (QCs and SA-AGVs scheduling) they have only been considered in (Homayouni
+       and Fontes 2021a). Here, we extend the latter work by proposing a modified MILP
+       model and also by proposing a bi-objective multi-population biased random key
+       genetic algorithm (mp-BRKGA) capable of quickly finding solutions with good
+       trade-offs regarding time (makespan) and energy (AGV energy consumption).
+         The joint scheduling of QCs and SA-AGVs has four components: (i) QC sched-
+       uling - timing the handling tasks of each QC, (ii) SA-AGV assignment - assigning
+       transport tasks to SA-AGVs, (iii) SA-AGV scheduling - sequencing and timing the
+       transport tasks of each SA-AGV, and (iv) speed assignment - determining the speed
+       of each leg (loaded and empty) of each transport task. Additionally, we consider the
+       dual-cycling strategy under which container loading and unloading are scheduled
+       simultaneously. The main contributions of this work are several: first, we address
+       a new problem that has only been previously addressed in (Homayouni and Fontes
+       2021a). Second, we clearly show the positive impact of considering SA-AGVs in
+       practice, since the computational results demonstrate that by resorting to SA-AGVs
+       it is possible to load and unload ships faster and, at the same time, consume less
+       energy. Third, we propose a bi-objective mixed-integer linear programming (MILP)
+       model that improves on that of Homayouni and Fontes (2021a) since it now has
+       fewer decision variables and fewer constraints. Thus, optimal Pareto fronts are
+       obtained for more problem instances than those originally reported in (Homayouni
+       and Fontes 2021a). Fourth, we develop a bi-objective multi-population Biased Ran-
+       dom Key Genetic Algorithm (mp-BRKGA) that efficiently approximates the true
+       Pareto front. Finally, the mp-BRKGA can be used to find solutions for large and
+       realistic size instances efficiently.                 
+         The remainder of the paper is organized as follows. Sect. 2 reviews related work
+       and Sect. 3 defines the problem of joint scheduling QCs and SA-AGVs and for-
+       mulates it as a MILP model. In Sect. 4, we describe the proposed bi-objective mp-
+       BRKGA solution approach and in Sect. 5, we report the numerical experiments and
+                                                1 3          
+
+===== PAGE 4 =====
+                                                             
+                                                             
+                                                             
+       244                             D. B. M. M. Fontes, S. M. Homayouni
+                                                             
+       corresponding computational results. Finally, Sect. 6 provides some conclusions and
+       future research directions.                           
+                                                             
+       2 Related works                                       
+                                                             
+       Seaside operations planning problems are commonly addressed in isolation, particu-
+       larly by practitioners. However, due to the inter-dependencies of, at least some of,
+       these problems, achieving the best performance in each problem does not ensure
+       the best performance of the port or even a good one. For example, a QC (say QC1)
+       may have to wait for an AGV to be able to load/unload a container. This delay of
+       QC1 leads to delays on other containers handled by QC1, which in turn may impose
+       waiting times (delays) on the vehicles transporting the delayed containers. The
+       shortcomings of considering the problems separately have been discussed in the
+       literature (see, e.g.,Homayouni and Fontes 2018; Dragović et al. 2017; Carlo et al.
+       2015). Problem integration can improve the performance of the container handling
+       systems, although requiring the development of complex models that are difficult to
+       solve. Homayouni et al. (2014) have shown that similar performance metrics can be
+       obtained with a half-sized AGV fleet by scheduling QCs and AGVs jointly rather
+       than sequentially.                                    
+         Among the reach literature on scheduling container handling systems, we are
+       interested in the joint scheduling of QCs and vehicles1, which, in recent years, has
+       been increasingly attracting research attention.      
+         Mathematical programming models for joint scheduling QCs and AGVs have
+       been proposed both for the single-cycling strategy (Hop et al. 2021; Skaf et al. 2021;
+       Zhen et al. 2019; Jonker et al. 2019; Kaveshgar and Huynh 2015) and for the dual-
+       cycling strategy (Homayouni and Fontes 2021a; Yue et al. 2021, 2020; Zhao et al.
+       2019; Homayouni and Tang 2016; Tang et al. 2014; Homayouni and Tang 2013).
+         The problem of joint scheduling QCs and AGVs under a single-cycling strategy
+       has been proven to be strongly NP-hard (Zhen et al. 2019). Unsurprisingly, several
+       metaheuristic approaches have been proposed over the years; the most common
+       being genetic algorithms (GAs). Homayouni and Tang (2013) propose a heuristic
+       approach in which a GA optimizes the schedule of the QCs handling tasks and then
+       a nearest available vehicle heuristic assigns the AGVs to the corresponding transport
+       tasks. Kaveshgar and Huynh (2015) propose a GA coupled with a greedy heuristic
+       that simultaneously schedules QCs and AGVs. The initial population is randomly
+       generated, except for one solution that is obtained by a greedy heuristic.
+         Recently, Yue et al. (2021) propose a two-stage approach for the sequential
+       scheduling of QCs and AGVs. QCs are scheduled with the objective of maximizing
+       customer satisfaction, while AGVs are scheduled with two objectives, namely: mini-
+       mizing idle time and minimizing QC delay. For the first stage, the author developed
+       1 In this section, for the sake of simplicity and readability, the horizontal transport vehicles are all
+       referred to as AGVs. Although some of the works reviewed consider other types of vehicles, e.g., yard
+       trucks, the optimization problems being addressed are the same.
+       1 3                                                   
+                                                             
+
+===== PAGE 5 =====
+                                                             
+                                                             
+                                                             
+       A bi‑objective multi‑population biased random key genetic… 245
+                                                             
+       a MILP model, which is solved using Gurobi®. To solve the AGVs scheduling prob-
+       lem associated with the QCs schedule found in the first phase, the authors propose a
+       non-dominated sorting genetic algorithm.              
+         Other metaheuristics have also been proposed; for example, Tang et al. (2014)
+       propose a particle swarm optimization (PSO) algorithm coupled with a heuristic for
+       the joint scheduling of QCs and AGVs. The PSO is responsible for assigning and
+       sequencing the handling tasks. The heuristic considers one transport task at a time,
+       according to the task request time, and assigns it to the earliest available AGV. Simi-
+       lar PSO algorithms were proposed by Zhen et al. (2019) and by Hop et al. (2021).
+       Other examples are the two-stage Tabu search (TS) by Zhao et al. (2019), the sim-
+       ulated annealing algorithms by Jonker et al. (2019) and by Homayouni and Tang
+       (2016), and the enumerative algorithm by Skaf et al. (2021).
+         Until recently, port authorities were just concerned with efficiency measures,
+       mainly related to time, such as loading and unloading makespan (Hop et al. 2021;
+       Skaf et al. 2021; Jonker et al. 2019; Kaveshgar and Huynh 2015), idle and waiting
+       times (Yue et al. 2021; Zhen et al. 2019; Tang et al. 2014), and equipment utiliza-
+       tion and delays (Homayouni and Tang 2013; Homayouni et al. 2014; Homayouni
+       and Tang 2016). However, recently, energy efficiency and energy consumption have
+       become the main issues when scheduling port operations. This change occurred not
+       only due to a more environmentally aware society but also due to changes in regula-
+       tion and legislation that enforce a reduction in energy consumption and on pollut-
+       ants emissions. This paradigm shift implies new management practices and policies,
+       which have become the focus of recent research. The next step, which is already
+       being made, is to approach operational decisions in a way that ensures the outcomes
+       required by these new management practices and policies.
+         As recent surveys on energy-efficient practices in seaports show there is a very
+       limited number of works on operations planning addressing energy issues (Sdouko-
+       poulos et al. 2019; Iris and Lam 2019). Zhao et al. (2019) propose a two-stage TS
+       algorithm to find solutions for the joint scheduling of QCs and AGVs. However,
+       in their approach QCs and AGVs are scheduled sequentially rather than simultane-
+       ously. The first stage uses a TS to schedule QCs and the second stage dispatches
+       AGVs based on the QC schedule previously obtained. Since both stages minimize
+       the energy consumed by the scheduled resources, there is a single objective func-
+       tion and thus, no trade-off solutions need to be searched for. Another sequential
+       approach for scheduling QCs and AGVs is proposed by Yue et al. (2020). First, a
+       constrained partial enumeration strategy schedules the QCs in order to minimize
+       energy consumption. Then a GA is used to assign the containers to AGVs and to
+       find the sequence of containers for each AGV such that no QC is delayed. In this
+       problem, the objective is to minimize the AGV energy consumption. Again, no
+       trade-off solutions need to be searched for as just one objective is considered. These
+       works address energy consumption in seaports; however, its minimization is not bal-
+       anced with other objectives. Furthermore, they assume the AGVs to move at a sin-
+       gle constant speed.                                   
+         Current AGV technology allows speed control and adjustment. Therefore, AGVs
+       traveling speed can be increased or decreased. Usually, traveling at a lower speed
+       requires a lower power demand and thus a lower energy consumption. On the other
+                                                1 3          
+
+===== PAGE 6 =====
+                                                             
+                                                             
+                                                             
+       246                             D. B. M. M. Fontes, S. M. Homayouni
+                                                             
+       hand, lowering the traveling speed increases the traveling time. Therefore, speed
+       management requires balancing energy consumption and execution time. By adjust-
+       ing the traveling speed of some AGVs one may reduce their energy consumption
+       without impacting productivity or may increase productivity without impacting
+       energy consumption. For example, an AGV arriving at the quayside to pick up or
+       drop off a container ahead of time, i.e., before the QC is ready to load or unload
+       the container, can be slowed down. This way reducing energy consumption without
+       impacting container handling times. On the other hand, speeding up an AGV may
+       reduce a QC idle time (waiting for the AGV), which in turn anticipates container
+       handling which may impact the makespan.               
+         Speed adjustable AGVs (SA-AGVs) have been around for sometime and have
+       already been considered in other contexts, e.g., in the pollution routing problem (a
+       variant of the vehicle routing problem that includes determining the speed of the
+       vehicles on each route segment) (Bektaş and Laporte 2011; Ronen 2011). Never-
+       theless, thus far, just one work has considered the joint scheduling of QCs and SA-
+       AGVs (Homayouni and Fontes 2021a). In it, three bi-objective MILP models are
+       proposed to simultaneously schedule QCs and SA-AGVs. Two of the models use a
+       single cycling strategy since they consider either the unloading of a set of importing
+       containers or the loading of a set of exporting containers. The third model resorts to
+       a dual-cycling strategy to unload and to load a mixed set of importing and exporting
+       containers. All three models minimize both the makespan and the total energy con-
+       sumed by the SA-AGVs.                                 
+         In here, we extend and improve on the work in (Homayouni and Fontes 2021a)
+       since i) the MILP model proposed requires fewer variables and fewer constraints and
+       ii) we also propose an mp-BRKGA that is capable of addressing larger and realistic
+       size instances. Furthermore, the mp-BRKGA approximates well the Pareto front and
+       thus, finds good trade-off solutions efficiently. Moreover, through the computational
+       results, we provide empirical evidence of the advantages of considering SA-AGVs
+       in practice, since by using them it is possible to improve both port productivity
+       (makespan) and port energy efficiency (energy consumption).
+       3 P roblem definition & formulation                   
+                                                             
+       Container ships arrive at ports and, based on ships characteristics and cargoes char-
+       acteristics, port authorities determine where they should berth as well as which QCs
+       are assigned to each ship. The order in which containers must be handled as well as
+       which QC handles each container are also predetermined. Therefore, the problem of
+       joint scheduling QCs and speed adjustable AGVs requires solving simultaneously
+       four interdependent combinatorial optimization problems, namely: QC scheduling
+       - determining the starting and the ending time of each handling task for each QC;
+       AGV assignment - determining which vehicle performs each transport task; AGV
+       scheduling - determining the sequence and the starting and the ending time of each
+       transport task for each vehicle; and AGV mode - determining the traveling speed of
+       each segment of each transport task.                  
+       1 3                                                   
+                                                             
+
+===== PAGE 7 =====
+                                                             
+                                                             
+                                                             
+       A bi‑objective multi‑population biased random key genetic… 247
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+         All exporting containers are initially stored at the LU stations. Each exporting
+       container is picked up by an SA-AGV from the specified LU station and transported
+       to the respective quayside. Once the SA-AGV arrives at the quayside and the cor-
+       responding QC is available, the QC picks up the container from the SA-AGV, releas-
+       ing the SA-AGV. Then, the QC moves the container onto the ship, places it in a
+       predetermined holding space, and moves back empty to the quayside. Thus, the han-
+       dling time of a QC in loading tasks is the time elapsed since it picks up the container
+       from the SA-AGV (when both are available at the quayside) until the QC is back
+       to the quayside, ready for its next assignment. Similarly, all importing containers
+       are initially available on the ships. The handling of an importing container requires
+       the QC to move empty from the quayside to the holding area in the ship where the
+       container is located, to grab and move the container to the quayside, and to drop it
+       off onto the assigned SA-AGV. Once the QC reaches the quayside with the container
+       and the SA-AGV is available (at the quayside), the QC drops the container onto the
+       SA-AGV and becomes ready to start its next task. Then, the SA-AGV transports the
+       container to the storage yard and delivers it to the predetermined LU station. The
+       handling time of a QC in unloading tasks is the time elapsed since it moves empty
+       from the quayside until it drops off the container onto the SA-AGV. Transfer times
+       between QCs and SA-AGVs and between SA-AGVs and LU stations are assumed
+       negligible.                                           
+         A schematic view of the work process of SA-AGVs and QCs is illustrated in
+       Fig. 1. Recall that under the dual-cycling strategy the SA-AGVs can be assigned to
+       any sequence of loading and/or unloading tasks.       
+         A transport task requires an SA-AGV to carry the corresponding container from its
+       origin to its destination. However, the SA-AGV location (dwell point) and the container
+       location may not be the same. Hence, a transport task may require the SA-AGV to
+       travel empty from its dwell point to the location where the container needs to be picked
+                                                1 3          
+                                         elciheV             
+                         A loading task                      
+                                     LU sta on               
+                         An unloading task                   
+               QCs                      Storage yard         
+       Fig. 1 A schematic view of the work process: loading and an unloading tasks under dual-cycling strategy
+
+===== PAGE 8 =====
+                                                             
+                                                             
+                                                             
+       248                             D. B. M. M. Fontes, S. M. Homayouni
+                                                             
+       up at (empty leg) as well as a loaded travel from the current location of the container
+       to the location it must be dropped off (loaded leg). SA-AGVs can autonomously adjust
+       their speed for each leg of each transport task. Since we assume that all containers carry
+       approximately the same cargo, SA-AGVs power consumption depends on whether the
+       SA-AGV travels empty or loaded and on its traveling speed. Furthermore, as the floor
+       layout is known, empty and loaded travel times, between every origin-destination pair,
+       at each speed are predetermined.                      
+         At the beginning of the scheduling period the location of all SA-AGVs is given and,
+       while operating, SA-AGVs remain wherever they finish the transport task (dwell point)
+       until they start the next one. Any of the SA-AGVs can be used to transport any con-
+       tainer. QCs and SA-AGVs can perform one task at a time in a non-preemptive manner.
+         We seek to find the starting/ending time of each handling task for each QC and the
+       starting/ending time of each transport task for each SA-AGV as well as the traveling
+       speed for the loaded and the empty legs of each transport task such that all importing
+       containers are unloaded and stored at the corresponding LU stations and all exporting
+       containers are loaded to the assigned holding space at the ships.
+         Among all possible solutions we are interested in those that minimize the makespan
+       and the total SA-AVGs energy consumption.             
+         The MILP model that we propose is a modified and improved version of the one
+       proposed in (Homayouni and Fontes 2021a) as it requires fewer variables and fewer
+       constraints. The notation used is provided in Table 1.
+         Without loss of generality, let us consider that tasks 1 to n 1 are the ordered
+       tasks associated with the containers assigned to the first QC (Q C 1 ), tasks n 1 + 1
+       to n 1 + n 2 are the ordered tasks associated with the containers assigned to QC 2 ,
+                    L   U                                    
+       and so on. Further, let and be the sets of loading and unloading tasks, respec-
+       tively, with J = L ∪ U . Additionally, we define a set F of pairs of tasks that cannot
+       be transported consecutively, which is used to exclude variables and constraints;
+       this way reducing the size of the model. This set contains pairs of non-existing
+       or non-feasible consecutive tasks, namely: pairs of tasks including the same task
+       twice and pairs of tasks of the same QC that do not satisfy precedence constraints.
+       F = {(i, i), i ∈ J} ∪ {(i, j) ∶j ≤ i, with i, j ∈ J k and k ∈ K} , where J k is the set of n k
+       ordered tasks handled by QC k and J is the set of all handling tasks.
+                         Minimize Z = C                      
+                               1  max                        
+                               Z = E                (1)      
+                               2                             
+                         Subject to:                         
+                         C  ≥ c , ∀j ∈ L,           (2)      
+                         max  j                              
+                         C  ≥ r , ∀j ∈ U,                    
+                          max j                     (3)      
+            E =        xv 𝜃vev + 𝜒v𝜗v𝜀v + yv 𝜃v ev ,         
+                       ij ij    j j        aj aj    (4)      
+               j∈J ( i∈J v∈V v∈V      a∈A v∈V  )             
+               ∑  ∑ ∑ (   ) ∑ (    )  ∑ ∑ (   )              
+       1 3                                                   
+
+===== PAGE 9 =====
+                                                             
+                                                             
+                                                             
+       A bi‑objective multi‑population biased random key genetic… 249
+       Table 1 Notation: Sets, indices, parameters, and variables
+                                                             
+       Sets:                                                 
+       L       Set of loading tasks, indexed by i and j;     
+       U       Set of unloading tasks, indexed by i and j;   
+       J       Set of all tasks J = L ∪ U with N = J , indexed by i and j;
+       K       Set of QCs, indexed by k;                     
+       J k     Set of the n k ordered tasks allocated t | o |QC k , k ∈ K;
+       A       Set of SA-AGVs, indexed by a;                 
+       V       Set of speed values at which the SA-AGVs can travel, indexed by v, 𝜔;
+       F       Set of pairs of tasks that cannot be transported/handled consecutively.
+       Parameters:                                           
+       𝜏 j     QC handling time for task j ∈ J;              
+       𝜃 i v j Empty travel time to pick up task j ∈ J at speed v ∈ V immediately after delivering
+                task i ∈ J;                                  
+       𝜃 a v j Empty travel time to pickup task j ∈ J at speed v ∈ V , as the first task of SA-AGV
+                a ∈ A;                                       
+       𝜗v j    Loaded travel time to deliver task j ∈ J at speed v ∈ V;
+       ev      Empty power consumption at speed v ∈ V;       
+       𝜀v      Loaded power consumption at speed v ∈ V;      
+       M       A sufficiently large positive integer.        
+       Decision and auxiliary variables:                     
+       x i v j Binary variable set to 1 if the empty travel to pickup task j ∈ J is done at speed v ∈ V
+                immediately after delivering task i ∈ J and to 0 otherwise; (Note that x i v j is not
+                defined if (i, j) ∈F );                      
+       𝜒 j v   Binary variable set to 1 if the loaded travel to deliver task j ∈ J is done at speed v ∈ V
+                and to 0 otherwise;                          
+       yv aj   Binary variable set to 1 if the first task of SA-AGV a ∈ A is to pickup task j ∈ J at
+                speed v ∈ V and to 0 otherwise;              
+       w j     Binary “dummy” variable set to 1 if the delivery of task j ∈ J is the last task of an
+                SA-AGV and to 0 otherwise;                   
+       r j     Delivery time of task j ∈ J;                  
+       c j     Handling completion time of task j ∈ J;       
+       E       Total energy consumed by the SA-AGVs;         
+       C max   Makespan.                                     
+                           yv ≤ 1, ∀a ∈ A,                   
+                            aj                      (5)      
+                       j∈J v∈V                               
+                       ∑ ∑                                   
+                          w =      yv ,                      
+                           j        aj              (6)      
+                        j∈J  a∈A j∈J v∈V                     
+                        ∑    ∑ ∑ ∑                           
+                        xv +   yv = 1, ∀j ∈ J,               
+                         ij    aj                   (7)      
+                    i∈J v∈V v∈V a∈A                          
+                    ∑ ∑    ∑ ∑                               
+                                                1 3          
+
+===== PAGE 10 =====
+                                                             
+                                                             
+                                                             
+       250                             D. B. M. M. Fontes, S. M. Homayouni
+                                                             
+                          xv + w = 1, ∀j ∈ J,                
+                           ji j                     (8)      
+                      i∈J v∈V                                
+                      ∑ ∑                                    
+                          𝜒v = 1, ∀j ∈ J,                    
+                           j                        (9)      
+                        v∈V                                  
+                        ∑                                    
+                      c ≥ c + 𝜏 , ∀j ∈ J ;k ∈ K,             
+                      j  j−1 j    k                (10)      
+                        c ≥ r + 𝜏 , ∀j ∈ L,                  
+                         j j  j                    (11)      
+             r ≥ c − 𝜏 + 𝜃vxv + 𝜗𝜔𝜒𝜔 + M xv − 1 , ∀i, j ∈ L, 
+             j  i i    ij ij j j      ij           (12)      
+                    v∈V   𝜔∈V     (v∈V   )                   
+                    ∑     ∑         ∑                        
+             r ≥ 𝜃v yv + 𝜗𝜔𝜒𝜔 + M yv − 1 , ∀j ∈ L;a ∈ A,     
+             j    aj aj  j j      aj               (13)      
+               v∈V    𝜔∈V     (v∈V   )                       
+               ∑      ∑        ∑                             
+                 c ≥ r + 𝜃vxv + M xv − 1 , ∀i, j ∈ U,        
+                 j  i    ij ij   ij                (14)      
+                      v∈V    (v∈V   )                        
+                      ∑       ∑                              
+                c ≥  𝜃v yv + M yv − 1 , ∀j ∈ U;a ∈ A,        
+                 j    aj aj   aj                   (15)      
+                   v∈V     (v∈V   )                          
+                   ∑        ∑                                
+                      r ≥ c + 𝜗v𝜒v, ∀j ∈ U,                  
+                       j  j   j j                  (16)      
+                           v∈V                               
+                           ∑                                 
+               c ≥ c − 𝜏 + 𝜃vxv + M xv − 1 , ∀j ∈ U;i ∈ L,   
+               j  i  i   ij ij   ij                (17)      
+                       v∈V    (v∈V  )                        
+                      ∑        ∑                             
+             r ≥ r + 𝜃vxv + 𝜗𝜔𝜒𝜔 + M xv − 1 , ∀j ∈ L;i ∈ U,  
+             j  i   ij ij  j j      ij             (18)      
+                  v∈V   𝜔∈V     (v∈V  )                      
+                  ∑     ∑        ∑                           
+                 xv , 𝜒v, yv , w ∈ {0, 1}, ∀i, j ∈ J;v ∈ V;a ∈ A,
+                  ij j aj j                        (19)      
+                       C , c , r , E ≥ 0, ∀j ∈ J.            
+                        max j j                    (20)      
+       Expression (1) states the problem objectives, which are the minimization of the
+       makespan and the minimization of the total energy consumed by the SA-AGVs. The
+       1 3                                                   
+
+===== PAGE 11 =====
+                                                             
+                                                             
+                                                             
+       A bi‑objective multi‑population biased random key genetic… 251
+                                                             
+       makespan is defined by constraints (2) and (3) and the total energy consumption by
+       constraint (4).                                       
+         Constraints (5) and (6) ensure that each SA-AGV has at most one first task and
+       that the number of first and last tasks are the same, respectively. Constraints (7) and
+       (8) ensure, respectively, that each task is either the first task of an SA-AGV or it is
+       preceded by another task and it is either the last task of an SA-AGV or it is followed
+       by another task. In addition, constraints (9) ensure that every transport task is per-
+       formed at a single chosen speed.                      
+         A handling task can only be completed once the assigned QC has completed its
+       previous task and the task handling time has elapsed (constraints (10)). Additionally,
+       completion time constraints interconnecting the handling tasks (QCs) and the trans-
+       port tasks (SA-AGVs) are imposed to ensure feasibility of the schedule for consecu-
+       tively transporting two loading tasks (constraints (11) to (13)), two unloading tasks
+       (constraints (14) to (16)), and one loading and one unloading tasks (constraints (17)
+       and (18)). When loading a task, the QC can only complete its task after the SA-AGV
+       arrives at the quayside (with the task) and the handling time has elapsed (constraints
+       (11)). On the other hand, an SA-AGV can only deliver the task at the quayside after
+       it has completed the previous loading task, traveled empty, at the chosen speed, from
+       the quayside to the LU station to pick up the next loading task, and traveled back
+       loaded, at the chosen speed, to deliver the task to the quayside (constraints (12). If
+       a delivery is the first task of an SA-AGV, then the arrival time at the quayside is
+       given as in constraints (13), as there is no previous task delivery. If the two con-
+       secutive transport tasks refer to unloading tasks, the task can only be unloaded (from
+       the ship onto the SA-AGV) once the SA-AGV has finished its previous delivery (to
+       the LU station) and traveled back empty, at the chosen speed, to the quayside (con-
+       straints (14)); unless it is the first AGV task, in which case only the empty travel to
+       the quayside, at the chosen speed, needs to be accounted for (constraints (15)), as
+       there is no previous task delivery. The time at which the task reaches the LU station
+       is given by the time at which it is unloaded onto the SA-AGV (handling time) plus
+       the loaded travel time to the LU station (constraints (16)). Similarly, constraints (17)
+       and (18) ensure the correctness of the completion time and the AGV arrival time for
+       mixed loading and unloading tasks.                    
+         Finally, constraints (19) and (20) define the decision variables domain.
+       4 The bi‑objective multi‑population BRKGA             
+       In this section, we propose a multi-objective multi-population biased random key
+       genetic algorithm (mp-BRKGA) that quickly finds effective solutions. The algo-
+               Ω + Π                             Ω           
+       rithm evolves populations independently and in parallel: each of the popu-
+                       Ω                Π                    
+       lations considers one of the objectives, while each of the populations considers
+                 Ω                                           
+       simultaneously all objectives.                        
+         Random key genetic algorithms (RKGAs) were originally proposed by Bean
+       (1994) specifically for problems involving sequencing. RKGAs represent a solution
+       to the optimization problem as a vector of random keys (RKs), real numbers in the
+       interval [0, 1], and search the solution space indirectly. This vector is then decoded
+                                                1 3          
+
+===== PAGE 12 =====
+                                                             
+                                                             
+                                                             
+       252                             D. B. M. M. Fontes, S. M. Homayouni
+                                                             
+       into a solution to the original problem and its quality (fitness) is calculated. There-
+       fore, RKGAs can be used to solve a wide range of problems. BRKGAs differ from
+       RKGAs by introducing bias in the recombination process as one of the parents is
+       always chosen from a group of elite solutions and, during recombination, the alleles
+       of this parent have a higher chance to be passed on. BRKGAs have been success-
+       fully used to find good quality solutions to combinatorial optimization problems in
+       several application areas (see, e.g.,Gonçalves and Wäscher 2020; Homayouni et al.
+       2022; Fontes et al. 2019; Zheng et al. 2015; Roque et al. 2014; Fontes and Gon-
+       çalves 2013; Nam and Lee 2013.)                       
+         The proposed mp-BRKGA borrows the principles of (Gonçalves and Resende
+       2012; Fontes and Gonçalves 2013) and thus it searches the solution space indi-
+       rectly and evolves several populations independently and in parallel. In addition, it
+       also borrows the ideas of the classical Non-Dominated Sorting Genetic Algorithm
+       II (NSGA-II) (Deb et al. 2002) to create and rank Pareto fronts. However, unlike
+       NSGA-II, the proposed mp-BRKGA always allows offspring solutions and mutant
+       solutions to be passed onto the next generation, which promotes diversity (Cha-
+       gas et al. 2021). On the other hand, the multiple populations are evolved indepen-
+       dently; this way increasing the chances of finding good solutions faster and speed-
+       ing up convergence (Zheng et al. 2015; Fontes and Gonçalves 2013; Gonçalves and
+       Resende 2012).                                        
+       4.1 Evolutionary process                              
+                                                             
+       The evolutionary strategy is similar for all populations. The initial population is
+       randomly generated as the components of the random-key vectors are random real
+       numbers uniformly sampled from the interval [0,1]. At each generation, a new popu-
+       lation is obtained by joining a set of N e elite solutions, a set of N o offspring solu-
+       tions, and a set of N m mutant solutions. At each generation, diversity is introduced
+       by generating some new individuals rather than performing gene-by-gene mutation
+       with very low probability. These new individuals, the mutants, are randomly gener-
+       ated in the same way as the initial solutions were and thus, no genetic material of the
+       current population is brought in.                     
+             Ω                                               
+         For the single objective populations, since they are evolved independently and
+       in parallel, the elite solutions are the current generation best N e solutions, which are
+       copied to the next generation. Regarding the Π multi-objective populations, the N e
+       elite solutions are chosen from a pool of solutions. For each multi-objective popula-
+       tion 𝜋 ∈ Π at generation g + 1 the pool consists of the generation g best N e solutions
+       of population 𝜋 and of the generation g best N e solutions of each of the Ω single
+       objective populations, from which repeated solutions are removed. Thus, the pool
+       contains up to                                        
+               (Ω + 1) ×N                                    
+                      e solutions. Additionally, after a pre-determined number
+       of generations ( n ex ), all multi-objective populations contribute with their best N e
+       solutions to the pool, from which repeated solutions are removed. Therefore, every
+       n ex generations the pool contains up to (Ω + Π) × N e solutions.
+         To identify the best multi-objective solutions (to incorporate in the pool of solu-
+       tions), we first rank the solutions and then solutions with the same rank are sorted
+       1 3                                                   
+
+===== PAGE 13 =====
+                                                             
+                                                             
+                                                             
+       A bi‑objective multi‑population biased random key genetic… 253
+                                                             
+       according to their contribution to diversity. The ranking procedure (Deb et al. 2002)
+       has three main steps which are repeated until all solutions have been ranked: (i)
+       identify all non-dominated solutions; (ii) rank the solutions found in (i) with the
+       smallest value (initially 1); and (iii) remove the solutions found in (i) and repeat.
+       Solution contribution to diversity is measured by calculating its crowding distance
+       (the larger the better). The crowding distance of a solution is calculated as the nor-
+       malized distance between its two closest neighbor solutions with the same non-
+       domination rank. To obtain it, the following procedure is used for each rank and
+       each objective function: (i) sort the set of solutions; and ii) calculate the crowding
+       distance as given in equation (21). Boundary solutions, which have the lowest and
+       highest objective function values, are given an infinite crowding distance value to
+       ensure they are always selected. The final crowding distance value of a solution is
+       given by the sum of the individual crowding distance values for each objective func-
+       tion, that is CD l = Ω 𝜔=1 CD𝜔 l , for all l solutions.
+                 ∑            f 𝜔 − f 𝜔                      
+                         CD𝜔 = l+1 l−1 ,                     
+                           l  f 𝜔 − f 𝜔            (21)      
+                              max min                        
+       where f 𝜔 and f 𝜔 are the 𝜔th objective function values of solution l two closest
+            l+1 l−1                                          
+       neighbor solutions and f 𝜔 and f 𝜔 are the 𝜔th objective function values of the
+                     max   min                               
+       boundary solutions.                                   
+         Regardless of the population being evolved, the N o offspring solutions are
+       obtained by a biased parameterized uniform crossover that for each gene gives a
+       higher probability of being copied from the best parent. We randomly select one par-
+       ent from the set of elite solutions and the other from the entire population. Finally,
+       N m mutants are randomly generated from the same distribution as the initial popula-
+       tion, for all populations.                            
+         The evolutionary process, which is depicted in Fig. 2, is repeated for a predeter-
+       mined number of generations (G max ). The best solution of each of the Ω populations
+       (i.e., 𝜔 1 and 𝜔 2 ), as well as the non-dominated solutions of each of the Π multi-
+       objective populations, are joined together. Then, repeated and dominated solutions
+       are removed. The remaining solutions are Pareto solutions and provide an approxi-
+       mation to the Pareto optimal front.                   
+       4.2 Solution encoding and decoding                    
+       A solution to the problem is encoded as a four-part vector each of which with N
+       elements. As before, N = k∈K n k is the total number of tasks and elements 1 to n 1
+       refer to the tasks of QC1, elements n 1 + 1 to n 1 + n 2 to the ones of QC2, and so on,
+       where n k is the number of ∑ tasks assigned to QC k ∈ K . Each element of the vector
+       is a random key (RK). The first N genes are used to obtain the tasks sequence, the
+       second N genes to assign AGVs to tasks ( a j ), the third N genes to determine the
+       SA-AGV speed for the empty legs ( v j ), and the last N genes to determine the SA-
+       AGV speed for the loaded legs ( w j ). An example of a random encoded solution is
+       provided in (Fig. 3a).                                
+                                                1 3          
+
+===== PAGE 14 =====
+                                                             
+                                                             
+                                                             
+       254                             D. B. M. M. Fontes, S. M. Homayouni
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+       Fig. 2 Block diagram of the evolutionary process of the proposed mp-BRKGA
+                                                             
+                                                             
+                                                             
+                                                             
+        (a)                                                  
+                                                             
+        (b)                                                  
+                                                             
+        (c)                                                  
+       Fig. 3 Solution encoding and decoding for an example with eight containers, two QCs each of which
+       associated with four tasks, and two SA-AGVs that can travel at one of the three possible speeds
+                                                             
+         The decoding (mapping) of the first N genes uses the smallest position value
+       rule originally devised in (Bean 1994). Genes are sorted in ascending order, thus
+       providing a sequence of tasks, see part (i) of (Fig. 3b). Then, the tasks of each QC
+       are sorted in ascending order to ensure precedence constraints, see part (i) of
+       (Fig. 3c). The genes in the second part of the chromosome are decoded into one
+       of the A SA-AGVs as follows: values in the interval [0, 1 ] are decoded as 1 (the
+                                        A                    
+       first SA-AGV), values in the interval ( 1 , 2 ] are decoded as 2 (the second SA-
+                              A A                            
+       AGV), | a | nd so on until values in the interval [ A −1 , 1] tha | t | are decoded as A (the
+                              | | | | A                      
+       last SA-AGV). This is illustrated in Fig. 3 - pa|rt| (ii). The remaining 2N genes are
+       decoded into one of the V speed values as foll|o|ws: values in the interval| [0|, 1 ]
+                                                    V        
+       are decoded as 1 (the first speed value), values in the interval ( 1 , 2 ] are decoded
+                                           V V               
+       as 2 (the second speed v | alu | e), and so on until values in the interval [ V −1 , 1] t | ha | t
+                                          | | | | V          
+                                               | |           
+                                               | |           
+       1 3                                                   
+
+===== PAGE 15 =====
+                                                             
+                                                             
+                                                             
+       A bi‑objective multi‑population biased random key genetic… 255
+                                                             
+                                                             
+        (a)                                                  
+                                                             
+        (b)                                                  
+                                                             
+                                                             
+        (c)                                                  
+                                                             
+        (d)                                                  
+       Fig. 4 Offspring generation example using parameterized uniform crossover with p e = 0.7
+                                                             
+       are decoded as V (the highest speed value). This is illustrated in Fig. 3 - parts
+       (iii) and (iv) for the empty and loaded legs, respectively.
+                | |                                          
+       4.3 Crossover procedure                               
+                                                             
+       At each generation, a set of N o offspring solutions is generated through a biased
+       parameterized uniform crossover. Bias is introduced by always selecting one parent
+       from the elite solutions and another from the remaining solutions and by giving a
+       larger inheritance probability to the genes of the elite parent.
+         Figure 4 illustrates the crossover operator: (a) and (b) show two random-key vec-
+       tors with 32 genes each. Let, without loss of generality, (Fig. 4a) refer to the elite
+       parent and (Fig. 4b) to the non-elite one. Additionally, let p e = 0.7 be the probabil-
+       ity of inheriting the genes from the elite parent. To determine from which parent
+       each gene is inherited a random number is generated in the interval [0; 1]; the cor-
+       responding mapping vector is shown in (Fig. 4c). Whenever a mapping vector ele-
+       ment has a value less than or equal to p e , the offspring inherits the allele of the elite
+       parent; otherwise it inherits the allele of the non-elite parent. In this example, the
+       offspring inherits nine alleles of the non-elite parent and 23 alleles of the elite par-
+       ent; resembling the elite parent the most, see (Fig. 4d).
+                                                             
+       5 Computational experiments                           
+                                                             
+       We evaluate the performance of the proposed bi-objective mp-BRKGA and the
+       MILP model on the set of 26 small-sized problem instances, DS01 to DS26, pro-
+       posed in (Homayouni and Fontes 2021a). In these instances, eight to 16 containers
+       are to be handled (loaded and unloaded) by two to six QCs and transported by two
+       SA-AGVs, under a dual cycling strategy. Additionally, we design and propose a set
+       of 10 medium and large-sized problem instances. Instances in this set are designated
+       as DL01 to DL10 and consider 40 to 160 containers that are to be handled by eight
+       to 16 QCs and transported by four to eight SA-AGVs. All the data pertaining to
+       the 36 problem instances can be downloaded from https://fastmanufacturingproject.
+       wordpress.com/problem-instances.                      
+                                                1 3          
+                                                             
+
+===== PAGE 16 =====
+                                                             
+                                                             
+                                                             
+       256                             D. B. M. M. Fontes, S. M. Homayouni
+                                                             
+         Following on the work in (Homayouni and Fontes 2021a), the average “nominal"
+       speed and power consumption are 6                     
+                           ms−1                              
+                              and 10 kilo Watt-second (kWs) and 3
+                                                   ms−1      
+       and 15 kWs, for AGVs traveling empty and carrying a 40 tonnes load, respectively. We
+       also consider two other speed values, nominal speed   
+                                   ±20%                      
+                                      . At the higher speed, empty
+       AGVs move at 7.2                                      
+                  ms−1                                       
+                     and consume 13.2 kWs, while loaded ones move at 3.6
+                                                   ms−1      
+       and consume 19.8 kWs. Similarly, at the lower speed, the AGVs move at 4.8 and 2.4
+       ms−1                                                  
+          and consume 7.8 and 11.7 kWs when traveling empty and loaded, respectively.
+         The bi-objective mp-BRKGA and the MILP model were implemented in P ython®
+       3.8 and the MILP model was solved using G urobi® 9.1. All computational experiments
+       were carried out on a 3.20 GHz I ntel® Core™i7-8700 PC with 24 GB RAM.
+       5.1 Performance indicators                            
+       The quality of the mp-BRKGA solutions and corresponding Pareto fronts (PFs) are
+       evaluated by resorting to two common performance indicators (PIs), namely: the modi-
+       fied Generational Distance (G D+ ) and the Spread ( Δ ) (Li and Yao 2019; Audet et al.
+       2021). The former measures the convergence of the solutions while the latter evaluates
+       their diversity (spread and uniformity). The          
+                               GD+                           
+                                  value is to be minimized, zero being
+       the best value as it indicates that the PF found lies on the true Pareto front PF∗ . Simi-
+       larly, a small Δ value is preferred as it is associated with a better PF distribution, both
+       in terms of spread and uniformity. Again,             
+                              Δ =0                           
+                                  is the best value since it implies that
+       solutions found are equidistantly spaced and cover the
+                                     PF∗                     
+                                       extremes. These indicators
+       are calculated as follows:                            
+                   n                                         
+                  1                                          
+          GD+(PF) =   min d+  ,                              
+                  n   j∈PF∗ (i,j)                            
+                   i=1 (     )                               
+                   ∑     {  }                                
+                              2            2                 
+          where d+ = max f i − f j, 0 + max f i − f j, 0 and f i and f i
+              (i,j)     1 1          2 2       1  2          
+                 √                                           
+                   (  {     })  (  {     })        (22)      
+       are the objective function values of solution i (C max and E, respectively);
+                          d + d + n−1 d − d̄                 
+                     Δ(PF) = u b i=1 i ,           (23)      
+                            d + d + d̄ (n − 1)               
+                            u  b ∑                           
+                                   �   �                     
+                                   �   �                     
+       where n is the number of solutions in the PF, d i is the Euclidean distance between
+       the objective function values of two consecutive solutions in the PF,
+                                             d̄              
+                                              is the average 
+       Euclidean distance, over all d i distances, and d u and d b are the Euclidean distances
+       between the two extreme solutions of the PF and those of the PF∗ , respectively.
+         To account for differences in the magnitude of the values of the two objective func-
+       tions, we normalize them as follows (Li and Yao 2019):
+                        f − f min   f − f min                
+                    f N = 1 1 and f N = 2 2 ,                
+                    1  f max − f min 2 f max − f min (24)    
+                       1   1       2   2                     
+       1 3                                                   
+
+===== PAGE 17 =====
+                                                             
+                                                             
+                                                             
+       A bi‑objective multi‑population biased random key genetic… 257
+                                                             
+       where f 1 min and f 1 max and f 2 min and f 2 max are the extreme values of C max and E, respec-
+       tively, that is, these values correspond to the objective function values of optimal
+       extreme points.                                       
+         An approximated true Pareto front (                 
+                            PF∗                              
+                               ) is obtained by employing a strategy that
+       combines the “lexicographic” and 𝜖-constraint methods. More specifically, since we
+       have two objectives we consider two single-objective optimization problems, one
+       for each objective function. To obtain the            
+                              PF∗                            
+                                 we perform the following three main
+       steps:                                                
+       1. determine the optimal makespan                     
+                             C∗                              
+                               while ignoring the energy consumption
+                              0                              
+         and then determine the optimal energy consumption   
+                                       E∗(C∗)                
+                                           while maintaining 
+                                          0                  
+         the makespan at its optimal value - this provides one of the boundary solutions
+         (Pareto front extreme point);                       
+       2. determine the optimal energy consumption           
+                                 E∗                          
+                                   while ignoring the makespan and
+                                  0                          
+         then determine the optimal makespan                 
+                              C∗(E∗)                         
+                                   while maintaining the energy con-
+                                 0                           
+         sumption at its optimal value - this provides the other boundary solution (Pareto
+         front extreme point);                               
+       3. solve a series of problems optimizing the makespan 
+                                      C∗                     
+                                        while imposing an upper
+                                       i                     
+         bound on the energy consumption ( 𝜖-constraint), starting with the best energy
+         consumption associated with the optimal makespan (  
+                                         E∗(C∗)              
+                                             ) and gradually 
+                                           0                 
+         decreasing it until it is not larger than the optimal energy consumption
+                                                 E∗          
+                                                   , and     
+                                                  0          
+         for each problem determine the optimal energy consumption
+                                           E∗(C∗)            
+                                               while main-   
+                                              i              
+         taining the makespan found.                         
+       By solving a series of optimization models, we obtain a series of non-dominated
+       solutions, which are part of the true Pareto front (Miettinen 2008).
+       5.2 Parameters setting                                
+       To test the proposed mp-BRKGA algorithm we need to set several control param-
+       eters. Following literature recommendations, we decided to set the population size
+       to P = 20N , the number of elite solutions passed on to N e = 0.2P , the number of
+       mutants introduced to N m = 0.1P , and the crossover probability to p e = 0.7 (see,
+       e.g.,Gonçalves and Resende 2012; Fontes and Gonçalves 2013; Homayouni et al.
+       2022). The remaining control parameters were set through empirical testing. We
+       considered values in the intervals recommended in the literature and test them on a
+       subset of five instances (instances DS01, DS05, DS10, DS15, and DS20) considering
+       all 180 combinations of the following values: G max = {50, 100, 200, 300, 400, 500} ,
+       Π = {1, 2, 4} , Ω = {0, 2} , and n ex = {10, 20, 30, 40, 50} . Due to the stochastic nature
+       of metaheuristic algorithms, we solved each of the five instances 10 times for each
+       of the 180 combinations.                              
+         From the experiments conducted we were able to observe and conclude that
+       the bi-objective populations outperform the single-objective ones. In addition,
+                                                     Ω       
+       incorporating the best solutions of the two single-objective populations (i.e.,
+       populations) into the bi-objective populations impacts the performance of the
+                                                1 3          
+
+===== PAGE 18 =====
+                                                             
+                                                             
+                                                             
+       258                             D. B. M. M. Fontes, S. M. Homayouni
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+       Fig. 5 Impact of the number of generations in the Pareto front obtained by the mp-BRKGA, for problem
+       instance DS10                                         
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+       Fig. 6 Impact of the number of populations (single and bi-objective) in the Pareto front obtained by the
+       mp-BRKGA, for problem instance DS15                   
+                                                             
+                                                             
+       latter in what regards extreme solutions. Further, the number of multi-objective
+              Π                                              
+       populations also contributes positively to the PIs, however, the improvement
+                    Π                                        
+       decreases rapidly as increases. Additionally, it requires significantly more
+       computation time. As expected, considering a larger number of generations
+       improves the PIs; particularly, the convergence of the PF to the PF∗ . Again, the
+       improvement decreases with the number of generations while the computation
+       time increases significantly. Regarding the n ex , we noticed that both exchang-
+       ing solutions too frequently or too infrequently degrades the algorithm perfor-
+       mance. The best performance was obtained by exchanging them at about every 30
+       1 3                                                   
+
+===== PAGE 19 =====
+                                                             
+                                                             
+                                                             
+       A bi‑objective multi‑population biased random key genetic… 259
+                                                             
+       generations. Hence, after analyzing the average values of the performance indica-
+       tors, we decided to set: G max = 300, Π =2, Ω = 2 , and n ex = 30.
+         Part of these conclusions are illustrated in Figs. 5 and 6. The PFs obtained by
+       mp-BRKGA with G max = {50, 100, 200, and 300} and the PF∗ obtained by the
+       MILP for instance DS10 are shown in Fig. 5. As it can be seen, the mp-BRKGA
+       is capable of obtaining a uniform and widely spread PF with different G max values.
+       However, its convergence to the                       
+                         PF∗                                 
+                            improves meaningfully as the number of gen-
+       erations increases from 50 to 100 and to 200 and more modestly when it increases
+       to 300.                                               
+         The PFs obtained by a single population bi-objective BRKGA and an mp-
+       BRKGA with two bi-objective populations and two single-objective populations
+       (                                                     
+        Π =2, Ω =2                                           
+               ) and the                                     
+                     PF∗                                     
+                       , for instance, DS15 are shown in Fig. 6. The impact of
+             Ω                                               
+       using the populations in finding solutions near the boundary solutions is clearly
+       shown. Moreover, having more multi-objective populations increases significantly
+       the convergence of PF to PF∗ .                        
+       5.3 Results for the set of small‑sized problem instances
+       The small-sized problem instances proposed in (Homayouni and Fontes 2021a) were
+       solved by the MILP model using the methodology described in the previous subsec-
+       tion in order to find an approximated true Pareto front
+                                      PF∗                    
+                                        . However, for instances
+       DS21, DS22, DS25, and DS26 the MILP was not capable of finding the whole
+                                                   PF∗       
+       (due to either lack of memory or reaching the 10,000 seconds time limit imposed).
+       Nevertheless, it was able to find the optimal extreme solutions. All instances were
+       solved using the proposed mp-BRKGA, 10 times each. Table 2 summarizes the
+       results by reporting for each problem instance, its characteristics (Q - number of
+       QCs and T - number of tasks), the best energy consumption and the best makespan
+       obtained by the MILP model (C m ∗ ax and E∗ ) and by the mp-BRKGA (C max and E),
+       disregarding the makespan and the energy consumption, respectively. Additionally,
+       Table 2 also reports the average percentage deviations ( 𝛿 C and 𝛿 E ) between the val-
+       ues of the MILP boundary solutions and those of the mp-BRKGA and the average
+       values of the PIs, over the 10 runs. It should be noticed that the objective function
+       values in Table 2 have been rounded to the nearest integer and the deviations are
+       calculated as: 𝛿 C = C ma C x − ∗ C m ∗ ax × 100 and 𝛿 E = E− E∗ E∗ × 100.
+                    max                                      
+         As it can be seen from the results reported, out of the 52 boundary solutions (two
+       for each problem instance) the mp-BRKGA found 45 of them and for the remaining
+       seven boundary solutions it found solutions with deviations ranging from 0.90% to
+       2.39%. The average makespan and energy consumption deviations are 0.27% and
+       0.13%, respectively. The PFs found by the mp-BRKGA closely lie on the PF∗ s since
+       the average                                           
+              GD+                                            
+                 is 0.0192 (ranging from 0.0079 to 0.0395) and it spreads quite uni-
+       formly over most of the whole                         
+                        PF∗                                  
+                           , including the extreme points, since the average
+                                                1 3          
+
+===== PAGE 20 =====
+                                                             
+                                                             
+                                                             
+       260                             D. B. M. M. Fontes, S. M. Homayouni
+       Table 2 Computational results: MILP and mp-BRKGA performance for the set of small-sized problem
+       instances                                             
+                 MILP     mp-BRKGA  GAPs     PIs             
+                                                             
+       Ins  Q-T  C m ∗ ax E∗ C max E 𝛿 C 𝛿 E GD+  Δ          
+       DS01 2-8  351 7475 351  7475 0.00 0.00 0.0178 0.5012  
+       DS02 2-8  350 7800 350  7800 0.00 0.00 0.0109 0.4884  
+       DS03 2-8  350 8125 350  8125 0.00 0.00 0.0134 0.5646  
+       DS04 4-8  318 9263 318  9263 0.00 0.00 0.0183 0.4331  
+       DS05 4-8  346 9425 346  9425 0.00 0.00 0.0094 0.6500  
+       DS06 4-8  243 7800 243  7800 0.00 0.00 0.0225 0.4410  
+       DS07 4-8  339 9425 339  9425 0.00 0.00 0.0079 0.8987  
+       DS08 4-8  277 8450 277  8450 0.00 0.00 0.0161 0.3632  
+       DS09 4-8  279 8450 279  8450 0.00 0.00 0.0125 0.6601  
+       DS10 2-12 504 12513 504 12513 0.00 0.00 0.0204 0.4937 
+       DS11 2-12 444 10400 444 10400 0.00 0.00 0.0190 0.5776 
+       DS12 2-12 493 11700 493 11700 0.00 0.00 0.0275 0.5958 
+       DS13 4-12 450 13000 450 13000 0.00 0.00 0.0139 0.7396 
+       DS14 4-12 486 13650 486 13650 0.00 0.00 0.0112 0.6691 
+       DS15 4-12 367 11213 367 11213 0.00 0.00 0.0344 0.6470 
+       DS16 4-12 453 12675 460 12675 1.52 0.00 0.0083 0.8384 
+       DS17 4-12 429 12675 429 12675 0.00 0.00 0.0163 0.5941 
+       DS18 4-12 380 11456 380 11456 0.00 0.00 0.0142 0.6678 
+       DS19 2-16 636 16900 636 16900 0.00 0.00 0.0395 0.5282 
+       DS20 2-16 686 17063 686 17225 0.00 0.95 0.0171 0.8509 
+       DS21 4-16 629 18038 629 18200 0.00 0.90 –  –          
+       DS22 4-16 536 16494 543 16738 1.29 1.48 –  –          
+       DS23 3-12 453 11050 453 11050 0.00 0.00 0.0391 0.6387 
+       DS24 3-12 532 14462 542 14463 1.87 0.00 0.0332 0.6690 
+       DS25 6-12 520 15600 533 15600 2.39 0.00 –  –          
+       DS26 6-12 422 13650 422 13650 0.00 0.00 –  –          
+       Mean                         0.27 0.13 0.0192 0.6141  
+       Δ is 0.6141 (ranging from 0.3632 to 0.8987)2. In addition, the mp-BRKGA finds
+       such PFs very quickly as its computation time ranges from 10 to 65 seconds.
+                                                             
+                                                             
+       5.4 Results for the set of medium and large‑sized problem instances
+                                                             
+       This section reports the computational results for the set of 10 medium and large-
+       sized problem instances. Due to problem complexity, the MILP model could not be
+                                                             
+       2 Note that GD+ and Δ values were not calculated for instances DS21, DS22, DS25, and DS26 for which
+                           PF∗                               
+       the MILP model was not capable of finding a .         
+       1 3                                                   
+                                                             
+
+===== PAGE 21 =====
+                                                             
+                                                             
+                                                             
+       A bi‑objective multi‑population biased random key genetic… 261
+       Table 3 Computational results:                        
+                                Makespan Energy bound- PIs   
+       mp-BRKGA performance for                              
+                                boundary ary                 
+       the set of medium and large-                          
+       sized problem instances Ins Q-T-A C max E C max E PF Δ
+                       DL01 8-40-4 1458 101318 4052 80925 |109| 0.8080
+                       DL02 8-80-4 3580 211270 6990 169679 48 0.5710
+                       DL03 10-50-5 1678 145452 3715 121631 79 0.8124
+                       DL04 10-100-5 4663 304850 8416 267287 16 0.5450
+                       DL05 12-60-6 2316 241267 5357 198802 60 0.8426
+                       DL06 12-120-6 6126 482919 9258 426581 28 0.5618
+                       DL07 14-70-7 3231 330260 4678 273490 90 0.9650
+                       DL08 14-140-7 7801 684191 11550 605093 26 0.6185
+                       DL09 16-80-8 3489 363978 6205 303629 54 0.7536
+                       DL10 16-160-8 7845 764904 13331 701853 24 0.7478
+                       Mean                     53 0.7226    
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+       Fig. 7 The Pareto front solutions for large-sized problem instance DL06
+                                                             
+       solved to optimality (due to either lack of memory or reaching the 10,000 seconds
+       time limit imposed); hence, we only report the solutions found by the mp-BRKGA.
+         Table 3 reports problem characteristics (Q - number of QCs, T - number of
+       tasks, and A - number of SA-AGVs) and the two boundary solutions for each prob-
+       lem instance, i.e., the minimum makespan and its associated energy consumption
+       (Makespan boundary) and the minimum energy consumption and associated makes-
+       pan (Energy boundary). In addition, for each problem instance, Table 3 also reports
+       the cardinality of the Pareto front ( PF ) and the diversity of the solutions found ( Δ ).
+       Note that, since for these problem instances no reference PFs are available, to cal-
+                 Δ                                           
+       culate the spread ( ) we used the b|est |boundary solutions obtained by mp-BRKGA.
+                                                             
+                                                1 3          
+                                                             
+
+===== PAGE 22 =====
+                                                             
+                                                             
+                                                             
+       262                             D. B. M. M. Fontes, S. M. Homayouni
+       Table 4 MILP Pareto front: 3S      NS                 
+       boundary objective function                           
+       values and cardinality ( PF∗ ), Ins C m ∗ ax E∗ PF∗ C m ∗ ax E∗ PF∗
+       for problem instances DS18 and                        
+       DS23      | |   DS18 380 11456 |35 | 458 11750 |7 |   
+                       DS23 453 11050 32  524 11333 6        
+                                                             
+         The results show that the mp-BRKGA is capable of finding well-populated PFs
+       (the average number of solutions in the PFs is 53 and ranges between 16 and 109)
+       and that the solutions found are diverse and uniformly distributed as the average
+       spread is 0.7226 (ranging between 0.5450 and 0.9650). Figure 7 illustrates the PF
+       obtained by mp-BRKGA for problem instance DL06. As it can be seen, the energy
+       consumption can be decreased substantially without a dramatic increase in the
+       makespan and the makespan can be decreased drastically with a small increase in
+       the energy consumption. The computation time, as expected, increases. On average,
+       it took about 1550 seconds to find the PFs (ranging from 400 and 3650 seconds).
+       The computation times, although much larger, are not a major concern since moor-
+       ing times are much larger and thus, whenever the ships are ready to be loaded and
+       unloaded the solution will be readily available.      
+                                                             
+       5.5 Impact of considering SA‑AGVs                     
+                                                             
+       In order to show the positive impacts of considering SA-AGVs rather than AGVs,
+       we also solved the problem instances under a scenario in which AGVs can only
+       travel at the nominal speed; thus having the two following scenarios:
+                                                             
+       1. Scenario                                           
+               3S                                            
+                 - AGVs can travel atone of the three previously defined speeds:
+         nominal and nominal                                 
+                     ±20%                                    
+                         (SA-AGVs);                          
+               NS                                            
+       2. Scenario - AGVs travel at the nominal speed only.  
+       From the results obtained, it is possible to conclude that under scenario
+                                              3S             
+                                                the Pareto   
+       fronts (both of the MILP and of the mp-BRKGA) are wider and have many more
+       non-dominated solutions. Regarding the boundary solutions, the minimum makes-
+       pan under scenario                                    
+                  NS                                         
+                     is, on average, about 17.6% larger than that of scenario
+                                                    3S       
+                               NS                            
+       while the minimum energy under scenario is on average 2.5% larger than that of
+       scenario                                              
+            3S                                               
+              . Finally, the average cardinality of the Pareto fronts is 29 (ranging from
+       21 to 35) in scenario                                 
+                   3S                                        
+                     and it drops down to 4 (ranging from 1 to 9) in scenario
+       NS                                                    
+         . These characteristics are very important since they provide the management
+       with additional trade-off solutions and thus, with the flexibility of choosing the solu-
+       tion to implement having in mind the status of the Port; sometimes it is important to
+       speed up operations while in others the focus is the energy.
+         Let us take a closer look at the Pareto fronts obtained under these two scenarios
+       by analyzing them, in more detail, for two problem instances (DS18 and DS23).
+       Table 4 reports the boundary solutions as well as the cardinality of the
+                                                PF∗          
+                                                   s and     
+       1 3                                                   
+
+===== PAGE 23 =====
+                                                             
+                                                             
+                                                             
+       A bi‑objective multi‑population biased random key genetic… 263
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+       Fig. 8 Pareto fronts for problem instance DS18 under scenarios 3S and NS (MILP-PF∗ and mp-
+       BRKGA-PF)                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+       Fig. 9 Pareto fronts for problem instance DS23 under scenarios 3S and NS (MILP-PF∗ and mp-
+       BRKGA-PF)                                             
+       Figs. 8 and 9 depicts the MILP Pareto fronts (        
+                                PF∗                          
+                                   s) as well as the mp-BRKGA ones
+       (PFs).                                                
+         Looking at the boundary solutions, it can be seen that under scenario
+                                                 3S          
+                                                   both      
+       the minimum makespan and the minimum energy are lower (about 20% and 2.5%,
+                                NS                           
+       respectively) than those of under scenario . Additionally, the number of solu-
+       tions made available to management, i.e., non-dominated solutions, in scenario
+                                                    3S       
+       is much larger (35 and 32 instead of 7 and 6 for instances DS18 and DS23, respec-
+       tively); thus, increasing management flexibility and ability to adjust the operations
+       schedule to port conditions and/or customer preferences.
+                                                1 3          
+
+===== PAGE 24 =====
+                                                             
+                                                             
+                                                             
+       264                             D. B. M. M. Fontes, S. M. Homayouni
+                                                             
+         Figures 8 and 9 show that both the PFs and the PF∗ s obtained under scenario 3S
+       are wider and consist of many more trade-off solutions (see also Table 4). Look-
+       ing at the solutions with intermediate values both regarding makespan and energy
+       consumption, it can be seen that by using SA-AGVs (scenario
+                                          3S                 
+                                            ) it is possible to
+       significantly reduce either the makespan or the energy consumption or even both.
+       For example, consider the solutions labelled 2 (scenario
+                                       NS                    
+                                         ) and 3 (scenario   
+                                                   3S        
+                                                     )       
+       in Fig. 8. The energy consumption in both solutions is almost the same, but the
+                                    NS                       
+       makespan of the solution obtained under scenario (labelled 2) is about 35.6%
+       larger. Other examples are shown in Fig. 9, solutions labelled 1 (scenario
+                                                3S           
+                                                  ) and 4    
+             NS                                              
+       (scenario ) have similar makespan values, however, the solution obtained under
+            NS                                               
+       scenario (labelled 4) requires about 10.6% more energy; solutions 2 (scenario
+       3S                                                    
+         ) and 4 (scenario                                   
+                   NS                                        
+                     ) require almost the same amount of energy, however, the
+                                 NS                          
+       makespan is about 11.7% larger under scenario .       
+         Another interesting observation is that for a specific level of one of the objectives,
+       the use of SA-AGVs allows a significant improvement in the other objective with a
+       minor deterioration of the former. Regarding the problem instance, DS18, see Fig. 8,
+       for energy levels ranging 11,700 - 12,000 kWs (2.5% interval) using the SA-AGVs
+       one can decrease the makespan to about 50% of the original value. For example,
+       from solution 1 to solution 3 the energy consumption goes up from 11,694 to 11,752
+       kWs (an increase of less than 0.5%), while the makespan goes down from 938 sec-
+       onds to 664 seconds (a decrease of more than 29%). Similar observations can be
+       done when comparing other alternative solutions, although sometimes with smaller
+       magnitudes. For example, solutions labeled 2 and 3 in Fig. 9 have a similar makes-
+       pan (it goes up from 465 to 470, about 1%), but quite different energy consumption
+       (it goes down from 13,370 to 12,690, about 5%).       
+         For further analysis, in Fig. 10 we provide the Gantt charts of solutions labeled 1,
+       2, and 4 of problem instance DS23. Each Gantt chart depicts the routing of each SA-
+       AGV, the speed at which the SA-AGVs travel (lower, nominal, and higher) in each
+       leg of each journey, the time at which the SA-AGVs start and finish each journey
+       leg, and the QCs tasks timing. Empty and loaded journey legs are also shown as the
+       latter are represented using thicker lines.           
+         By comparing the Gantt charts of solutions labeled 1 and 4 we can see how to
+       take advantage of the adjustable speed in order to reduce the number of empty legs
+       and thus decrease the energy required to perform all transport tasks while maintain-
+       ing the makespan. Similarly, the comparison of the Gantt charts of solutions labeled
+       2 and 4 shows how to take advantage of the adjustable speed in order to decrease the
+       makespan while having a similar energy consumption, actually slightly lower.
+       6 Conclusion                                          
+       In this work, we consider the joint scheduling of QCs and speed adjustable AGVs
+       in container terminals through which, at almost no extra operational cost, we can
+       decrease the energy consumption and/or service time (makespan). The problem is
+       formulated as a bi-objective Mixed-Integer Linear Programming (MILP) model,
+       which is solved by employing a strategy that combines the “lexicographic" and 𝜖
+       1 3                                                   
+
+===== PAGE 25 =====
+                                                             
+                                                             
+                                                             
+       A bi‑objective multi‑population biased random key genetic… 265
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+       Fig. 10 The Gantt chart for Pareto solutions of problem instance D23 (solutions 1 and 2 refer to scenario
+       3S          NS                                        
+         and solution 4 refers to ); The loaded leg of each travel assignment is indicated by a thicker line
+       -constraint methods in order to obtain an approximated true Pareto front (
+                                                   PF∗       
+                                                     ).      
+       Since several optimization problems have to be solved, each requiring a significant
+       computation time, we also propose bi-objective multi-population BRKGA.
+         Our computational experiments show the effectiveness of the proposed MILP
+       model and solution strategy since it is capable of finding
+                                       PF∗                   
+                                         for 22 of the 26 small-
+       sized problem instances considered. The mp-BRKGA is capable of finding 45 out
+       of 52 boundary solutions and for the remaining seven boundary solutions it found
+       solutions with average deviations of 0.27% and 0.13% from the minimum makespan
+       and energy consumption values, respectively. Additionally, the mp-BRKGA finds
+       approximated Pareto fronts (PF) that closely lie on the PF∗ . The non-dominated
+       solutions it found are uniformly distributed and cover, almost always, the whole
+                                                   PF∗       
+                                                1 3          
+
+===== PAGE 26 =====
+                                                             
+                                                             
+                                                             
+       266                             D. B. M. M. Fontes, S. M. Homayouni
+                                                             
+       . Regarding medium and large-sized instances, the mp-BRKGA found PFs with up
+       to 109 solutions. Additionally, the solutions found are diverse and uniformly distrib-
+       uted, since the average spread is only 0.7226.        
+         The advantage of considering speed adjustable AGVs is clearly demonstrated.
+       On the one hand, the boundary solutions have much smaller makespan and energy
+       values. On the other hand, we have also shown that by adjusting the speed one can
+       reduce the makespan, the energy consumed, and even both simultaneously. Finally,
+       considering speed adjustable AGVs increases management flexibility since a wider
+       range of trade-off solutions can be found. Port management can choose the solution
+       to implement (QCs and AGVs schedules) that best fits port conditions or customer
+       requirements without having to solve the problem again and with full knowledge of
+       the implications.                                     
+         This work can be extended in several ways; for example, by including other con-
+       tainer operations (e.g., QCs planning problem and storage yard crane scheduling)
+       within the scheduling process, by considering other port resources and equipment
+       (e.g., human resources and buffer spaces), by including other scheduling subprob-
+       lems (e.g., collision avoidance, deadlock resolution, congestion management, and
+       layout planning), and by including other energy factors (e.g., energy consumption by
+       other resources and energy price variations).         
+       Declarations                                          
+       Conflict of interests The authors declare that they have no conflict of interest.
+                                                             
+                                                             
+                                                             
+       References                                            
+                                                             
+       Audet C, Bigeon J, Cartier D, Le Digabel S, Salomon L (2021) Performance indicators in multiobjec-
+         tive optimization. Eur J Oper Res 292(2):397–422    
+       Bean JC (1994) Genetic algorithms and random keys for sequencing and optimization. ORSA J Com-
+         put 6(2):154–160                                    
+       Bektaş T, Laporte G (2011) The pollution-routing problem. Trans Res Part B: Methodol
+         45(8):1232–1250                                     
+       Carlo HJ, Vis IFA, Roodbergen KJ (2015) Seaside operations in container terminals: literature over-
+         view, trends, and research directions. Flex Serv Manuf J 27(2):224–262
+       Chagas JB, Blank J, Wagner M, Souza MJ, Deb K (2021) A non-dominated sorting based custom-
+         ized random-key genetic algorithm for the bi-objective traveling thief problem. J Heuristics
+         27(3):267–301                                       
+       Deb K, Pratap A, Agarwal S, Meyarivan T (2002) A fast and elitist multiobjective genetic algorithm:
+         NSGA-II. IEEE Trans Evol Comput 6(2):182–197        
+       Dragović B, Tzannatos E, Park NK (2017) Simulation modelling in ports and container terminals:
+         literature overview and analysis by research field, application area and tool. Flex Serv Manuf J
+         29(1):4–34                                          
+       Dulebenets MA, Pasha J, Abioye OF, Kavoosi M (2021) Vessel scheduling in liner shipping: a critical
+         literature review and future research needs. Flex Serv Manuf J 33(1):43–106
+       Fontes DBMM, Gonçalves JF (2013) A multi-population hybrid biased random key genetic algorithm
+         for hop-constrained trees in nonlinear cost flow networks. Optim Lett 7(6):1303–1324
+       1 3                                                   
+
+===== PAGE 27 =====
+                                                             
+                                                             
+                                                             
+       A bi‑objective multi‑population biased random key genetic… 267
+                                                             
+       Fontes DBMM, Pereira PA, Fontes ACC (2019) A decision support system for TV self-promotion
+         scheduling. Int J Adv Trends Comput Sci Eng 8(2):134–140
+       Gonçalves JF, Resende MG (2012) A parallel multi-population biased random-key genetic algorithm
+         for a container loading problem. Comput Oper Res 39(2):179–190
+       Gonçalves JF, Wäscher G (2020) A MIP model and a biased random-key genetic algorithm based
+         approach for a two-dimensional cutting problem with defects. Eur J Oper Res 286(3):867–882
+       Homayouni SM, Fontes DBMM (2018) Metaheuristics for maritime operations. Wiley Online Library,
+         IAU, Iran                                           
+       Homayouni SM, Fontes DBMM (2021) Energy-efficient scheduling of intra-terminal container trans-
+         port. In: Intelligent control and smart energy management. Renewable Resources and Transpor-
+         tation, Springer International Publishing, Cham     
+       Homayouni SM, Fontes DBMM (2021b) A MILP model for energy-efficient job shop scheduling
+         problem and transport resources. In: IFIP International Conference on Advances in Production
+         Management Systems, Springer, pp 378–386            
+       Homayouni SM, Tang SH (2013) Multi objective optimization of coordinated scheduling of cranes
+         and vehicles at container terminals. Math Probl Eng 2013:746781
+       Homayouni SM, Tang SH (2016) Optimization of integrated scheduling of handling and storage oper-
+         ations at automated container terminals. WMU J Marit Aff 15(1):17–39
+       Homayouni SM, Tang SH, Motlagh O (2014) A genetic algorithm for optimization of integrated
+         scheduling of cranes, vehicles, and storage platforms at automated container terminals. J Comput
+         Appl Math 270:545–556                               
+       Homayouni SM, Fontes DBMM, Gonçalves JF (2022) A multistart biased random key genetic algo-
+         rithm for the flexible job shop scheduling problem with transportation. Int Trans Oper Res.
+         https://d oi.o rg/1 0.1 111/i tor.1 2878            
+       Hop DC, Van Hop N, Anh TTM (2021) Adaptive particle swarm optimization for integrated quay
+         crane and yard truck scheduling problem. Comput Ind Eng 153:107075
+       Iris Ç, Lam JSL (2019) A review of energy efficiency in ports: operational strategies, technologies and
+         energy management systems. Renew Sustain Energy Rev 112:170–182
+       Jonker T, Duinkerken MB, Yorke-Smith N, de Waal A, Negenborn RR (2019) Coordinated optimiza-
+         tion of equipment operations in a container terminal. Flex Serv Manuf J 33:281–311
+       Kaveshgar N, Huynh N (2015) Integrated quay crane and yard truck scheduling for unloading inbound
+         containers. Int J Prod Econ 159:168–177             
+       Kizilay D, Eliiyi DT et al (2021) A comprehensive review of quay crane scheduling, yard operations
+         and integrations thereof in container terminals. Flex Serv Manuf J 33:1–42
+       Li M, Yao X (2019) Quality evaluation of solution sets in multiobjective optimisation: a survey. ACM
+         Comput Surv (CSUR) 52(2):1–38                       
+       Ma N, Zhou C, Stephen A (2021) Simulation model and performance evaluation of battery-powered
+         AGV systems in automated container terminals. Simul Model Pract Theory 106:102146
+       Miettinen K (2008) Introduction to multiobjective optimization: noninteractive approaches. Springer,
+         Berlin, Heidelberg, pp 1–26                         
+       Nam H, Lee T (2013) A scheduling problem for a novel container transport system: a case of mobile
+         harbor operation schedule. Flex Serv Manuf J 25(4):576–608
+       Riazi S, Bengtsson K, Lennartson B (2020) Energy optimization of large-scale AGV systems. IEEE
+         Trans Autom Sci Eng 18(2):638–49                    
+       Ronen D (2011) The effect of oil price on containership speed and fleet size. J Oper Res Soc
+         62(1):211–216                                       
+       Roque LAC, Fontes DBMM, Fontes FACC (2014) A hybrid biased random key genetic algorithm
+         approach for the unit commitment problem. J Comb Optim 28(1):140–166
+       Schmidt J, Meyer-Barlag C, Eisel M, Kolbe LM, Appelrath HJ (2015) Using battery-electric AGVS in
+         container terminals-assessing the potential and optimizing the economic viability. Res Trans Bus
+         Manag 17:99–111                                     
+       Sdoukopoulos E, Boile M, Tromaras A, Anastasiadis N (2019) Energy efficiency in European ports:
+         state-of-practice and insights on the way forward. Sustainability 11(18):4952
+       Skaf A, Lamrous S, Hammoudan Z, Manier MA (2021) Integrated quay crane and yard truck schedul-
+         ing problem at port of Tripoli-Lebanon. Comput Ind Eng 159:107448
+       Tang L, Zhao J, Liu J (2014) Modeling and solution of the joint quay crane and truck scheduling prob-
+         lem. Eur J Oper Res 236(3):978–990                  
+                                                1 3          
+
+===== PAGE 28 =====
+                                                             
+                                                             
+                                                             
+       268                             D. B. M. M. Fontes, S. M. Homayouni
+                                                             
+       Yu B, Peng Z, Tian Z, Yao B (2019) Sailing speed optimization for tramp ships with fuzzy time win-
+         dow. Flex Serv Manuf J 31(2):308–330                
+       Yue L, Fan H, Zhai C (2020) Joint configuration and scheduling optimization of a dual-trolley
+         quay crane and automatic guided vehicles with consideration of vessel stability. Sustainability
+         12(1):24                                            
+       Yue L, Fan H, Ma M (2021) Optimizing configuration and scheduling of double 40 ft dual-trolley
+         quay cranes and AGVS for improving container terminal services. J Clean Prod 292:126019
+       Zhao Q, Ji S, Guo D, Du X, Wang H (2019) Research on cooperative scheduling of automated quay-
+         side cranes and automatic guided vehicles in automated container terminal. Math Probl Eng
+         2019:6574582                                        
+       Zhen L, Yu S, Wang S, Sun Z (2019) Scheduling quay cranes and yard trucks for unloading operations
+         in container ports. Ann Oper Res 273(1):455–478     
+       Zheng JN, Chien CF, Gen M (2015) Multi-objective multi-population biased random-key genetic
+         algorithm for the 3-d container loading problem. Comput Ind Eng 89:80–87
+       Publisher’s Note Springer Nature remains neutral with regard to jurisdictional claims in published maps
+       and institutional affiliations.                       
+       Springer Nature or its licensor holds exclusive rights to this article under a publishing agreement with the
+       author(s) or other rightsholder(s); author self-archiving of the accepted manuscript version of this article
+       is solely governed by the terms of such publishing agreement and applicable law.
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+                                                             
+       1 3                                                   
+                                                             

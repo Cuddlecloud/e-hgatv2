@@ -1,0 +1,133 @@
+
+
+===== PAGE 1 =====
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                   Explainable  AI-Guided   NSGA-II  for Energy-                  
+                                                                                  
+                           Efficient Job Shop Scheduling                          
+                                                                                  
+                                  S. Mahdi Homayouni                              
+                                                                                  
+               School of Business, Social and Decision Sciences, Constructor University,
+                          Campus Ring 1, 28759, Bremen, Germany.                  
+                           mhomayouni@constructor.university                      
+                                                                                  
+                                                                                  
+                                     Narjes Davari                                
+                                                                                  
+                 School of Computer Science and Engineering, Constructor University,
+                          Campus Ring 1, 28759, Bremen, Germany.                  
+                             ndavari@constructor.university                       
+                                                                                  
+                                                                                  
+                 Abstract                                                         
+                                                                                  
+                 The Energy-Efficient Job Shop Scheduling Problem (EEJSP) is a scientifically
+                 significant and practically impactful problem that has attracted substantial
+                 attention over the past decade. In this problem, jobs are composed of a
+                 sequence of operations that must be processed on either all or a designated
+                 subset of machines. The complexity lies in jointly determining the operation
+                 sequence on each machine and the processing speed assigned to each
+                 operation. These speed settings influence both the production time
+                 (makespan) and energy consumption [1], leading to a multi-objective
+                 optimization (MOO) formulation aimed at minimizing both.         
+                                                                                  
+                 This combinatorial problem becomes even more intensive due to the high-
+                 dimensional search space created by the interplay between sequencing and
+                 speed selection. Although the Non-dominated Sorting Genetic Algorithm II
+                 (NSGA-II) is effective in producing diverse Pareto-optimal solutions, it often
+                 fails to scale efficiently for large or dynamic instances. Its uniform treatment
+                 of the search space and lack of intelligent feedback mechanisms can lead to
+                 excessive computation and suboptimal Pareto front coverage.      
+                                                                                  
+                 Recent advances in Artificial Intelligence (AI), particularly Explainable AI
+                 (XAI) [2], offer a promising remedy. While research at the intersection of AI
+                 and MOO is still emerging, learning-based methods can extract patterns from
+                 explored solutions to predict promising search regions and adapt strategies
+                 dynamically. Specifically, search space decomposition informed by
+                 interpretable surrogate models may improve scalability by focusing
+                 computational effort on high-potential areas while enhancing solution
+                 diversity and algorithmic transparency.                          
+                                                                                  
+                                                                                  
+                                                                                  
+                                         1                                        
+                                                                                  
+                                                                                  
+
+===== PAGE 2 =====
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                 Our proposed framework integrates periodic explainability mechanisms
+                 within the NSGA-II process. Every T generations, surrogate models are
+                 trained using eXtreme Gradient Boosting (XGBoost) [3] to approximate
+                 relationships between decision variables and the two objectives. SHapley
+                 Additive exPlanations (SHAP) [2], specifically TreeSHAP [4], are used to
+                 interpret feature influence—focusing on job sequencing and speed level
+                 assignment. Based on SHAP value patterns, the population is clustered into
+                 interpretable subspaces with similar decision–objective relationships.
+                 Localized neighborhood searches are then applied within each cluster to
+                 intensify exploration in high-potential regions.                 
+                                                                                  
+                 Preliminary experiments suggest that explainability improves optimization
+                 efficiency and solution quality without significant computational time,
+                 especially when SHAP analysis is scheduled periodically. The SHAP-driven
+                 clustering helps NSGA-II focus on impactful decisions, reducing ineffective
+                 evaluations. While runtime analysis is ongoing, early results indicate
+                 promising scalability. We will present these preliminary findings at the
+                 conference.                                                      
+                                                                                  
+                 Keywords                                                         
+                                                                                  
+                 Explainable Artificial Intelligence (XAI), SHAP Values, NSGA-II, 
+                 Energy-Efficiency, Job Shop Scheduling Problem,                  
+                                                                                  
+                 References                                                       
+                                                                                  
+                  [1] Homayouni, S.M., & Fontes, D.B.M.M. (2025). Optimizing job  
+                    shop scheduling with speed‐adjustable machines and peak power 
+                    constraints: A mathematical model and heuristic solutions.    
+                    International Transactions in Operational Research, 32(1): 194-
+                    220.                                                          
+                                                                                  
+                  [2] Gunning, D., et al. (2019). XAI-Explainable artificial intelligence.
+                    Science Robotics, 4(37): eaay7120.                            
+                                                                                  
+                  [3] Chen, T., & Guestrin, C. (2016). XGBoost: A scalable tree boosting
+                    system. In Proceedings of the 22nd ACM SIGKDD international   
+                    conference on knowledge discovery and data mining, 785-794.   
+                                                                                  
+                  [4] Yang, J. (2021). Fast treeshap: Accelerating shap value     
+                    computation for trees. arXiv preprint arXiv:2109.09847.       
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                         2                                        
+                                                                                  
+                                                                                  

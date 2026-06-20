@@ -81,11 +81,15 @@ def _run_one(job: Job, args_dict: dict) -> dict:
         seed=job.seed,
         num_samples=args_dict["core_samples"],
         epochs=args_dict["core_epochs"],
+        batch_size=args_dict["core_batch"],
+        lr=args_dict["core_lr"],
         device=args_dict["device"],
     )
     fused_cfg = FusedTrainConfig(
         num_samples=args_dict["fused_samples"],
         epochs=args_dict["fused_epochs"],
+        batch_size=args_dict["fused_batch"],
+        lr=args_dict["fused_lr"],
         seed=job.seed,
         use_physics_prior=args_dict["physics_prior"],
         alpha_makespan=args_dict["alpha_makespan"],
@@ -185,8 +189,14 @@ def main() -> None:
                    help="fleet power budget (engages coupling). Use a sentinel <0 for uncoupled.")
     p.add_argument("--core-samples", type=int, default=3000)
     p.add_argument("--core-epochs", type=int, default=80)
+    p.add_argument("--core-batch", type=int, default=32,
+                   help="core mini-batch (large=fewer GPU kernel launches; scale --core-lr with it)")
+    p.add_argument("--core-lr", type=float, default=1e-3)
     p.add_argument("--fused-samples", type=int, default=1500)
     p.add_argument("--fused-epochs", type=int, default=40)
+    p.add_argument("--fused-batch", type=int, default=32,
+                   help="fused mini-batch (large=fewer GPU kernel launches; scale --fused-lr with it)")
+    p.add_argument("--fused-lr", type=float, default=1e-3)
     p.add_argument("--explain-samples", type=int, default=256)
     p.add_argument("--physics-prior", action="store_true")
     p.add_argument("--alpha-makespan", type=float, default=1.0,
@@ -206,8 +216,12 @@ def main() -> None:
         "peak_power": peak_power,
         "core_samples": args.core_samples,
         "core_epochs": args.core_epochs,
+        "core_batch": args.core_batch,
+        "core_lr": args.core_lr,
         "fused_samples": args.fused_samples,
         "fused_epochs": args.fused_epochs,
+        "fused_batch": args.fused_batch,
+        "fused_lr": args.fused_lr,
         "explain_samples": args.explain_samples,
         "physics_prior": args.physics_prior,
         "alpha_makespan": args.alpha_makespan,
