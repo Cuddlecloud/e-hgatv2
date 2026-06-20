@@ -76,22 +76,45 @@ def _normalise_targets(model: EHGATv2, y: Tensor) -> Tensor:
 
 
 @torch.no_grad()
-def _predict_split(model: EHGATv2, graphs: list[HeteroData]) -> tuple[Tensor, Tensor]:
+def _predict_split(
+    model: EHGATv2, graphs: list[HeteroData], device: torch.device | None = None
+) -> tuple[Tensor, Tensor]:
     model.eval()
     loader = DataLoader(graphs, batch_size=256, shuffle=False)
     preds, trues = [], []
     for batch in loader:
-        preds.append(model.predict(batch))
-        trues.append(batch.y)
+        if device is not None:
+            batch = batch.to(device)
+        preds.append(model.predict(batch).cpu())
+        trues.append(batch.y.cpu())
     return torch.cat(preds, dim=0), torch.cat(trues, dim=0)
 
 
+def _resolve_device(device: str | torch.device | None) -> torch.device:
+    """Pick the training device: explicit request, else CUDA when available, else CPU."""
+    if device is not None:
+        return torch.device(device)
+    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
 def train_surrogate(
-    instance: Instance, config: TrainConfig | None = None
+    instance: Instance,
+    config: TrainConfig | None = None,
+    *,
+    device: str | torch.device | None = None,
 ) -> TrainResult:
-    """Generate data, train the surrogate, and evaluate on a held-out test split."""
+    """Generate data, train the surrogate, and evaluate on a held-out test split.
+
+    The core GNN training is the dominant cost in the fused pipeline; ``device`` moves the
+    model + mini-batches onto the GPU (default: CUDA when available) so the H100 is the
+    load-bearer for the heavy 80-epoch core fit. Data generation stays on the CPU (it is a
+    Python combinatorial decode+simulate per sample, not GPU-addressable). The returned
+    model is moved back to CPU so downstream fused fine-tuning (which encodes on CPU before
+    its own device move) is unchanged.
+    """
     config = config or TrainConfig()
     seed_everything(config.seed)
+    dev = _resolve_device(device)
 
     graphs = generate_graphs(instance, config.num_samples, seed=config.seed)
     train_graphs, val_graphs, test_graphs = split_graphs(
@@ -100,6 +123,7 @@ def train_surrogate(
 
     model = EHGATv2(EHGATv2Config(hidden=config.hidden, layers=config.layers, heads=config.heads))
     fit_normalization(train_graphs).apply_to(model)
+    model = model.to(dev)
 
     optimizer = torch.optim.Adam(
         model.parameters(), lr=config.lr, weight_decay=config.weight_decay
@@ -115,6 +139,7 @@ def train_surrogate(
         model.train()
         epoch_loss = 0.0
         for batch in train_loader:
+            batch = batch.to(dev)
             optimizer.zero_grad()
             pred, _ = model(batch)
             loss = loss_fn(pred, _normalise_targets(model, batch.y))
@@ -125,11 +150,12 @@ def train_surrogate(
 
         record = {"epoch": float(epoch), "train_mse": epoch_loss}
         if val_graphs:
-            val_pred, val_true = _predict_split(model, val_graphs)
+            val_pred, val_true = _predict_split(model, val_graphs, dev)
             record["val_mae_overall"] = regression_metrics(val_pred, val_true)["mae_overall"]
         result.history.append(record)
 
     eval_graphs = test_graphs or val_graphs or train_graphs
-    test_pred, test_true = _predict_split(model, eval_graphs)
+    test_pred, test_true = _predict_split(model, eval_graphs, dev)
     result.metrics = regression_metrics(test_pred, test_true)
+    model.to("cpu")
     return result

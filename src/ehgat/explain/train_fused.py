@@ -161,10 +161,21 @@ def _evaluate(
     return regression_metrics(pred, true)
 
 
-def build_core(instance: Instance, *, seed: int = 0, num_samples: int = 1500, epochs: int = 60) -> EHGATv2:
-    """Train a base E-HGATv2 surrogate to supply the frozen embedding core."""
+def build_core(
+    instance: Instance,
+    *,
+    seed: int = 0,
+    num_samples: int = 1500,
+    epochs: int = 60,
+    device: str | None = None,
+) -> EHGATv2:
+    """Train a base E-HGATv2 surrogate to supply the frozen embedding core.
+
+    ``device`` is forwarded to :func:`train_surrogate` so the heavy core fit runs on the
+    GPU (default: CUDA when available); the model is returned on CPU for fused fine-tuning.
+    """
     result = train_surrogate(
-        instance, TrainConfig(num_samples=num_samples, epochs=epochs, seed=seed)
+        instance, TrainConfig(num_samples=num_samples, epochs=epochs, seed=seed), device=device
     )
     return result.model
 

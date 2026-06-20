@@ -81,6 +81,7 @@ def _run_one(job: Job, args_dict: dict) -> dict:
         seed=job.seed,
         num_samples=args_dict["core_samples"],
         epochs=args_dict["core_epochs"],
+        device=args_dict["device"],
     )
     fused_cfg = FusedTrainConfig(
         num_samples=args_dict["fused_samples"],
