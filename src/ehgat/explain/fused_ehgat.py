@@ -54,6 +54,79 @@ _T_TRAVEL_COL = 0  # EDGE_FEATURES index of Travel_Time (= empty_t + loaded_t)
 _E_EMPTY_COL = 1  # EDGE_FEATURES index of Empty_Energy
 _E_LOADED_COL = 2  # EDGE_FEATURES index of Loaded_Energy
 
+# Physics-unrolled coupling: per AGV travel leg we feed the wait head a small **contention
+# vector** read off the previous iterate's tentative timing -- (own power, concurrent power
+# demand over the leg's active interval, budget excess, #overlapping legs). Two legs per
+# task (empty, loaded) => 2 * 4 features. This is the signal a single static pass is missing
+# (the wait is a timing fixed-point; see the unrolled forward).
+_CONT_PER_LEG = 6
+_CONT_DIM = 2 * _CONT_PER_LEG
+_CONT_EPS = 1e-6
+_CONT_CNT_SCALE = 4.0  # normaliser for the peak concurrent-leg count (bounded ~ #AGVs)
+_CONT_CLAMP = 6.0      # cap on budget-normalised contention features (anti-blowup safeguard)
+
+
+def _peak_contention(starts: Tensor, ends: Tensor, powers: Tensor, p_max: float) -> Tensor:
+    """Bounded per-leg contention features from leg intervals + powers.
+
+    Operates on the **last axis** as the leg axis ``M = 2n`` (empty legs then loaded legs),
+    with an optional leading batch axis, so the same code serves the per-graph (``[2N]``) and
+    batched (``[S, 2n]``) paths. Per leg, 6 bounded features capture both the *power* pressure
+    and the *priority/queue* structure the simulator uses to resolve it:
+      0 own power, 1 peak concurrent-others power, 2 budget excess, 3 peak concurrent count
+      (all bounded by fleet concurrency / budget, so the scale is stable in ``N``),
+      4 start-time rank (fraction of legs starting earlier -- the leg's queue position),
+      5 time-to-next-budget-free (soonest a concurrent leg finishes after this leg's start,
+        normalised by mean leg duration -- the quantity that sets the wait length).
+
+    Returns ``[..., n, 12]`` = per task ``[empty(6), loaded(6)]``.
+    """
+    finite = p_max != float("inf")
+    scale = p_max if finite else 1.0
+    dt = powers.dtype
+    neg = torch.finfo(dt).min
+    pos = torch.finfo(dt).max
+    # Event times are leg starts. act[..., k, j] = leg j running at event time t_k = starts[k].
+    t_k = starts.unsqueeze(-1)
+    s_j = starts.unsqueeze(-2)
+    e_j = ends.unsqueeze(-2)
+    act = (s_j <= t_k + _CONT_EPS) & (t_k < e_j - _CONT_EPS)
+    actf = act.to(dt)
+    inst = (actf * powers.unsqueeze(-2)).sum(-1)   # [..., k] total power at each event
+    cnt = actf.sum(-1)                             # [..., k] concurrent legs at each event
+    # Event k inside leg i's interval [s_i, e_i): inint[..., i, k].
+    ts = starts.unsqueeze(-2)
+    s_i = starts.unsqueeze(-1)
+    e_i = ends.unsqueeze(-1)
+    inint = (s_i <= ts + _CONT_EPS) & (ts < e_i - _CONT_EPS)
+    peak_power = torch.where(inint, inst.unsqueeze(-2), torch.full_like(inint, neg, dtype=dt)).amax(-1)
+    peak_cnt = torch.where(inint, cnt.unsqueeze(-2), torch.zeros_like(inint, dtype=dt)).amax(-1)
+    conc_others = (peak_power - powers).clamp_min(0.0)
+    excess = (peak_power - p_max).clamp_min(0.0) if finite else torch.zeros_like(powers)
+    # Priority/queue structure. rank[i] = fraction of legs starting strictly earlier than i.
+    rank = (s_j < s_i - _CONT_EPS).to(dt).mean(-1)
+    # time-to-next-free: among legs running at i's start (excluding i), soonest finish - start.
+    runs_at_start = (s_j <= s_i + _CONT_EPS) & (s_i < e_j - _CONT_EPS)
+    self_mask = torch.eye(starts.shape[-1], dtype=torch.bool, device=starts.device)
+    runs_at_start = runs_at_start & ~self_mask
+    remaining = (e_j - s_i).clamp_min(0.0)
+    ttf = torch.where(runs_at_start, remaining, torch.full_like(remaining, pos)).amin(-1)
+    ttf = torch.where(ttf >= pos * 0.5, torch.zeros_like(ttf), ttf)  # no concurrent leg -> 0
+    mean_dur = (ends - starts).clamp_min(_CONT_EPS).mean(-1, keepdim=True)
+    feats = torch.stack(
+        [
+            (powers / scale).clamp(0.0, _CONT_CLAMP),
+            (conc_others / scale).clamp(0.0, _CONT_CLAMP),
+            (excess / scale).clamp(0.0, _CONT_CLAMP),
+            (peak_cnt / _CONT_CNT_SCALE).clamp(0.0, _CONT_CLAMP),
+            rank,
+            (ttf / mean_dur).clamp(0.0, _CONT_CLAMP),
+        ],
+        dim=-1,
+    )  # [..., M, 6]
+    half = feats.shape[-2] // 2
+    return torch.cat([feats[..., :half, :], feats[..., half:, :]], dim=-1)  # [..., n, 12]
+
 # Empty/loaded legs use *independent* speed levels, so the time split is not a smooth
 # function of the arc features -- but it is exactly recoverable. Each leg's energy pins its
 # level (``empty_t = empty_e / empty_power(level)``); the true (empty_level, loaded_level)
@@ -133,11 +206,24 @@ class FusedEHGATv2(nn.Module):
     wait_mean: Tensor
     wait_std: Tensor
 
+    peak_power: Tensor
+
     def __init__(
-        self, core: EHGATv2, *, use_physics_prior: bool = False, coupled: bool = False
+        self,
+        core: EHGATv2,
+        *,
+        use_physics_prior: bool = False,
+        coupled: bool = False,
+        unroll_steps: int = 0,
+        peak_power: float | None = None,
     ) -> None:
         super().__init__()
         self.core = core
+        # Physics-unrolled refinement steps for the coupled wait head (0 = single static
+        # pass, the legacy behaviour). Each step recomputes the tentative max-plus timing and
+        # feeds the resulting per-leg contention back into the wait head -- a learned,
+        # differentiable analogue of the simulator's iterative power-contention resolution.
+        self.unroll_steps = int(unroll_steps)
         # When True the leg head learns a residual around the exact closed-form leg split
         # (faithful-by-construction *baseline*, but the GNN barely contributes). When False
         # (default) the GNN must predict the leg times itself from its embeddings + the
@@ -158,12 +244,20 @@ class FusedEHGATv2(nn.Module):
         self.delay_head = nn.Sequential(
             nn.Linear(hidden + 1, hidden), nn.ReLU(), nn.Linear(hidden, 1)
         )
-        # Power-wait head: a per-leg (empty, loaded) resource-contention delay. Same context
-        # as the leg head; the wait is a global concurrency quantity the message passing must
-        # infer from the schedule structure.
+        # Power-wait head: a per-leg (empty, loaded) resource-contention delay. It sees the
+        # leg context PLUS the physics-unrolled contention vector (own/concurrent power, budget
+        # excess, overlap count) read off the previous iterate's tentative timing -- the
+        # timing-dependent signal that a single static pass cannot express.
         self.wait_head = nn.Sequential(
-            nn.Linear(2 * hidden + EDGE_DIM, hidden), nn.ReLU(), nn.Linear(hidden, _N_LEG_TIMES)
+            nn.Linear(2 * hidden + EDGE_DIM + _CONT_DIM, hidden),
+            nn.ReLU(),
+            nn.Linear(hidden, _N_LEG_TIMES),
         )
+        # Zero the output layer so the initial (pre-training) wait prediction is the mean wait
+        # (de-normalised from the zero output), not a large random value -- the physics-unrolled
+        # feedback (waits -> timing -> contention -> waits) is otherwise prone to diverge.
+        nn.init.zeros_(self.wait_head[-1].weight)
+        nn.init.zeros_(self.wait_head[-1].bias)
         # De-normalisation of standardised head outputs into physical units.
         self.register_buffer("leg_mean", torch.zeros(_N_LEG_TIMES))
         self.register_buffer("leg_std", torch.ones(_N_LEG_TIMES))
@@ -171,6 +265,11 @@ class FusedEHGATv2(nn.Module):
         self.register_buffer("tau_std", torch.ones(1))
         self.register_buffer("wait_mean", torch.zeros(_N_LEG_TIMES))
         self.register_buffer("wait_std", torch.ones(_N_LEG_TIMES))
+        # Fleet power budget (kW); used to form the contention budget-excess feature. Inf when
+        # uncoupled so the feature is well-defined even if the head is never exercised.
+        self.register_buffer(
+            "peak_power", torch.tensor(float(peak_power) if peak_power is not None else float("inf"))
+        )
 
     def set_leg_normalization(
         self,
@@ -243,18 +342,14 @@ class FusedEHGATv2(nn.Module):
 
     def _local_attributes(
         self, data: HeteroData, h: Tensor | None = None
-    ) -> tuple[Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor]:
-        """Project embeddings + physics priors to local physical attributes.
+    ) -> tuple[Tensor, Tensor, Tensor, Tensor, Tensor, Tensor]:
+        """Project embeddings + physics priors to the wait-independent local attributes.
 
-        Returns ``(empty_t, loaded_t, empty_e, loaded_e, d, wait_empty, wait_loaded)``.
-
-        Leg *times* are GNN-predicted (anchored, de-normalised); leg *energies* are read
-        **exactly** from the input AGV arc features (Empty_Energy / Loaded_Energy), so the
-        energy objective is strictly exact and additive (``dE/d(leg energy) = 1``). The
-        per-leg power *waits* are predicted only when ``self.coupled`` (else zero).
-
-        ``h`` may be a precomputed (cached) frozen-core embedding; if ``None`` it is computed
-        on the fly. Heads still backprop into their own parameters either way.
+        Returns ``(empty_t, loaded_t, empty_e, loaded_e, d, leg_in)``. Leg *times* are
+        GNN-predicted (anchored, de-normalised); leg *energies* are read **exactly** from the
+        AGV arc features; ``leg_in`` is returned so the (unrolled) wait head can be driven
+        with appended contention features. Power *waits* are computed separately because they
+        depend on the tentative timing (see :meth:`_predict_waits` / :meth:`forward`).
         """
         if h is None:
             h = self.core.encode(data)  # [N, hidden]
@@ -276,14 +371,37 @@ class FusedEHGATv2(nn.Module):
             node_delay = (
                 self.delay_head(delay_in).squeeze(-1) * self.tau_std + self.tau_mean
             ).clamp_min(0.0)
+        return empty_t, loaded_t, empty_e, loaded_e, node_delay, leg_in
 
-        if self.coupled:
-            waits = (self.wait_head(leg_in) * self.wait_std + self.wait_mean).clamp_min(0.0)
-            wait_empty, wait_loaded = waits[:, 0], waits[:, 1]
-        else:
-            zeros = empty_t.new_zeros(empty_t.shape[0])
-            wait_empty, wait_loaded = zeros, zeros
-        return empty_t, loaded_t, empty_e, loaded_e, node_delay, wait_empty, wait_loaded
+    def _predict_waits(self, leg_in: Tensor, contention: Tensor) -> Tensor:
+        """Per-leg ``[N, 2]`` power waits from the leg context + a contention vector."""
+        wait_in = torch.cat([leg_in, contention], dim=-1)
+        return (self.wait_head(wait_in) * self.wait_std + self.wait_mean).clamp_min(0.0)
+
+    def _contention_features(
+        self,
+        e_end: Tensor,
+        l_end: Tensor,
+        empty_eff: Tensor,
+        loaded_eff: Tensor,
+        p_empty: Tensor,
+        p_loaded: Tensor,
+    ) -> Tensor:
+        """Per-task ``[N, 2*4]`` contention vector from one iterate's tentative leg timing.
+
+        For each of the ``2N`` AGV legs we read its active interval ``[end - dur, end]`` and
+        power, then summarise the budget pressure it sees as the simulator does -- the **peak
+        instantaneous concurrent power** over the leg's interval (bounded by fleet concurrency,
+        so the feature scale is stable in ``N``), the concurrent power of *other* legs at that
+        peak, the budget excess, and the peak concurrent leg count. All inputs are detached
+        (read off the *previous* iterate), so gradients flow only through the final composition.
+        """
+        return _peak_contention(
+            torch.cat([e_end - empty_eff, l_end - loaded_eff]),
+            torch.cat([e_end, l_end]),
+            torch.cat([p_empty, p_loaded]),
+            float(self.peak_power),
+        )
 
     def forward(self, data: HeteroData, h: Tensor | None = None) -> FusedPrediction:
         """Predict one graph's ``(C_max, E)`` via tropical DP + additive energy.
@@ -291,30 +409,54 @@ class FusedEHGATv2(nn.Module):
         ``data`` must be a single :class:`HeteroData` (the tropical DP is assembled per
         graph). Batching is handled by iterating graphs in the trainer/explainer. ``h`` is an
         optional cached frozen-core embedding (see :meth:`encode_cached`).
+
+        Coupled mode runs ``unroll_steps`` physics-unrolled refinements: predict waits ->
+        recompose the max-plus timing -> read the per-leg contention off that timing -> refine
+        the waits, mirroring the simulator's iterative power-contention resolution.
         """
         n = int(data[NODE_TYPE].x.shape[0])
         is_load = data[NODE_TYPE].x[:, 1] > 0.5
         agv_prev, qc_prev = extract_precedence(
             data[AGV_EDGE].edge_index, data[QC_EDGE].edge_index, n
         )
-        (empty_t, loaded_t, empty_e, loaded_e, node_delay, wait_empty, wait_loaded) = (
-            self._local_attributes(data, h=h)
-        )
+        empty_t, loaded_t, empty_e, loaded_e, node_delay, leg_in = self._local_attributes(data, h=h)
+        energy = (empty_e + loaded_e).sum()  # strictly additive -> exact, dE/d(leg_e) = 1
 
-        if self.coupled:
-            # Effective leg durations fold the predicted power wait into the travel time, so
-            # the precedence-only coupled activity DAG reproduces the coupled makespan exactly
-            # (no resolution arcs). Handling tau stays exact -- only AGV legs wait for power.
-            empty_eff = empty_t + wait_empty
-            loaded_eff = loaded_t + wait_loaded
+        if not self.coupled:
+            dag = assemble_event_dag(is_load, agv_prev, qc_prev, empty_t, loaded_t, node_delay)
+            completion = tropical_longest_path(dag.node_weights, dag.edge_index, dag.edge_weights)
+            makespan = completion[dag.completion_nodes].max()
+            zeros = empty_t.new_zeros(n)
+            return FusedPrediction(
+                makespan=makespan, energy=energy, node_delay=node_delay, empty_t=empty_t,
+                loaded_t=loaded_t, empty_e=empty_e, loaded_e=loaded_e, dag=dag,
+                wait_empty=zeros, wait_loaded=zeros,
+            )
+
+        # Per-leg power draw (kW) = exact leg energy / predicted travel time; detached for the
+        # contention features (the wait is idle time, not part of the power-drawing travel).
+        p_empty = (empty_e / empty_t.clamp_min(_CONT_EPS)).detach()
+        p_loaded = (loaded_e / loaded_t.clamp_min(_CONT_EPS)).detach()
+        e_idx = 1 + 4 * torch.arange(n, device=empty_t.device)
+        l_idx = e_idx + 1
+        contention = empty_t.new_zeros(n, _CONT_DIM)
+        waits = self._predict_waits(leg_in, contention)
+        for step in range(self.unroll_steps + 1):
+            if step > 0:
+                waits = self._predict_waits(leg_in, contention)
+            empty_eff = empty_t + waits[:, 0]
+            loaded_eff = loaded_t + waits[:, 1]
             dag = assemble_coupled_event_dag(
                 is_load, agv_prev, qc_prev, empty_eff, loaded_eff, node_delay, []
             )
-        else:
-            dag = assemble_event_dag(is_load, agv_prev, qc_prev, empty_t, loaded_t, node_delay)
-        completion = tropical_longest_path(dag.node_weights, dag.edge_index, dag.edge_weights)
+            completion = tropical_longest_path(dag.node_weights, dag.edge_index, dag.edge_weights)
+            if step < self.unroll_steps:
+                contention = self._contention_features(
+                    completion[e_idx].detach(), completion[l_idx].detach(),
+                    empty_eff.detach(), loaded_eff.detach(), p_empty, p_loaded,
+                )
         makespan = completion[dag.completion_nodes].max()
-        energy = (empty_e + loaded_e).sum()  # strictly additive -> exact, dE/d(leg_e) = 1
+        wait_empty, wait_loaded = waits[:, 0], waits[:, 1]
         return FusedPrediction(
             makespan=makespan,
             energy=energy,

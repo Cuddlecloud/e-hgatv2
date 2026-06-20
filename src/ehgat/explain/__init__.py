@@ -9,19 +9,31 @@ from ehgat.explain.fused_explainer import (
     faithfulness_report,
     fused_pareto_tension_scores,
 )
+from ehgat.explain.gnn_landscape import (
+    FEATURE_FAMILIES,
+    GnnLandscapeResult,
+    aggregate_landscape,
+    exact_landscape,
+    gnn_landscape,
+    landscape_rank_agreement,
+)
 from ehgat.explain.pts_calculator import ParetoPoint, pareto_tension_scores
 from ehgat.explain.tape_explainer import TapeExplanation, explain_schedule, explain_schedules
 from ehgat.explain.tropical_dp import TropicalMaxPlus, tropical_longest_path, tropical_makespan
 
 __all__ = [
+    "FEATURE_FAMILIES",
     "EventDag",
     "FaithfulnessReport",
     "FusedEHGATv2",
     "FusedPrediction",
+    "GnnLandscapeResult",
     "ParetoPoint",
     "TapeExplanation",
     "TropicalMaxPlus",
+    "aggregate_landscape",
     "assemble_event_dag",
+    "exact_landscape",
     "explain_fused",
     "explain_fused_schedules",
     "explain_schedule",
@@ -29,6 +41,8 @@ __all__ = [
     "extract_precedence",
     "faithfulness_report",
     "fused_pareto_tension_scores",
+    "gnn_landscape",
+    "landscape_rank_agreement",
     "pareto_tension_scores",
     "tropical_longest_path",
     "tropical_makespan",

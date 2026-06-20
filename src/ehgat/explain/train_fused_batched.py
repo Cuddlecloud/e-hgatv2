@@ -26,7 +26,7 @@ from torch import Tensor
 
 from ehgat.environment.instance import Instance
 from ehgat.explain.event_dag import assemble_coupled_event_dag, extract_precedence
-from ehgat.explain.fused_ehgat import FusedEHGATv2
+from ehgat.explain.fused_ehgat import _CONT_DIM, FusedEHGATv2, _peak_contention
 from ehgat.explain.train_fused import (
     FusedSample,
     FusedTrainConfig,
@@ -128,29 +128,85 @@ def build_batch(model: FusedEHGATv2, samples: list[FusedSample], instance: Insta
 
 
 _NEG_INF = -1.0e30
+_CONT_EPS = 1e-6
 
 
-def _forward_batch(model: FusedEHGATv2, b: BatchedFused, coupled: bool) -> tuple[Tensor, Tensor, Tensor, Tensor, Tensor]:
-    """Vectorised fused forward over the whole batch -> (times, tau, waits, makespan, energy)."""
-    times = (model.leg_head(b.leg_in) * model.leg_std + model.leg_mean).clamp_min(0.0)
-    tau = (model.delay_head(b.delay_in).squeeze(-1) * model.tau_std + model.tau_mean).clamp_min(0.0)
-    if coupled:
-        waits = (model.wait_head(b.leg_in) * model.wait_std + model.wait_mean).clamp_min(0.0)
-    else:
-        waits = torch.zeros_like(times)
-    empty_eff = times[:, 0] + waits[:, 0]
-    loaded_eff = times[:, 1] + waits[:, 1]
+def _batched_contention(
+    e_end: Tensor, l_end: Tensor, empty_eff: Tensor, loaded_eff: Tensor,
+    p_empty: Tensor, p_loaded: Tensor, num_samples: int, n: int, p_max: float,
+) -> Tensor:
+    """Per-task ``[T, 8]`` contention features, blocked per sample (N constant within an
+    instance). Mirrors :meth:`FusedEHGATv2._contention_features` exactly, per graph.
+    """
+    s = num_samples
+    # [S, 2n] per-sample leg arrays (empty legs then loaded legs), all detached.
+    starts = torch.cat([(e_end - empty_eff).view(s, n), (l_end - loaded_eff).view(s, n)], dim=1)
+    ends = torch.cat([e_end.view(s, n), l_end.view(s, n)], dim=1)
+    powers = torch.cat([p_empty.view(s, n), p_loaded.view(s, n)], dim=1)  # [S, 2n]
+    feats = _peak_contention(starts, ends, powers, p_max)  # [S, n, 8]
+    return feats.reshape(s * n, _CONT_DIM)                 # [T, 8], sample-major
+
+
+def _compose_makespan(
+    empty_eff: Tensor, loaded_eff: Tensor, tau: Tensor, b: BatchedFused
+) -> tuple[Tensor, Tensor]:
+    """Assemble node weights, run the batched max-plus DP -> (node values x, makespan[S])."""
     vals_all = torch.cat([empty_eff, loaded_eff, tau])
-    node_weights = torch.zeros(b.num_nodes, dtype=times.dtype, device=times.device).index_add(
+    node_weights = torch.zeros(b.num_nodes, dtype=empty_eff.dtype, device=empty_eff.device).index_add(
         0, b.idx_all, vals_all
     )
     x = batched_longest_path(node_weights, b.edge_weights, b.schedule)
     comp_vals = x[b.comp_nodes]
     makespan = torch.full((b.num_samples,), _NEG_INF, dtype=x.dtype, device=x.device)
     makespan = makespan.scatter_reduce(0, b.comp_batch, comp_vals, reduce="amax", include_self=True)
+    return x, makespan
+
+
+def _forward_batch(
+    model: FusedEHGATv2, b: BatchedFused, coupled: bool
+) -> tuple[Tensor, Tensor, Tensor, Tensor, Tensor, Tensor]:
+    """Vectorised fused forward -> (times, tau, waits, makespan, energy, wait_steps).
+
+    Coupled mode runs ``model.unroll_steps`` physics-unrolled refinements (predict waits ->
+    recompose timing -> read per-leg contention -> refine), batched over all samples.
+    ``wait_steps`` ``[K+1, T, 2]`` stacks the wait prediction at every step for deep
+    supervision (training each refinement toward the true wait, not just the final one).
+    """
+    times = (model.leg_head(b.leg_in) * model.leg_std + model.leg_mean).clamp_min(0.0)
+    tau = (model.delay_head(b.delay_in).squeeze(-1) * model.tau_std + model.tau_mean).clamp_min(0.0)
     leg_e = b.empty_e + b.loaded_e
-    energy = torch.zeros(b.num_samples, dtype=x.dtype, device=x.device).index_add(0, b.task_batch, leg_e)
-    return times, tau, waits, makespan, energy
+    energy = torch.zeros(b.num_samples, dtype=times.dtype, device=times.device).index_add(0, b.task_batch, leg_e)
+
+    if not coupled:
+        waits = torch.zeros_like(times)
+        _x, makespan = _compose_makespan(times[:, 0], times[:, 1], tau, b)
+        return times, tau, waits, makespan, energy, waits.unsqueeze(0)
+
+    t = b.task_batch.shape[0]
+    s = b.num_samples
+    n = t // s
+    e_idx, l_idx = b.idx_all[:t], b.idx_all[t : 2 * t]
+    p_empty = (b.empty_e / times[:, 0].clamp_min(_CONT_EPS)).detach()
+    p_loaded = (b.loaded_e / times[:, 1].clamp_min(_CONT_EPS)).detach()
+    p_max = float(model.peak_power)
+
+    contention = times.new_zeros(t, model.wait_head[0].in_features - b.leg_in.shape[1])
+    waits = times.new_zeros(t, 2)
+    wait_steps: list[Tensor] = []
+    x = None
+    for step in range(model.unroll_steps + 1):
+        wait_in = torch.cat([b.leg_in, contention], dim=-1)
+        waits = (model.wait_head(wait_in) * model.wait_std + model.wait_mean).clamp_min(0.0)
+        wait_steps.append(waits)
+        empty_eff = times[:, 0] + waits[:, 0]
+        loaded_eff = times[:, 1] + waits[:, 1]
+        x, makespan = _compose_makespan(empty_eff, loaded_eff, tau, b)
+        if step < model.unroll_steps:
+            contention = _batched_contention(
+                x[e_idx].detach(), x[l_idx].detach(), empty_eff.detach(), loaded_eff.detach(),
+                p_empty, p_loaded, s, n, p_max,
+            )
+    return times, tau, waits, makespan, energy, torch.stack(wait_steps)
 
 
 def _r2(pred: Tensor, true: Tensor) -> float:
@@ -173,7 +229,10 @@ def train_fused_batched(
         core = build_core(instance, seed=config.seed)
 
     coupled = instance.peak_power is not None
-    model = FusedEHGATv2(core, use_physics_prior=config.use_physics_prior, coupled=coupled)
+    model = FusedEHGATv2(
+        core, use_physics_prior=config.use_physics_prior, coupled=coupled,
+        unroll_steps=config.unroll_steps, peak_power=instance.peak_power,
+    )
     model.freeze_core()
 
     samples = build_samples(instance, config.num_samples, seed=config.seed)
@@ -235,15 +294,19 @@ def train_fused_batched(
         for gi in torch.randperm(len(train_groups), generator=gen).tolist():
             tb = train_groups[gi]
             opt.zero_grad()
-            times, tau, waits, makespan, energy = _forward_batch(model, tb, coupled)
+            times, tau, waits, makespan, energy, wait_steps = _forward_batch(model, tb, coupled)
             leg_term = (((times - tb.leg_true) / s_leg) ** 2).mean()
             tau_term = (((tau - tb.tau_true) / s_tau) ** 2).mean()
             cmax_term = (((makespan - tb.mk_true) / s_mk) ** 2).mean()
             e_term = (((energy - tb.energy_true.to(dev)) / s_e) ** 2).mean()
             loss = leg_term + tau_term + config.alpha_makespan * cmax_term + config.beta_energy * e_term
             if coupled:
-                loss = loss + (((waits - tb.wait_true) / s_w) ** 2).mean()
-            loss.backward(); opt.step()
+                # Deep supervision: train EVERY refinement step toward the true wait, so the
+                # unroll actually converges to the contention fixed-point (not just the last step).
+                loss = loss + (((wait_steps - tb.wait_true) / s_w) ** 2).mean()
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.head_parameters(), 5.0)
+            opt.step()
             epoch_loss += float(loss)
         sched.step()
 
@@ -251,7 +314,7 @@ def train_fused_batched(
         if val_b is not None:
             with torch.no_grad():
                 model.eval()
-                _, _, _, vmk, ven = _forward_batch(model, val_b, coupled)
+                _, _, _, vmk, ven, _ = _forward_batch(model, val_b, coupled)
                 record["r2_makespan"] = _r2(vmk, val_b.mk_true)
                 record["r2_energy"] = _r2(ven, val_b.energy_true.to(dev))
         result.history.append(record)
@@ -267,6 +330,7 @@ def train_fused_batched(
             "r2_makespan": _r2(mk, mk_true),
             "r2_energy": _r2(en, en_true),
             "mae_makespan": float((mk - mk_true).abs().mean()),
+            "mae_energy": float((en - en_true).abs().mean()),
         }
     model = model.to("cpu")
     return result

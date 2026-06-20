@@ -61,6 +61,7 @@ class FusedTrainConfig:
     alpha_makespan: float = 1.0
     beta_energy: float = 1.0
     use_physics_prior: bool = False  # False = GNN predicts legs; True = exact-prior baseline
+    unroll_steps: int = 0  # physics-unrolled coupled refinement steps (0 = static wait head)
     seed: int = 0
 
 
@@ -188,7 +189,10 @@ def train_fused(
     # only AGV legs contend for power -- so it is anchored in both modes.
     coupled = instance.peak_power is not None
 
-    model = FusedEHGATv2(core, use_physics_prior=config.use_physics_prior, coupled=coupled)
+    model = FusedEHGATv2(
+        core, use_physics_prior=config.use_physics_prior, coupled=coupled,
+        unroll_steps=config.unroll_steps, peak_power=instance.peak_power,
+    )
     model.freeze_core()
 
     samples = build_samples(instance, config.num_samples, seed=config.seed)

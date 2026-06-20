@@ -26,6 +26,12 @@ def _is_integer(value: float, tol: float = 1e-6) -> bool:
 
 
 def test_fused_makespan_gradients_are_binary_critical_path() -> None:
+    # Seed locally so the random head induces a *unique* critical path independent of test
+    # order (with ties the max-plus subgradient legitimately splits into fractions; this test
+    # checks the no-smearing/binary property, which requires a tie-free critical path).
+    from ehgat.utils.seeding import seed_everything
+
+    seed_everything(0)
     inst = build_toy_instance(num_tasks=6)
     schedule = decode(make_rng(0).random(NUM_BLOCKS * inst.num_tasks), inst)
     ex = explain_fused(_fresh_model(), schedule, inst)

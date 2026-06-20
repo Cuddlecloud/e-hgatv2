@@ -5,7 +5,73 @@ full context. Pair this with `docs/NEURIPS_PAPER_PLAN.md` (the scientific plan) 
 saved Cascade memories (infra/workflow). To pull the live conversation into a new window,
 `@mention` the originating Cascade conversation.
 
-_Last updated: 2026-06-18._
+_Last updated: 2026-06-20._
+
+## Physics-unrolled GNN+TAPE — closes the coupled makespan gap (NEW, 2026-06-20)
+**Problem.** Under peak-power coupling the per-leg wait is a *timing fixed-point* (it depends
+on which legs run concurrently, which depends on the waits). A single static wait head caps
+coupled makespan R² at ~0.80 (vs 0.997 uncoupled). Static global-context pooling did not help.
+
+**Fix (implemented).** `FusedEHGATv2` now runs `unroll_steps` (K) physics-unrolled refinements
+in coupled mode — a learned, differentiable analogue of the simulator's contention resolution.
+Each step: (1) wait head predicts per-leg waits, (2) the max-plus DP recomposes the tentative
+timing, (3) per-leg **contention features** are read off that timing, (4) they feed the next
+wait prediction. Both modules fire every step — the GNN supplies the nonlinear waits, TAPE
+supplies the timing the next GNN step needs; neither can be removed.
+- Contention feature (`_peak_contention`, shared per-graph + batched): the **peak instantaneous
+  concurrent power** over a leg's active interval (the exact quantity the simulator's
+  `power_used + p <= budget` rule gates), plus concurrent-others power, budget excess, peak
+  concurrent leg count. Budget-normalised and **bounded** (clamp `_CONT_CLAMP=6`) so the
+  feature scale is stable in N and cannot blow up the feedback. Computed from *detached*
+  previous-iterate timing (truncated/Gauss-Seidel: gradients flow only through the final
+  composition). Wait head output layer is **zero-initialised** (starts at the mean wait).
+- Batched trainer mirrors it exactly (`_batched_contention`, per-sample-blocked since N is
+  constant within an instance; scales to the val batch). Grad-norm clip 5.0.
+- Wired through `FusedTrainConfig.unroll_steps` and `scripts/run_fused_eval.py --unroll-steps`.
+
+**Result (coupled pp=30, 10 seeds, A100; R²_makespan, leg-Jaccard intact ~0.92–0.95):**
+| K | N=6 | N=10 | N=20 |
+|---|-----|------|------|
+| 0 static | 0.861 | 0.801 | 0.800 |
+| 1        | 0.882 | 0.854 | 0.865 |
+| 2        | 0.880 | 0.857 | 0.868 |
+| 3        | 0.880 | 0.858 | 0.870 |
+Lift +0.06–0.07 at N=10/20, **growing with N** (coupling matters more at scale); stable across
+all seeds after the clamp. K=1 already captures most of the gain (cheapest); K=3 marginally best.
+Tests: `tests/unit/test_fused_batched.py` (K=0 legacy, vectorised contention == per-graph,
+uncoupled reduction).
+
+**Size transfer (the scaling claim) — `scripts/run_unroll_transfer.py`.** Train on small N
+(exact event-sim labels), predict coupled `(C_max,E)` **solver-free** on larger unseen N, no
+retraining. Trained on N=10, pp=30, 8 seeds (R²_makespan, zero-shot):
+| test N | K=0 static | K=2 unrolled |
+|--------|-----------|--------------|
+| 10 (in-dist) | 0.796 | 0.863 |
+| 15 | 0.802 | 0.870 |
+| 20 | 0.737 | 0.846 |
+| 30 | 0.573 | 0.800 |
+| 40 | 0.461 | 0.779 |
+The **static head collapses** with N (0.80→0.46: it memorises N=10 wait magnitudes); the
+**unrolled model transfers** (0.86→0.78) and the gap **widens with N** (+0.07 @N=10 → +0.32
+@N=40) -- it learns the contention-*resolution mechanism*, not the magnitudes. MAE @N=40:
+88s (unrolled) vs 145s (static). Solver-free forward is 21-81x faster than the simulator
+(grows with N; far larger vs CP-SAT labels). Energy transfers exactly (additive, R²=1.0).
+**v2 upgrade (richer features + deep supervision, 2026-06-20).** `_peak_contention` now emits
+6 per-leg features (added: start-time **rank** = queue position, and **time-to-next-budget-free**
+= soonest a concurrent leg finishes after this leg's start, the quantity that sets the wait
+length) -- encoding the priority/queue structure the simulator's SGS uses, not just the power
+summary. Training adds **deep supervision**: every unroll step's waits are supervised toward
+`wait_true` (`wait_steps` stacked from `_forward_batch`), so the iteration converges to the
+fixed-point. Result (K=2): in-dist N=20 0.868->**0.874**, N=10 0.857->0.868; transfer N=40
+0.779->**0.819**, N=30 0.800->0.832 (gains concentrate at large-N transfer, where the priority
+features matter most). At N=40 unrolled beats static by +0.31 R²; ~2.9% relative makespan error.
+
+**R² is a harsh metric here** (report MAE/relative too): coupled makespan CV is only 0.07-0.17
+(budget compresses the spread), so the ~3-5% relative error of the unrolled model reads as
+R²~0.82-0.87. Uncoupled R²=0.997 because its CV is larger and there is no wait fixed-point.
+
+**Next:** swap exact-sim labels for CP-SAT optimal labels to strengthen the amortisation
+narrative; add MAE/relative-error columns to the paper's empirical matrix.
 
 ## Req 2 — Physics-Fused TAPE (DONE, the model-native explainer) — Modules in `src/ehgat/explain/`
 The novel, GNN-centric answer to Req 2: a **faithful-by-construction** explainer built by
