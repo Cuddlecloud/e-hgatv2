@@ -255,8 +255,14 @@ via the exact critical path, (c) finer granularity than Sobol, (d) faithfulness 
 
 - **Only real published data wired in:** `data/distance_matrix.json` (Homayouni & Fontes
   2022, Table 4).
-- **All instances are synthetic** via `build_toy_instance()` — there is **no DS/DL
-  benchmark loader yet**. The DS/DL task sets exist only as text/screenshots in the PDFs.
+- **`build_toy_instance()` = real Table 4 geometry + SYNTHETIC task sets** (round-robin
+  QC/LU, handling ~U(30,80)). All headline runs to date used this (real geometry, synthetic
+  tasks) — good for method validation, NOT yet comparable to the advisor's DS/DL Tables 2/3.
+- **DS/DL loader now EXISTS** (`src/ehgat/environment/dsdl.py`, tested `tests/unit/test_dsdl.py`;
+  JSON schema/template `data/dsdl_instances.template.json`). It ingests transcribed Table 5
+  task sets → real `Instance`s (uncoupled + coupled). DS (≤6 QC) = fully real geometry; DL
+  (8-16 QC) needs `allow_synthetic_geometry=True` (extended geometry, flagged). **Remaining
+  blocker = transcribing FSMJ-2023 Table 5 from the PDF images into the JSON.**
 - **Coupled (peak-power) has NO published benchmark anywhere** — it's the author's
   extension; labels come from the project's own simulator. This is a known credibility risk;
   defense = it's the novel regime with no closed form, validated against the exact simulator.

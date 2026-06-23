@@ -50,6 +50,8 @@ from ehgat.search.nsga2 import (
     fast_non_dominated_sort,
     order_by_rank_crowding,
 )
+from ehgat.explain.fused_ehgat import FusedEHGATv2
+from ehgat.search.tape_guidance import tape_predict_objectives, tape_signals_batch
 from ehgat.surrogate.ehgatv2 import EHGATv2
 from ehgat.surrogate.graph import AGV_EDGE, NODE_TYPE, QC_EDGE, build_hetero_graph
 from ehgat.utils.seeding import make_rng
@@ -86,6 +88,11 @@ _SPEED_WEIGHT = 1.0
 # measured fitness-improvement credit) -- the genuine operator-utility baseline/ceiling,
 # distinct from the bottleneck-identity oracle (which assumes the bottleneck->operator map).
 _OPERATOR_SOURCES = ("random", "attention", "oracle", "reward")
+# Channel-A guidance signal: ``attention`` is the bare HAN readout (learned, empirically
+# near-random faithfulness); ``tape`` is the fused model's native critical-path gradient
+# (``dC_max/d(leg)`` -- faithful by construction). With ``tape`` the SAME signal that
+# explains a schedule (Req 2) also steers the mutation + screening (Req 3).
+_GUIDANCE_SOURCES = ("attention", "tape")
 _AGGREGATION_WINDOWS = ("full", "front", "best")
 # Channel-B granularity: a single population-averaged bias per generation ("population")
 # vs the per-task bottleneck of the individual being mutated ("per_task"). The latter
@@ -113,6 +120,7 @@ class AttentionNSGA2Config:
     random_mutation: bool = False  # H2 ablation: select a random task instead of max-alpha
     mutation_temperature: float = 0.25  # softmax temperature for soft bottleneck sampling
     screening_factor: int = 1  # generate k*lambda offspring, surrogate-screen to lambda (1=off)
+    guidance: str = "attention"  # Channel-A signal source: attention (bare HAN) | tape (fused)
     operator_selection: str = "random"  # Channel-B AOS source: random | attention | oracle
     operator_temperature: float = 1.0  # softmax tau for operator probs (exploitation knob)
     operator_speed_weight: float = _SPEED_WEIGHT  # `speed` op score (>=structural; anti-crowd-out)
@@ -723,9 +731,33 @@ def _update_archive(
 # Main loop
 # --------------------------------------------------------------------------------------
 def run_attention_nsga2(
-    instance: Instance, model: EHGATv2, config: AttentionNSGA2Config
+    instance: Instance,
+    model: EHGATv2 | None,
+    config: AttentionNSGA2Config,
+    *,
+    fused_model: FusedEHGATv2 | None = None,
 ) -> AttentionNSGA2Result:
-    """Run the attention-guided NSGA-II and return its non-dominated front."""
+    """Run the attention-guided NSGA-II and return its non-dominated front.
+
+    ``config.guidance`` selects the Channel-A signal: ``"attention"`` (default) uses the
+    bare HAN readout of ``model``; ``"tape"`` uses ``fused_model``'s native critical-path
+    gradients (faithful by construction) for BOTH the bottleneck task selection and the
+    offspring screening, so the same signal that explains a schedule also steers the search.
+    ``fused_model`` is required when ``guidance == "tape"``; ``model`` may then be ``None``
+    (the fused core is used for the unused-in-tape attention calls).
+    """
+    if config.guidance not in _GUIDANCE_SOURCES:
+        raise ValueError(
+            f"guidance must be one of {_GUIDANCE_SOURCES}, got {config.guidance!r}"
+        )
+    if config.guidance == "tape":
+        if fused_model is None:
+            raise ValueError("guidance='tape' requires a fused_model (FusedEHGATv2)")
+        fused_model.eval()
+        if model is None:
+            model = fused_model.core
+    if model is None:
+        raise ValueError("model is required unless guidance='tape' supplies a fused_model")
     if config.pop_size < 2:
         raise ValueError(f"pop_size must be >= 2, got {config.pop_size}")
     if config.operator_selection not in _OPERATOR_SOURCES:
@@ -760,12 +792,19 @@ def run_attention_nsga2(
     # individual's own bottleneck type, evaluated lazily inside `_mutate`. Only the
     # bottleneck-type sources (`attention` / `oracle`) support per-task scope; the `reward`
     # arm is an online controller with a single global policy (population scope by nature).
-    per_task = (
-        (config.operator_selection, config.operator_temperature, config.operator_speed_weight)
-        if config.operator_selection in ("attention", "oracle")
-        and config.operator_granularity == "per_task"
-        else None
-    )
+    if config.guidance == "tape":
+        # TAPE drives Channel-B per-task too: the operator router consumes the *provided*
+        # fused-TAPE (w_agv, w_qc) criticalities (source label "attention" only selects the
+        # use-provided-signals branch of `_per_task_bias`; it never recomputes here because
+        # every mutated child carries precomputed TAPE signals).
+        per_task = ("attention", config.operator_temperature, config.operator_speed_weight)
+    else:
+        per_task = (
+            (config.operator_selection, config.operator_temperature, config.operator_speed_weight)
+            if config.operator_selection in ("attention", "oracle")
+            and config.operator_granularity == "per_task"
+            else None
+        )
     # Channel-B `reward` arm: the field-standard online AOS (Adaptive Pursuit driven by a
     # measured fitness-improvement credit). Its policy replaces the structural-bias
     # `op_probs` and is updated from each generation's offspring credit below.
@@ -827,7 +866,17 @@ def run_attention_nsga2(
         signals_by_idx: dict[int, tuple[np.ndarray, np.ndarray, np.ndarray]] = {}
         if need_signals:
             mut_idx = [i for i, m in enumerate(will_mutate) if m]
-            if mut_idx:
+            if mut_idx and config.guidance == "tape":
+                # Faithful Signal #3: fused-GNN TAPE per child (tropical DP is per-graph).
+                sig_list = tape_signals_batch(
+                    fused_model,  # type: ignore[arg-type]  # not-None when guidance=="tape"
+                    [base_children[i] for i in mut_idx],
+                    instance,
+                    config.mutation_temperature,
+                )
+                for k, i in enumerate(mut_idx):
+                    signals_by_idx[i] = sig_list[k]
+            elif mut_idx:
                 pb_probs, pb_wagv, pb_wqc = _batch_attention_signals(
                     [base_children[i] for i in mut_idx],
                     instance,
@@ -861,7 +910,11 @@ def run_attention_nsga2(
                 cand_ops.append(op_index)
                 cand_parent_obj.append(parent_objs[i])
         if config.screening_factor > 1:
-            predicted = _predict_objectives(candidates, instance, model)
+            predicted = (
+                tape_predict_objectives(fused_model, candidates, instance)  # type: ignore[arg-type]
+                if config.guidance == "tape"
+                else _predict_objectives(candidates, instance, model)
+            )
             pred_fronts = fast_non_dominated_sort(predicted)
             keep = order_by_rank_crowding(predicted, pred_fronts)[: config.pop_size]
             offspring = [candidates[i] for i in keep]

@@ -1,0 +1,26 @@
+[
+  {
+    "instance": "L15",
+    "n": 16,
+    "coupled": false,
+    "peak_power": null,
+    "n_front": 44,
+    "lambda_min": 0.2514403331155076,
+    "lambda_max": 1.0,
+    "lambda_mean": 0.8167414945828905,
+    "top_tasks_makespan_end": [
+      3,
+      6,
+      10
+    ],
+    "top_tasks_energy_end": [
+      0,
+      1,
+      5
+    ],
+    "bottleneck_migration": 1.0,
+    "pts_concentration_topk": 0.3669452941056837,
+    "topk": 3,
+    "fused_r2_makespan": 0.9992064833641052
+  }
+]

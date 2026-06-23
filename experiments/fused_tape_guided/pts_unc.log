@@ -1,0 +1,33 @@
+instance toy:5 ...
+  toy:5: front=84 lambda[0.20,1.00] migration=0.80 conc@3=0.84
+instance toy:8 ...
+  toy:8: front=116 lambda[0.00,1.00] migration=0.50 conc@3=0.67
+instance toy:10 ...
+  toy:10: front=47 lambda[0.17,1.00] migration=0.80 conc@3=0.56
+instance toy:15 ...
+  toy:15: front=29 lambda[0.30,0.96] migration=0.80 conc@3=0.34
+instance toy:20 ...
+  toy:20: front=28 lambda[0.56,1.00] migration=1.00 conc@3=0.30
+instance L07 ...
+  L07: front=49 lambda[0.08,0.99] migration=0.50 conc@3=0.71
+instance L15 ...
+  L15: front=33 lambda[0.39,1.00] migration=0.80 conc@3=0.33
+instance L21 ...
+  L21: front=37 lambda[0.45,1.00] migration=0.80 conc@3=0.59
+instance L35 ...
+  L35: front=48 lambda[0.00,1.00] migration=1.00 conc@3=0.45
+# Pareto-front behaviour via TAPE PTS (uncoupled)
+
+_Per instance: lambda sweep across the front, the top bottleneck tasks at the makespan-optimal vs energy-optimal extreme, the bottleneck migration (1 - Jaccard of top-3 at the two extremes), and the PTS concentration (share of total tension on the top-3 tasks)._
+
+| Instance | N | front | lambda range | top-3 (Cmax end) | top-3 (E end) | migration | PTS conc.@3 |
+|---|---|---|---|---|---|---|---|
+| toy:5 | 5 | 84 | [0.20, 1.00] | [1, 2, 3] | [0, 2, 4] | 0.80 | 0.84 |
+| toy:8 | 8 | 116 | [0.00, 1.00] | [2, 3, 5] | [2, 3, 4] | 0.50 | 0.67 |
+| toy:10 | 10 | 47 | [0.17, 1.00] | [1, 2, 3] | [0, 2, 4] | 0.80 | 0.56 |
+| toy:15 | 15 | 29 | [0.30, 0.96] | [1, 2, 3] | [2, 6, 7] | 0.80 | 0.34 |
+| toy:20 | 20 | 28 | [0.56, 1.00] | [3, 4, 5] | [0, 6, 7] | 1.00 | 0.30 |
+| L07 | 8 | 49 | [0.08, 0.99] | [1, 5, 6] | [1, 4, 6] | 0.50 | 0.71 |
+| L15 | 16 | 33 | [0.39, 1.00] | [0, 2, 4] | [4, 5, 6] | 0.80 | 0.33 |
+| L21 | 12 | 37 | [0.45, 1.00] | [5, 10, 0] | [5, 8, 9] | 0.80 | 0.59 |
+| L35 | 12 | 48 | [0.00, 1.00] | [2, 3, 5] | [0, 1, 6] | 1.00 | 0.45 |

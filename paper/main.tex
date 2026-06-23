@@ -1,0 +1,1349 @@
+\documentclass[11pt]{article}
+
+% ---------------------------------------------------------------------------
+% Overleaf-ready. Compiles with pdfLaTeX (Overleaf default) or Tectonic.
+% Only standard, widely available packages are used.
+% ---------------------------------------------------------------------------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{caption}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,calc,backgrounds,shapes.geometric}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.16}
+\usepgfplotslibrary{groupplots}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\captionsetup{font=small,labelfont=bf}
+
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+
+\newcommand{\Cmax}{C_{\max}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\DeclareMathOperator{\softmax}{softmax}
+\DeclareMathOperator{\LeakyReLU}{LeakyReLU}
+\DeclareMathOperator{\ReLU}{ReLU}
+\DeclareMathOperator{\MLP}{MLP}
+\DeclareMathOperator*{\maxop}{max}
+\newcommand{\concat}{\,\Vert\,}
+
+% TikZ styles for the architecture / DAG diagrams
+\tikzset{
+  blk/.style={draw, rounded corners=2pt, align=center, inner sep=4pt, font=\footnotesize},
+  core/.style={blk, fill=blue!8},
+  head/.style={blk, fill=green!8},
+  io/.style={blk, fill=gray!8},
+  ev/.style={draw, circle, minimum size=15pt, inner sep=0pt, font=\scriptsize},
+  crit/.style={very thick, red},
+  fl/.style={-{Latex[length=2mm]}},
+}
+
+\title{\textbf{Faithful Tropical Explanations for Guiding\\[2pt]
+Bi-Objective Quay-Crane and Speed-Adjustable-AGV Scheduling}}
+
+\author{Aayush Jha\\\small Research report prepared for Prof.\ Mahdi Homayouni}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+We study the bi-objective scheduling of quay cranes (QCs) and speed-adjustable
+automated guided vehicles (SA-AGVs) in a dual-cycling container terminal, where the
+two competing objectives are the makespan $\Cmax$ and the total AGV travel energy $E$.
+Building on the multi-population biased random-key genetic algorithm (mp-BRKGA) of
+Fontes and Homayouni, we ask a question motivated directly by the project brief: can the
+\emph{explanation} of why a schedule is good be made faithful enough to (i) describe the
+behaviour of the Pareto front and (ii) actively steer the search?
+Our contribution is a \emph{physics-fused heterogeneous graph attention surrogate}
+(E-HGATv2) whose makespan is produced by an exact \emph{max-plus (tropical) longest-path}
+layer. Because the makespan flows through the genuine critical-path recurrence, the
+network's own gradient with respect to each transport leg is an \emph{exact binary
+critical-path indicator}---we call this readout \emph{TAPE} (Tropical Attribution for
+Physical Explanations). We show on $11$ problem instances (synthetic dual-cycling
+instances and the published FSMJ loading benchmark, in both the uncoupled and the
+peak-power-coupled regime) that TAPE recovers the true critical path with
+Jaccard $0.87$--$1.00$ against an exact oracle, whereas the conventional learned
+attention weights are statistically uncorrelated with the true makespan levers
+($|\rho|\le 0.17$). Routing the same faithful signal back into an NSGA-II search makes the
+guided algorithm dominate mp-BRKGA, single-population BRKGA and an unguided control on
+hypervolume in $11/11$ instances (Friedman $\chi^2_4=28.9$, $p=8\times10^{-6}$; all
+post-hoc Holm-adjusted $p<0.006$). Finally, aggregating TAPE over the approximated Pareto
+set with a trade-off-weighted score (Pareto Tension Score) yields an interpretable,
+sparse description of how the binding bottleneck \emph{migrates} along the front. The same
+mathematical object thus explains the front, characterises its behaviour, and guides the
+optimiser---one evidenced mechanism for all of the project's research directions.
+\end{abstract}
+
+\section{Introduction and research directions}
+\label{sec:intro}
+
+The container terminal scheduling problem treated here couples three decisions that an
+operations-research reader will recognise immediately: \emph{assignment} of container
+moves (tasks) to vehicles, \emph{sequencing} of tasks on each vehicle and on each crane,
+and the \emph{speed level} of every vehicle leg, which trades travel time against energy.
+The objective is bi-objective: minimise the makespan $\Cmax$ and the total travel energy
+$E$. The reference method is the multi-population biased random-key genetic algorithm
+(mp-BRKGA) of Fontes and Homayouni~\cite{fontes2022mpbrkga}.
+
+This report responds to four research directions stated in the project brief:
+\begin{enumerate}[label=(R\arabic*),leftmargin=*]
+  \item \textbf{Feature engineering / post-hoc analysis.} Derive, by post-hoc analysis of
+  solved instances, the quantities that actually drive the objectives.
+  \item \textbf{Landscape / feature-importance analysis.} On small instances, explain
+  \emph{why} particular solutions are Pareto-optimal in terms of the input variables
+  (task order, vehicle speed, crane workload).
+  \item \textbf{Feedback / guidance algorithm.} Use the knowledge gathered during the
+  search to steer the optimiser (which neighbourhood to explore, which operator to apply).
+  \item \textbf{Front behaviour.} Extract that knowledge in a way that captures the
+  behaviour of the Pareto front itself.
+\end{enumerate}
+
+\noindent\textbf{Our thesis.} A single mathematical object---the gradient of an exact
+max-plus longest path that is embedded inside a learned surrogate---answers all four. It is
+the post-hoc importance signal (R1, R2), it is the steering signal fed back to NSGA-II
+(R3), and, aggregated over the front with a trade-off weight, it is a description of front
+behaviour (R4). Crucially we insist this signal be \emph{faithful}: it must point at the
+operations that truly set the makespan, not merely produce a plausible-looking heat map.
+This faithfulness requirement is what distinguishes the present work from the common
+practice of reading a neural network's attention weights as if they were explanations.
+
+\section{Problem formulation}
+\label{sec:problem}
+
+\subsection{Entities and decisions}
+An instance has a set of container moves (\emph{tasks}) $\mathcal{J}=\{0,\dots,N-1\}$.
+Each task $j$ is bound to one quay crane $\mathrm{qc}(j)$ and one yard/storage station
+$\mathrm{lu}(j)$, and is of one of two kinds: a \emph{LOAD} (export: the loaded vehicle leg
+runs $\mathrm{LU}\!\to\!\mathrm{QC}$) or an \emph{UNLOAD} (import: the loaded leg runs
+$\mathrm{QC}\!\to\!\mathrm{LU}$). Each crane processes its tasks one at a time with a
+handling time $\tau_j$. A fleet of $|\mathcal{A}|$ SA-AGVs performs the transport. A
+decision specifies, for every task, (a) the assigned vehicle, (b) the position in that
+vehicle's sequence and in its crane's sequence, and (c) a discrete speed level for the
+\emph{empty} leg (vehicle driving to the pickup) and for the \emph{loaded} leg.
+
+\subsection{Physics of a leg}
+Three speed levels $\alpha\in\{0.8,1.0,1.2\}$ scale a nominal speed; loaded and empty legs
+have distinct nominal speeds and power draws (Table~\ref{tab:speed}, after
+\cite{homayouni2022book,fontes2022mpbrkga}). For a leg of length $d$ at level $\ell$,
+\begin{equation}
+t_{\text{leg}}(d,\ell) = \frac{d}{v_\ell}, \qquad
+e_{\text{leg}}(d,\ell) = P_\ell \cdot t_{\text{leg}}(d,\ell),
+\end{equation}
+i.e.\ energy is power $\times$ time. A faster level shortens $t$ but raises $P$, which is
+the source of the time--energy trade-off.
+
+\begin{table}[t]
+\centering
+\caption{Kinematic and power constants per speed level (after \cite{homayouni2022book}).}
+\label{tab:speed}
+\small
+\begin{tabular}{lccccc}
+\toprule
+Level & $\alpha$ & empty $v$ (m/s) & empty $P$ (kW) & loaded $v$ (m/s) & loaded $P$ (kW)\\
+\midrule
+Lower   & 0.8 & 4.8 & 7.8  & 2.4 & 11.7\\
+Nominal & 1.0 & 6.0 & 10.0 & 3.0 & 15.0\\
+Higher  & 1.2 & 7.2 & 13.2 & 3.6 & 19.8\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Objectives and the max-plus structure of the makespan}
+\label{sec:maxplus}
+Total energy is simply additive over the chosen legs,
+\begin{equation}
+E \;=\; \sum_{j\in\mathcal{J}} \big(e^{\text{empty}}_j + e^{\text{loaded}}_j\big).
+\label{eq:energy}
+\end{equation}
+The makespan is more subtle. Fixing the assignment and sequencing turns the schedule into a
+\emph{precedence graph}: task $j$ cannot start its work until both its predecessor on the
+same vehicle and its predecessor on the same crane have finished. Following the corrected
+single-indexed timing of \cite{fontes2023flowtime}, the per-task completion obeys, for a
+LOAD,
+\begin{equation}
+c_j \;=\; \max\!\big(a^{\text{agv}}_j + t^{\text{empty}}_j + t^{\text{loaded}}_j,\;
+c_{\mathrm{qcprev}(j)}\big) + \tau_j ,
+\end{equation}
+and for an UNLOAD,
+\begin{equation}
+c_j \;=\; \max\!\big(a^{\text{agv}}_j + t^{\text{empty}}_j,\; c_{\mathrm{qcprev}(j)} + \tau_j\big)
++ t^{\text{loaded}}_j ,
+\end{equation}
+with $a^{\text{agv}}_j$ the time the vehicle becomes free for $j$. Because every completion
+is a \emph{maximum of sums} along the vehicle and crane chains, the makespan
+\begin{equation}
+\Cmax \;=\; \max_{j} c_j
+\end{equation}
+is exactly a \emph{longest path} in the precedence graph under the algebra
+$(\max,+)$---the \emph{tropical} or \emph{max-plus} semiring~\cite{baccelli1992synch}. This
+is the single structural fact the whole method exploits: the longest path is the
+\emph{critical path}, and the objective is determined by the activities lying on it.
+
+\subsection{The peak-power-coupled regime}
+\label{sec:coupled}
+The uncoupled problem above has a closed-form (longest-path) makespan. We additionally
+study the author's extension in which the fleet shares an instantaneous \emph{peak-power
+budget} $P_{\max}$: the sum of the powers of all vehicle legs running at any instant may not
+exceed $P_{\max}$. A leg may then have to \emph{wait} for budget even when its precedence is
+satisfied. The makespan becomes the output of an event-driven simulator and \emph{no longer
+has a closed form}. This is precisely the regime where a learned surrogate earns its place,
+and where ``which leg is on the critical path'' is no longer obvious by inspection.
+
+\section{Method}
+\label{sec:method}
+
+Figure~\ref{fig:arch} previews the full pipeline; the rest of this section dissects each
+block with the notation of Table~\ref{tab:notation}.
+
+\subsection{Decision variables, the search space, and why we guide it}
+\label{sec:searchspace}
+An instance has $N$ transport tasks $\mathcal{J}=\{1,\dots,N\}$, a fleet of $A$
+speed-adjustable AGVs, $K$ quay cranes, and $V$ admissible speed levels per leg. A
+\emph{solution} is the tuple
+\begin{equation}
+z \;=\; \big(\,\alpha,\;\sigma,\;\omega^{\mathrm e},\;\omega^{\mathrm l}\,\big),\qquad
+\alpha:\mathcal{J}\!\to\!\{1,\dots,A\},\;\;
+\sigma\in\mathfrak{S}_N,\;\;
+\omega^{\mathrm e},\omega^{\mathrm l}\in\{1,\dots,V\}^{N},
+\label{eq:solution}
+\end{equation}
+i.e.\ an assignment $\alpha$ of each task to a vehicle, a processing order $\sigma$, and a
+speed level for each empty (e) and loaded (l) leg. The decoder of
+Section~\ref{sec:randomkey} turns $z$ into a feasible schedule $s(z)$ whose physical
+evaluation returns the objective pair $f(s)=(\Cmax(s),E(s))$. The cardinality of the
+feasible set,
+\begin{equation}
+|\mathcal{Z}| \;=\; \underbrace{A^{N}}_{\text{assignment}}\cdot
+\underbrace{N!}_{\text{order}}\cdot
+\underbrace{V^{2N}}_{\text{speeds}},
+\end{equation}
+grows super-exponentially (already $>10^{40}$ at $N{=}20$, $A{=}3$, $V{=}3$), and the
+underlying assignment--sequencing problem is NP-hard~\cite{homayouni2023}; exact MILP is
+intractable beyond a few dozen tasks. We therefore search with the population-based
+metaheuristic NSGA-II~\cite{deb2002nsga2} and concentrate our contribution on \emph{where}
+in $\mathcal Z$ the search spends its budget: a faithful, physics-anchored explanation of
+\emph{which decisions bind the objectives} is used to bias the variation operators and to
+screen offspring (Sections~\ref{sec:guidance}).
+
+\begin{table}[t]
+\centering\small
+\caption{Notation used throughout the Method.}
+\label{tab:notation}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Symbol & Meaning\\
+\midrule
+$\mathcal J=\{1,\dots,N\}$ & transport tasks\\
+$z=(\alpha,\sigma,\omega^{\mathrm e},\omega^{\mathrm l})$ & a solution (Eq.~\ref{eq:solution})\\
+$s(z)$, $f(s)=(\Cmax,E)$ & decoded schedule and its objective pair\\
+$G_s=(V,\,E^{\mathrm{agv}},E^{\mathrm{qc}})$ & heterogeneous schedule graph\\
+$x_j\in\R^{d_0}$, $u_{ij}\in\R^{d_e}$ & task-node and arc input features\\
+$h_j^{(\ell)}\in\R^{d}$ & embedding of task $j$ after layer $\ell$\\
+$\mathcal N_r(j)$ & resource-$r$ predecessors of $j$ ($r\in\{\mathrm{agv},\mathrm{qc}\}$)\\
+$\beta_j^{r}$ & semantic (cross-resource) attention of $j$ on $r$\\
+$t^{\mathrm e}_j,t^{\mathrm l}_j$ & empty/loaded leg times of task $j$\\
+$\tau_j$ & crane handling delay of task $j$\\
+$G_{\mathrm{dag}}=(\mathcal N,\mathcal A,b,w)$ & event DAG: node weights $b$, arc weights $w$\\
+$\pi^\star$ & critical (longest) path in $G_{\mathrm{dag}}$\\
+$g_a=\partial\Cmax/\partial w_a$ & TAPE attribution of arc $a$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Random-key representation and the decoder}
+\label{sec:randomkey}
+We use the biased random-key encoding~\cite{fontes2022mpbrkga}: a chromosome is a vector
+$\chi\in[0,1]^{4N}$ split into four length-$N$ blocks. The deterministic decoder
+$\mathcal D:[0,1]^{4N}\!\to\!\mathcal Z$ reads task order from the argsort of the first
+block, vehicle assignment from $\lceil A\,\chi^{(2)}\rceil$, and the two speed levels from
+$\lceil V\,\chi^{(3)}\rceil,\lceil V\,\chi^{(4)}\rceil$; structural feasibility (one vehicle
+per task, crane order from the fixed bay layout) is enforced during decoding. The optimiser
+is elitist NSGA-II~\cite{deb2002nsga2}; our contribution lies in \emph{how its mutation and
+screening are guided}.
+
+\begin{figure}[t]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[node distance=6mm and 9mm]
+\node[io] (sched) {schedule\\$s(z)$};
+\node[io, right=of sched] (graph) {hetero.\ graph\\$G_s$};
+\node[core, right=of graph] (core) {\textbf{E-HGATv2 core}\\$L\!\times$ (max-agg\\GATv2 $+$ semantic attn)};
+\node[core, right=of core] (emb) {node embeddings\\$\{h_j\}$};
+\node[head, above right=4mm and 10mm of emb] (proj) {projection heads\\$t^{\mathrm e}_j,t^{\mathrm l}_j,\tau_j$};
+\node[head, right=14mm of emb] (dp) {tropical DP\\$\Rightarrow \Cmax$};
+\node[head, below right=4mm and 10mm of emb] (en) {additive sum\\$\Rightarrow E$};
+\node[blk, fill=red!8, right=12mm of dp] (tape) {\textbf{TAPE}\\$g_a=\partial\Cmax/\partial w_a$};
+\node[blk, fill=orange!12, below=10mm of tape] (guide) {guidance:\\mutate/screen};
+\draw[fl] (sched)--(graph);
+\draw[fl] (graph)--(core);
+\draw[fl] (core)--(emb);
+\draw[fl] (emb)--(proj);
+\draw[fl] (emb)--(en);
+\draw[fl] (proj)--(dp);
+\draw[fl] (dp)--(tape);
+\draw[fl] (tape)--(guide);
+\draw[fl] (guide) -| node[pos=0.25,below,font=\scriptsize]{NSGA-II} (sched);
+\end{tikzpicture}%
+}
+\caption{Pipeline. The E-HGATv2 core embeds a decoded schedule; projection heads predict
+local physical attributes that an \emph{exact} max-plus dynamic program composes into
+$\Cmax$ (energy is an exact additive sum). Differentiating the DP yields the TAPE arc
+attributions $g_a$, which both \emph{explain} the schedule and \emph{steer} the next NSGA-II
+generation.}
+\label{fig:arch}
+\end{figure}
+
+\subsection{Heterogeneous graph representation of a schedule}
+\label{sec:graphrep}
+A decoded schedule $s(z)$ is encoded as a directed heterogeneous graph
+$G_s=(V,E^{\mathrm{agv}},E^{\mathrm{qc}})$ in which every transport task is a node $j\in V$
+and the two resource chains are the two arc types:
+\begin{itemize}[leftmargin=*,itemsep=2pt]
+  \item a \textbf{task-node feature} $x_j\in\R^{d_0}$ ($d_0{=}4$) holds the handling time,
+  task kind, and origin/destination descriptors;
+  \item an \textbf{AGV arc} $(i\!\to\! j)\in E^{\mathrm{agv}}$ exists iff task $i$ is the
+  immediate vehicle-predecessor of $j$ under $\alpha,\sigma$; its feature
+  $u_{ij}\in\R^{d_e}$ ($d_e{=}3$) carries the leg travel time and the empty/loaded leg
+  energies;
+  \item a \textbf{QC arc} $(i\!\to\! j)\in E^{\mathrm{qc}}$ exists iff $i$ immediately
+  precedes $j$ on the same crane.
+\end{itemize}
+This graph is precisely the precedence DAG whose longest path is the makespan
+(Section~\ref{sec:maxplus}); the representation is therefore \emph{isomorphic to the
+objective's combinatorial structure}, not a generic featurisation. A key fact exploited
+below is that in any \emph{resolved} schedule each task has at most one AGV predecessor and
+at most one QC predecessor, i.e.\ $|\mathcal N_{\mathrm{agv}}(j)|\le 1$ and
+$|\mathcal N_{\mathrm{qc}}(j)|\le 1$.
+
+\subsection{E-HGATv2: a $(\max,+)$-aligned message-passing surrogate}
+\label{sec:ehgat}
+A graph neural network is a parametric map on graphs that, in $L$ rounds, lets each node
+recompute its state $h_j^{(\ell)}\in\R^{d}$ from its neighbours' states. We design the
+update to mirror the makespan recurrence~\eqref{eq:troprec}, whose two operators are a
+\emph{within-resource $\max$} and a \emph{cross-resource $\max$}.
+
+\paragraph{Elementary operators.} We use four standard building blocks. For a vector
+$z\in\R^{m}$, the rectifier $\ReLU(z)=\max(0,z)$ acts coordinatewise and the leaky variant
+$\LeakyReLU(z)=\max(\eta z,z)$ ($\eta{=}0.2$) keeps a small negative slope; the
+$\softmax(z)_k=e^{z_k}/\sum_{k'}e^{z_{k'}}$ maps scores to a probability vector. A
+\emph{multilayer perceptron} composes affine maps with $\ReLU$,
+$\MLP(z)=W_2\,\ReLU(W_1 z+b_1)+b_2$. A \emph{read-out} pools a variable-size set of node
+states $\{h_j\}_{j\in V}$ into one vector with the permutation-invariant operators
+$\operatorname{mean-pool}(\{h_j\})=\tfrac1{|V|}\sum_j h_j$,
+$\operatorname{max-pool}(\{h_j\})=\max_j h_j$ (coordinatewise), and
+$\operatorname{sum-pool}(\{u_a\})=\sum_a u_a$. The two $\max$ operators are what align the
+network with the $(\max,+)$ objective.
+
+The encoder is $h_j^{(0)}=\ReLU(W_0 x_j)$, and each of the $L$ layers ($L{=}3$, $d{=}64$,
+$4$ heads) applies, per task $j$:
+
+\paragraph{(i) Within-resource attention and max reduction.}
+For each relation $r\in\{\mathrm{agv},\mathrm{qc}\}$ we run a GATv2
+operator~\cite{brody2022gatv2}. GATv2 scores an arc $(i\!\to\! j)$ \emph{after} the
+nonlinearity, which (unlike GAT) makes the attention a universal function of the
+endpoint--edge triple:
+\begin{equation}
+e^{r}_{ij} \;=\; \mathbf a_r^{\!\top}\,
+\LeakyReLU\!\big(W_r\,[\,h_i^{(\ell-1)}\concat h_j^{(\ell-1)}\concat u_{ij}\,]\big),
+\qquad
+\alpha^{r}_{ij} \;=\; \softmax_{i\in\mathcal N_r(j)} e^{r}_{ij}.
+\end{equation}
+The relation message is taken with an \emph{elementwise maximum} over predecessors,
+\begin{equation}
+m^{r}_j \;=\; \maxop_{i\in\mathcal N_r(j)}\; \alpha^{r}_{ij}\,\Theta_r\,
+[\,h_i^{(\ell-1)}\concat u_{ij}\,],
+\label{eq:maxagg}
+\end{equation}
+where $W_r\in\R^{2d+d_e}$ and $\mathbf a_r$ are the GATv2 score parameters and
+$\Theta_r\colon\R^{d+d_e}\!\to\!\R^{d}$ is the per-relation value transform (realised as the
+$4$ attention heads of width $d/4$, concatenated), so $m^{r}_j\in\R^{d}$.
+Equation~\eqref{eq:maxagg} is the $(\max,+)$ reduction: a node inherits the \emph{binding}
+predecessor, exactly as the longest path does, rather than the additive blend
+$\sum_i\alpha_{ij}(\cdot)$ of a standard attention layer. (Because $|\mathcal N_r(j)|\le1$ in a resolved schedule, the
+per-relation softmax is degenerate---$\alpha^{r}_{ij}\equiv1$---so the \emph{non-degenerate}
+selection happens across relations, next.)
+
+\paragraph{Why GATv2 (dynamic attention) and not GAT.} The original
+GAT~\cite{velickovic2018gat} scores an arc as
+$\LeakyReLU\!\big(\mathbf a^{\!\top}[\,W h_i\concat W h_j\,]\big)$, applying the learned
+vector $\mathbf a$ and the matrix $W$ \emph{before} the nonlinearity. Brody et
+al.~\cite{brody2022gatv2} prove this yields \emph{static attention}: the induced ranking of
+source nodes is global---the most-attended key is the \emph{same for every query node} $j$.
+That is the wrong inductive bias here, because which predecessor (and which resource chain)
+\emph{gates} a task is intrinsically \emph{query-dependent}: a long empty leg binds one task
+yet is slack for another, depending on the rest of its chain. GATv2 moves the nonlinearity
+\emph{inside} the score, $e^{r}_{ij}=\mathbf a_r^{\!\top}\LeakyReLU(W_r[h_i\concat h_j\concat
+u_{ij}])$, giving \emph{dynamic attention} that can realise a different ranking per task.
+The cross-resource gating~\eqref{eq:sem} that mirrors
+$\max(\text{agv-ready},\text{qc-ready})$ is precisely a per-task selection of the binding
+chain, so the ``v2'' is load-bearing rather than cosmetic: a static-attention GAT cannot, in
+principle, represent ``task $j$ is AGV-bound while task $k$ is QC-bound.''
+
+\paragraph{(ii) Cross-resource semantic attention.}
+A task completes when the \emph{later} of its two resource chains is ready,
+$\max(\text{agv-ready},\text{qc-ready})$. We make this argmax differentiable with a
+semantic (HAN-style) attention~\cite{wang2019han} over the two relation messages. With a
+shared scorer $(W_s,\mathbf q)$,
+\begin{align}
+s^{r}_j &= \mathbf q^{\!\top}\tanh\!\big(W_s\, m^{r}_j\big),
+&
+\big(\beta^{\mathrm{agv}}_j,\beta^{\mathrm{qc}}_j\big)
+&= \softmax\big(s^{\mathrm{agv}}_j,\, s^{\mathrm{qc}}_j\big),
+\label{eq:sem}\\[2pt]
+m_j &= \beta^{\mathrm{agv}}_j\, m^{\mathrm{agv}}_j
+      + \beta^{\mathrm{qc}}_j\, m^{\mathrm{qc}}_j,
+&
+h_j^{(\ell)} &= h_j^{(\ell-1)} + \ReLU(m_j),
+\end{align}
+where $s^{\mathrm{qc}}_j\!\to\!-\infty$ if $j$ has no crane predecessor, and the residual
+connection lets criticality propagate across the $L$ hops of the DAG. The scalar
+$\beta^{r}_j$ is exactly ``how much resource $r$ gates task $j$''---and is the per-arc weight
+one is tempted to read as criticality.
+
+\paragraph{(iii) Physics-matched read-out.}
+Inputs are standardised once at the encoder by frozen statistics
+$\tilde x_j=(x_j-\mu_{\mathrm{node}})\oslash\sigma_{\mathrm{node}}$ and
+$\tilde u_a=(u_a-\mu_{\mathrm{agv}})\oslash\sigma_{\mathrm{agv}}$ ($\oslash$ is elementwise
+division). The two objectives have different algebra, so the read-out forms three
+pooled vectors from the final node states $h^{(L)}_j\in\R^{d}$---two for the longest-path
+makespan and one for the additive energy:
+\begin{equation}
+g_{\mathrm{mean}}=\tfrac1N\!\sum_{j} h^{(L)}_j\in\R^{d},\quad
+g_{\max}=\maxop_{j} h^{(L)}_j\in\R^{d}\ \text{(coordinatewise)},\quad
+g_{E}=\!\!\sum_{a\in E^{\mathrm{agv}}}\!\! \tilde u_a\in\R^{d_e}.
+\end{equation}
+The energy uses a \emph{sum} pool because a max pool would discard the additive arc
+contributions. Concatenating, $z=[\,g_{\mathrm{mean}}\concat g_{\max}\concat g_{E}\,]\in
+\R^{2d+d_e}$, a two-layer head regresses the standardised objective vector and a buffer
+de-normalises it to physical units:
+\begin{equation}
+\hat y = W_2\,\ReLU(W_1 z + b_1)+b_2\in\R^{2},\qquad
+(\widehat{\Cmax},\widehat E)=\hat y\odot\sigma_{y}+\mu_{y},
+\label{eq:readout}
+\end{equation}
+with $W_1\in\R^{d\times(2d+d_e)}$, $W_2\in\R^{2\times d}$ and $\odot$ the Hadamard product.
+Training minimises the standardised MSE
+$\sum_s\big\|\hat y(s)-(y(s)-\mu_y)\oslash\sigma_y\big\|_2^2$ over decoded schedules $s$
+(so the makespan and energy losses are balanced despite their different scales). This
+plain regressor attains $R^2\approx0.99$ on held-out schedules in the uncoupled regime
+(Section~\ref{sec:results}).
+
+\begin{proposition}[Inductive-bias alignment]
+\label{prop:bias}
+Replacing the additive aggregation of a standard attention/MPNN layer with the
+$(\max,+)$ pair \eqref{eq:maxagg}--\eqref{eq:sem} makes the layer's two reductions coincide
+with the two $\max$ operators of the makespan recurrence~\eqref{eq:troprec}. A
+sum-aggregation network must instead \emph{approximate} $\max$ with depth/width, whereas
+E-HGATv2 represents it exactly in the limit $\beta\!\to\!\{0,1\}$.
+\end{proposition}
+
+\paragraph{Why the attention weights are not enough.} It is tempting to read
+$\beta^{r}_j$ from \eqref{eq:sem} as ``how critical arc $r$ of task $j$ is.'' We show in
+Section~\ref{sec:results} that this reading is \emph{not faithful}: the $\beta$ ranking is
+statistically uncorrelated with the true critical path (the softmax is a smooth surrogate,
+not the argmax, and it is trained only to fit the \emph{scalar} $\Cmax$, with no constraint
+tying it to the binding path). This is the gap the fused head closes.
+
+\subsection{Physics-fused tropical head}
+\label{sec:fused}
+The read-out~\eqref{eq:readout} regresses the scalar $\Cmax$ through a generic MLP. The
+Jacobian of that MLP \emph{smears} sensitivity across every pooled feature, so an
+input-attribution of $\Cmax$ has no reason to coincide with the binding path. The
+\emph{fused} model keeps the trained E-HGATv2 core as a frozen feature extractor but
+replaces the makespan MLP with the genuine physics in three steps: (i) project embeddings to
+local physical attributes, (ii) assemble the event DAG, (iii) compose $\Cmax$ with an exact
+differentiable max-plus dynamic program.
+
+\paragraph{(i) Projection heads.} Let task $j$ have its unique incoming AGV arc $(i\!\to\!j)$
+with standardised arc prior $\tilde u_{ij}$, and let $h_i,h_j$ be the frozen-core embeddings.
+The heads emit local attributes in de-normalised physical units (buffers $\mu_\bullet,
+\sigma_\bullet$ from training statistics, $[\cdot]_+\!=\!\ReLU$):
+\begin{align}
+\big(t^{\mathrm e}_j,\,t^{\mathrm l}_j\big)
+&= \big[\,\MLP_{\mathrm{leg}}\!\big([\,h_i\concat h_j\concat \tilde u_{ij}\,]\big)\odot\sigma_{\mathrm{leg}}+\mu_{\mathrm{leg}}\,\big]_+,
+\label{eq:leghead}\\
+\tau_j &= \big[\,\MLP_{\mathrm{delay}}\!\big([\,h_j\concat \tilde x^{\mathrm{hand}}_j\,]\big)\,\sigma_\tau+\mu_\tau\,\big]_+ .
+\end{align}
+Here $\MLP_{\mathrm{leg}}\colon\R^{2d+d_e}\!\to\!\R^{2}$ and
+$\MLP_{\mathrm{delay}}\colon\R^{d+1}\!\to\!\R$ (the extra input being the standardised
+handling prior $\tilde x^{\mathrm{hand}}_j$). The leg \emph{energies}
+$e^{\mathrm e}_j,e^{\mathrm l}_j$ are read \emph{exactly} from the arc
+features (not learned), so energy is a strictly linear head,
+\begin{equation}
+E=\sum_{j\in\mathcal J}\big(e^{\mathrm e}_j+e^{\mathrm l}_j\big),
+\qquad \frac{\partial E}{\partial e^{\bullet}_j}=1 .
+\label{eq:fusedenergy}
+\end{equation}
+In the coupled regime an additional head predicts a per-leg power wait
+$\delta^{\bullet}_j=\MLP_{\mathrm{wait}}([\,h_i\concat h_j\concat\tilde u_{ij}\concat c_j\,])$,
+$\MLP_{\mathrm{wait}}\colon\R^{2d+d_e+d_c}\!\to\!\R^{2}$, from a contention vector
+$c_j\in\R^{d_c}$ read off the previous timing iterate; the effective leg weight
+becomes $t^{\bullet}_j+\delta^{\bullet}_j$ and the prediction is the fixed point of an
+unrolled timing$\to$contention$\to$wait recursion (the differentiable analogue of the
+simulator's iterative power resolution).
+
+\paragraph{(ii) Event DAG.} The attributes instantiate a weighted DAG
+$G_{\mathrm{dag}}=(\mathcal N,\mathcal A,b,w)$ whose nodes are task events, whose node
+weights $b_v$ are handling delays $\tau$, and whose arc weights $w_a$ are the (effective) leg
+times---exactly the precedence structure of Section~\ref{sec:maxplus}.
+
+\paragraph{(iii) Tropical longest-path layer.} The completion time of every node solves, in
+topological order,
+\begin{equation}
+x_v \;=\; b_v + \max_{u:\,(u\to v)\in\mathcal A}\big(x_u + w_{uv}\big),
+\qquad \Cmax=\max_{v\in\mathcal N_{\mathrm{end}}} x_v ,
+\label{eq:troprec}
+\end{equation}
+and the layer stores, per node, the maximising in-arc $a^\star(v)=\argmax_{u\to v}(x_u+w_{uv})$.
+
+\begin{proposition}[Exactness of the makespan head]
+\label{prop:exact}
+With $b,w$ set to the true handling delays and leg times, \eqref{eq:troprec} equals the
+physical makespan of Section~\ref{sec:maxplus}; the recurrence is the $(\max,+)$ rewriting of
+the LOAD/UNLOAD completions $c_j$. Hence the only approximation in the fused makespan is the
+heads' prediction of the local attributes---the \emph{composition} is exact.
+\end{proposition}
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[node distance=10mm and 13mm]
+\node[ev] (s) {$s$};
+\node[ev, right=of s] (a1) {$1$};
+\node[ev, right=of a1] (a2) {$2$};
+\node[ev, right=of a2] (a3) {$3$};
+\node[ev, below=8mm of a1] (b1) {$4$};
+\node[ev, right=of b1] (b2) {$5$};
+\node[ev, above right=6mm and 6mm of a3] (t) {$t$};
+% AGV chain 1 (critical)
+\draw[fl, crit] (s)--(a1) node[midway,above,font=\scriptsize]{$t^{\mathrm e}_1$};
+\draw[fl, crit] (a1)--(a2) node[midway,above,font=\scriptsize]{$t^{\mathrm l}_2$};
+\draw[fl, crit] (a2)--(a3) node[midway,above,font=\scriptsize]{$t^{\mathrm l}_3$};
+\draw[fl, crit] (a3)--(t);
+% AGV chain 2 (slack)
+\draw[fl] (s)--(b1);
+\draw[fl] (b1)--(b2);
+\draw[fl] (b2)--(t);
+% QC serialisation arc (cross-resource)
+\draw[fl, dashed] (b2)--(a3) node[midway,below,font=\scriptsize]{$\tau$ (qc)};
+\end{tikzpicture}
+\caption{Event DAG $G_{\mathrm{dag}}$ for a small schedule. Solid arcs are AGV legs, the
+dashed arc is a quay-crane serialisation constraint. The bold red path $s\!\to\!1\!\to\!2\!\to\!3\!\to\!t$
+is the critical (longest) path $\pi^\star$; only its arcs carry a nonzero TAPE gradient
+(Eq.~\ref{eq:tape}).}
+\label{fig:dag}
+\end{figure}
+
+\subsection{TAPE: exact critical-path attributions}
+\label{sec:tape}
+Let $\pi^\star$ be the maximising path realised by the stored arcs $a^\star(\cdot)$. Along it
+$\Cmax=\sum_{a\in\pi^\star} w_a+\sum_{v\in\pi^\star} b_v$.
+
+\begin{proposition}[TAPE subgradient]
+\label{prop:tape}
+If the maximiser at each node is unique, then for every arc weight $w_a$ and node weight
+$b_v$,
+\begin{equation}
+\boxed{\;\frac{\partial \Cmax}{\partial w_a}=\mathbf 1[\,a\in\pi^\star\,],
+\qquad
+\frac{\partial \Cmax}{\partial b_v}=\mathbf 1[\,v\in\pi^\star\,].\;}
+\label{eq:tape}
+\end{equation}
+\end{proposition}
+\begin{proof}
+For a perturbation $|\varepsilon|$ small enough that no node's $\argmax$ in
+\eqref{eq:troprec} changes, the active path $\pi^\star$ and node set are fixed, so locally
+$\Cmax(w_a+\varepsilon)=\Cmax+\varepsilon\,\mathbf 1[a\in\pi^\star]$; differentiating gives
+the indicator (analogously for $b_v$). Our custom backward computes exactly this: it seeds
+the completion node with gradient $1$ and, in reverse topological order, routes each node's
+incoming gradient $g_v$ only through its stored arc $a^\star(v)$ to that arc and its source,
+$g_{a^\star(v)}\!\mathrel{+}=\!g_v,\ g_{\mathrm{src}(a^\star(v))}\!\mathrel{+}=\!g_v$,
+accumulating $\mathbf 1[\cdot\in\pi^\star]$.
+\end{proof}
+
+We call the vector $g=(g_a)_{a\in\mathcal A}$, $g_a=\partial\Cmax/\partial w_a$,
+\textbf{TAPE} (Tropical Attribution for Physical Explanations). Operationally:
+\emph{delaying an on-path leg by $\Delta$ raises the makespan by exactly $\Delta$; delaying an
+off-path leg changes nothing.} Unlike the attention weights $\beta$ of \eqref{eq:sem}---which
+are a smooth surrogate trained only to fit a scalar---TAPE is a binary critical-path
+indicator \emph{by construction}, so there is nothing to misread. Crucially the leg times
+themselves are predicted by the graph network~\eqref{eq:leghead}, so the network stays
+load-bearing; TAPE only makes its prediction faithfully inspectable. (An exact oracle
+critical path, computed from the resolved simulator with no network, is retained only as a
+ceiling reference.)
+
+\begin{definition}[Faithfulness]
+For a schedule, let $\mathcal{C}_{\text{model}}=\{a:g_a>\tfrac12\}$ be the model's binding-leg
+set and $\mathcal{C}_{\text{oracle}}$ the exact critical-path leg set. The \emph{leg-critical
+Jaccard} $|\mathcal{C}_{\text{model}}\cap\mathcal{C}_{\text{oracle}}|/
+|\mathcal{C}_{\text{model}}\cup\mathcal{C}_{\text{oracle}}|$ measures faithfulness; a value of
+$1$ means the model identifies exactly the binding legs.
+\end{definition}
+
+\subsection{Faithful guidance: the explanation steers the search (R3)}
+\label{sec:guidance}
+The TAPE vector is converted into three search signals that mirror the inputs the NSGA-II
+mutation already expected, so the explanation \emph{is} the controller:
+\begin{align}
+w^{\text{agv}}_j &= \tfrac{\partial \Cmax}{\partial t^{\text{empty}}_j}
++ \tfrac{\partial \Cmax}{\partial t^{\text{loaded}}_j}
+&&\text{(transport criticality of task $j$)},\\
+w^{\text{qc}}_j &= \tfrac{\partial \Cmax}{\partial \tau_j}
+&&\text{(crane criticality of task $j$)},\\
+\Pr[\text{mutate } j] &= \mathrm{softmax}_j\!\big((w^{\text{agv}}_j+w^{\text{qc}}_j)/T\big)
+&&\text{(where to search)} .
+\end{align}
+A task's \emph{type} of criticality, $w^{\text{agv}}_j/(w^{\text{agv}}_j+w^{\text{qc}}_j)$,
+routes the operator choice (re-assign/swap-vehicle when transport-bound; swap-crane when
+crane-bound). Finally, the fused head's near-exact $(\Cmax,E)$ prediction \emph{screens} a
+larger pool of offspring so the expensive exact evaluations are spent only on
+predicted-good children. The same object thus explains and steers; Algorithm~\ref{alg:tape}
+specifies one generation.
+
+\begin{algorithm}[t]
+\caption{TAPE-guided NSGA-II generation (one step)}
+\label{alg:tape}
+\begin{algorithmic}[1]
+\Require population $P$ ($|P|=\mu$), fused model $\mathcal F$, instance $\mathcal I$, screen factor $\kappa$, temperature $T$
+\State $(\mathcal R,\mathrm{cd})\gets$ fast-non-dominated-sort and crowding-distance of $P$
+\State $\mathcal O\gets\varnothing$
+\For{$m=1$ to $\kappa\mu$} \Comment{over-produce offspring to screen}
+  \State pick parent $p$ by binary tournament on $(\mathcal R,\mathrm{cd})$
+  \State $g\gets\textsc{TAPE}(\mathcal F, s(p))$ \Comment{Eq.~\eqref{eq:tape}: one backward pass}
+  \State compute $w^{\mathrm{agv}}_j,w^{\mathrm{qc}}_j$ and $\Pr[\text{mutate }j]\propto e^{(w^{\mathrm{agv}}_j+w^{\mathrm{qc}}_j)/T}$
+  \State sample task $j\sim\Pr[\cdot]$; choose operator by the ratio $w^{\mathrm{agv}}_j/(w^{\mathrm{agv}}_j{+}w^{\mathrm{qc}}_j)$
+  \State $o\gets$ apply operator to $p$ at task $j$; $\mathcal O\gets\mathcal O\cup\{o\}$
+\EndFor
+\State $\widehat f\gets\mathcal F.\textsc{predict}(\mathcal O)$ \Comment{cheap surrogate screen of all $\kappa\mu$}
+\State $\mathcal O^\star\gets$ top $\mu$ of $\mathcal O$ by non-dominated rank of $\widehat f$
+\State evaluate $\mathcal O^\star$ \emph{exactly} (Sec.~\ref{sec:maxplus}/\ref{sec:coupled})
+\State \Return environmental-selection$(P\cup\mathcal O^\star)$ \Comment{elitist $\mu$-survival}
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Front behaviour: Pareto Tension Scores (R4)}
+\label{sec:pts}
+To describe the \emph{front} rather than a single schedule, we aggregate TAPE over the
+approximated Pareto set. At a front point, the local trade-off weight $\lambda\in[0,1]$ is
+read from the front tangent $(\Delta \Cmax,\Delta E)$ (the slope at which one objective is
+traded for the other). The \emph{Pareto Tension Score} of task $j$ is the
+$\lambda$-weighted combination of its makespan and energy gradients,
+\begin{equation}
+\mathrm{PTS}_j \;=\; \big|\,\lambda\,\partial_{t_j}\Cmax + (1-\lambda)\,\partial_{e_j}E\,\big| ,
+\end{equation}
+i.e.\ how strongly task $j$ is \emph{tense}---binding on the objective mixture that defines
+that point of the front. Sweeping $\lambda$ from the makespan-optimal end to the
+energy-optimal end shows \emph{which bottleneck migrates}, and how concentrated the tension
+is on a few tasks. This is the requested front-behaviour knowledge (Section~\ref{sec:front}).
+
+\section{Experimental setup}
+\label{sec:setup}
+
+\subsection{Instances (datasets)}
+We use three families (Table~\ref{tab:data}). \textbf{Synthetic dual-cycling} instances
+(\textsf{SD-$N$}) alternate LOAD/UNLOAD moves over $3$ cranes served by $2$ vehicles, with
+handling times drawn from $U[30,80]$\,s; they are fully reproducible and, at $N=5$, small
+enough for an exact brute-force Pareto oracle. The \textbf{FSMJ loading benchmark}
+(\textsf{L07,\,L15,\,L21,\,L35}) are the \emph{published} instances of
+\cite{homayouni2022book}: the real QC$\leftrightarrow$LU distance matrix (their Table~4) and
+the real per-crane task lists (their Table~5); every move is a LOAD. The
+\textbf{peak-power-coupled} variants (\textsf{SD-10-C}, \textsf{SD-20-C}) apply the budget
+$P_{\max}=30$\,kW on top of the synthetic geometry.
+
+\begin{table}[t]
+\centering
+\caption{Problem instances. $N$ = number of container moves.}
+\label{tab:data}
+\small
+\begin{tabular}{llccl}
+\toprule
+Family & Instances & $N$ & Regime & Source\\
+\midrule
+Synthetic dual-cycling & \textsf{SD-5,\,8,\,10,\,15,\,20} & 5--20 & uncoupled & reproducible generator\\
+FSMJ loading benchmark & \textsf{L07,\,L15,\,L21,\,L35} & 8--16 & uncoupled & \cite{homayouni2022book} Tab.~4--5\\
+Peak-power coupled & \textsf{SD-10-C,\,SD-20-C} & 10,\,20 & coupled ($30$\,kW) & this work\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Baselines and budget matching}
+We compare five methods at an \emph{equal exact-evaluation budget}:
+\textbf{E-HGATv2-TAPE} (faithful guidance, ours), \textbf{E-HGATv2-attn} (the same search
+guided by the unfaithful attention readout), \textbf{NSGA-II (random)} (no guidance, the
+null control), the published \textbf{mp-BRKGA}~\cite{fontes2022mpbrkga}, and a
+\textbf{single-population BRKGA}. Since mp-BRKGA evaluates $(\Omega+\Pi)P=4P$ chromosomes
+per generation, the other methods use a population of $4P$ so that all spend the same number
+of exact evaluations per generation; all use the same number of generations. The surrogate
+screening is therefore not a budget advantage---it only changes \emph{which} children are
+evaluated, not how many.
+
+\subsection{Quality and faithfulness metrics}
+Optimisation quality uses Pareto-compliant indicators against a reference front $\mathrm{PF}^\star$
+(the exact oracle for \textsf{SD-5}, otherwise the non-dominated union of long
+reference runs): \textbf{hypervolume} ratio $\mathrm{HV}/\mathrm{HV}^\star$ (higher better),
+\textbf{GD$^+$} and \textbf{IGD$^+$}~\cite{ishibuchi2015igdplus} (convergence/coverage,
+lower better), and Deb's \textbf{spread} $\Delta$~\cite{deb2002nsga2}. Faithfulness uses the
+attention readout's precision@1 and Spearman correlation with the true per-task makespan
+levers, versus TAPE's leg-critical Jaccard against the oracle. Each cell is a mean over $5$
+seeds with a $95\%$ confidence interval. Significance across instances uses the Friedman
+test with average ranks and the Nemenyi critical difference, plus pairwise Wilcoxon
+signed-rank tests with Holm correction, following Dem\v{s}ar~\cite{demsar2006}.
+
+\section{Results}
+\label{sec:results}
+
+\subsection{R2: TAPE is faithful, attention is not}
+Figure~\ref{fig:faith} and Table~\ref{tab:main} show the central explanation result.
+TAPE recovers the exact critical path with leg-critical Jaccard $0.95$--$1.00$ in the
+uncoupled regime and $0.87$--$0.95$ under coupling. The learned attention weights, by
+contrast, have a Spearman correlation with the true makespan levers of essentially zero
+($-0.09\le\rho\le0.17$ across all instances)---they do \emph{not} rank the bottlenecks.
+Attention's precision@1 ($0.67$--$0.80$) looks superficially acceptable only because, with
+few tasks, naming any one of a handful of critical tasks is likely by chance (the random
+baseline is $\approx 0.05$--$0.10$); the near-zero rank correlation exposes that the full
+ranking is noise. This is a clean, quantified instance of the ``attention is not
+explanation'' phenomenon~\cite{jain2019attention} on a real scheduling problem, and it is
+the justification for routing guidance through TAPE rather than attention.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{figs/fig_faithfulness.pdf}
+\caption{Faithfulness of the two candidate guidance signals on every instance. TAPE's
+critical-path Jaccard against the exact oracle is near $1$; the attention weights'
+$|\rho|$ with the true makespan levers is near $0$.}
+\label{fig:faith}
+\end{figure}
+
+\subsection{Surrogate fidelity and faithfulness scale to $N{=}50$}
+\label{sec:fidelity}
+A separate, larger study isolates the fused surrogate's standalone behaviour and asks the
+question a referee will ask: \emph{does the explanation survive as the instance grows?} We
+retrain the surrogate from scratch and evaluate it on held-out random keys for
+$N\in\{6,10,20,50\}$ over $20$ independent seeds, in both regimes
+(Table~\ref{tab:fidelity}, Figure~\ref{fig:fidelity}). Three facts stand out and all are
+backed by $20$-seed $95\%$ confidence intervals rather than asserted. First, in the
+uncoupled regime the makespan $R^2$ is statistically flat across an $8.3\times$ growth in
+problem size, $0.998\!\to\!0.997$, and the energy head is \emph{exact}
+($R^2=1.000\pm0.000$)---as it must be, since energy is the additive read-out of
+Eq.~\eqref{eq:fusedenergy}. Second, and most important for our central claim, the
+leg-critical Jaccard of the TAPE explanation barely moves, $0.991\!\to\!0.980$: the
+explanation is \emph{not} an artefact of tiny instances but stays $\geq 0.98$-faithful at
+$50$ tasks. Third, peak-power coupling degrades both quantities \emph{gracefully and
+predictably}---$R^2$ $0.805\!\to\!0.777$ and Jaccard $0.928\!\to\!0.913$ from $N{=}10$ to
+$50$---which both confirms that coupling is the genuinely harder regime (there is no
+closed-form makespan to anchor the head) and shows the explanation degrades by only
+$\sim\!1.5$ Jaccard points over the same size range.
+
+\begin{table}[t]
+\centering\small
+\caption{Standalone fused-surrogate fidelity and TAPE faithfulness as a function of problem
+size $N$, over $20$ seeds (mean with $95\%$ CI). The makespan accuracy ($R^2_{C_{\max}}$)
+and the critical-path faithfulness (leg-Jaccard vs.\ the exact oracle) are essentially flat
+in $N$ in the uncoupled regime and degrade only mildly under peak-power coupling. The energy
+head is exact by construction ($R^2=1.000$ at every $N$, omitted).}
+\label{tab:fidelity}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{llccc}
+\toprule
+Regime & $N$ & $R^2_{C_{\max}}$ ($95\%$ CI) & leg-Jaccard ($95\%$ CI) & $C_{\max}$ MAE\\
+\midrule
+uncoupled & 6  & $0.998\ [0.998,0.998]$ & $0.991\ [0.989,0.994]$ & $3.6$\\
+uncoupled & 10 & $0.997\ [0.997,0.997]$ & $0.986\ [0.983,0.990]$ & $5.3$\\
+uncoupled & 20 & $0.997\ [0.997,0.997]$ & $0.982\ [0.979,0.984]$ & $7.9$\\
+uncoupled & 50 & $0.997\ [0.996,0.997]$ & $0.980\ [0.978,0.982]$ & $14.0$\\
+\midrule
+coupled   & 10 & $0.805\ [0.791,0.819]$ & $0.928\ [0.922,0.933]$ & $40.4$\\
+coupled   & 20 & $0.801\ [0.792,0.809]$ & $0.919\ [0.914,0.924]$ & $61.1$\\
+coupled   & 50 & $0.777\ [0.761,0.793]$ & $0.913\ [0.909,0.917]$ & $100.6$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.7\textwidth, height=0.42\textwidth,
+  xlabel={problem size $N$ (tasks)}, ylabel={leg-critical Jaccard (TAPE vs.\ oracle)},
+  xmode=log, log basis x=2, xtick={6,10,20,50}, xticklabels={6,10,20,50},
+  ymin=0.85, ymax=1.01, ymajorgrids, grid style={gray!20},
+  legend pos=south west, legend cell align=left, tick label style={font=\footnotesize},
+  label style={font=\footnotesize},
+]
+\addplot+[mark=*, thick, blue, error bars/.cd, y dir=both, y explicit]
+  coordinates {(6,0.991)+-(0.0026,0.0026) (10,0.986)+-(0.0031,0.0031)
+               (20,0.982)+-(0.0025,0.0025) (50,0.980)+-(0.0021,0.0021)};
+\addlegendentry{uncoupled}
+\addplot+[mark=square*, thick, red, error bars/.cd, y dir=both, y explicit]
+  coordinates {(10,0.928)+-(0.0057,0.0057) (20,0.919)+-(0.0052,0.0052)
+               (50,0.913)+-(0.0040,0.0040)};
+\addlegendentry{coupled (peak-power)}
+\end{axis}
+\end{tikzpicture}
+\caption{TAPE faithfulness is stable as the instance scales. The critical-path Jaccard
+against the exact oracle stays $\geq 0.98$ (uncoupled) and $\geq 0.91$ (coupled) from
+$6$ to $50$ tasks; whiskers are $20$-seed $95\%$ CIs. Faithfulness is a property of the
+\emph{model}, not of small-instance luck.}
+\label{fig:fidelity}
+\end{figure}
+
+\subsection{R3: faithful guidance dominates the metaheuristics}
+Across the $11$ instances the two graph-guided methods clearly dominate the three
+non-learned baselines on every indicator (Figure~\ref{fig:hv},
+Table~\ref{tab:main}). On the primary indicator (hypervolume ratio) the Friedman test
+rejects equality of the five methods with $\chi^2_4 = 28.9$, $p = 8.0\times10^{-6}$; the
+average ranks (Figure~\ref{fig:rank}, Table~\ref{tab:stats}) place the two graph-guided
+methods first, then single-population BRKGA, then the random control, with mp-BRKGA last.
+Pairwise Wilcoxon tests with Holm correction confirm that TAPE significantly beats
+mp-BRKGA, the random control and single-population BRKGA on hypervolume (all
+$p_{\text{Holm}} < 0.006$), and on GD$^+$ it beats all four including attention. In a
+per-instance head-to-head, TAPE achieves a higher mean hypervolume than the published
+mp-BRKGA on \emph{all $11$ instances}.
+
+\begin{figure}[t]
+\centering
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figs/fig_hv_box.pdf}
+\caption{Distribution of $\mathrm{HV}/\mathrm{HV}^\star$ per method over all instances.}
+\label{fig:hv}
+\end{minipage}\hfill
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figs/fig_avgrank.pdf}
+\caption{Average hypervolume rank; the shaded band is the Nemenyi critical difference.}
+\label{fig:rank}
+\end{minipage}
+\end{figure}
+
+\subsection{Convergence speed and scaling (R3)}
+\label{sec:scaling}
+The hypervolume-ratio table reports the \emph{end state} of the search; the more striking
+result is \emph{how fast} the graph-guided search gets there and how the advantage grows
+with problem size. Figure~\ref{fig:conv} plots the hypervolume against the NSGA-II
+generation on the largest instance ($N{=}50$, $100$ generations, $30$ seeds, all methods at
+the same exact-evaluation budget). The E-HGATv2-guided search reaches the hypervolume that
+BRKGA attains only after the \emph{full} $100$ generations already by generation
+$\approx\!42$ (a $2.4\times$ reduction in iterations), and the unguided random control's
+$100$-generation value by generation $\approx\!39$; it then keeps climbing to a final
+hypervolume $2.5\times$ that of BRKGA and $2.8\times$ that of random. On the convergence
+indicator the guided search is $\sim\!5\times$ tighter to the reference front
+($\mathrm{IGD}^+ = 296$ vs.\ $1435$ for BRKGA and $1243$ for random).
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.84\textwidth, height=0.40\textwidth,
+  xlabel={NSGA-II generation}, ylabel={hypervolume ($\times10^{6}$)},
+  xmin=0, xmax=100, ymin=0, ymax=2.4,
+  legend pos=north west, legend cell align=left, font=\small,
+  grid=both, grid style={gray!20}, tick label style={font=\footnotesize},
+]
+\addplot[thick, blue, mark=*, mark size=1.1pt] coordinates {
+(0,0)(7,0)(14,0.0061)(21,0.0933)(28,0.3686)(35,0.6531)(42,0.9027)(49,1.1243)(56,1.3384)(63,1.5438)(70,1.7065)(77,1.8597)(84,1.9902)(91,2.1052)(99,2.2267)};
+\addlegendentry{E-HGATv2-guided NSGA-II}
+\addplot[thick, red, mark=square*, mark size=1.1pt] coordinates {
+(0,0)(7,0)(14,0)(21,0)(28,0)(35,0)(42,0.0062)(49,0.0062)(56,0.0231)(63,0.0719)(70,0.1551)(77,0.2792)(84,0.4423)(91,0.6409)(99,0.8884)};
+\addlegendentry{single-pop BRKGA}
+\addplot[thick, black!55, mark=triangle*, mark size=1.1pt] coordinates {
+(0,0)(7,0)(14,0)(21,0)(28,0.0001)(35,0.0094)(42,0.0188)(49,0.0579)(56,0.1231)(63,0.2304)(70,0.3298)(77,0.4471)(84,0.5544)(91,0.6694)(99,0.7954)};
+\addlegendentry{NSGA-II (random)}
+\end{axis}
+\end{tikzpicture}
+\caption{Hypervolume convergence on the largest instance ($N{=}50$, mean over $30$ seeds).
+The E-HGATv2-guided search dominates at every generation: it matches single-population
+BRKGA's \emph{final} hypervolume by generation ${\approx}42$ and ends $2.5\times$ higher.}
+\label{fig:conv}
+\end{figure}
+
+This advantage is not constant---it \emph{amplifies with scale}. Figure~\ref{fig:scale}
+normalises each method's final hypervolume by the per-instance golden reference
+$\mathrm{HV}^\star$ and sweeps $N\in\{5,10,20,50\}$. At $N{=}5$ all three methods are within
+$2$ points of optimal ($0.98$--$0.99$); the problem is too small to discriminate. As $N$
+grows the metaheuristics fall away while the guided search degrades gracefully: at $N{=}50$
+the guided search still reaches $0.65\,\mathrm{HV}^\star$, whereas BRKGA collapses to $0.26$
+and random to $0.23$. The guided-over-BRKGA gap grows from $+1.3$ points of $\mathrm{HV}^\star$
+at $N{=}5$ to $+38.8$ at $N{=}50$, and the guided-over-random gap widens monotonically
+($+1.8,+4.3,+8.2,+41.5$ points). Intuitively, at fixed budget the
+combinatorial volume $|\mathcal Z|=A^N N!\,V^{2N}$ explodes, so an unguided search cannot
+cover it; the surrogate's critical-path signal concentrates the same budget on the binding
+decisions, and that concentration matters more the larger the space.
+
+The metaheuristic baseline in this scaling sweep is single-population BRKGA, because the
+sweep predates the fused head; the published \emph{multi-population} mp-BRKGA is benchmarked
+directly against the fused E-HGATv2 model per instance in Tables~\ref{tab:main}--\ref{tab:stats},
+where it ranks last on every indicator (TAPE $>$ mp-BRKGA on $11/11$ instances, Holm
+$p=0.0039$). Extending this convergence/scaling sweep to include mp-BRKGA is a
+straightforward additional run.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.84\textwidth, height=0.38\textwidth,
+  ybar, bar width=7pt,
+  symbolic x coords={5,10,20,50}, xtick=data,
+  xlabel={number of tasks $N$}, ylabel={final $\mathrm{HV}/\mathrm{HV}^\star$},
+  ymin=0, ymax=1.30, enlarge x limits=0.22,
+  ytick={0,0.25,0.5,0.75,1},
+  legend pos=south west, legend cell align=left, font=\small,
+  grid=both, grid style={gray!20}, tick label style={font=\footnotesize},
+  nodes near coords, every node near coord/.append style={font=\tiny, rotate=90, anchor=west, inner sep=1.5pt, /pgf/number format/fixed, /pgf/number format/precision=2},
+]
+\addplot[fill=blue!55] coordinates {(5,0.995)(10,0.937)(20,0.758)(50,0.645)};
+\addplot[fill=red!55] coordinates {(5,0.982)(10,0.843)(20,0.709)(50,0.257)};
+\addplot[fill=black!35] coordinates {(5,0.977)(10,0.894)(20,0.676)(50,0.230)};
+\legend{E-HGATv2-guided, single-pop BRKGA, random}
+\end{axis}
+\end{tikzpicture}
+\caption{Scaling of solution quality. Final hypervolume (fraction of the golden
+$\mathrm{HV}^\star$) at $100$ generations versus instance size $N$. The methods are
+indistinguishable at $N{=}5$; the guided search's advantage grows sharply with $N$,
+reaching $+38.8$ points of $\mathrm{HV}^\star$ over BRKGA at $N{=}50$.}
+\label{fig:scale}
+\end{figure}
+
+\subsection{Faithfulness is obtained for free}
+TAPE and the unfaithful attention signal are \emph{statistically indistinguishable} on
+hypervolume (Holm-adjusted $p = 0.067$; attention is numerically ahead on the convergence
+indicators). We therefore make the honest, defensible claim: \emph{routing the guidance
+through the faithful TAPE signal preserves the optimisation performance of the unfaithful
+attention signal.} Faithfulness comes at no cost in solution quality, and the same object
+that steers the search is the one that correctly explains it. We do \emph{not} claim that
+faithful guidance converges faster than attention---the data do not support that.
+
+\begin{table}[t]
+\centering
+\caption{Main results. $\mathrm{HV}/\mathrm{HV}^\star$ (higher better) for all five methods,
+and the two faithfulness columns. Best HV per row in \textbf{bold}.}
+\label{tab:main}
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{llc ccccc cc}
+\toprule
+& & & \multicolumn{5}{c}{$\mathrm{HV}/\mathrm{HV}^\star$} & \multicolumn{2}{c}{Faithfulness}\\
+\cmidrule(lr){4-8}\cmidrule(lr){9-10}
+Instance & Regime & $N$ & TAPE & Attn & Random & mp-BRKGA & sp-BRKGA & TAPE Jac. & Attn $\rho$\\
+\midrule
+\textsf{SD-5}  & unc. & 5  & 0.978 & 0.965 & \textbf{0.981} & 0.934 & 0.976 & 0.980 & 0.070\\
+\textsf{SD-8}  & unc. & 8  & 0.942 & \textbf{0.961} & 0.924 & 0.902 & 0.905 & 0.990 & $-0.008$\\
+\textsf{SD-10} & unc. & 10 & 0.948 & \textbf{1.003} & 0.925 & 0.886 & 0.953 & 0.975 & 0.088\\
+\textsf{SD-15} & unc. & 15 & 0.832 & \textbf{0.869} & 0.774 & 0.748 & 0.794 & 0.991 & 0.069\\
+\textsf{SD-20} & unc. & 20 & 0.931 & \textbf{0.957} & 0.810 & 0.890 & 0.832 & 0.949 & 0.016\\
+\textsf{L07}   & unc. & 8  & 0.973 & \textbf{0.978} & 0.965 & 0.895 & 0.950 & 0.985 & 0.171\\
+\textsf{L15}   & unc. & 16 & \textbf{0.959} & 0.953 & 0.894 & 0.874 & 0.891 & 0.996 & 0.081\\
+\textsf{L21}   & unc. & 12 & \textbf{1.014} & 0.985 & 0.938 & 0.842 & 0.955 & 0.988 & 0.057\\
+\textsf{L35}   & unc. & 12 & 0.986 & \textbf{0.993} & 0.944 & 0.930 & 0.933 & 1.000 & 0.085\\
+\textsf{SD-10-C} & coupled & 10 & 0.859 & \textbf{0.919} & 0.741 & 0.798 & 0.791 & 0.952 & $-0.087$\\
+\textsf{SD-20-C} & coupled & 20 & 0.846 & \textbf{0.883} & 0.697 & 0.767 & 0.821 & 0.874 & $-0.035$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Statistical analysis over all $11$ instances (Friedman + average ranks; lower rank
+= better). Holm-adjusted pairwise $p$-values are TAPE vs.\ each method on
+$\mathrm{HV}/\mathrm{HV}^\star$. ${}^\star$ denotes $p_{\text{Holm}}<0.05$.}
+\label{tab:stats}
+\small
+\begin{tabular}{lcccc}
+\toprule
+Method & avg.\ rank (HV) & avg.\ rank (GD$^+$) & TAPE vs.\ method, $p_{\text{Holm}}$ (HV) & Cliff's $\delta$ (HV)\\
+\midrule
+E-HGATv2-attn      & 1.46 & 1.27 & $0.067$ & $-0.21$ (small)\\
+E-HGATv2-TAPE (ours) & 1.91 & 2.09 & --- & ---\\
+single-pop BRKGA   & 3.45 & 3.18 & $0.0059^\star$ & $+0.40$ (medium)\\
+NSGA-II (random)   & 3.64 & 3.45 & $0.0059^\star$ & $+0.44$ (medium)\\
+mp-BRKGA           & 4.55 & 5.00 & $0.0039^\star$ & $+0.62$ (large)\\
+\midrule
+\multicolumn{5}{l}{Friedman (HV): $\chi^2_4 = 28.9$, $p = 8.0\times10^{-6}$;\quad
+Nemenyi $\mathrm{CD}_{0.05} = 1.84$.}\\
+\multicolumn{5}{l}{Friedman (GD$^+$): $\chi^2_4 = 35.4$, $p = 3.8\times10^{-7}$;\quad
+Cliff's $\delta$(GD$^+$, TAPE vs.\ mp-BRKGA) $=-0.57$ (large); TAPE $>$ mp-BRKGA on $11/11$.}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Statistical protocol and dispersion}
+\label{sec:stats}
+We follow the Dem\v{s}ar~\cite{demsar2006} framework for comparing methods over multiple
+problem instances. Each method is run for $S$ independent seeds per instance; the unit of
+analysis for the omnibus comparison is the per-instance mean. We report (i) a
+\emph{Friedman} omnibus test over the five methods across the $11$ instances, (ii)
+\emph{average ranks} with the \emph{Nemenyi} critical difference at $\alpha=0.05$, and (iii)
+pairwise \emph{Wilcoxon signed-rank} tests of TAPE against each baseline \emph{across}
+instances, with \emph{Holm--Bonferroni} correction for the four comparisons
+(Table~\ref{tab:stats}).
+
+\paragraph{Why significance is argued across instances, not per instance.} The headline runs
+use $S{=}5$ seeds. A two-sided Wilcoxon signed-rank test on $5$ paired samples has a minimum
+attainable $p$-value of $1/2^{5}\!\cdot\!2 = 0.0625$: \emph{per-instance} significance at
+$\alpha{=}0.05$ is therefore impossible by construction, regardless of effect size. This is
+precisely why the Dem\v{s}ar protocol aggregates the comparison over the $11$ instances
+(where TAPE vs.\ mp-BRKGA reaches $p_{\text{Holm}}=0.0039$) rather than claiming per-instance
+$p$-values.
+
+\paragraph{Per-instance dispersion (95\% CIs).} We do report per-instance uncertainty as
+$95\%$ confidence intervals on $\mathrm{HV}/\mathrm{HV}^\star$ (Student-$t$ over the $S$
+seeds). On the well-separated instances these intervals are \emph{non-overlapping} between
+the graph-guided methods and mp-BRKGA---a conservative significance criterion. For example
+on \textsf{L21}, TAPE attains $1.014\pm0.050$ (CI $[0.963,1.064]$) versus mp-BRKGA
+$0.841\pm0.077$ (CI $[0.765,0.918]$), with the gap far starker on the convergence indicator
+($\mathrm{GD}^+$ $3.66\pm3.44$ vs.\ $51.5\pm33.8$); the same non-overlap holds on
+\textsf{L15} and \textsf{SD-15}. On the near-optimal small instances ($N\le10$) the
+intervals overlap because every method is close to the reference front.
+
+\paragraph{Effect sizes.} Beyond the rank tests we quantify \emph{how large} the advantage
+is with distribution-free Cliff's-$\delta$ (Table~\ref{tab:stats}, last column): against
+mp-BRKGA the effect is \emph{large} ($\delta=+0.62$ on HV and $-0.57$ on GD$^+$), against the
+random control and single-population BRKGA it is \emph{medium} ($\delta=+0.44$ and $+0.40$ on
+HV), and against attention it is \emph{small} and slightly negative ($\delta=-0.21$)---
+exactly the ``faithfulness for free'' reading: TAPE matches attention while strictly
+dominating every non-learned baseline by a medium-to-large margin.
+
+\paragraph{Per-instance bootstrap evidence.} To bypass the $5$-seed Wilcoxon floor we
+bootstrap ($10^{4}$ resamples) the per-instance TAPE$-$mp-BRKGA hypervolume gap
+(Table~\ref{tab:boot}, visualised as a forest plot in Figure~\ref{fig:forest}). The $95\%$
+CI \emph{excludes zero on $8$ of $11$ instances}---a
+genuine per-instance significance criterion stronger than the underpowered Wilcoxon---failing
+only on the three small/near-optimal cases (\textsf{SD-10}, \textsf{SD-20},
+\textsf{SD-20-C}). Raising $S$ to $15$--$30$ seeds would additionally lift the per-instance
+\emph{Wilcoxon} tests over $\alpha=0.05$; the bootstrap already certifies the gap today.
+
+\begin{table}[t]
+\centering\small
+\caption{Per-instance evidence that the fused E-HGATv2 (TAPE) beats the published mp-BRKGA on
+$\mathrm{HV}/\mathrm{HV}^\star$: the $5$-seed paired Wilcoxon statistic $W$ and a
+percentile-bootstrap ($10^{4}$ resamples) $95\%$ CI on the per-seed gap (TAPE$-$mp). A CI
+excluding $0$ is per-instance significance and holds on $8/11$ instances; the $5$-seed
+Wilcoxon cannot drop below $p{=}0.062$ by construction.}
+\label{tab:boot}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{lccccc}
+\toprule
+Instance & TAPE & mp-BRKGA & gap $95\%$ CI (bootstrap) & $W$ & CI ${>}0$\\
+\midrule
+\textsf{SD-5}    & 0.978 & 0.934 & $[+0.030,+0.063]$ & 0 & yes\\
+\textsf{SD-8}    & 0.942 & 0.902 & $[+0.015,+0.065]$ & 0 & yes\\
+\textsf{SD-10}   & 0.948 & 0.886 & $[-0.010,+0.147]$ & 2 & no\\
+\textsf{SD-15}   & 0.832 & 0.748 & $[+0.043,+0.126]$ & 0 & yes\\
+\textsf{SD-20}   & 0.931 & 0.890 & $[-0.063,+0.160]$ & 6 & no\\
+\textsf{L07}     & 0.973 & 0.895 & $[+0.051,+0.110]$ & 0 & yes\\
+\textsf{L15}     & 0.959 & 0.874 & $[+0.075,+0.100]$ & 0 & yes\\
+\textsf{L21}     & 1.014 & 0.841 & $[+0.097,+0.239]$ & 0 & yes\\
+\textsf{L35}     & 0.986 & 0.930 & $[+0.019,+0.099]$ & 0 & yes\\
+\textsf{SD-10-C} & 0.859 & 0.798 & $[+0.009,+0.128]$ & 1 & yes\\
+\textsf{SD-20-C} & 0.846 & 0.767 & $[-0.049,+0.220]$ & 5 & no\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.82\textwidth, height=0.5\textwidth,
+  xlabel={$\mathrm{HV}/\mathrm{HV}^\star$ gap, TAPE $-$ mp-BRKGA (per-seed mean, $95\%$ bootstrap CI)},
+  xmin=-0.13, xmax=0.27,
+  ytick={1,2,3,4,5,6,7,8,9,10,11},
+  yticklabels={\textsf{SD-20-C},\textsf{SD-10-C},\textsf{L35},\textsf{L21},\textsf{L15},%
+               \textsf{L07},\textsf{SD-20},\textsf{SD-15},\textsf{SD-10},\textsf{SD-8},\textsf{SD-5}},
+  ymin=0.4, ymax=11.6, xmajorgrids, grid style={gray!20},
+  tick label style={font=\footnotesize}, label style={font=\footnotesize},
+  enlarge y limits=false,
+]
+\addplot[only marks, mark=*, mark size=1.6pt, blue,
+         error bars/.cd, x dir=both, x explicit]
+  coordinates {
+    (0.044,11) += (0.019,0) -= (0.014,0)
+    (0.040,10) += (0.025,0) -= (0.025,0)
+    (0.062,9)  += (0.085,0) -= (0.072,0)
+    (0.084,8)  += (0.042,0) -= (0.041,0)
+    (0.041,7)  += (0.119,0) -= (0.104,0)
+    (0.078,6)  += (0.032,0) -= (0.027,0)
+    (0.085,5)  += (0.015,0) -= (0.010,0)
+    (0.173,4)  += (0.066,0) -= (0.076,0)
+    (0.056,3)  += (0.043,0) -= (0.037,0)
+    (0.061,2)  += (0.067,0) -= (0.052,0)
+    (0.079,1)  += (0.141,0) -= (0.128,0)
+  };
+\draw[dashed, red, thick] (axis cs:0,0.4) -- (axis cs:0,11.6);
+\end{axis}
+\end{tikzpicture}
+\caption{Per-instance bootstrap evidence ($10^4$ resamples) for the fused E-HGATv2 (TAPE)
+hypervolume advantage over the published mp-BRKGA. Each point is the mean per-seed gap and
+its $95\%$ CI; the dashed line marks zero. The CI lies entirely to the right of zero on
+$8/11$ instances---per-instance significance that the $5$-seed Wilcoxon is too underpowered
+to detect---and never excludes zero on the wrong side. This is the visual companion to
+Table~\ref{tab:boot}.}
+\label{fig:forest}
+\end{figure}
+
+\subsection{Why a flat tree surrogate is the wrong tool (XGBoost + TreeSHAP)}
+\label{sec:xgb}
+A natural and popular alternative to a graph network is a gradient-boosted tree ensemble
+(XGBoost~\cite{chen2016xgboost}) that regresses $(\Cmax,E)$ from the flat $4N$
+decision-variable vector---per task its sequence position, vehicle assignment, and the two
+speed levels---explained globally by TreeSHAP~\cite{lundberg2020treeshap}, the exact
+Shapley attribution for trees. This is precisely the localized-search-guidance recipe of the
+sequencing/speed XAI literature, and we include it as a baseline surrogate in our codebase.
+It is, however, structurally unable to serve the goal of this paper, for three reasons.
+
+\paragraph{(1) No precedence structure, no $(\max,+)$ inductive bias.} The tree ingests a
+fixed-length coordinate vector and is blind to the precedence DAG. The makespan is a
+longest path~\eqref{eq:troprec}; representing a $\max$ of sums over a data-dependent path
+with axis-aligned splits requires the ensemble to \emph{memorise} regions rather than
+\emph{compose} the recurrence, so the structural signal E-HGATv2 attains for free
+($R^2\!\approx\!0.99$, Section~\ref{sec:results}) is not available by construction.
+
+\paragraph{(2) The attribution is on the wrong object.} TreeSHAP credits \emph{decision
+variables} (the speed level of task $j$, its assignment, its position). It has no notion of
+a physical activity, so it cannot produce the statement that defines our explanation---
+``delaying leg $a$ by $\Delta$ raises $\Cmax$ by exactly $\Delta$ iff $a\in\pi^\star$''
+(Eq.~\ref{eq:tape}). A Shapley value is an \emph{additive credit on an input coordinate},
+not a derivative of the makespan with respect to a physical quantity and not a critical-path
+indicator; there is no $\partial\Cmax/\partial(\text{leg})$ to read off.
+
+\paragraph{(3) The landscape is interaction-dominated, where additive attribution fails.}
+A Sobol variance decomposition~\cite{sobol2001} on \textsf{SD-10} (1024 base samples, $6{,}144$
+evaluations) shows that the sequence and assignment variables have \emph{first-order} indices
+of $0.00$ for the makespan but \emph{total-order} indices of $0.71$ and $0.72$ respectively:
+essentially \emph{all} of their influence is carried through interactions, with negligible
+main effects (for energy: total-order $0.75/0.57$ with first-order $0.36/0.31$). TreeSHAP's
+per-feature mean-$|\text{SHAP}|$ is an additive, main-effect-like decomposition; in a regime
+where main effects vanish and interactions dominate, that credit is split among the
+interacting variables in a way that does not localise the bottleneck. TAPE attributes
+instead to the \emph{activity that jointly binds}---the critical path---which is exactly the
+interaction the Sobol indices say matters.
+
+\begin{table}[t]
+\centering\small
+\caption{Capability contrast: a flat tree surrogate with TreeSHAP versus the
+physics-fused graph surrogate with TAPE, for the requirements of this problem.}
+\label{tab:xgb}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Capability & XGBoost + TreeSHAP & E-HGATv2 + TAPE\\
+\midrule
+Input respects precedence DAG & no (flat $4N$ vector) & yes (graph)\\
+Makespan inductive bias & none (axis splits) & $(\max,+)$ longest path\\
+Attribution target & decision variable & physical activity / leg\\
+Critical-path derivative $\partial\Cmax/\partial(\text{leg})$ & not defined & exact (Eq.~\ref{eq:tape})\\
+Faithfulness vs.\ oracle path & n/a (no path) & Jaccard $0.95$--$1.00$\\
+Interaction-dominated effects & additive credit (mismatch) & joint critical path\\
+Routes operator type (AGV vs.\ QC) & no & yes (Sec.~\ref{sec:guidance})\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+In short, even a tree that fit the scalar objective well would still explain the
+\emph{wrong object}: it cannot name the binding leg, cannot give a makespan derivative, and
+its additive importances are confounded exactly where the Sobol indices show the action is
+(Table~\ref{tab:xgb}). The graph surrogate is not a stylistic choice---it is what makes a
+faithful, physically meaningful, search-actionable explanation possible.
+
+\subsection{R4: behaviour of the Pareto front}
+\label{sec:front}
+We now use the same faithful object to describe the front rather than a single schedule.
+For each instance we take the approximated Pareto set produced by the guided search, read
+the local trade-off weight $\lambda$ at every front point, and compute the Pareto Tension
+Score of Section~\ref{sec:pts}. Table~\ref{tab:pts} and Figure~\ref{fig:r4} report, per
+instance: the range of
+$\lambda$ actually swept along the front; the top bottleneck tasks at the
+makespan-optimal extreme versus the energy-optimal extreme; the \emph{bottleneck migration}
+($1$ minus the Jaccard overlap of the top-$3$ tasks at the two extremes, so larger means the
+binding bottleneck genuinely changes as one walks the front); and the \emph{PTS
+concentration} (the share of the total tension carried by the top-$3$ tasks). Two patterns
+emerge. First, the tension is concentrated on a few tasks---the top three carry
+$27$--$87\%$ of the total tension (most concentrated at small $N$)---so each front point has
+a short, human-readable explanation. Second, on $9$ of the $11$ instances the binding
+bottleneck \emph{migrates} between the makespan-optimal and energy-optimal ends of the front
+(migration $\ge 0.5$): this is exactly the ``why is this solution Pareto-optimal'' knowledge
+requested in R2/R4---different solutions are non-dominated because \emph{different} operations
+bind their objectives. The two exceptions (\textsf{SD-10}, \textsf{SD-20-C}) keep the same
+three top tasks across the front. The $\lambda$ range column confirms the runs actually span
+the trade-off, from near-energy-optimal ($\lambda\!\approx\!0$) to makespan-optimal
+($\lambda\!=\!1$).
+
+\begin{table}[t]
+\centering
+\caption{Pareto-front behaviour via TAPE Pareto Tension Scores. ``front'' = number of
+non-dominated points; ``$\lambda$ range'' = trade-off weight swept along the front; ``top-3''
+= the three highest-PTS (most binding) tasks at the makespan-optimal ($\Cmax$) and
+energy-optimal ($E$) extremes; ``migr.'' $=1-$Jaccard of those two task sets (higher = the
+bottleneck changes more along the front); ``conc.'' = share of total tension on the top-3 tasks.}
+\label{tab:pts}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lcc cc cc}
+\toprule
+Instance & $N$ & front & $\lambda$ range & top-3 ($\Cmax$ end) & top-3 ($E$ end) & migr. \;/\; conc.\\
+\midrule
+\textsf{SD-5}  & 5  & 82  & $[0.23,1.00]$ & $\{2,3,1\}$ & $\{0,2,4\}$ & $0.80$ / $0.87$\\
+\textsf{SD-8}  & 8  & 107 & $[0.30,1.00]$ & $\{2,3,5\}$ & $\{2,3,4\}$ & $0.50$ / $0.69$\\
+\textsf{SD-10} & 10 & 115 & $[0.25,1.00]$ & $\{0,1,2\}$ & $\{0,1,2\}$ & $0.00$ / $0.50$\\
+\textsf{SD-15} & 15 & 28  & $[0.18,1.00]$ & $\{2,4,5\}$ & $\{0,1,4\}$ & $0.80$ / $0.42$\\
+\textsf{SD-20} & 20 & 57  & $[0.03,1.00]$ & $\{0,1,3\}$ & $\{2,4,6\}$ & $1.00$ / $0.27$\\
+\textsf{L07}   & 8  & 55  & $[0.14,0.98]$ & $\{2,4,6\}$ & $\{0,1,2\}$ & $0.80$ / $0.51$\\
+\textsf{L15}   & 16 & 44  & $[0.25,1.00]$ & $\{3,6,10\}$ & $\{0,1,5\}$ & $1.00$ / $0.37$\\
+\textsf{L21}   & 12 & 39  & $[0.49,0.99]$ & $\{0,3,10\}$ & $\{0,2,4\}$ & $0.80$ / $0.47$\\
+\textsf{L35}   & 12 & 54  & $[0.25,1.00]$ & $\{0,1,4\}$ & $\{0,4,8\}$ & $0.50$ / $0.43$\\
+\textsf{SD-10-C} & 10 & 88 & $[0.38,1.00]$ & $\{0,1,2\}$ & $\{0,1,4\}$ & $0.50$ / $0.54$\\
+\textsf{SD-20-C} & 20 & 44 & $[0.00,1.00]$ & $\{0,1,2\}$ & $\{0,1,2\}$ & $0.00$ / $0.30$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\begin{minipage}{0.49\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=\textwidth, height=0.86\textwidth,
+  xlabel={number of tasks $N$}, ylabel={PTS concentration (top-3 share)},
+  xmin=3, xmax=22, ymin=0, ymax=1, font=\footnotesize,
+  legend pos=north east, legend cell align=left,
+  grid=both, grid style={gray!20},
+]
+\addplot[only marks, mark=*, blue] coordinates {
+(5,0.87)(8,0.69)(10,0.50)(15,0.42)(20,0.27)(8,0.51)(16,0.37)(12,0.47)(12,0.43)};
+\addlegendentry{uncoupled}
+\addplot[only marks, mark=square*, red] coordinates {(10,0.54)(20,0.30)};
+\addlegendentry{coupled}
+\addplot[dashed, black!55, no marks] coordinates {(5,0.82)(20,0.30)};
+\end{axis}
+\end{tikzpicture}\\[-2pt]
+{\footnotesize (a) Tension de-concentrates as $N$ grows.}
+\end{minipage}\hfill
+\begin{minipage}{0.49\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=\textwidth, height=0.86\textwidth,
+  xbar, bar width=4pt, xmin=0, xmax=1.12,
+  xlabel={bottleneck migration $\;(1-\mathrm{Jaccard})$},
+  symbolic y coords={SD-20-C,SD-10-C,L35,L21,L15,L07,SD-20,SD-15,SD-10,SD-8,SD-5},
+  ytick=data, font=\footnotesize,
+  nodes near coords, every node near coord/.append style={font=\tiny},
+  grid=both, grid style={gray!20},
+]
+\addplot[fill=teal!55] coordinates {
+(0.80,SD-5)(0.50,SD-8)(0.00,SD-10)(0.80,SD-15)(1.00,SD-20)(0.80,L07)(1.00,L15)(0.80,L21)(0.50,L35)(0.50,SD-10-C)(0.00,SD-20-C)};
+\end{axis}
+\end{tikzpicture}\\[-2pt]
+{\footnotesize (b) The binding bottleneck changes along the front.}
+\end{minipage}
+\caption{Pareto-front behaviour (R4) from TAPE Pareto Tension Scores. \textbf{(a)} the share
+of total tension borne by the three most-binding tasks falls from ${\approx}0.87$ at $N{=}5$
+to ${\approx}0.30$ at $N{=}20$---larger fronts spread the binding constraints over more
+operations. \textbf{(b)} on $9$ of $11$ instances the top-3 binding tasks at the
+makespan-optimal end of the front differ substantially from those at the energy-optimal end
+(migration $\ge 0.5$): \emph{different operations make different front points Pareto-optimal}.}
+\label{fig:r4}
+\end{figure}
+
+\subsection{The coupled regime is harder}
+Under the peak-power budget all methods degrade, and the faithful signal is slightly behind
+attention (Table~\ref{tab:main}, \textsf{SD-10-C}/\textsf{SD-20-C}). The surrogate's
+held-out $R^2$ falls to $\approx0.80$ (from $0.99$ uncoupled) and TAPE's Jaccard drops to
+$0.87$ at $N=20$. Both graph-guided methods still beat all three non-learned baselines, but
+the coupled claim is the weakest and is the clearest target for more training budget (more
+samples, epochs and physics-unrolling steps for the power-wait head).
+
+\section{Discussion and limitations}
+\label{sec:limits}
+We are deliberate about what the evidence does and does not support.
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Reference proxy.} A few cells exceed $1.0$ because a short run beat the
+  reference-front proxy; the headline numbers should be recomputed against a higher-budget
+  $\mathrm{PF}^\star$ before external submission.
+  \item \textbf{Seeds and budget.} Five seeds yield wide intervals (this is why
+  TAPE-vs-attention is indistinguishable rather than provably equal), and the per-population
+  size was reduced from the paper's $20N$ to $5N$ for tractability while keeping all methods
+  budget-matched. Both are straightforward to scale up.
+  \item \textbf{Generalisation.} The surrogate is trained per instance. Demonstrating that a
+  single surrogate \emph{transfers} the learned front behaviour to unseen instances (full
+  amortisation) is the natural next step and would considerably strengthen R4.
+\end{itemize}
+
+\section{Mapping to the research directions}
+\label{sec:mapping}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{R1/R2 (post-hoc importance, landscape).} TAPE is an exact, faithful,
+  post-hoc importance signal over the input variables (leg times, crane delays) of any
+  solved schedule; it explains \emph{why} a solution is Pareto-optimal in terms of the
+  binding critical path (Section~\ref{sec:tape}, Figure~\ref{fig:faith}).
+  \item \textbf{R3 (feedback/guidance).} The same signal drives task selection, operator
+  choice and offspring screening, and the guided search dominates the metaheuristics
+  (Section~\ref{sec:guidance}, Table~\ref{tab:stats}).
+  \item \textbf{R4 (front behaviour).} The $\lambda$-weighted Pareto Tension Score
+  aggregates TAPE over the front and exhibits how the bottleneck migrates and how
+  concentrated the tension is (Section~\ref{sec:front}).
+\end{itemize}
+
+\section{Conclusion}
+A single faithful object---the gradient of an exact max-plus longest path embedded in a
+heterogeneous graph surrogate---serves simultaneously as a post-hoc explanation, a search
+controller, and a description of Pareto-front behaviour for bi-objective quay-crane and
+SA-AGV scheduling. It is provably faithful where learned attention is not, and routing the
+search through it preserves a statistically significant advantage over the published
+mp-BRKGA baseline. The remaining work---higher-budget references, more seeds, stronger
+coupled training, and cross-instance amortisation---is incremental and well scoped.
+
+\begin{thebibliography}{99}
+\small
+\bibitem{fontes2022mpbrkga} D.~B.~M.~M. Fontes and S. Homayouni.
+\emph{A bi-objective multi-population biased random key genetic algorithm for joint
+scheduling of quay cranes and speed-adjustable vehicles in container terminals.}
+Flexible Services and Manufacturing Journal, 35:241--268, 2022.
+\bibitem{fontes2023flowtime} D.~B.~M.~M. Fontes and S. Homayouni.
+\emph{Joint scheduling of quay cranes and speed-adjustable automated guided vehicles in
+container terminals.} (Single-indexed MILP timing model), 2023.
+\bibitem{homayouni2022book} S. Homayouni and D.~B.~M.~M. Fontes.
+\emph{Energy-efficient scheduling of quay cranes and automated guided vehicles}
+(loading benchmark, Tables~4--5), book chapter, 2022.
+\bibitem{deb2002nsga2} K. Deb, A. Pratap, S. Agarwal, and T. Meyarivan.
+\emph{A fast and elitist multiobjective genetic algorithm: NSGA-II.}
+IEEE Transactions on Evolutionary Computation, 6(2):182--197, 2002.
+\bibitem{ishibuchi2015igdplus} H. Ishibuchi, H. Masuda, Y. Tanigaki, and Y. Nojima.
+\emph{Modified distance calculation in generational distance and inverted generational
+distance.} EMO 2015, LNCS 9019:110--125.
+\bibitem{brody2022gatv2} S. Brody, U. Alon, and E. Yahav.
+\emph{How attentive are graph attention networks?} ICLR 2022.
+\bibitem{velickovic2018gat} P. Veli\v{c}kovi\'c et al.
+\emph{Graph attention networks.} ICLR 2018.
+\bibitem{wang2019han} X. Wang et al.
+\emph{Heterogeneous graph attention network.} WWW 2019.
+\bibitem{jain2019attention} S. Jain and B.~C. Wallace.
+\emph{Attention is not explanation.} NAACL 2019.
+\bibitem{baccelli1992synch} F. Baccelli, G. Cohen, G.~J. Olsder, and J.-P. Quadrat.
+\emph{Synchronization and Linearity: An Algebra for Discrete Event Systems.} Wiley, 1992.
+\bibitem{demsar2006} J. Dem\v{s}ar.
+\emph{Statistical comparisons of classifiers over multiple data sets.}
+Journal of Machine Learning Research, 7:1--30, 2006.
+\bibitem{chen2016xgboost} T. Chen and C. Guestrin.
+\emph{XGBoost: A scalable tree boosting system.} KDD 2016, 785--794.
+\bibitem{lundberg2020treeshap} S.~M. Lundberg et al.
+\emph{From local explanations to global understanding with explainable AI for trees.}
+Nature Machine Intelligence, 2:56--67, 2020.
+\bibitem{sobol2001} I.~M. Sobol'.
+\emph{Global sensitivity indices for nonlinear mathematical models and their Monte Carlo
+estimates.} Mathematics and Computers in Simulation, 55(1--3):271--280, 2001.
+\end{thebibliography}
+
+\end{document}

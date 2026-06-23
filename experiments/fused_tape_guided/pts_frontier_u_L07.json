@@ -1,0 +1,26 @@
+[
+  {
+    "instance": "L07",
+    "n": 8,
+    "coupled": false,
+    "peak_power": null,
+    "n_front": 55,
+    "lambda_min": 0.13835986807170392,
+    "lambda_max": 0.9780350036722079,
+    "lambda_mean": 0.6409694911439928,
+    "top_tasks_makespan_end": [
+      2,
+      4,
+      6
+    ],
+    "top_tasks_energy_end": [
+      0,
+      1,
+      2
+    ],
+    "bottleneck_migration": 0.8,
+    "pts_concentration_topk": 0.5074821446469396,
+    "topk": 3,
+    "fused_r2_makespan": 0.9993778467178345
+  }
+]

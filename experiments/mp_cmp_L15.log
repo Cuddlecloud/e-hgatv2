@@ -1,0 +1,3 @@
+instance=L15 N=16 QCs=2 | mp pop=320/pop x4 pops, single/GAT pop=1280 | gens=60 | matched evals/gen=1280
+training surrogate for GAT ...
+reference: non-dominated union of 3 methods @ 150 gens | 228 pts | HV*=962881.5

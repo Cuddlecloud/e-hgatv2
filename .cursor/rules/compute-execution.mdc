@@ -1,0 +1,47 @@
+---
+description: Where to run compute-heavy jobs (NEVER the user's Mac)
+alwaysApply: true
+---
+
+# Compute execution policy
+
+## ZERO TOLERANCE — read this first
+
+**ABSOLUTE RULE: NEVER execute ANY compute on the user's local Mac. No exceptions.**
+This rule has been violated before and the user has explicitly, angrily forbidden it. One
+more violation ends the engagement. Treat this as a hard stop, not a guideline.
+
+Specifically, NEVER run locally (always on the VM instead):
+- any training, benchmark, figure-generation, statistics, or PTS script; ANY `scripts/*.py`;
+- any package install (`brew install`, `pip install`, `cargo`, `tectonic`, etc.);
+- any "quick smoke test" or "just to confirm it starts" run of a heavy script.
+
+The ONLY local code execution allowed is small, computationally light `pytest` unit tests
+(seconds, no training/benchmarks). When in doubt, do NOT run it locally. If the VM SSH is not available, STOP and ask. Do not
+rationalize a local run for any reason (speed, convenience, "it's small", "just checking").
+
+**NEVER run computationally expensive work on the user's local Mac.** It throttles the
+whole system. The Mac is for editing, linting, and git only.
+
+Heavy jobs MUST run on the remote VM over SSH. This includes:
+- Surrogate / GNN training (`train_surrogate`, `train_fused`, core/fused fitting)
+- Multi-seed benchmarks & comparisons (`run_benchmark`, `run_mp_comparison`, `run_fused_eval`,
+  `run_real_fused_eval`)
+- Landscape / Sobol / SHAP sweeps, scaling runs (N ≥ ~10), reference-front (PF*) builds
+- Anything spawning multiple worker processes or running many generations
+
+## How to run on the VM
+- Ask the user for the **current** SSH command first (it rotates on reboot / new pod;
+  e.g. `ssh -p <port> root@<ip> -L 8080:localhost:8080`). Do not assume an old one is live.
+- Launch long jobs so a disconnect/reboot can't kill them: run inside `tmux`/`nohup` **on the
+  VM**, write artifacts to the repo's `experiments/`, and `scp`/sync back to local promptly.
+- Pin threads on the box: `OMP_NUM_THREADS=1 MKL_NUM_THREADS=1`, `--workers ≈ free vCPU`.
+
+## Allowed on the Mac (and ONLY these)
+- Small, computationally light `pytest` unit tests (run in seconds, no training/benchmarks).
+- File reads/edits, `ReadLints`, `git`.
+- NOTHING else executes locally. NOT allowed: any training/benchmark/figure/statistics
+  script, any `scripts/*.py` run, smoke tests of heavy scripts, package installs
+  (`brew`/`pip`/`cargo`/`tectonic`), or anything that spawns a heavy/long process.
+
+If no VM SSH is currently available, STOP and ask for it rather than running ANY heavy compute locally.

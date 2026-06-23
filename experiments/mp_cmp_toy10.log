@@ -1,0 +1,18 @@
+instance=toy:10 N=10 QCs=3 | mp pop=200/pop x4 pops, single/GAT pop=800 | gens=60 | matched evals/gen=800
+training surrogate for GAT ...
+reference: non-dominated union of 3 methods @ 150 gens | 281 pts | HV*=993029.5
+  E-HGATv2-NSGA-II: done 5 seeds
+  mp-BRKGA: done 5 seeds
+  single-pop BRKGA: done 5 seeds
+
+# mp-BRKGA vs E-HGATv2 vs single-pop BRKGA -- toy:10 (N=10)
+
+_5 seeds, 60 gens, matched true-eval budget (mp 200x4 = single/GAT 800 per gen). Reference: non-dominated union of 3 methods @ 150 gens. Cells = mean (95% CI)._
+
+| Method | HV / HV* | GD+ | IGD+ | Spread | true evals |
+|---|---|---|---|---|---|
+| E-HGATv2-NSGA-II | 0.9879 ± 0.0087 | 7.3219 ± 7.6411 | 6.8626 ± 6.6772 | 0.7645 ± 0.0724 | 48800 |
+| mp-BRKGA | 0.9021 ± 0.0887 | 133.7439 ± 156.8748 | 42.0156 ± 40.8843 | 0.9143 ± 0.0709 | 48800 |
+| single-pop BRKGA | 0.9034 ± 0.0432 | 23.6361 ± 25.6298 | 54.0188 ± 28.0579 | 0.9480 ± 0.0960 | 48800 |
+
+wrote experiments/mp_comparison/mp_comparison_toy10.* (total 1551s)

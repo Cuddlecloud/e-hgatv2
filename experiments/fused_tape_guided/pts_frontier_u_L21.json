@@ -1,0 +1,26 @@
+[
+  {
+    "instance": "L21",
+    "n": 12,
+    "coupled": false,
+    "peak_power": null,
+    "n_front": 39,
+    "lambda_min": 0.4921657214265116,
+    "lambda_max": 0.9946636807562493,
+    "lambda_mean": 0.8093024221421884,
+    "top_tasks_makespan_end": [
+      0,
+      3,
+      10
+    ],
+    "top_tasks_energy_end": [
+      0,
+      2,
+      4
+    ],
+    "bottleneck_migration": 0.8,
+    "pts_concentration_topk": 0.47232124008796744,
+    "topk": 3,
+    "fused_r2_makespan": 0.9995402097702026
+  }
+]

@@ -24,6 +24,10 @@ htmlcov/
 .vscode/
 .DS_Store
 
+# Vendored libs / scratch (regenerable, heavy)
+.pylibs/
+tmp/
+
 # Secrets / local env (NEVER commit)
 .env
 *.env

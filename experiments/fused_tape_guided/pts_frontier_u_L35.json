@@ -1,0 +1,26 @@
+[
+  {
+    "instance": "L35",
+    "n": 12,
+    "coupled": false,
+    "peak_power": null,
+    "n_front": 54,
+    "lambda_min": 0.25178261174292027,
+    "lambda_max": 1.0,
+    "lambda_mean": 0.7895490067403202,
+    "top_tasks_makespan_end": [
+      0,
+      1,
+      4
+    ],
+    "top_tasks_energy_end": [
+      0,
+      4,
+      8
+    ],
+    "bottleneck_migration": 0.5,
+    "pts_concentration_topk": 0.4317646419127441,
+    "topk": 3,
+    "fused_r2_makespan": 0.9993456602096558
+  }
+]

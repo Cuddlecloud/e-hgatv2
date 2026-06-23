@@ -1,0 +1,26 @@
+[
+  {
+    "instance": "toy:10",
+    "n": 10,
+    "coupled": true,
+    "peak_power": 30.0,
+    "n_front": 88,
+    "lambda_min": 0.3840763113195874,
+    "lambda_max": 1.0,
+    "lambda_mean": 0.9050598083737552,
+    "top_tasks_makespan_end": [
+      0,
+      1,
+      2
+    ],
+    "top_tasks_energy_end": [
+      0,
+      1,
+      4
+    ],
+    "bottleneck_migration": 0.5,
+    "pts_concentration_topk": 0.5430552404129831,
+    "topk": 3,
+    "fused_r2_makespan": 0.8810774087905884
+  }
+]
