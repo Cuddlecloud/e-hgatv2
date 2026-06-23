@@ -1,0 +1,12 @@
+instance toy:5 ...
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+  toy:5: front=82 lambda[0.23,1.00] migration=0.80 conc@3=0.87
+# Pareto-front behaviour via TAPE PTS (u_toy_5)
+
+_Per instance: lambda sweep across the front, the top bottleneck tasks at the makespan-optimal vs energy-optimal extreme, the bottleneck migration (1 - Jaccard of top-3 at the two extremes), and the PTS concentration (share of total tension on the top-3 tasks)._
+
+| Instance | N | front | lambda range | top-3 (Cmax end) | top-3 (E end) | migration | PTS conc.@3 |
+|---|---|---|---|---|---|---|---|
+| toy:5 | 5 | 82 | [0.23, 1.00] | [2, 3, 1] | [0, 2, 4] | 0.80 | 0.87 |

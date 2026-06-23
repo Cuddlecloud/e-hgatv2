@@ -1,0 +1,41 @@
+instance=toy:8 N=8 coupled=False | mp P=40x4, GAT/BRKGA pop=160 | gens=40 | matched evals/gen=160
+training core + fused TAPE head ...
+/venv/main/lib/python3.12/site-packages/torch_geometric/utils/_scatter.py:91: UserWarning: The usage of `scatter(reduce='max')` can be accelerated via the 'torch-scatter' package, but it was not found
+  warnings.warn(
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+  fused R2_makespan=0.9889 R2_energy=1.0000
+reference: non-dominated union of mp-BRKGA + BRKGA + TAPE @ 50 gens | 127 pts | HV*=1416518.1
+  E-HGATv2-TAPE: done 5 seeds
+  E-HGATv2-attn: done 5 seeds
+  NSGA-II (random): done 5 seeds
+  mp-BRKGA: done 5 seeds
+  single-pop BRKGA: done 5 seeds
+
+# Faithful-guidance study -- toy:8 (N=8, uncoupled)
+
+_5 seeds, 40 gens, matched exact-eval budget (mp 40x4 = GAT/BRKGA 160/gen). Reference: non-dominated union of mp-BRKGA + BRKGA + TAPE @ 50 gens. Cells = mean (95% CI)._
+
+## Optimisation (Req 3)
+
+| Method | HV / HV* | GD+ | IGD+ | Spread | true evals |
+|---|---|---|---|---|---|
+| E-HGATv2-TAPE | 0.9418 ± 0.0341 | 23.2004 ± 23.7631 | 49.4046 ± 31.1691 | 0.9452 ± 0.0154 | 6560 |
+| E-HGATv2-attn | 0.9611 ± 0.0255 | 14.0407 ± 12.5831 | 24.1963 ± 26.6417 | 0.9563 ± 0.0789 | 6560 |
+| NSGA-II (random) | 0.9236 ± 0.0224 | 23.2190 ± 16.5584 | 49.7176 ± 29.9895 | 0.9455 ± 0.1087 | 6560 |
+| mp-BRKGA | 0.9023 ± 0.0169 | 31.6282 ± 16.1001 | 72.9011 ± 9.7000 | 0.8627 ± 0.1096 | 6560 |
+| single-pop BRKGA | 0.9051 ± 0.0231 | 13.5048 ± 5.7266 | 71.6835 ± 44.4731 | 0.9918 ± 0.0984 | 6560 |
+
+## Guidance-signal faithfulness (Req 2)
+
+| Signal | precision@1 | Spearman rho | leg-critical Jaccard vs oracle |
+|---|---|---|---|
+| attention (Signal #1) | 0.800 | -0.008 | n/a |
+| **TAPE (Signal #3)** | n/a | n/a | **0.990** |
+| random baseline | 0.125 | 0.000 | n/a |
+
+_TAPE makespan abs-error vs oracle: 9.085. A faithful signal that also tops the optimisation table is the unified Req 2+3 claim._
+
+
+wrote experiments/fused_tape_guided/tape_bench_toy8_unc.* (total 837s)

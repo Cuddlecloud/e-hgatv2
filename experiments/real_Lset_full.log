@@ -1,0 +1,371 @@
+real fused eval | 35 instances x 5 seeds = 175 runs | 64 workers
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+/workspace/e-hgatv2/src/ehgat/surrogate/train.py:148: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  epoch_loss += float(loss) * batch.num_graphs
+done L01 seed=4 N=4 R2mk=0.999 legJ=1.000 (53s) [1/175]
+done L02 seed=1 N=4 R2mk=1.000 legJ=1.000 (53s) [2/175]
+done L01 seed=3 N=4 R2mk=0.999 legJ=1.000 (52s) [3/175]
+done L03 seed=2 N=4 R2mk=1.000 legJ=0.990 (52s) [4/175]
+done L03 seed=0 N=4 R2mk=1.000 legJ=1.000 (53s) [5/175]
+done L03 seed=3 N=4 R2mk=0.999 legJ=1.000 (53s) [6/175]
+done L02 seed=2 N=4 R2mk=1.000 legJ=0.994 (53s) [7/175]
+done L03 seed=4 N=4 R2mk=0.999 legJ=0.987 (53s) [8/175]
+done L02 seed=0 N=4 R2mk=1.000 legJ=0.992 (54s) [9/175]
+done L03 seed=1 N=4 R2mk=0.999 legJ=0.979 (54s) [10/175]
+done L02 seed=4 N=4 R2mk=1.000 legJ=1.000 (54s) [11/175]
+done L02 seed=3 N=4 R2mk=1.000 legJ=0.997 (54s) [12/175]
+done L01 seed=2 N=4 R2mk=0.999 legJ=0.985 (54s) [13/175]
+done L01 seed=1 N=4 R2mk=0.999 legJ=0.994 (54s) [14/175]
+done L01 seed=0 N=4 R2mk=0.999 legJ=0.997 (54s) [15/175]
+done L06 seed=0 N=6 R2mk=0.999 legJ=0.994 (60s) [16/175]
+done L05 seed=4 N=6 R2mk=1.000 legJ=0.993 (60s) [17/175]
+done L06 seed=2 N=6 R2mk=0.999 legJ=0.984 (60s) [18/175]
+done L04 seed=2 N=6 R2mk=1.000 legJ=1.000 (60s) [19/175]
+done L05 seed=1 N=6 R2mk=1.000 legJ=0.994 (60s) [20/175]
+done L06 seed=3 N=6 R2mk=0.999 legJ=0.993 (60s) [21/175]
+done L04 seed=1 N=6 R2mk=0.999 legJ=0.989 (60s) [22/175]
+done L05 seed=0 N=6 R2mk=1.000 legJ=1.000 (60s) [23/175]
+done L05 seed=2 N=6 R2mk=1.000 legJ=0.994 (60s) [24/175]
+done L04 seed=0 N=6 R2mk=0.999 legJ=1.000 (60s) [25/175]
+done L06 seed=1 N=6 R2mk=0.999 legJ=0.992 (61s) [26/175]
+done L04 seed=4 N=6 R2mk=0.999 legJ=0.985 (60s) [27/175]
+done L04 seed=3 N=6 R2mk=0.999 legJ=0.994 (60s) [28/175]
+done L06 seed=4 N=6 R2mk=0.999 legJ=0.984 (61s) [29/175]
+done L05 seed=3 N=6 R2mk=1.000 legJ=1.000 (61s) [30/175]
+done L07 seed=2 N=8 R2mk=0.999 legJ=1.000 (67s) [31/175]
+done L07 seed=0 N=8 R2mk=0.999 legJ=1.000 (67s) [32/175]
+done L08 seed=0 N=8 R2mk=0.999 legJ=0.996 (67s) [33/175]
+done L07 seed=3 N=8 R2mk=0.999 legJ=0.999 (67s) [34/175]
+done L08 seed=3 N=8 R2mk=0.999 legJ=0.991 (67s) [35/175]
+done L08 seed=4 N=8 R2mk=0.999 legJ=0.997 (67s) [36/175]
+done L07 seed=1 N=8 R2mk=0.999 legJ=0.996 (68s) [37/175]
+done L07 seed=4 N=8 R2mk=0.999 legJ=0.985 (68s) [38/175]
+done L08 seed=1 N=8 R2mk=0.999 legJ=0.988 (68s) [39/175]
+done L08 seed=2 N=8 R2mk=0.999 legJ=0.992 (68s) [40/175]
+done L10 seed=0 N=10 R2mk=0.999 legJ=0.996 (74s) [41/175]
+done L09 seed=2 N=10 R2mk=0.999 legJ=0.991 (74s) [42/175]
+done L10 seed=4 N=10 R2mk=1.000 legJ=0.997 (74s) [43/175]
+done L10 seed=2 N=10 R2mk=0.999 legJ=1.000 (74s) [44/175]
+done L09 seed=4 N=10 R2mk=1.000 legJ=0.996 (74s) [45/175]
+done L09 seed=3 N=10 R2mk=0.999 legJ=0.993 (74s) [46/175]
+done L09 seed=1 N=10 R2mk=1.000 legJ=0.993 (74s) [47/175]
+done L09 seed=0 N=10 R2mk=0.999 legJ=0.996 (74s) [48/175]
+done L10 seed=3 N=10 R2mk=0.999 legJ=0.999 (75s) [49/175]
+done L10 seed=1 N=10 R2mk=0.999 legJ=0.993 (75s) [50/175]
+done L12 seed=2 N=12 R2mk=0.999 legJ=0.999 (81s) [51/175]
+done L11 seed=1 N=12 R2mk=0.999 legJ=0.987 (81s) [52/175]
+done L12 seed=4 N=12 R2mk=1.000 legJ=0.987 (81s) [53/175]
+done L11 seed=2 N=12 R2mk=0.999 legJ=0.994 (82s) [54/175]
+done L12 seed=3 N=12 R2mk=1.000 legJ=0.996 (82s) [55/175]
+done L11 seed=0 N=12 R2mk=0.999 legJ=0.992 (82s) [56/175]
+done L11 seed=3 N=12 R2mk=0.999 legJ=0.994 (82s) [57/175]
+done L11 seed=4 N=12 R2mk=1.000 legJ=0.993 (82s) [58/175]
+done L12 seed=1 N=12 R2mk=0.999 legJ=0.992 (82s) [59/175]
+done L12 seed=0 N=12 R2mk=1.000 legJ=0.987 (82s) [60/175]
+done L13 seed=3 N=14 R2mk=1.000 legJ=0.999 (89s) [61/175]
+done L13 seed=0 N=14 R2mk=0.999 legJ=0.998 (89s) [62/175]
+done L13 seed=1 N=14 R2mk=0.999 legJ=0.993 (89s) [63/175]
+done L13 seed=2 N=14 R2mk=0.999 legJ=0.989 (89s) [64/175]
+done L17 seed=2 N=6 R2mk=0.999 legJ=1.000 (60s) [65/175]
+done L17 seed=4 N=6 R2mk=0.999 legJ=0.991 (60s) [66/175]
+done L18 seed=1 N=6 R2mk=0.999 legJ=1.000 (60s) [67/175]
+done L18 seed=2 N=6 R2mk=1.000 legJ=1.000 (60s) [68/175]
+done L17 seed=3 N=6 R2mk=0.999 legJ=0.990 (61s) [69/175]
+done L18 seed=3 N=6 R2mk=1.000 legJ=1.000 (61s) [70/175]
+done L17 seed=0 N=6 R2mk=0.999 legJ=1.000 (62s) [71/175]
+done L17 seed=1 N=6 R2mk=0.999 legJ=0.990 (62s) [72/175]
+done L18 seed=4 N=6 R2mk=1.000 legJ=1.000 (61s) [73/175]
+done L18 seed=0 N=6 R2mk=1.000 legJ=1.000 (62s) [74/175]
+done L19 seed=0 N=9 R2mk=1.000 legJ=1.000 (71s) [75/175]
+done L19 seed=1 N=9 R2mk=0.999 legJ=0.993 (71s) [76/175]
+done L19 seed=2 N=9 R2mk=0.999 legJ=0.998 (71s) [77/175]
+done L19 seed=3 N=9 R2mk=0.999 legJ=1.000 (71s) [78/175]
+done L20 seed=1 N=9 R2mk=0.999 legJ=0.992 (71s) [79/175]
+done L19 seed=4 N=9 R2mk=1.000 legJ=0.999 (71s) [80/175]
+done L20 seed=2 N=9 R2mk=0.999 legJ=0.999 (71s) [81/175]
+done L20 seed=0 N=9 R2mk=0.999 legJ=0.995 (71s) [82/175]
+done L20 seed=3 N=9 R2mk=0.999 legJ=0.993 (71s) [83/175]
+done L20 seed=4 N=9 R2mk=0.999 legJ=0.988 (71s) [84/175]
+done L13 seed=4 N=14 R2mk=0.999 legJ=0.998 (96s) [85/175]
+done L14 seed=2 N=14 R2mk=0.999 legJ=0.988 (96s) [86/175]
+done L21 seed=0 N=12 R2mk=1.000 legJ=0.992 (81s) [87/175]
+done L21 seed=1 N=12 R2mk=0.999 legJ=0.995 (81s) [88/175]
+done L25 seed=1 N=8 R2mk=0.999 legJ=0.987 (67s) [89/175]
+done L25 seed=2 N=8 R2mk=0.999 legJ=0.991 (67s) [90/175]
+done L25 seed=3 N=8 R2mk=0.999 legJ=0.984 (67s) [91/175]
+done L14 seed=3 N=14 R2mk=0.999 legJ=0.996 (97s) [92/175]
+done L14 seed=4 N=14 R2mk=1.000 legJ=0.992 (97s) [93/175]
+done L25 seed=0 N=8 R2mk=0.999 legJ=0.992 (68s) [94/175]
+done L21 seed=2 N=12 R2mk=0.999 legJ=0.991 (82s) [95/175]
+done L21 seed=3 N=12 R2mk=1.000 legJ=0.998 (82s) [96/175]
+done L14 seed=1 N=14 R2mk=0.999 legJ=0.998 (99s) [97/175]
+done L14 seed=0 N=14 R2mk=0.999 legJ=0.989 (99s) [98/175]
+done L22 seed=2 N=12 R2mk=0.999 legJ=0.985 (81s) [99/175]
+done L21 seed=4 N=12 R2mk=1.000 legJ=0.993 (82s) [100/175]
+done L25 seed=4 N=8 R2mk=0.999 legJ=1.000 (67s) [101/175]
+done L22 seed=0 N=12 R2mk=1.000 legJ=0.999 (82s) [102/175]
+done L26 seed=0 N=8 R2mk=0.999 legJ=1.000 (67s) [103/175]
+done L22 seed=1 N=12 R2mk=0.999 legJ=0.999 (82s) [104/175]
+done L22 seed=4 N=12 R2mk=1.000 legJ=0.994 (82s) [105/175]
+done L26 seed=2 N=8 R2mk=0.999 legJ=1.000 (67s) [106/175]
+done L26 seed=1 N=8 R2mk=0.999 legJ=1.000 (68s) [107/175]
+done L22 seed=3 N=12 R2mk=0.999 legJ=0.996 (83s) [108/175]
+done L15 seed=1 N=16 R2mk=0.999 legJ=0.996 (105s) [109/175]
+done L15 seed=0 N=16 R2mk=1.000 legJ=0.998 (106s) [110/175]
+done L15 seed=2 N=16 R2mk=0.999 legJ=0.997 (106s) [111/175]
+done L15 seed=3 N=16 R2mk=0.999 legJ=0.996 (106s) [112/175]
+done L15 seed=4 N=16 R2mk=0.999 legJ=0.996 (106s) [113/175]
+done L16 seed=0 N=16 R2mk=1.000 legJ=0.998 (107s) [114/175]
+done L16 seed=1 N=16 R2mk=1.000 legJ=0.991 (107s) [115/175]
+done L16 seed=2 N=16 R2mk=1.000 legJ=0.989 (107s) [116/175]
+done L16 seed=3 N=16 R2mk=1.000 legJ=0.999 (107s) [117/175]
+done L16 seed=4 N=16 R2mk=1.000 legJ=0.999 (107s) [118/175]
+done L23 seed=0 N=15 R2mk=1.000 legJ=0.998 (92s) [119/175]
+done L23 seed=1 N=15 R2mk=1.000 legJ=0.990 (93s) [120/175]
+done L23 seed=2 N=15 R2mk=1.000 legJ=0.986 (93s) [121/175]
+done L23 seed=3 N=15 R2mk=1.000 legJ=0.996 (94s) [122/175]
+done L23 seed=4 N=15 R2mk=1.000 legJ=0.994 (92s) [123/175]
+done L24 seed=4 N=15 R2mk=1.000 legJ=0.995 (91s) [124/175]
+done L24 seed=3 N=15 R2mk=1.000 legJ=1.000 (92s) [125/175]
+done L24 seed=0 N=15 R2mk=0.999 legJ=0.995 (92s) [126/175]
+done L24 seed=2 N=15 R2mk=1.000 legJ=0.990 (92s) [127/175]
+done L24 seed=1 N=15 R2mk=0.999 legJ=0.993 (93s) [128/175]
+done L26 seed=4 N=8 R2mk=1.000 legJ=0.993 (65s) [129/175]
+done L26 seed=3 N=8 R2mk=0.999 legJ=0.977 (65s) [130/175]
+done L28 seed=0 N=12 R2mk=1.000 legJ=0.999 (78s) [131/175]
+done L28 seed=1 N=12 R2mk=1.000 legJ=0.999 (80s) [132/175]
+done L27 seed=2 N=12 R2mk=0.999 legJ=0.993 (81s) [133/175]
+done L28 seed=2 N=12 R2mk=1.000 legJ=1.000 (81s) [134/175]
+done L27 seed=0 N=12 R2mk=0.999 legJ=0.995 (84s) [135/175]
+done L27 seed=3 N=12 R2mk=1.000 legJ=0.985 (84s) [136/175]
+done L27 seed=1 N=12 R2mk=1.000 legJ=0.998 (85s) [137/175]
+done L28 seed=3 N=12 R2mk=1.000 legJ=1.000 (76s) [138/175]
+done L27 seed=4 N=12 R2mk=0.999 legJ=0.998 (86s) [139/175]
+done L28 seed=4 N=12 R2mk=1.000 legJ=0.998 (79s) [140/175]
+done L32 seed=1 N=10 R2mk=1.000 legJ=0.993 (66s) [141/175]
+done L32 seed=3 N=10 R2mk=1.000 legJ=1.000 (66s) [142/175]
+done L31 seed=0 N=10 R2mk=0.999 legJ=0.996 (69s) [143/175]
+done L32 seed=0 N=10 R2mk=0.999 legJ=1.000 (69s) [144/175]
+done L31 seed=1 N=10 R2mk=0.998 legJ=1.000 (69s) [145/175]
+done L32 seed=4 N=10 R2mk=0.999 legJ=0.997 (68s) [146/175]
+done L31 seed=2 N=10 R2mk=0.999 legJ=0.998 (69s) [147/175]
+done L31 seed=4 N=10 R2mk=0.999 legJ=0.992 (69s) [148/175]
+done L31 seed=3 N=10 R2mk=0.999 legJ=1.000 (70s) [149/175]
+done L32 seed=2 N=10 R2mk=0.999 legJ=0.988 (70s) [150/175]
+done L35 seed=1 N=12 R2mk=0.999 legJ=0.999 (70s) [151/175]
+done L35 seed=0 N=12 R2mk=0.999 legJ=0.989 (72s) [152/175]
+done L35 seed=4 N=12 R2mk=1.000 legJ=0.997 (70s) [153/175]
+done L30 seed=3 N=16 R2mk=1.000 legJ=0.999 (86s) [154/175]
+done L29 seed=1 N=16 R2mk=1.000 legJ=0.999 (99s) [155/175]
+done L29 seed=0 N=16 R2mk=0.999 legJ=0.993 (99s) [156/175]
+done L33 seed=1 N=15 R2mk=1.000 legJ=1.000 (81s) [157/175]
+done L35 seed=3 N=12 R2mk=0.999 legJ=0.992 (73s) [158/175]
+done L30 seed=0 N=16 R2mk=1.000 legJ=0.997 (94s) [159/175]
+done L35 seed=2 N=12 R2mk=0.999 legJ=0.998 (74s) [160/175]
+done L29 seed=3 N=16 R2mk=1.000 legJ=0.998 (96s) [161/175]
+done L30 seed=1 N=16 R2mk=1.000 legJ=0.995 (95s) [162/175]
+done L29 seed=2 N=16 R2mk=1.000 legJ=0.983 (96s) [163/175]
+done L33 seed=0 N=15 R2mk=1.000 legJ=0.992 (84s) [164/175]
+done L29 seed=4 N=16 R2mk=1.000 legJ=0.994 (97s) [165/175]
+done L30 seed=2 N=16 R2mk=1.000 legJ=0.992 (96s) [166/175]
+done L30 seed=4 N=16 R2mk=1.000 legJ=0.999 (87s) [167/175]
+done L34 seed=4 N=15 R2mk=1.000 legJ=1.000 (80s) [168/175]
+done L34 seed=1 N=15 R2mk=0.999 legJ=0.989 (82s) [169/175]
+done L33 seed=4 N=15 R2mk=1.000 legJ=1.000 (83s) [170/175]
+done L33 seed=2 N=15 R2mk=1.000 legJ=1.000 (83s) [171/175]
+done L34 seed=2 N=15 R2mk=0.999 legJ=0.999 (83s) [172/175]
+done L34 seed=0 N=15 R2mk=1.000 legJ=0.997 (84s) [173/175]
+done L33 seed=3 N=15 R2mk=1.000 legJ=1.000 (85s) [174/175]
+done L34 seed=3 N=15 R2mk=1.000 legJ=0.998 (84s) [175/175]
+
+wrote /workspace/e-hgatv2/experiments/fused_eval/fused_eval_real_Lset_full.json and /workspace/e-hgatv2/experiments/fused_eval/fused_eval_real_Lset_full.md  (total 255s)
+DONE_EXIT_0
