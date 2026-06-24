@@ -36,6 +36,30 @@ def test_tape_matches_exact_evaluator_objectives() -> None:
     assert max(ex.event_edge_grad) == 1.0
 
 
+def test_critical_path_durations_sum_to_makespan() -> None:
+    # The makespan is the max-plus longest path, so the on-path activity durations
+    # (empty/loaded legs + QC handling) must sum exactly to C_max. This is the precise
+    # additive quantification used by scripts/run_critical_path_demo.py.
+    rng = make_rng(3)
+    for num_tasks in (5, 8, 10):
+        inst = build_toy_instance(num_tasks=num_tasks)
+        for _ in range(5):
+            schedule = decode(rng.random(NUM_BLOCKS * inst.num_tasks), inst)
+            ev = evaluate(schedule, inst)
+            ex = explain_schedule(schedule, inst)
+            total = 0.0
+            for j in range(inst.num_tasks):
+                if ex.empty_time_grad[j] > 0.5:
+                    total += ev.empty_time[j]
+                if ex.loaded_time_grad[j] > 0.5:
+                    total += ev.loaded_time[j]
+                if ex.node_grad[j] > 0.5:
+                    total += inst.tasks[j].handling_time
+            assert abs(total - ex.makespan) <= 1e-6 * max(1.0, abs(ex.makespan)), (
+                f"N={num_tasks}: on-path duration sum {total} != C_max {ex.makespan}"
+            )
+
+
 def test_pts_output_is_json_shaped() -> None:
     inst = build_toy_instance(num_tasks=4)
     rng = make_rng(1)
