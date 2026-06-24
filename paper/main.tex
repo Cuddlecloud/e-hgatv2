@@ -149,6 +149,7 @@ the source of the time--energy trade-off.
 \caption{Kinematic and power constants per speed level (after \cite{homayouni2022book}).}
 \label{tab:speed}
 \small
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lccccc}
 \toprule
 Level & $\alpha$ & empty $v$ (m/s) & empty $P$ (kW) & loaded $v$ (m/s) & loaded $P$ (kW)\\
@@ -157,7 +158,7 @@ Lower   & 0.8 & 4.8 & 7.8  & 2.4 & 11.7\\
 Nominal & 1.0 & 6.0 & 10.0 & 3.0 & 15.0\\
 Higher  & 1.2 & 7.2 & 13.2 & 3.6 & 19.8\\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 \subsection{Objectives and the max-plus structure of the makespan}
@@ -478,7 +479,12 @@ The heads emit local attributes in de-normalised physical units (buffers $\mu_\b
 \end{align}
 Here $\MLP_{\mathrm{leg}}\colon\R^{2d+d_e}\!\to\!\R^{2}$ and
 $\MLP_{\mathrm{delay}}\colon\R^{d+1}\!\to\!\R$ (the extra input being the standardised
-handling prior $\tilde x^{\mathrm{hand}}_j$). The leg \emph{energies}
+handling prior $\tilde x^{\mathrm{hand}}_j$). The outer $[\cdot]_+=\ReLU$ is not cosmetic:
+it enforces the physical non-negativity $t^{\mathrm e}_j,t^{\mathrm l}_j,\tau_j\in\R_{\ge0}$
+that the tropical layer~\eqref{eq:troprec} requires---a negative leg time or handling delay
+is unphysical and would corrupt the longest-path semantics (it could shorten $\Cmax$ below a
+genuine bottleneck). The heads thus map abstract embeddings to a strictly non-negative
+physical parametrisation $(b_v,w_a)$ of the event DAG. The leg \emph{energies}
 $e^{\mathrm e}_j,e^{\mathrm l}_j$ are read \emph{exactly} from the arc
 features (not learned), so energy is a strictly linear head,
 \begin{equation}
@@ -547,8 +553,17 @@ is the critical (longest) path $\pi^\star$; only its arcs carry a nonzero TAPE g
 
 \subsection{TAPE: exact critical-path attributions}
 \label{sec:tape}
-Let $\pi^\star$ be the maximising path realised by the stored arcs $a^\star(\cdot)$. Along it
-$\Cmax=\sum_{a\in\pi^\star} w_a+\sum_{v\in\pi^\star} b_v$.
+Let $\pi^\star$ be the maximising path realised by the stored arcs $a^\star(\cdot)$.
+Equivalently, writing $\Pi$ for the set of all source-to-sink paths in $G_{\mathrm{dag}}$,
+\begin{equation}
+\pi^\star \;=\; \argmax_{\pi\in\Pi}\;\Big(\textstyle\sum_{(u,v)\in\pi} w_{uv}+\sum_{v\in\pi} b_v\Big),
+\qquad
+\Cmax=\sum_{a\in\pi^\star} w_a+\sum_{v\in\pi^\star} b_v,
+\label{eq:critpath}
+\end{equation}
+i.e.\ $\pi^\star$ is exactly the sequence of events and legs that \emph{determine} the
+makespan; the topological-order recurrence~\eqref{eq:troprec} and its stored argmaxes
+$a^\star(\cdot)$ recover this global maximiser in one linear pass.
 
 \begin{proposition}[TAPE subgradient]
 \label{prop:tape}
@@ -582,6 +597,28 @@ themselves are predicted by the graph network~\eqref{eq:leghead}, so the network
 load-bearing; TAPE only makes its prediction faithfully inspectable. (An exact oracle
 critical path, computed from the resolved simulator with no network, is retained only as a
 ceiling reference.)
+
+\paragraph{Selective gradient flow into the surrogate.} TAPE is the \emph{first factor} of
+the chain rule whenever the makespan is differentiated through the network, so it shapes
+\emph{training}, not only inference. Because the leg times and delays are themselves outputs
+of the projection heads~\eqref{eq:leghead}, for any core/head parameter $\theta$
+\begin{equation}
+\frac{\partial \Cmax}{\partial \theta}
+=\sum_{a\in\mathcal A}\underbrace{\mathbf 1[\,a\in\pi^\star\,]}_{\text{TAPE }g_a}\,
+   \frac{\partial w_a}{\partial \theta}
+\;+\;\sum_{v\in\mathcal N}\mathbf 1[\,v\in\pi^\star\,]\,
+   \frac{\partial b_v}{\partial \theta},
+\label{eq:tapechain}
+\end{equation}
+so the makespan gradient reaches \emph{only} the heads of legs and events that lie on the
+binding path $\pi^\star$; every off-path prediction receives \emph{exactly zero} makespan
+signal. The surrogate therefore concentrates its capacity on the activities that actually
+set $\Cmax$, instead of smearing credit across all $\sim\!4N$ pooled features the way the
+generic regression head~\eqref{eq:readout} does---whose dense Jacobian is precisely what
+makes its input attributions unfaithful. Equation~\eqref{eq:tapechain} is the training-time
+counterpart of the inference-time faithfulness in~\eqref{eq:tape}: the same binary indicator
+$\mathbf 1[\cdot\in\pi^\star]$ that makes the explanation exact also makes the learning
+signal critical-path-localised.
 
 \begin{definition}[Faithfulness]
 For a schedule, let $\mathcal{C}_{\text{model}}=\{a:g_a>\tfrac12\}$ be the model's binding-leg
@@ -666,6 +703,7 @@ $P_{\max}=30$\,kW on top of the synthetic geometry.
 \caption{Problem instances. $N$ = number of container moves.}
 \label{tab:data}
 \small
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{llccl}
 \toprule
 Family & Instances & $N$ & Regime & Source\\
@@ -674,7 +712,7 @@ Synthetic dual-cycling & \textsf{SD-5,\,8,\,10,\,15,\,20} & 5--20 & uncoupled & 
 FSMJ loading benchmark & \textsf{L07,\,L15,\,L21,\,L35} & 8--16 & uncoupled & \cite{homayouni2022book} Tab.~4--5\\
 Peak-power coupled & \textsf{SD-10-C,\,SD-20-C} & 10,\,20 & coupled ($30$\,kW) & this work\\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 \subsection{Baselines and budget matching}
@@ -754,6 +792,7 @@ in $N$ in the uncoupled regime and degrade only mildly under peak-power coupling
 head is exact by construction ($R^2=1.000$ at every $N$, omitted).}
 \label{tab:fidelity}
 \setlength{\tabcolsep}{6pt}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{llccc}
 \toprule
 Regime & $N$ & $R^2_{C_{\max}}$ ($95\%$ CI) & leg-Jaccard ($95\%$ CI) & $C_{\max}$ MAE\\
@@ -767,7 +806,7 @@ coupled   & 10 & $0.805\ [0.791,0.819]$ & $0.928\ [0.922,0.933]$ & $40.4$\\
 coupled   & 20 & $0.801\ [0.792,0.809]$ & $0.919\ [0.914,0.924]$ & $61.1$\\
 coupled   & 50 & $0.777\ [0.761,0.793]$ & $0.913\ [0.909,0.917]$ & $100.6$\\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 \begin{figure}[t]
@@ -931,6 +970,7 @@ and the two faithfulness columns. Best HV per row in \textbf{bold}.}
 \label{tab:main}
 \scriptsize
 \setlength{\tabcolsep}{4pt}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{llc ccccc cc}
 \toprule
 & & & \multicolumn{5}{c}{$\mathrm{HV}/\mathrm{HV}^\star$} & \multicolumn{2}{c}{Faithfulness}\\
@@ -949,7 +989,7 @@ Instance & Regime & $N$ & TAPE & Attn & Random & mp-BRKGA & sp-BRKGA & TAPE Jac.
 \textsf{SD-10-C} & coupled & 10 & 0.859 & \textbf{0.919} & 0.741 & 0.798 & 0.791 & 0.952 & $-0.087$\\
 \textsf{SD-20-C} & coupled & 20 & 0.846 & \textbf{0.883} & 0.697 & 0.767 & 0.821 & 0.874 & $-0.035$\\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 \begin{table}[t]
@@ -959,22 +999,25 @@ Instance & Regime & $N$ & TAPE & Attn & Random & mp-BRKGA & sp-BRKGA & TAPE Jac.
 $\mathrm{HV}/\mathrm{HV}^\star$. ${}^\star$ denotes $p_{\text{Holm}}<0.05$.}
 \label{tab:stats}
 \small
+\setlength{\tabcolsep}{6pt}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lcccc}
 \toprule
-Method & avg.\ rank (HV) & avg.\ rank (GD$^+$) & TAPE vs.\ method, $p_{\text{Holm}}$ (HV) & Cliff's $\delta$ (HV)\\
+Method & rank (HV) & rank (GD$^+$) & $p_{\text{Holm}}$ (HV) & Cliff's $\delta$ (HV)\\
 \midrule
 E-HGATv2-attn      & 1.46 & 1.27 & $0.067$ & $-0.21$ (small)\\
 E-HGATv2-TAPE (ours) & 1.91 & 2.09 & --- & ---\\
 single-pop BRKGA   & 3.45 & 3.18 & $0.0059^\star$ & $+0.40$ (medium)\\
 NSGA-II (random)   & 3.64 & 3.45 & $0.0059^\star$ & $+0.44$ (medium)\\
 mp-BRKGA           & 4.55 & 5.00 & $0.0039^\star$ & $+0.62$ (large)\\
-\midrule
-\multicolumn{5}{l}{Friedman (HV): $\chi^2_4 = 28.9$, $p = 8.0\times10^{-6}$;\quad
-Nemenyi $\mathrm{CD}_{0.05} = 1.84$.}\\
-\multicolumn{5}{l}{Friedman (GD$^+$): $\chi^2_4 = 35.4$, $p = 3.8\times10^{-7}$;\quad
-Cliff's $\delta$(GD$^+$, TAPE vs.\ mp-BRKGA) $=-0.57$ (large); TAPE $>$ mp-BRKGA on $11/11$.}\\
 \bottomrule
-\end{tabular}
+\end{tabular}}
+
+\vspace{3pt}
+{\footnotesize Friedman (HV): $\chi^2_4 = 28.9$, $p = 8.0\times10^{-6}$; Nemenyi
+$\mathrm{CD}_{0.05} = 1.84$.\quad Friedman (GD$^+$): $\chi^2_4 = 35.4$,
+$p = 3.8\times10^{-7}$; Cliff's $\delta$(GD$^+$, TAPE vs.\ mp-BRKGA) $= -0.57$ (large);
+TAPE $>$ mp-BRKGA on $11/11$ instances.}
 \end{table}
 
 \subsection{Statistical protocol and dispersion}
@@ -1032,6 +1075,7 @@ excluding $0$ is per-instance significance and holds on $8/11$ instances; the $5
 Wilcoxon cannot drop below $p{=}0.062$ by construction.}
 \label{tab:boot}
 \setlength{\tabcolsep}{6pt}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lccccc}
 \toprule
 Instance & TAPE & mp-BRKGA & gap $95\%$ CI (bootstrap) & $W$ & CI ${>}0$\\
@@ -1048,7 +1092,7 @@ Instance & TAPE & mp-BRKGA & gap $95\%$ CI (bootstrap) & $W$ & CI ${>}0$\\
 \textsf{SD-10-C} & 0.859 & 0.798 & $[+0.009,+0.128]$ & 1 & yes\\
 \textsf{SD-20-C} & 0.846 & 0.767 & $[-0.049,+0.220]$ & 5 & no\\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 \begin{figure}[t]
@@ -1135,6 +1179,7 @@ interaction the Sobol indices say matters.
 physics-fused graph surrogate with TAPE, for the requirements of this problem.}
 \label{tab:xgb}
 \setlength{\tabcolsep}{5pt}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}lcc@{}}
 \toprule
 Capability & XGBoost + TreeSHAP & E-HGATv2 + TAPE\\
@@ -1147,7 +1192,7 @@ Faithfulness vs.\ oracle path & n/a (no path) & Jaccard $0.95$--$1.00$\\
 Interaction-dominated effects & additive credit (mismatch) & joint critical path\\
 Routes operator type (AGV vs.\ QC) & no & yes (Sec.~\ref{sec:guidance})\\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 In short, even a tree that fit the scalar objective well would still explain the
@@ -1189,6 +1234,7 @@ bottleneck changes more along the front); ``conc.'' = share of total tension on 
 \label{tab:pts}
 \footnotesize
 \setlength{\tabcolsep}{4pt}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lcc cc cc}
 \toprule
 Instance & $N$ & front & $\lambda$ range & top-3 ($\Cmax$ end) & top-3 ($E$ end) & migr. \;/\; conc.\\
@@ -1205,7 +1251,7 @@ Instance & $N$ & front & $\lambda$ range & top-3 ($\Cmax$ end) & top-3 ($E$ end)
 \textsf{SD-10-C} & 10 & 88 & $[0.38,1.00]$ & $\{0,1,2\}$ & $\{0,1,4\}$ & $0.50$ / $0.54$\\
 \textsf{SD-20-C} & 20 & 44 & $[0.00,1.00]$ & $\{0,1,2\}$ & $\{0,1,2\}$ & $0.00$ / $0.30$\\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 \begin{figure}[t]
