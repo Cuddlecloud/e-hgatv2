@@ -522,6 +522,25 @@ the LOAD/UNLOAD completions $c_j$. Hence the only approximation in the fused mak
 heads' prediction of the local attributes---the \emph{composition} is exact.
 \end{proposition}
 
+\paragraph{Why use a GNN at all for a deterministic problem?} In the uncoupled regime the
+makespan is a closed-form longest path---so why interpose a learned model? Three reasons.
+\begin{enumerate}[nosep,leftmargin=*]
+\item \textbf{Screening throughput.} A batched GNN forward over $\kappa\mu$ candidate
+  schedules costs one matrix--multiply pass ($\sim\!3$\,ms for $200$ schedules at $N{=}50$);
+  the exact simulator requires sequentially decoding every event ($\sim\!45$\,ms per schedule
+  at $N{=}50$). The surrogate thus provides a $\sim\!15\times$ throughput gain for the
+  screening step, which is the inner loop of Algorithm~\ref{alg:tape}.
+\item \textbf{Differentiable explanations without finite differences.} The exact simulator
+  is a black box; extracting $\partial\Cmax/\partial(\text{leg})$ would require $O(4N)$
+  perturbation runs. The fused head produces the full TAPE vector in \emph{one backward
+  pass} ($O(N)$ time, zero additional simulations).
+\item \textbf{Coupled-regime generalisation.} Under peak-power coupling the makespan has
+  \emph{no} closed form (it is the fixed point of an iterative power-resolution loop); the
+  fused head approximates the coupled makespan ($R^2\approx 0.80$,
+  Table~\ref{tab:fidelity}) and still produces an actionable, if degraded, TAPE signal
+  (Jaccard $\geq 0.91$) without access to the simulator at query time.
+\end{enumerate}
+
 \begin{figure}[t]
 \centering
 \begin{tikzpicture}[node distance=10mm and 13mm]
@@ -668,6 +687,26 @@ specifies one generation.
 \State \Return environmental-selection$(P\cup\mathcal O^\star)$ \Comment{elitist $\mu$-survival}
 \end{algorithmic}
 \end{algorithm}
+
+\paragraph{Worked example (why TAPE focuses the search).} Consider a $20$-task schedule
+where TAPE marks legs $\{3^{\mathrm e},7^{\mathrm l},12^{\mathrm e},12^{\mathrm l}\}$ as
+critical ($g_a=1$). Without guidance, the mutation operator picks one of $20$ tasks
+uniformly at random; the probability of perturbing a bottleneck task is $\le 3/20=15\%$.
+With TAPE, the softmax assigns $\Pr[\text{mutate }j]\propto e^{w_j/T}$; because only $3$
+tasks carry nonzero $w_j$ (tasks $3$, $7$, $12$) the operator targets a binding task with
+$\ge 85\%$ probability at $T{=}0.25$, turning an undirected random walk into a focused
+hill-climb on the makespan-critical chain. The energy objective is left to crowding-distance
+selection, which preserves front diversity while TAPE accelerates convergence.
+
+\paragraph{Computational cost of one generation.}
+\begin{itemize}[nosep,leftmargin=*]
+\item One backward pass through the $O(|\mathcal A|)$ topological sweep: $\sim\!4N$ multiply--adds (linear in problem size).
+\item Screening $\kappa\mu$ offspring with $\mathcal F.\textsc{predict}$: a single batched GNN forward ($\sim\!3$ ms at $N{=}50$ on CPU).
+\item Exact evaluations (the expensive step): only $\mu$ schedules, not $\kappa\mu$.
+\end{itemize}
+Thus the TAPE guidance adds negligible wall-time ($<\!2\%$ of the generation budget at
+$N{=}50$) while reducing the number of exact evaluations needed to reach a target
+hypervolume by $\sim\!2.4\times$ (Section~\ref{sec:scaling}).
 
 \subsection{Front behaviour: Pareto Tension Scores (R4)}
 \label{sec:pts}
@@ -836,6 +875,250 @@ $6$ to $50$ tasks; whiskers are $20$-seed $95\%$ CIs. Faithfulness is a property
 \emph{model}, not of small-instance luck.}
 \label{fig:fidelity}
 \end{figure}
+
+\subsection{R2: landscape analysis via critical-path attribution}
+\label{sec:r2worked}
+
+The advisor's second requirement asks: \emph{which input variables (task dispatch order,
+AGV travelling speed, crane workload) causally determine the objective values, and why are
+specific solutions Pareto-optimal?} TAPE answers this question exactly. For any schedule
+$\sigma$, the tropical subgradient (Eq.~\ref{eq:tapechain}) partitions all activities into
+two sets:
+\begin{itemize}[nosep]
+  \item \textbf{Critical} ($\partial C_{\max}/\partial d_{i,a} = 1$): perturbing this
+    activity's duration by $\Delta$ changes $C_{\max}$ by exactly $\Delta$. These are the
+    binding constraints.
+  \item \textbf{Slack} ($\partial C_{\max}/\partial d_{i,a} = 0$): this activity has
+    positive float; it can be slowed (reducing energy) without any makespan penalty.
+\end{itemize}
+Below we walk through the SD-10 instance ($N{=}10$ tasks, $2$~AGVs, $3$~QCs) in detail,
+contrasting the makespan-optimal and energy-optimal Pareto extremes. The analysis is
+produced entirely by querying the fused surrogate's TAPE; the oracle confirms perfect
+agreement (Jaccard~$= 1.00$).
+
+\subsubsection{Makespan-optimal schedule ($\sigma^\star_{C}$): $C_{\max}=454.2\,\mathrm{s}$, $E=12{,}896\,\mathrm{kJ}$}
+
+TAPE identifies $12$ binding activities forming a single chain through AGV-0 (dispatch
+order $\langle 0, 5, 4, 8, 1, 7\rangle$). No QC handling appears on the critical path:
+
+\smallskip
+\noindent
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{clrrrrrl}
+\toprule
+Step & Activity & $\ell$ (m) & $v$ (m/s) & Level & Duration (s) & $\frac{\partial C_{\max}}{\partial d}$ & Interpretation \\
+\midrule
+1  & Task~0 empty leg   &   0 & 6.0 & NOM  &  0.0 & 1 & AGV-0 starts co-located \\
+2  & Task~0 loaded leg  & 150 & 3.6 & HIGH & 41.7 & 1 & Container~0 at max speed \\
+3  & Task~5 empty leg   & 100 & 7.2 & HIGH & 13.9 & 1 & Repositions to pick up container~5 \\
+4  & Task~5 loaded leg  & 300 & 3.6 & HIGH & 83.3 & 1 & Container~5 (longest leg, $18\%$ of $C_{\max}$) \\
+5  & Task~4 empty leg   &  50 & 6.0 & NOM  &  8.3 & 1 & Short repositioning \\
+6  & Task~4 loaded leg  & 300 & 3.6 & HIGH & 83.3 & 1 & Container~4 at max speed \\
+7  & Task~8 empty leg   & 200 & 7.2 & HIGH & 27.8 & 1 & Repositions (longer route) \\
+8  & Task~8 loaded leg  & 150 & 3.6 & HIGH & 41.7 & 1 & Container~8 at max speed \\
+9  & Task~1 empty leg   & 250 & 6.0 & NOM  & 41.7 & 1 & Repositions (nominal speed) \\
+10 & Task~1 loaded leg  & 150 & 3.0 & NOM  & 50.0 & 1 & Container~1 at nominal speed \\
+11 & Task~7 empty leg   & 150 & 7.2 & HIGH & 20.8 & 1 & Repositions \\
+12 & Task~7 loaded leg  & 150 & 3.6 & HIGH & 41.7 & 1 & Container~7 (terminal event) \\
+\midrule
+& \textbf{Total} & & & & \textbf{454.2} & & $= C_{\max}$ (verified) \\
+\bottomrule
+\end{tabular}}
+
+\smallskip
+\paragraph{Interpretation.}
+The critical path consists entirely of AGV-0 transport legs. All loaded legs assigned
+HIGHER speed ($v=3.6\,\mathrm{m/s}$, except task~1 at NOMINAL $3.0\,\mathrm{m/s}$)
+confirm that this schedule already operates near the maximum transport rate.
+AGV-1 and its assigned tasks ($\{6, 2, 3, 9\}$) are entirely off the critical path---their
+speeds could be reduced to LOWER ($2.4\,\mathrm{m/s}$) without affecting makespan, saving
+energy. Zero QC handlings appear on-path: \textbf{crane workload is not the bottleneck.}
+
+\paragraph{Actionable insight.}
+The highest-marginal-return intervention is task~5's loaded leg (300\,m at $3.6\,\mathrm{m/s}$,
+$d=83.3\,\mathrm{s}$, $18\%$ of $C_{\max}$). Since it already runs at the maximum
+discrete speed, no further speedup is available within the current fleet. The only
+remaining option is to \emph{re-dispatch} task~5 to AGV-1, splitting the critical chain.
+TAPE identifies this operational decision directly.
+
+\subsubsection{Energy-optimal schedule ($\sigma^\star_{E}$): $C_{\max}=925.6\,\mathrm{s}$, $E=10{,}938\,\mathrm{kJ}$}
+
+TAPE now identifies $17$ binding activities with a qualitatively different structure:
+
+\smallskip
+\noindent
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{clrrrrrl}
+\toprule
+Step & Activity & $\ell$ (m) & $v$ (m/s) & Level & Duration (s) & $\frac{\partial C_{\max}}{\partial d}$ & Interpretation \\
+\midrule
+1  & Task~0 empty leg    &   0 & 7.2 & HIGH &  0.0 & 1 & Co-located start \\
+2  & Task~0 loaded leg   & 150 & 2.4 & LOW  & 62.5 & 1 & Container~0 at \emph{minimum} speed \\
+3  & Task~0 QC handling  & --- & --- & ---  & 73.0 & 1 & QC1 unloads container~0 \\
+4  & Task~3 loaded leg   & 300 & 2.4 & LOW  &125.0 & 1 & Container~3 at minimum speed \\
+5  & Task~3 QC handling  & --- & --- & ---  & 43.0 & 1 & QC1 unloads container~3 \\
+6  & Task~8 empty leg    &  50 & 4.8 & LOW  & 10.4 & 1 & Repositions (low empty speed) \\
+7  & Task~8 loaded leg   & 150 & 2.4 & LOW  & 62.5 & 1 & Container~8 at minimum speed \\
+8  & Task~8 QC handling  & --- & --- & ---  & 38.0 & 1 & QC3 unloads container~8 \\
+9  & Task~5 loaded leg   & 300 & 2.4 & LOW  &125.0 & 1 & Container~5 at minimum speed \\
+10 & Task~5 QC handling  & --- & --- & ---  & 32.0 & 1 & QC3 unloads container~5 \\
+11 & Task~4 empty leg    &  50 & 4.8 & LOW  & 10.4 & 1 & Repositions \\
+12 & Task~4 loaded leg   & 300 & 2.4 & LOW  &125.0 & 1 & Container~4 at minimum speed \\
+13 & Task~4 QC handling  & --- & --- & ---  & 45.0 & 1 & QC2 unloads container~4 \\
+14 & Task~7 loaded leg   & 150 & 3.0 & NOM  & 50.0 & 1 & Container~7 \\
+15 & Task~7 QC handling  & --- & --- & ---  & 30.0 & 1 & QC2 unloads container~7 \\
+16 & Task~1 empty leg    & 150 & 4.8 & LOW  & 31.2 & 1 & Repositions \\
+17 & Task~1 loaded leg   & 150 & 2.4 & LOW  & 62.5 & 1 & Container~1 at minimum speed (terminal) \\
+\midrule
+& \textbf{Total} & & & & \textbf{925.6} & & $= C_{\max}$ (verified) \\
+\bottomrule
+\end{tabular}}
+
+\smallskip
+\paragraph{Interpretation.}
+The bottleneck has migrated from AGV transport speed to \textbf{crane workload}. Of the
+17~critical activities, 6 are QC handlings (35\%), compared to 0/12 (0\%) in the
+makespan-optimal case. The energy-efficient schedule assigns nearly all AGV legs their
+minimum speed (LOWER: $v=2.4\,\mathrm{m/s}$ loaded, $4.8\,\mathrm{m/s}$ empty), which
+maximises leg durations but minimises power draw. The resulting serialisation at the cranes
+causes QC queuing delays to appear on the critical path. The binding constraint is now
+the \emph{service order at the cranes} rather than AGV speed.
+
+\paragraph{Per-crane binding workload.}
+The critical-path QC time decomposes as: QC1 ($73+43=116\,\mathrm{s}$, $12.5\%$ of
+$C_{\max}$), QC2 ($45+30=75\,\mathrm{s}$, $8.1\%$), QC3 ($38+32=70\,\mathrm{s}$,
+$7.6\%$). QC1 is the most loaded crane, with consecutive handlings of tasks~0 and~3
+creating a $116\,\mathrm{s}$ serialisation chain.
+
+\paragraph{Why is this solution Pareto-optimal?}
+TAPE makes the trade-off legible: $\sigma^\star_E$ achieves $15\%$ lower energy than
+$\sigma^\star_C$ by running AGVs at LOWER speed ($2.4$ vs.\ $3.6\,\mathrm{m/s}$), but the
+resulting serialisation doubles the makespan ($925.6$ vs.\ $454.2\,\mathrm{s}$). Every
+on-path loaded leg already operates at the energy-minimum speed level; accelerating any one
+would reduce $C_{\max}$ but increase $E$ proportionally---hence non-dominance.
+
+\subsubsection{Summary: from TAPE to variable-objective relationships}
+
+Table~\ref{tab:critpath_summary} aggregates the critical-path composition across all four
+evaluated instances and both Pareto extremes.
+
+\begin{table}[t]
+\centering\small
+\caption{Composition of the critical path across Pareto extremes: fraction of on-path
+activities attributable to AGV transport vs.\ QC handling. The makespan-optimal solutions
+are transport-dominated (AGV speed is the binding variable); the energy-optimal solutions
+are crane-dominated (QC workload and service order are binding).}
+\label{tab:critpath_summary}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{lcccc}
+\toprule
+& \multicolumn{2}{c}{$\min C_{\max}$ schedule} & \multicolumn{2}{c}{$\min E$ schedule} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+Instance & \% transport & \% QC & \% transport & \% QC \\
+\midrule
+SD-5  & 83\% (5/6) & 17\% (1/6) & 67\% (8/12) & 33\% (4/12) \\
+SD-8  & 100\% (6/6) & 0\% (0/6) & 67\% (4/6)  & 33\% (2/6) \\
+SD-10 & 100\% (12/12) & 0\% (0/12) & 65\% (11/17) & 35\% (6/17) \\
+L07   & 63\% (5/8) & 37\% (3/8) & 50\% (4/8)  & 50\% (4/8) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The pattern is consistent across all instances: \textbf{makespan-optimal solutions are
+bound by AGV travelling speed} (the transport network is the bottleneck), while
+\textbf{energy-optimal solutions are bound by crane workload and service order} (QC
+serialisation is the bottleneck). TAPE makes this causal structure explicit and
+quantitative---for each individual activity, the derivative $\partial C_{\max}/\partial
+d_{i,a}\in\{0,1\}$ identifies whether it contributes to the schedule's binding constraint,
+and the magnitude of its duration quantifies its contribution to $C_{\max}$.
+
+\paragraph{Sensitivity to AGV travelling speed.}
+Since leg duration $d_{i,\text{leg}} = \ell_i / v_i$ where $\ell_i$ is the travel distance
+and $v_i$ the AGV speed, the chain rule gives the makespan sensitivity to speed:
+\begin{equation}\label{eq:speed_sens}
+  \frac{\partial C_{\max}}{\partial v_i}
+  = \frac{\partial C_{\max}}{\partial d_{i,\text{leg}}} \cdot \frac{\partial d_{i,\text{leg}}}{\partial v_i}
+  = \mathbf{1}[(i,\text{leg})\in\mathcal{P}^\star] \cdot \Bigl(-\frac{\ell_i}{v_i^2}\Bigr).
+\end{equation}
+For off-path legs ($\partial C_{\max}/\partial d = 0$), the speed has \emph{zero} effect on
+makespan---the AGV can be slowed arbitrarily to save energy without schedule penalty. For
+on-path legs, the sensitivity is $-\ell_i/v_i^2$: increasing speed yields diminishing
+returns proportional to the inverse square. Three discrete speed levels are available
+(Table~\ref{tab:notation}): LOWER ($v_L = 2.4\,\mathrm{m/s}$ loaded), NOMINAL
+($v_N = 3.0\,\mathrm{m/s}$), and HIGHER ($v_H = 3.6\,\mathrm{m/s}$). For on-path leg~$i$
+with distance $\ell_i$ at NOMINAL speed, the makespan reduction from upgrading to HIGHER is:
+\[
+  \Delta C_{\max} = \frac{\ell_i}{v_N} - \frac{\ell_i}{v_H}
+  = \ell_i\!\left(\frac{1}{3.0} - \frac{1}{3.6}\right) = \frac{\ell_i}{18}\,.
+\]
+In SD-10's makespan-optimal schedule, task~5's loaded leg ($\ell = 300\,\mathrm{m}$,
+$v = 3.6\,\mathrm{m/s}$ [HIGHER], $d = 83.3\,\mathrm{s}$) is the longest binding
+activity, contributing $18\%$ of $C_{\max}$. Since it already runs at the maximum
+discrete speed level, $\Delta C_{\max} = 0$ within the feasible set---no further speedup
+is available. TAPE identifies this saturation automatically: the highest-return
+intervention is not a speed change but a structural one (re-dispatching task~5 to AGV-1
+to split the critical chain).
+
+\paragraph{Sensitivity to crane workload.}
+For QC handling activities, the duration is a fixed service time $\tau_i$ determined by
+container type and crane assignment. The TAPE derivative identifies which crane services
+are binding:
+\begin{equation}\label{eq:crane_sens}
+  \frac{\partial C_{\max}}{\partial \tau_i} = \mathbf{1}[(i,\text{qc})\in\mathcal{P}^\star].
+\end{equation}
+In $\sigma^\star_E$ (SD-10), the per-crane binding workload decomposes as:
+\begin{center}\small
+\begin{tabular}{lccc}
+\toprule
+Crane & On-path tasks & Total binding time (s) & \% of $C_{\max}$ \\
+\midrule
+QC1 & tasks 0, 3 & $73 + 43 = 116$ & 12.5\% \\
+QC2 & tasks 4, 7 & $45 + 30 = 75$  &  8.1\% \\
+QC3 & tasks 8, 5 & $38 + 32 = 70$  &  7.6\% \\
+\midrule
+\textbf{All QCs} & \textbf{6 tasks} & \textbf{261} & \textbf{28.2\%} \\
+\bottomrule
+\end{tabular}
+\end{center}
+QC1 is the most loaded crane on the critical path, contributing $116\,\mathrm{s}$
+($12.5\%$ of $C_{\max}$). Its two consecutive handling operations (tasks $0 \to 3$)
+create a serialisation chain: task~3 must wait for the crane to finish task~0.
+Reassigning task~3 ($\tau=43\,\mathrm{s}$) to QC2 would remove
+$43\,\mathrm{s}$ from QC1's binding chain if the reassignment does not create a new
+binding chain through QC2---a decision the terminal operator can evaluate by re-running the
+surrogate's TAPE in $<\!1\,\mathrm{ms}$. This per-crane decomposition is unavailable from
+any global feature-importance method (e.g.\ TreeSHAP): it requires the \emph{structural},
+schedule-specific attribution that TAPE provides.
+
+\paragraph{Task dispatch order and critical-path formation.}
+The sequence in which tasks are assigned to each AGV determines the precedence chains that
+form the critical path. In $\sigma^\star_C$, AGV-0's dispatch order is
+$\langle 0, 5, 4, 8, 1, 7\rangle$; each consecutive pair $(j, j')$ creates a precedence
+arc because $j'$ cannot begin its empty leg until $j$ completes delivery. TAPE reveals that
+\emph{all six} consecutive pairs in this chain are binding---there is zero slack between any
+two successive tasks on AGV-0. Reordering the dispatch (e.g., scheduling task~5---the
+longest loaded leg---earlier, so it overlaps with a shorter task on AGV-1) would
+break this chain and potentially reduce $C_{\max}$.
+
+In $\sigma^\star_E$, by contrast, the critical path threads through \emph{both} AGVs and
+all three QCs, indicating that the dispatch order is less decisive than crane service
+order: even if tasks were reshuffled across AGVs, the QC serialisation would still
+dominate.
+
+This is the ``landscape analysis'' requested in R2: not a global feature importance
+ranking, but a \emph{per-solution, per-variable} causal attribution that explains
+\emph{why} each schedule occupies its position on the Pareto front.
+
+\paragraph{Extension to the coupled regime.}
+Under peak-power coupling, an additional class of binding variable emerges: simultaneous
+AGV power draw. When two AGVs attempt high-speed legs concurrently, the power budget
+forces one to wait, creating an additional ``power arc'' in the event DAG. TAPE attributes
+through these arcs, identifying \emph{which} concurrent leg pair caused the delay and
+quantifying its contribution to $C_{\max}$. The fidelity study
+(Table~\ref{tab:fidelity}) confirms that the surrogate's TAPE remains actionable in this
+regime (Jaccard $0.928$, $0.919$, $0.913$ at $N{=}10, 20, 50$ respectively)---the
+landscape analysis degrades gracefully rather than failing, and the GNN is
+\emph{indispensable} here because no closed-form critical path exists to fall back on.
 
 \subsection{R3: faithful guidance dominates the metaheuristics}
 Across the $11$ instances the two graph-guided methods clearly dominate the three

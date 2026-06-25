@@ -130,6 +130,7 @@ def _fused_durations(model, schedule, instance) -> tuple[list[float], list[float
 
 def _traverse(label: str, schedule, instance, fused, coupled: bool) -> dict:
     from ehgat.environment.evaluator import evaluate
+    from ehgat.environment.physics import SPEED_TABLE
     from ehgat.explain.fused_explainer import explain_fused
     from ehgat.explain.tape_explainer import explain_schedule, explain_schedule_coupled
 
@@ -146,18 +147,55 @@ def _traverse(label: str, schedule, instance, fused, coupled: bool) -> dict:
                   | {j + instance.num_tasks for j in _on_path(fused_ex.loaded_time_grad)})
     oracle_legs = (_on_path(oracle.empty_time_grad)
                    | {j + instance.num_tasks for j in _on_path(oracle.loaded_time_grad)})
+
+    # Compute distances and speeds for each task (for paper's variable-objective analysis)
+    n = instance.num_tasks
+    agv_prev_map: dict[int, int] = {}
+    for a_seq in schedule.agv_sequences:
+        for idx, t in enumerate(a_seq):
+            agv_prev_map[t] = a_seq[idx - 1] if idx > 0 else -1
+
     for r in rows:
         j, act = r["task"], r["activity"]
+        # AGV and QC assignment
+        r["agv"] = int(schedule.assignment[j])
+        r["qc"] = instance.tasks[j].qc
+
         if act == "empty_leg":
             r["gnn_on_path"] = fused_ex.empty_time_grad[j] > 0.5
             r["gnn_duration"] = f_empty[j]
+            # Distance and speed
+            ap = agv_prev_map.get(j, -1)
+            origin = instance.agv_start if ap < 0 else instance.tasks[ap].dropoff
+            r["distance_m"] = instance.distance.distance(origin, instance.tasks[j].pickup)
+            spec = SPEED_TABLE[schedule.empty_speed[j]]
+            r["speed_ms"] = spec.empty_speed
+            r["speed_level"] = schedule.empty_speed[j].name
+            r["power_kw"] = spec.empty_power
         elif act == "loaded_leg":
             r["gnn_on_path"] = fused_ex.loaded_time_grad[j] > 0.5
             r["gnn_duration"] = f_loaded[j]
+            r["distance_m"] = instance.loaded_distance(instance.tasks[j])
+            spec = SPEED_TABLE[schedule.loaded_speed[j]]
+            r["speed_ms"] = spec.loaded_speed
+            r["speed_level"] = schedule.loaded_speed[j].name
+            r["power_kw"] = spec.loaded_power
         else:
             r["gnn_on_path"] = fused_ex.node_grad[j] > 0.5
             r["gnn_duration"] = f_handling[j]
+            r["distance_m"] = None
+            r["speed_ms"] = None
+            r["speed_level"] = None
+            r["power_kw"] = None
         r["abs_err"] = abs(r["gnn_duration"] - r["duration"])
+
+    # Per-AGV and per-QC aggregations
+    agv_on_path: dict[int, list[dict]] = {}
+    qc_on_path: dict[str, list[dict]] = {}
+    for r in rows:
+        agv_on_path.setdefault(r["agv"], []).append(r)
+        if r["activity"] == "qc_handling":
+            qc_on_path.setdefault(r["qc"], []).append(r)
 
     return {
         "label": label,
@@ -169,6 +207,12 @@ def _traverse(label: str, schedule, instance, fused, coupled: bool) -> dict:
         "decomposition_total": oracle_total,
         "decomposition_consistent": consistent,
         "leg_critical_jaccard": _jaccard(fused_legs, oracle_legs),
+        "agv_sequences": [list(s) for s in schedule.agv_sequences],
+        "qc_sequences": [list(s) for s in schedule.qc_sequences],
+        "per_agv_on_path": {str(a): {"count": len(rs), "total_s": sum(r["duration"] for r in rs)}
+                           for a, rs in agv_on_path.items()},
+        "per_qc_on_path": {q: {"count": len(rs), "total_s": sum(r["duration"] for r in rs)}
+                          for q, rs in qc_on_path.items()},
         "rows": rows,
     }
 
