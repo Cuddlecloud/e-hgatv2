@@ -1,0 +1,96 @@
+{
+  "train_instances": [
+    "toy:5",
+    "toy:8",
+    "toy:10"
+  ],
+  "test_instances": [
+    "L07"
+  ],
+  "n_train_points": 301,
+  "n_test_points": 73,
+  "train_metrics": {
+    "n_test_points": 301,
+    "mae_transport_frac": 0.03207154320795991,
+    "mae_qc_frac": 0.03207542466751111,
+    "corr_transport": 0.927651921649311,
+    "corr_qc": 0.9272313630190449
+  },
+  "test_metrics": {
+    "n_test_points": 73,
+    "mae_transport_frac": 0.12608916189205122,
+    "mae_qc_frac": 0.12587562738460997,
+    "corr_transport": -0.48621300673508294,
+    "corr_qc": -0.5038213569455966
+  },
+  "instance_features": {
+    "toy:5": {
+      "instance_id": "toy:5",
+      "num_tasks": 5,
+      "num_agvs": 2,
+      "num_qcs": 3,
+      "mean_handling_time": 55.8,
+      "std_handling_time": 11.08873302050329,
+      "max_handling_time": 73.0,
+      "min_handling_time": 43.0,
+      "tasks_per_qc_max": 2,
+      "tasks_per_qc_min": 1,
+      "tasks_per_agv": 2.5,
+      "coupled": false
+    },
+    "toy:8": {
+      "instance_id": "toy:8",
+      "num_tasks": 8,
+      "num_agvs": 2,
+      "num_qcs": 3,
+      "mean_handling_time": 46.75,
+      "std_handling_time": 14.626602476310074,
+      "max_handling_time": 73.0,
+      "min_handling_time": 30.0,
+      "tasks_per_qc_max": 3,
+      "tasks_per_qc_min": 2,
+      "tasks_per_agv": 4.0,
+      "coupled": false
+    },
+    "toy:10": {
+      "instance_id": "toy:10",
+      "num_tasks": 10,
+      "num_agvs": 2,
+      "num_qcs": 3,
+      "mean_handling_time": 48.3,
+      "std_handling_time": 15.336557632011168,
+      "max_handling_time": 73.0,
+      "min_handling_time": 30.0,
+      "tasks_per_qc_max": 4,
+      "tasks_per_qc_min": 3,
+      "tasks_per_agv": 5.0,
+      "coupled": false
+    },
+    "L07": {
+      "instance_id": "L07",
+      "num_tasks": 8,
+      "num_agvs": 2,
+      "num_qcs": 2,
+      "mean_handling_time": 64.375,
+      "std_handling_time": 14.490837622442672,
+      "max_handling_time": 80.0,
+      "min_handling_time": 38.0,
+      "tasks_per_qc_max": 4,
+      "tasks_per_qc_min": 4,
+      "tasks_per_agv": 4.0,
+      "coupled": false
+    }
+  },
+  "front_statistics": {
+    "train": {
+      "mean_transport_frac": 0.8034847811841167,
+      "std_transport_frac": 0.11745701869499948,
+      "mean_qc_frac": 0.19651521881588324
+    },
+    "test": {
+      "mean_transport_frac": 0.8412864689254697,
+      "std_transport_frac": 0.09247657354851671,
+      "mean_qc_frac": 0.15871353107453026
+    }
+  }
+}
