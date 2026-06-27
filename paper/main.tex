@@ -820,28 +820,38 @@ $0.50$; $\rho=+0.07$; separation $+0.06\sigma$---while TAPE is near-exact at all
 critical-path information, coarse or fine: a strictly stronger statement than the near-zero
 rank correlation, and one only a physically grounded objective permits.
 
-\paragraph{Then why does attention guide search as well as TAPE?}
-Because the guidance benefit is not attention's. The attention and TAPE arms share the
-surrogate's offspring \emph{screening} and differ only in which task mutation targets. An
-ablation that adds the missing control---random mutation \emph{with} screening---isolates the
-cause (Table~\ref{tab:ladder}, bottom): replacing attention-targeted by random-targeted
-mutation (both screened) shifts $\mathrm{HV}/\mathrm{HV}^\star$ by only $-0.009$ (mixed sign,
-within noise), whereas adding screening to random mutation improves it by $+0.042$
-(consistent across instances, growing with $N$). The lever is the surrogate's objective
-\emph{regression} used for screening---shared by both guided arms---not the attention
-distribution. This reconciles the two facts: attention guides optimisation as well as TAPE
-(it rides the same screening) while encoding none of the bottleneck structure TAPE recovers.
-The network attains $R^2\!\approx\!0.99$ objective regression with attention that is, by every
-granularity measurable against ground truth, indistinguishable from random---accurate
-prediction does not imply an interpretable attention map.
+\paragraph{Then why does attention guide search at all?}
+Because the guidance benefit is the surrogate's, not attention's. The search arms share
+everything except which task mutation targets and whether offspring are screened; isolating
+those two factors is decisive (Table~\ref{tab:ladder}, bottom). Adding the missing
+control---\emph{random} mutation \emph{with} screening---yields the \emph{best} arm of all
+($\mathrm{HV}/\mathrm{HV}^\star=0.991$), ahead of attention-targeted ($0.977$) and
+TAPE-targeted ($0.956$); the only arm that trails is random mutation \emph{without} screening
+($0.950$). Two readings follow. \emph{(i) Screening is the engine}: it lifts random mutation
+by $+0.041$ and accounts for the entire gap between the guided arms and the published null.
+NSGA-II's convergence comes from screening surrogate-predicted-good offspring and selecting by
+non-dominated sorting---a pressure to which the mutation \emph{operator} is nearly irrelevant.
+So attention ``guides as well as TAPE'' only because both ride the same screening, not because
+attention localises anything (it does not; Table~\ref{tab:ladder}, top). \emph{(ii) Diffuse
+beats precise}: the more diffuse the targeting, the better the hypervolume
+(random $\ge$ attention $>$ TAPE), because exact bottleneck-targeting is
+\emph{exploitative}---it concentrates mutations on the current critical task and narrows front
+coverage, while HV rewards spread. This is the mechanism behind the small attention-over-TAPE
+edge on HV (Table~\ref{tab:stats}, ranks $1.46$ vs.\ $1.91$, $p_{\text{Holm}}=0.067$):
+accidental exploration, not information. The network attains
+$R^2\!\approx\!0.99$ objective regression with an attention map indistinguishable from random
+at every measurable granularity---accurate prediction does not imply an interpretable
+attention map, and faithful guidance must come from the exact tropical gradient, not the
+attention weights.
 
 \begin{table}[t]
 \centering\small
 \caption{Attention vs.\ TAPE against the \emph{exact} critical path. \textbf{Top:} alignment
 at four granularities (coarse$\to$fine), pooled over nine instances; attention matches the
 random baseline at every level while TAPE is near-exact. \textbf{Bottom:} a search-guidance
-ablation (HV/HV$^\star$, mean over instances) showing the optimisation benefit comes from the
-shared surrogate \emph{screening}, not from attention-targeted mutation.}
+ablation (mean HV/HV$^\star$ over three instances, $N{=}5,8,10$): random mutation \emph{with}
+screening is the best arm, so the optimisation benefit comes from the shared surrogate
+\emph{screening}, not from attention- or TAPE-targeted mutation.}
 \label{tab:ladder}
 \setlength{\tabcolsep}{6pt}
 \begin{tabular}{lccc}
@@ -853,9 +863,11 @@ ROC-AUC (rank on-path above off-path)   & $0.51$ & $\mathbf{0.94}$ & $0.50$ \\
 Spearman (vs.\ graded sensitivity)      & $+0.07$ & $\mathbf{+0.70}$ & $0.00$ \\
 separation (critical$-$off, $\sigma$)   & $+0.06$ & $\mathbf{+1.92}$ & $0.00$ \\
 \midrule
-\multicolumn{4}{l}{\emph{Search-guidance ablation $\;\Delta(\mathrm{HV}/\mathrm{HV}^\star)$:}}\\
-attention-targeted $-$ random-targeted mutation (both screened) & \multicolumn{3}{c}{$-0.009$ \;(within noise)} \\
-screening added to random mutation & \multicolumn{3}{c}{$\mathbf{+0.042}$ \;(consistent)} \\
+\multicolumn{4}{l}{\emph{Search-guidance ablation --- mean $\mathrm{HV}/\mathrm{HV}^\star$ (screening is the lever):}}\\
+random mutation $+$ screening      & \multicolumn{3}{c}{$\mathbf{0.991}$ \;\;(best)} \\
+attention-targeted $+$ screening   & \multicolumn{3}{c}{$0.977$} \\
+TAPE-targeted $+$ screening        & \multicolumn{3}{c}{$0.956$} \\
+random mutation, \emph{no} screening & \multicolumn{3}{c}{$0.950$ \;\;(null)} \\
 \bottomrule
 \end{tabular}
 \end{table}
