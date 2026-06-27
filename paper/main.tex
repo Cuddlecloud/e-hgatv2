@@ -1586,6 +1586,125 @@ makespan-optimal end of the front differ substantially from those at the energy-
 \label{fig:r4}
 \end{figure}
 
+\subsection{Amortising front behaviour across instances (R4)}
+\label{sec:amortise}
+Section~\ref{sec:front} \emph{describes} each front with a faithful object; the stronger R4
+claim is \emph{amortisation}---that a single model, given only an instance's structure,
+predicts its front composition \emph{without} running the search. We test this directly. We
+fit one lightweight predictor $g:(\,\text{structural features},\,\lambda\,)\mapsto\rho$, where
+$\rho$ is the transport share of the critical path (the composition of
+Table~\ref{tab:critpath_summary}) and the features are $N$, the AGV and QC counts, and the
+mean QC handling time. We evaluate by \emph{leave-one-instance-out} (LOIO): train on all but
+one instance, predict the held-out instance's front, and---crucially---compare against a
+\emph{constant} baseline that ignores all features and emits the training-set mean
+$\bar\rho$. Beating that baseline is the only honest evidence that structure was used.
+
+\textbf{On the public benchmark, amortisation is untestable, not failed.} On the $35$ real
+instances \textsf{L01}--\textsf{L35} (the small set of~\cite{homayouni2022book}),
+LOIO attains a held-out $\mathrm{MAE}(\rho)=0.048$. But the constant baseline attains
+\emph{the same} $0.048$, and the learned model beats it on only $14/35$ instances: the
+features carry no usable signal here. The cause is a saturated target---across all $35$
+instances and every front point the critical path is transport-bound ($\rho=0.88\pm0.04$
+between instances; $87\%$ of all front points have $\rho>0.80$). With essentially no
+composition variance, \emph{no} predictor can beat a constant, so these instances cannot
+exhibit amortisation. This is itself a finding: for this terminal layout, ``transport binds
+the critical path'' is a near-invariant structural fact, and the qualitative explanation
+generalises trivially and robustly.
+
+\textbf{When composition varies, a single surrogate recovers it.} To obtain instances whose
+binding resource actually differs, we vary the fleet/crane ratio: many AGVs with few cranes
+makes transport cheap and QC handling bind ($\rho$ small), while few AGVs with many cranes
+makes transport bind ($\rho\!\to\!1$). A $20$-instance set built this way spans
+$\rho\in[0.19,0.99]$ (between-instance std $0.29$, versus $0.04$ on the public set). On it,
+LOIO is decisive (Table~\ref{tab:amortise}): $\mathrm{MAE}(\rho)=0.107$ against a constant
+baseline of $0.289$ ($2.7\times$ better; model wins on $17/20$ instances), and the predicted
+and true per-instance transport shares correlate at $r=0.945$. A single surrogate, shown only
+an unseen instance's fleet and crane structure, correctly places it on the QC-bound
+($\rho=0.19$)\,--\,transport-bound ($\rho=0.99$) axis. This is the requested
+``search$\rightarrow$knowledge'' transfer, demonstrated where there is knowledge to transfer.
+
+\begin{table}[t]
+\centering\small
+\caption{Amortisation of front composition (R4), leave-one-instance-out. The model beats a
+constant-mean baseline only where the target $\rho$ (transport share of the critical path)
+actually varies. The public small set is transport-saturated, so amortisation is untestable
+there; on a composition-spanning set the structural predictor recovers $\rho$ across unseen
+instances at $r=0.945$.}
+\label{tab:amortise}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{lccccc}
+\toprule
+& & $\rho$ spread & \multicolumn{2}{c}{LOIO $\mathrm{MAE}(\rho)$} & between-inst.\ \\
+\cmidrule(lr){4-5}
+Instance set & \#inst & (std / range) & model & constant & recovery $r$ \\
+\midrule
+\textsf{L01--L35} (real, small) & 35 & $0.04$ / $[0.77,0.94]$ & $0.048$ & $0.048$ & --- (saturated) \\
+composition-diverse (synthetic) & 20 & $0.29$ / $[0.19,0.99]$ & $\mathbf{0.107}$ & $0.289$ & $\mathbf{0.945}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\begin{minipage}{0.49\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=\textwidth, height=0.86\textwidth,
+  xlabel={true transport share $\rho$}, ylabel={predicted $\hat\rho$ (held-out)},
+  xmin=0, xmax=1, ymin=0, ymax=1, font=\footnotesize,
+  grid=both, grid style={gray!20}, legend pos=north west, legend cell align=left,
+]
+\addplot[no marks, black!55, dashed, domain=0:1] {x}; \addlegendentry{$\hat\rho=\rho$}
+\addplot[only marks, mark=*, mark size=1.6pt, blue] coordinates {
+(0.191,0.235)(0.219,0.276)(0.255,0.409)(0.264,0.130)(0.277,0.398)(0.340,0.312)(0.350,0.279)(0.468,0.240)(0.561,0.697)(0.582,0.379)(0.681,0.728)(0.755,0.782)(0.807,0.766)(0.858,0.784)(0.899,0.924)(0.929,0.956)(0.958,0.956)(0.964,0.961)(0.974,0.969)(0.989,0.948)};
+\addlegendentry{composition-diverse}
+\node[font=\footnotesize] at (axis cs:0.72,0.18) {$r=0.945$};
+\end{axis}
+\end{tikzpicture}\\[-2pt]
+{\footnotesize (a) Held-out composition is recovered from structure alone.}
+\end{minipage}\hfill
+\begin{minipage}{0.49\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=\textwidth, height=0.86\textwidth,
+  xlabel={instance rank (normalised)}, ylabel={transport share $\rho$},
+  xmin=0, xmax=1, ymin=0, ymax=1, font=\footnotesize,
+  grid=both, grid style={gray!20}, legend pos=south east, legend cell align=left,
+]
+\addplot[only marks, mark=square*, mark size=1.1pt, red] coordinates {
+(0.000,0.769)(0.029,0.812)(0.059,0.821)(0.088,0.825)(0.118,0.828)(0.147,0.836)(0.176,0.841)(0.206,0.843)(0.235,0.847)(0.265,0.854)(0.294,0.857)(0.324,0.871)(0.353,0.874)(0.382,0.878)(0.412,0.881)(0.441,0.881)(0.471,0.884)(0.500,0.885)(0.529,0.886)(0.559,0.891)(0.588,0.892)(0.618,0.892)(0.647,0.894)(0.676,0.898)(0.706,0.902)(0.735,0.902)(0.765,0.905)(0.794,0.906)(0.824,0.906)(0.853,0.913)(0.882,0.918)(0.912,0.921)(0.941,0.928)(0.971,0.933)(1.000,0.935)};
+\addlegendentry{\textsf{L01--L35} (real)}
+\addplot[only marks, mark=*, mark size=1.4pt, blue] coordinates {
+(0.000,0.191)(0.053,0.219)(0.105,0.255)(0.158,0.264)(0.211,0.277)(0.263,0.340)(0.316,0.350)(0.368,0.468)(0.421,0.561)(0.474,0.582)(0.526,0.681)(0.579,0.755)(0.632,0.807)(0.684,0.858)(0.737,0.899)(0.789,0.929)(0.842,0.958)(0.895,0.964)(0.947,0.974)(1.000,0.989)};
+\addlegendentry{composition-diverse}
+\end{axis}
+\end{tikzpicture}\\[-2pt]
+{\footnotesize (b) The real set is transport-saturated; only the diverse set varies.}
+\end{minipage}
+\caption{Amortising front composition (R4). \textbf{(a)} On a composition-spanning set,
+leave-one-instance-out predictions of the transport share $\rho$ track the truth
+($r=0.945$): a single surrogate reads an unseen instance's fleet/crane structure and places
+it on the QC-bound\,/\,transport-bound axis. \textbf{(b)} Why the public benchmark cannot
+show this: across all $35$ real instances $\rho=0.88\pm0.04$ (near-flat, transport-bound),
+so a constant matches any predictor; the synthetic set deliberately spans
+$\rho\in[0.19,0.99]$.}
+\label{fig:amortise}
+\end{figure}
+
+\textbf{What does \emph{not} amortise.} Two finer targets resist prediction, and we report
+them. (i) The \emph{within-front} ordering of $\rho$ along a single instance's front is
+recovered only weakly (median per-instance correlation ${\approx}0.12$): real fronts are
+compositionally near-flat, so there is little ordering signal. (ii) Predicting \emph{which}
+task is on the critical path from static task features is at chance---LOIO
+$\mathrm{AUC}=0.53$, no better than a $\lambda$-only baseline---because task-level
+criticality is set by the realised schedule, not by static attributes. The amortisation
+benefit is therefore at the level of \emph{instance composition}, not per-task criticality.
+Finally, the composition-spanning evidence is synthetic; confirming it on a real,
+structurally diverse benchmark (e.g.\ the large \textsf{DL} set
+of~\cite{homayouni2022book}, which varies AGV and QC counts) is the remaining step.
+
 \subsection{The coupled regime is harder}
 Under the peak-power budget all methods degrade, and the faithful signal is slightly behind
 attention (Table~\ref{tab:main}, \textsf{SD-10-C}/\textsf{SD-20-C}). The surrogate's
@@ -1605,9 +1724,14 @@ We are deliberate about what the evidence does and does not support.
   TAPE-vs-attention is indistinguishable rather than provably equal), and the per-population
   size was reduced from the paper's $20N$ to $5N$ for tractability while keeping all methods
   budget-matched. Both are straightforward to scale up.
-  \item \textbf{Generalisation.} The surrogate is trained per instance. Demonstrating that a
-  single surrogate \emph{transfers} the learned front behaviour to unseen instances (full
-  amortisation) is the natural next step and would considerably strengthen R4.
+  \item \textbf{Generalisation.} A single surrogate \emph{does} transfer front composition to
+  unseen instances when composition varies---leave-one-instance-out recovery $r=0.945$ on a
+  composition-spanning set (Section~\ref{sec:amortise}, Figure~\ref{fig:amortise}). Two
+  honest caveats remain: the public small benchmark is transport-saturated, so it cannot
+  exhibit the effect (a constant matches any predictor there), and the composition-spanning
+  demonstration is synthetic. Confirming amortisation on a real, structurally diverse set
+  (the large \textsf{DL} instances of~\cite{homayouni2022book}) is the natural next step;
+  per-task criticality, by contrast, is set by the realised schedule and does not amortise.
 \end{itemize}
 
 \section{Mapping to the research directions}
@@ -1622,7 +1746,9 @@ We are deliberate about what the evidence does and does not support.
   (Section~\ref{sec:guidance}, Table~\ref{tab:stats}).
   \item \textbf{R4 (front behaviour).} The $\lambda$-weighted Pareto Tension Score
   aggregates TAPE over the front and exhibits how the bottleneck migrates and how
-  concentrated the tension is (Section~\ref{sec:front}).
+  concentrated the tension is (Section~\ref{sec:front}); a single structural surrogate then
+  \emph{amortises} the front composition to unseen instances ($r=0.945$ where composition
+  varies, Section~\ref{sec:amortise}).
 \end{itemize}
 
 \section{Conclusion}
