@@ -158,6 +158,14 @@ def _save_json(result: BenchmarkResult, out: Path) -> Path:
 def main(args: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="E-HGATv2 effectiveness benchmark")
     parser.add_argument("--tasks", type=int, default=5, help="number of tasks/nodes")
+    parser.add_argument(
+        "--agvs", type=int, default=None,
+        help="AGV fleet size (default: scaled_fleet(N), ~1 AGV per 12 tasks)",
+    )
+    parser.add_argument(
+        "--qcs", type=int, default=None,
+        help="number of quay cranes, max 6 (default: scaled_fleet(N), 3..6)",
+    )
     parser.add_argument("--seeds", type=int, default=5, help="number of seeds (default 5)")
     parser.add_argument("--gens", type=int, default=40, help="generations (default 40)")
     parser.add_argument("--pop", type=int, default=None, help="population size (default 20N)")
@@ -202,6 +210,8 @@ def main(args: list[str] | None = None) -> None:
 
     config = BenchmarkConfig(
         num_tasks=ns.tasks,
+        num_agvs=ns.agvs,
+        num_qcs=ns.qcs,
         num_seeds=ns.seeds,
         generations=ns.gens,
         pop_size=ns.pop,

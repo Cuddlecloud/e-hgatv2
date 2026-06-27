@@ -42,6 +42,9 @@ class FrontDatapoint:
     """One Pareto-optimal schedule's TAPE decomposition."""
     instance_id: str
     num_tasks: int
+    num_agvs: int  # real fleet size (was previously hardcoded as num_tasks/2)
+    num_qcs: int  # real crane count (was previously hardcoded as the constant 3)
+    mean_handling: float  # mean QC handling time -- drives transport/QC balance
     lam: float  # trade-off weight (0 = pure makespan, 1 = pure energy)
     transport_frac: float  # fraction of critical path that is transport legs
     qc_frac: float  # fraction that is QC handling
@@ -50,13 +53,69 @@ class FrontDatapoint:
     energy: float
 
 
+def _feature_row(dp: "FrontDatapoint") -> list[float]:
+    """Predictor input row: λ plus the REAL structural features of the instance.
+
+    Previously the QC count was hardcoded to the constant ``3`` and the AGV count
+    faked as ``num_tasks / 2`` -- so the model could not tell a 2-crane instance
+    from a 3-crane one, which is why R4 failed to generalise to L07 (2 cranes).
+    """
+    return [dp.lam, float(dp.num_tasks), float(dp.num_agvs),
+            float(dp.num_qcs), dp.mean_handling]
+
+
+# --- per-instance front-data caching -------------------------------------------------
+# Each instance's _compute_front_data (core+fused training, NSGA-II, TAPE) is fully
+# independent and CPU-bound, so we compute one instance per process and fan out across
+# the VM's many cores (see scripts/run_front_parallel.sh).  Stage 1 writes a cache file
+# per instance; stage 2 pools the caches and fits the cheap predictor.
+
+def _cache_path(cache_dir: Path, spec: str) -> Path:
+    safe = spec.replace(":", "_").replace("/", "_")
+    return cache_dir / f"front_{safe}.json"
+
+
+def _dp_to_dict(dp: "FrontDatapoint") -> dict:
+    return {
+        "instance_id": dp.instance_id, "num_tasks": dp.num_tasks,
+        "num_agvs": dp.num_agvs, "num_qcs": dp.num_qcs,
+        "mean_handling": dp.mean_handling, "lam": dp.lam,
+        "transport_frac": dp.transport_frac, "qc_frac": dp.qc_frac,
+        "per_task_critical": dp.per_task_critical,
+        "makespan": dp.makespan, "energy": dp.energy,
+    }
+
+
+def _dp_from_dict(d: dict) -> "FrontDatapoint":
+    return FrontDatapoint(**d)
+
+
+def _load_cached(cache_dir: Path, spec: str) -> list["FrontDatapoint"]:
+    path = _cache_path(cache_dir, spec)
+    if not path.exists():
+        raise FileNotFoundError(
+            f"No cache for {spec} at {path}. Run stage 1 "
+            f"(--compute-instance {spec}) first.")
+    return [_dp_from_dict(d) for d in json.loads(path.read_text())]
+
+
 def _load_instance(spec: str, peak_power: float | None):
     from ehgat.environment.dsdl import load_tables_4_5
-    from ehgat.environment.instance import build_toy_instance
+    from ehgat.environment.instance import AVAILABLE_QCS, build_toy_instance
 
     if spec.startswith("toy:"):
-        n = int(spec.split(":", 1)[1])
-        return build_toy_instance(num_tasks=n, peak_power=peak_power)
+        # ``toy:N`` -> legacy 3-QC/2-AGV toy.  ``toy:N:Q`` or ``toy:N:Q:A`` set the
+        # crane and AGV counts so the training set can span instance *structure*.
+        parts = spec.split(":")
+        n = int(parts[1])
+        num_qcs = int(parts[2]) if len(parts) > 2 else 3
+        num_agvs = int(parts[3]) if len(parts) > 3 else 2
+        if num_qcs > len(AVAILABLE_QCS):
+            raise ValueError(
+                f"{spec}: num_qcs={num_qcs} exceeds {len(AVAILABLE_QCS)} packaged cranes")
+        return build_toy_instance(
+            num_tasks=n, qcs=AVAILABLE_QCS[:num_qcs], num_agvs=num_agvs,
+            peak_power=peak_power)
     data = Path(__file__).resolve().parents[1] / "data" / "tables_4_5.json"
     return load_tables_4_5(data, peak_power=peak_power, only=[spec])[0].instance
 
@@ -71,6 +130,9 @@ def _compute_front_data(spec: str, peak_power: float | None, args) -> list[Front
     instance = _load_instance(spec, peak_power)
     n = instance.num_tasks
     coupled = instance.peak_power is not None
+    inst_num_agvs = instance.num_agvs
+    inst_num_qcs = len(instance.qcs)
+    inst_mean_handling = float(np.mean([t.handling_time for t in instance.tasks]))
 
     print(f"  [{spec}] Training core model...", flush=True)
     core = build_core(instance, seed=0, num_samples=args.core_samples,
@@ -139,6 +201,9 @@ def _compute_front_data(spec: str, peak_power: float | None, args) -> list[Front
         datapoints.append(FrontDatapoint(
             instance_id=spec,
             num_tasks=n,
+            num_agvs=inst_num_agvs,
+            num_qcs=inst_num_qcs,
+            mean_handling=inst_mean_handling,
             lam=float(lam_values[i]),
             transport_frac=transport_frac,
             qc_frac=qc_frac,
@@ -185,8 +250,8 @@ def _train_predictor(train_data: list[FrontDatapoint]):
     import torch
     import torch.nn as nn
 
-    # Build feature matrix: [λ, num_tasks, num_agvs, num_qcs] → [transport_frac, qc_frac]
-    X = np.array([[dp.lam, dp.num_tasks, dp.num_tasks / 2, 3] for dp in train_data])
+    # Feature matrix: [λ, num_tasks, num_agvs, num_qcs, mean_handling] → [transport, qc]
+    X = np.array([_feature_row(dp) for dp in train_data])
     Y = np.array([[dp.transport_frac, dp.qc_frac] for dp in train_data])
 
     X_t = torch.tensor(X, dtype=torch.float32)
@@ -198,7 +263,7 @@ def _train_predictor(train_data: list[FrontDatapoint]):
     X_norm = (X_t - x_mean) / x_std
 
     model = nn.Sequential(
-        nn.Linear(4, 32), nn.ReLU(),
+        nn.Linear(len(_feature_row(train_data[0])), 32), nn.ReLU(),
         nn.Linear(32, 32), nn.ReLU(),
         nn.Linear(32, 2), nn.Sigmoid(),
     )
@@ -218,7 +283,7 @@ def _evaluate_predictor(model, x_mean, x_std, test_data: list[FrontDatapoint]) -
     """Evaluate predictor on held-out instance data."""
     import torch
 
-    X = np.array([[dp.lam, dp.num_tasks, dp.num_tasks / 2, 3] for dp in test_data])
+    X = np.array([_feature_row(dp) for dp in test_data])
     Y = np.array([[dp.transport_frac, dp.qc_frac] for dp in test_data])
 
     X_t = torch.tensor(X, dtype=torch.float32)
@@ -254,26 +319,44 @@ def main() -> None:
     p.add_argument("--fused-samples", type=int, default=1000)
     p.add_argument("--fused-epochs", type=int, default=60)
     p.add_argument("--device", default="cpu")
+    p.add_argument("--cache-dir", default=str(OUT / "cache"),
+                   help="Per-instance front-data cache directory (stage 1 writes, stage 2 reads).")
+    p.add_argument("--compute-instance", default=None,
+                   help="Stage 1: compute+cache front data for this ONE instance, then exit. "
+                        "Run many of these in parallel (one per core) to populate the cache.")
     args = p.parse_args()
 
     import torch
     torch.set_num_threads(int(os.environ.get("OMP_NUM_THREADS", "1")))
 
+    cache_dir = Path(args.cache_dir)
+    cache_dir.mkdir(parents=True, exist_ok=True)
     OUT.mkdir(parents=True, exist_ok=True)
 
-    # Collect training data
-    print("=== Collecting training front data ===", flush=True)
+    # --- Stage 1: compute one instance and cache it, then exit. ----------------------
+    if args.compute_instance is not None:
+        spec = args.compute_instance
+        print(f"=== Stage 1: computing front data for {spec} ===", flush=True)
+        dps = _compute_front_data(spec, args.peak_power, args)
+        path = _cache_path(cache_dir, spec)
+        path.write_text(json.dumps([_dp_to_dict(d) for d in dps], indent=2))
+        print(f"Cached {len(dps)} datapoints -> {path}", flush=True)
+        return
+
+    # --- Stage 2: pool cached per-instance front data and fit the predictor. ---------
+    print("=== Loading cached training front data ===", flush=True)
     train_data: list[FrontDatapoint] = []
     for spec in args.train_instances:
-        print(f"Instance: {spec}", flush=True)
-        train_data.extend(_compute_front_data(spec, args.peak_power, args))
+        dps = _load_cached(cache_dir, spec)
+        print(f"  {spec}: {len(dps)} points", flush=True)
+        train_data.extend(dps)
 
-    # Collect test data
-    print("\n=== Collecting test front data ===", flush=True)
+    print("=== Loading cached test front data ===", flush=True)
     test_data: list[FrontDatapoint] = []
     for spec in args.test_instances:
-        print(f"Instance: {spec}", flush=True)
-        test_data.extend(_compute_front_data(spec, args.peak_power, args))
+        dps = _load_cached(cache_dir, spec)
+        print(f"  {spec}: {len(dps)} points", flush=True)
+        test_data.extend(dps)
 
     # Save raw front data
     raw = {
@@ -306,6 +389,21 @@ def main() -> None:
     # Also evaluate on training data (sanity)
     train_results = _evaluate_predictor(model, x_mean, x_std, train_data)
 
+    # Per-test-instance breakdown: R4 claims the predictor recovers the λ -> composition
+    # curve for each UNSEEN instance, so report corr/MAE per held-out instance, not just
+    # pooled. (Pooled corr can look fine for the wrong reason when instances differ in mean.)
+    per_instance: dict[str, dict] = {}
+    for spec in args.test_instances:
+        sub = [d for d in test_data if d.instance_id == spec]
+        if len(sub) > 2:
+            per_instance[spec] = _evaluate_predictor(model, x_mean, x_std, sub)
+            m = per_instance[spec]
+            print(f"  [{spec}] corr_transport={m['corr_transport']:.3f} "
+                  f"corr_qc={m['corr_qc']:.3f} mae_transport={m['mae_transport_frac']:.3f} "
+                  f"(n={m['n_test_points']})", flush=True)
+        else:
+            print(f"  [{spec}] skipped per-instance corr (n={len(sub)} <= 2)", flush=True)
+
     # Instance features
     features = {}
     for spec in args.train_instances + args.test_instances:
@@ -319,6 +417,7 @@ def main() -> None:
         "n_test_points": len(test_data),
         "train_metrics": train_results,
         "test_metrics": results,
+        "test_metrics_per_instance": per_instance,
         "instance_features": features,
         "front_statistics": {
             "train": {

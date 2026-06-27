@@ -32,7 +32,13 @@ from ehgat.benchmark.faithfulness import (
     evaluate_faithfulness,
 )
 from ehgat.environment.decoder import NUM_BLOCKS, decode
-from ehgat.environment.instance import EXACT_TOY_TASKS, Instance, build_toy_instance
+from ehgat.environment.instance import (
+    AVAILABLE_QCS,
+    EXACT_TOY_TASKS,
+    Instance,
+    build_toy_instance,
+    scaled_fleet,
+)
 from ehgat.environment.oracle import exact_pareto_front
 from ehgat.metrics import gd_plus, hypervolume, igd_plus, nadir_reference, spread
 from ehgat.search.attention_nsga2 import AttentionNSGA2Config, run_attention_nsga2
@@ -45,6 +51,7 @@ __all__ = [
     "BenchmarkResult",
     "MethodResult",
     "Stat",
+    "build_scaling_instance",
     "run_benchmark",
 ]
 
@@ -69,6 +76,8 @@ class BenchmarkConfig:
     """Configuration for the effectiveness benchmark."""
 
     num_tasks: int = EXACT_TOY_TASKS
+    num_agvs: int | None = None  # default: scaled_fleet(N) -- ~1 AGV per 12 tasks
+    num_qcs: int | None = None  # default: scaled_fleet(N) -- 3..6 quay cranes
     generations: int = 60
     pop_size: int | None = None  # default 20N (matches BRKGA + attention search)
     num_seeds: int = 10
@@ -345,11 +354,41 @@ def _pareto_front_float(points: Sequence[tuple[float, float]]) -> tuple[tuple[fl
     return tuple(front)
 
 
+def _resolve_fleet(
+    num_tasks: int, num_agvs: int | None, num_qcs: int | None
+) -> tuple[int, int]:
+    """Fill unset fleet sizes from the deterministic :func:`scaled_fleet` policy."""
+    default_agvs, default_qcs = scaled_fleet(num_tasks)
+    return (num_agvs or default_agvs), (num_qcs or default_qcs)
+
+
+def build_scaling_instance(
+    num_tasks: int,
+    *,
+    num_agvs: int | None = None,
+    num_qcs: int | None = None,
+    peak_power: float | None = None,
+) -> Instance:
+    """Build a benchmark instance with an N-scaled (or explicit) AGV/QC fleet.
+
+    Unset fleet sizes default to :func:`scaled_fleet`, so this is a pure function of its
+    arguments -- the search and its separately-built BRKGA reference front are identical.
+    """
+    agvs, qcs = _resolve_fleet(num_tasks, num_agvs, num_qcs)
+    if qcs > len(AVAILABLE_QCS):
+        raise ValueError(
+            f"num_qcs={qcs} exceeds the {len(AVAILABLE_QCS)} cranes in the distance matrix"
+        )
+    return build_toy_instance(
+        num_tasks=num_tasks, num_agvs=agvs, qcs=AVAILABLE_QCS[:qcs], peak_power=peak_power
+    )
+
+
 def _brkga_reference_points_for_seed(
-    num_tasks: int, pop_size: int, generations: int, seed: int
+    num_tasks: int, num_agvs: int, num_qcs: int, pop_size: int, generations: int, seed: int
 ) -> tuple[tuple[float, float], ...]:
     """Build one BRKGA reference front in a subprocess-friendly worker."""
-    instance = build_toy_instance(num_tasks=num_tasks)
+    instance = build_scaling_instance(num_tasks, num_agvs=num_agvs, num_qcs=num_qcs)
     res = run_brkga(instance, BRKGAConfig(pop_size=pop_size, generations=generations, seed=seed))
     return tuple((float(m), float(e)) for m, e in res.front)
 
@@ -367,10 +406,13 @@ def _approximate_reference_front(
     workers = max(1, min(workers, seeds, os.cpu_count() or 1))
     points: list[tuple[float, float]] = []
 
+    n_agvs, n_qcs = instance.num_agvs, len(instance.qcs)
     if workers == 1:
         for seed in range(seeds):
             points.extend(
-                _brkga_reference_points_for_seed(instance.num_tasks, pop, generations, seed)
+                _brkga_reference_points_for_seed(
+                    instance.num_tasks, n_agvs, n_qcs, pop, generations, seed
+                )
             )
         return _pareto_front_float(points)
 
@@ -382,7 +424,8 @@ def _approximate_reference_front(
     with ProcessPoolExecutor(max_workers=workers) as executor:
         futures = {
             executor.submit(
-                _brkga_reference_points_for_seed, instance.num_tasks, pop, generations, seed
+                _brkga_reference_points_for_seed,
+                instance.num_tasks, n_agvs, n_qcs, pop, generations, seed,
             ): seed
             for seed in range(seeds)
         }
@@ -409,7 +452,9 @@ def run_benchmark(config: BenchmarkConfig | None = None) -> BenchmarkResult:
         # raises if Torch's interop pool already started; intra-op pinning is what matters
         torch.set_num_interop_threads(1)
 
-    instance = build_toy_instance(num_tasks=config.num_tasks)
+    instance = build_scaling_instance(
+        config.num_tasks, num_agvs=config.num_agvs, num_qcs=config.num_qcs
+    )
     pop_size = config.pop_size or 20 * instance.num_tasks
     generations = config.generations
 

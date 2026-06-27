@@ -5,7 +5,14 @@ from __future__ import annotations
 import pytest
 
 from ehgat.environment.distance import load_default_distance_matrix
-from ehgat.environment.instance import Instance, Task, TaskKind, build_toy_instance
+from ehgat.environment.instance import (
+    AVAILABLE_QCS,
+    Instance,
+    Task,
+    TaskKind,
+    build_toy_instance,
+    scaled_fleet,
+)
 
 
 def test_toy_instance_topology() -> None:
@@ -82,3 +89,34 @@ def test_rejects_nonpositive_handling_time() -> None:
     t = Task(task_id=0, qc="QC1", lu="LU1", kind=TaskKind.LOAD, handling_time=0.0)
     with pytest.raises(ValueError, match="handling_time"):
         Instance(tasks=(t,), qcs=("QC1",), num_agvs=1, agv_start="LU1", distance=dm)
+
+
+def test_scaled_fleet_is_monotone_and_bounded() -> None:
+    # AGVs grow with N (never below 2); QCs stay within the 3..6 available cranes.
+    prev_agvs = 0
+    for n in (5, 10, 20, 50, 100, 160, 200):
+        agvs, qcs = scaled_fleet(n)
+        assert agvs >= 2
+        assert agvs >= prev_agvs  # non-decreasing in N
+        assert 3 <= qcs <= len(AVAILABLE_QCS)
+        prev_agvs = agvs
+    # Small instances reproduce the historical (2 AGV, 3 QC) toy for comparability.
+    assert scaled_fleet(10) == (2, 3)
+    assert scaled_fleet(20) == (2, 3)
+
+
+def test_scaled_fleet_rejects_nonpositive() -> None:
+    with pytest.raises(ValueError, match="num_tasks"):
+        scaled_fleet(0)
+
+
+def test_large_scaled_instance_builds_and_validates() -> None:
+    # N=200 must build a valid instance: fleet from scaled_fleet, QCs within the matrix.
+    agvs, qcs = scaled_fleet(200)
+    inst = build_toy_instance(num_tasks=200, num_agvs=agvs, qcs=AVAILABLE_QCS[:qcs])
+    assert inst.num_tasks == 200
+    assert inst.num_agvs == agvs
+    assert len(inst.qcs) == qcs
+    # Every task references a QC that exists in the distance matrix (no validation error).
+    grouped = [t.task_id for qc in inst.qcs for t in inst.tasks_of_qc(qc)]
+    assert sorted(grouped) == list(range(200))

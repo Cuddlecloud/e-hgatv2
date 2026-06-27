@@ -307,7 +307,7 @@ def train_fused_batched(
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.head_parameters(), 5.0)
             opt.step()
-            epoch_loss += float(loss)
+            epoch_loss += loss.detach().item()
         sched.step()
 
         record = {"epoch": float(epoch), "train_loss": epoch_loss / max(len(train_groups), 1)}

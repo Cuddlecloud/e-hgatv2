@@ -32,12 +32,18 @@ from ehgat.utils.seeding import make_rng
 _MAX_LEG_POWER = max(spec.loaded_power for spec in SPEED_TABLE.values())
 
 __all__ = [
+    "AVAILABLE_QCS",
     "EXACT_TOY_TASKS",
     "Instance",
     "Task",
     "TaskKind",
     "build_toy_instance",
+    "scaled_fleet",
 ]
+
+# Quay cranes available in the packaged Table-4 distance matrix (QC1..QC6). A QC label
+# must be a node in the distance matrix, so the fleet can never use more than these.
+AVAILABLE_QCS: tuple[str, ...] = ("QC1", "QC2", "QC3", "QC4", "QC5", "QC6")
 
 # Task count for the canonical *exact* instance. Even with the smart speed Pareto DP
 # (which removes the 3^(2N) speed factor), the structure space grows ~ (N+1)!, so the
@@ -188,3 +194,26 @@ def build_toy_instance(
         distance=distance,
         peak_power=peak_power,
     )
+
+
+def scaled_fleet(num_tasks: int) -> tuple[int, int]:
+    """Deterministic ``(num_agvs, num_qcs)`` fleet sizing for an ``N``-task instance.
+
+    Container terminals run a *small, fixed* set of quay cranes but an AGV fleet that
+    grows with throughput, so the fleet here is a pure function of ``N``:
+
+    - ``num_agvs = max(2, round(N / 12))`` -- roughly one AGV per twelve container moves
+      (floor of 2 so even tiny instances dual-cycle).
+    - ``num_qcs  = clamp(round(N / 40), 3, 6)`` -- grows slowly from 3 to the 6 cranes
+      present in the packaged distance matrix (:data:`AVAILABLE_QCS`).
+
+    Being a pure function of ``N`` is essential: the search instance and its BRKGA
+    reference front are built in *separate* processes (see ``benchmark.runner``), and
+    they must be byte-for-byte the same instance. For ``N <= ~20`` this reproduces the
+    historical ``(2 AGVs, 3 QCs)`` toy, so small-N results stay comparable.
+    """
+    if num_tasks < 1:
+        raise ValueError(f"num_tasks must be >= 1, got {num_tasks}")
+    num_agvs = max(2, round(num_tasks / 12))
+    num_qcs = min(len(AVAILABLE_QCS), max(3, round(num_tasks / 40)))
+    return num_agvs, num_qcs

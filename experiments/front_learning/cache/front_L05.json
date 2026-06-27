@@ -1,0 +1,1182 @@
+[
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.0,
+    "transport_frac": 0.6666666666666666,
+    "qc_frac": 0.3333333333333333,
+    "per_task_critical": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      0.0
+    ],
+    "makespan": 267.0,
+    "energy": 7091.666666666666
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.006743295019157123,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 269.44444444444446,
+    "energy": 7066.666666666666
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.011494252873563114,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 271.16666666666663,
+    "energy": 7041.666666666666
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.018237547892720238,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 273.6111111111111,
+    "energy": 6991.666666666666
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.022988505747126384,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 275.3333333333333,
+    "energy": 6966.666666666666
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.02298850574712654,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 275.33333333333337,
+    "energy": 6941.666666666666
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.029731800766283508,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 277.77777777777777,
+    "energy": 6916.666666666666
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.034482758620689655,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 279.5,
+    "energy": 6891.666666666666
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.04122605363984678,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 281.94444444444446,
+    "energy": 6841.666666666666
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.04597701149425277,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 283.66666666666663,
+    "energy": 6816.666666666666
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.05272030651340989,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 286.1111111111111,
+    "energy": 6791.666666666666
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.05747126436781604,
+    "transport_frac": 0.6666666666666666,
+    "qc_frac": 0.3333333333333333,
+    "per_task_critical": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      0.0
+    ],
+    "makespan": 287.8333333333333,
+    "energy": 6766.666666666666
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.06421455938697317,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 290.27777777777777,
+    "energy": 6741.666666666666
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.06421455938697332,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 290.2777777777778,
+    "energy": 6716.666666666666
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.06896551724137931,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "makespan": 292.0,
+    "energy": 6691.666666666666
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.07570881226053644,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 294.44444444444446,
+    "energy": 6666.666666666666
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.08620689655172414,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "makespan": 298.25,
+    "energy": 6660.416666666666
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.08720306513409955,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 298.6111111111111,
+    "energy": 6635.416666666666
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.0910344827586207,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 300.0,
+    "energy": 6627.083333333334
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.10252873563218395,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 304.1666666666667,
+    "energy": 6602.083333333334
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.10344827586206896,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "makespan": 304.5,
+    "energy": 6589.583333333334
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.11402298850574723,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 308.33333333333337,
+    "energy": 6564.583333333334
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.1206896551724138,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "makespan": 310.75,
+    "energy": 6558.333333333334
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.13126436781609205,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 314.58333333333337,
+    "energy": 6552.083333333334
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.13793103448275862,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "makespan": 317.0,
+    "energy": 6539.583333333334
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.14850574712643688,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 320.83333333333337,
+    "energy": 6527.083333333334
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.15517241379310345,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "makespan": 323.25,
+    "energy": 6520.833333333334
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.16574712643678172,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 327.08333333333337,
+    "energy": 6514.583333333334
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.1724137931034483,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "makespan": 329.5,
+    "energy": 6508.333333333334
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.18298850574712655,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 333.33333333333337,
+    "energy": 6489.583333333334
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.1896551724137931,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "makespan": 335.75,
+    "energy": 6483.333333333334
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.20022988505747136,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 339.58333333333337,
+    "energy": 6477.083333333334
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.20689655172413793,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "makespan": 342.0,
+    "energy": 6470.833333333334
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.2174712643678162,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 345.83333333333337,
+    "energy": 6458.333333333334
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.22413793103448276,
+    "transport_frac": 0.8571428571428571,
+    "qc_frac": 0.14285714285714285,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "makespan": 348.25,
+    "energy": 6452.083333333334
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.7203065134099617,
+    "transport_frac": 0.9230769230769231,
+    "qc_frac": 0.07692307692307693,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 528.1111111111111,
+    "energy": 6450.0
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.7241379310344828,
+    "transport_frac": 0.9230769230769231,
+    "qc_frac": 0.07692307692307693,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 529.5,
+    "energy": 6441.666666666666
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.7356321839080462,
+    "transport_frac": 0.9230769230769231,
+    "qc_frac": 0.07692307692307693,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 533.6666666666667,
+    "energy": 6416.666666666667
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.752873563218391,
+    "transport_frac": 0.9230769230769231,
+    "qc_frac": 0.07692307692307693,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 539.9166666666667,
+    "energy": 6410.416666666667
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.7586206896551724,
+    "transport_frac": 0.9230769230769231,
+    "qc_frac": 0.07692307692307693,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 542.0,
+    "energy": 6408.333333333334
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.7701149425287358,
+    "transport_frac": 0.9230769230769231,
+    "qc_frac": 0.07692307692307693,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 546.1666666666667,
+    "energy": 6397.916666666667
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.7873563218390807,
+    "transport_frac": 0.9230769230769231,
+    "qc_frac": 0.07692307692307693,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 552.4166666666667,
+    "energy": 6391.666666666667
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.7931034482758621,
+    "transport_frac": 0.9230769230769231,
+    "qc_frac": 0.07692307692307693,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 554.5,
+    "energy": 6389.583333333334
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.8045977011494255,
+    "transport_frac": 0.9230769230769231,
+    "qc_frac": 0.07692307692307693,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 558.6666666666667,
+    "energy": 6379.166666666667
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.8218390804597703,
+    "transport_frac": 0.9230769230769231,
+    "qc_frac": 0.07692307692307693,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 564.9166666666667,
+    "energy": 6372.916666666667
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.8275862068965517,
+    "transport_frac": 0.9230769230769231,
+    "qc_frac": 0.07692307692307693,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 567.0,
+    "energy": 6370.833333333334
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.8390804597701151,
+    "transport_frac": 0.9230769230769231,
+    "qc_frac": 0.07692307692307693,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 571.1666666666667,
+    "energy": 6360.416666666667
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.85632183908046,
+    "transport_frac": 0.9230769230769231,
+    "qc_frac": 0.07692307692307693,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 577.4166666666667,
+    "energy": 6354.166666666667
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.8620689655172413,
+    "transport_frac": 0.9230769230769231,
+    "qc_frac": 0.07692307692307693,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 579.5,
+    "energy": 6352.083333333334
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.8735632183908048,
+    "transport_frac": 0.9230769230769231,
+    "qc_frac": 0.07692307692307693,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 583.6666666666667,
+    "energy": 6341.666666666667
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.8908045977011496,
+    "transport_frac": 0.9230769230769231,
+    "qc_frac": 0.07692307692307693,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 589.9166666666667,
+    "energy": 6335.416666666667
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.896551724137931,
+    "transport_frac": 0.9230769230769231,
+    "qc_frac": 0.07692307692307693,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 592.0,
+    "energy": 6333.333333333334
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.9080459770114945,
+    "transport_frac": 0.9230769230769231,
+    "qc_frac": 0.07692307692307693,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 596.1666666666667,
+    "energy": 6322.916666666667
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.9252873563218393,
+    "transport_frac": 0.9230769230769231,
+    "qc_frac": 0.07692307692307693,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 602.4166666666667,
+    "energy": 6316.666666666667
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.9310344827586207,
+    "transport_frac": 0.9230769230769231,
+    "qc_frac": 0.07692307692307693,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 604.5,
+    "energy": 6314.583333333334
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.9425287356321841,
+    "transport_frac": 0.9230769230769231,
+    "qc_frac": 0.07692307692307693,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 608.6666666666667,
+    "energy": 6304.166666666667
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.959770114942529,
+    "transport_frac": 0.9230769230769231,
+    "qc_frac": 0.07692307692307693,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 614.9166666666667,
+    "energy": 6297.916666666667
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 0.9655172413793104,
+    "transport_frac": 0.9230769230769231,
+    "qc_frac": 0.07692307692307693,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 617.0,
+    "energy": 6295.833333333334
+  },
+  {
+    "instance_id": "L05",
+    "num_tasks": 6,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 55.666666666666664,
+    "lam": 1.0,
+    "transport_frac": 0.9230769230769231,
+    "qc_frac": 0.07692307692307693,
+    "per_task_critical": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 629.5,
+    "energy": 6283.333333333334
+  }
+]

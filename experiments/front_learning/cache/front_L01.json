@@ -1,0 +1,614 @@
+[
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.0,
+    "transport_frac": 0.8,
+    "qc_frac": 0.2,
+    "per_task_critical": [
+      0.0,
+      1.0,
+      1.0,
+      0.0
+    ],
+    "makespan": 175.0,
+    "energy": 4491.666666666667
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.027520759193357103,
+    "transport_frac": 0.8,
+    "qc_frac": 0.2,
+    "per_task_critical": [
+      0.0,
+      1.0,
+      1.0,
+      0.0
+    ],
+    "makespan": 178.22222222222223,
+    "energy": 4466.666666666667
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.047449584816132734,
+    "transport_frac": 0.8,
+    "qc_frac": 0.2,
+    "per_task_critical": [
+      0.0,
+      1.0,
+      1.0,
+      0.0
+    ],
+    "makespan": 180.55555555555554,
+    "energy": 4433.333333333333
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.06310794780545666,
+    "transport_frac": 0.8,
+    "qc_frac": 0.2,
+    "per_task_critical": [
+      1.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "makespan": 182.38888888888889,
+    "energy": 4383.333333333333
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.07117437722419935,
+    "transport_frac": 0.8,
+    "qc_frac": 0.2,
+    "per_task_critical": [
+      0.0,
+      1.0,
+      1.0,
+      0.0
+    ],
+    "makespan": 183.33333333333334,
+    "energy": 4341.666666666667
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.08683274021352302,
+    "transport_frac": 0.8,
+    "qc_frac": 0.2,
+    "per_task_critical": [
+      1.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "makespan": 185.16666666666666,
+    "energy": 4316.666666666667
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.09489916963226572,
+    "transport_frac": 0.8,
+    "qc_frac": 0.2,
+    "per_task_critical": [
+      0.0,
+      1.0,
+      1.0,
+      0.0
+    ],
+    "makespan": 186.11111111111111,
+    "energy": 4291.666666666667
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.11862396204033208,
+    "transport_frac": 0.8,
+    "qc_frac": 0.2,
+    "per_task_critical": [
+      0.0,
+      1.0,
+      1.0,
+      0.0
+    ],
+    "makespan": 188.88888888888889,
+    "energy": 4283.333333333333
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.12241992882562257,
+    "transport_frac": 0.8,
+    "qc_frac": 0.2,
+    "per_task_critical": [
+      1.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "makespan": 189.33333333333331,
+    "energy": 4258.333333333333
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.14234875444839845,
+    "transport_frac": 0.8,
+    "qc_frac": 0.2,
+    "per_task_critical": [
+      0.0,
+      1.0,
+      1.0,
+      0.0
+    ],
+    "makespan": 191.66666666666666,
+    "energy": 4233.333333333333
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.15800711743772236,
+    "transport_frac": 0.8,
+    "qc_frac": 0.2,
+    "per_task_critical": [
+      1.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "makespan": 193.5,
+    "energy": 4183.333333333333
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.16607354685646505,
+    "transport_frac": 0.8,
+    "qc_frac": 0.2,
+    "per_task_critical": [
+      0.0,
+      1.0,
+      1.0,
+      0.0
+    ],
+    "makespan": 194.44444444444446,
+    "energy": 4141.666666666667
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.19359430604982217,
+    "transport_frac": 0.8,
+    "qc_frac": 0.2,
+    "per_task_critical": [
+      1.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "makespan": 197.66666666666669,
+    "energy": 4116.666666666667
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.2135231316725978,
+    "transport_frac": 0.8,
+    "qc_frac": 0.2,
+    "per_task_critical": [
+      0.0,
+      1.0,
+      1.0,
+      0.0
+    ],
+    "makespan": 200.0,
+    "energy": 4083.3333333333335
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.2469750889679716,
+    "transport_frac": 0.8,
+    "qc_frac": 0.2,
+    "per_task_critical": [
+      1.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "makespan": 203.91666666666669,
+    "energy": 4077.0833333333335
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.2846975088967971,
+    "transport_frac": 0.8,
+    "qc_frac": 0.2,
+    "per_task_critical": [
+      0.0,
+      1.0,
+      0.0,
+      1.0
+    ],
+    "makespan": 208.33333333333334,
+    "energy": 4068.75
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.30035587188612106,
+    "transport_frac": 0.8,
+    "qc_frac": 0.2,
+    "per_task_critical": [
+      1.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "makespan": 210.16666666666669,
+    "energy": 4056.25
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.3202846975088967,
+    "transport_frac": 0.8,
+    "qc_frac": 0.2,
+    "per_task_critical": [
+      0.0,
+      1.0,
+      1.0,
+      0.0
+    ],
+    "makespan": 212.5,
+    "energy": 4045.8333333333335
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.3359430604982206,
+    "transport_frac": 0.8,
+    "qc_frac": 0.2,
+    "per_task_critical": [
+      1.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "makespan": 214.33333333333334,
+    "energy": 4039.5833333333335
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.35587188612099646,
+    "transport_frac": 0.8,
+    "qc_frac": 0.2,
+    "per_task_critical": [
+      1.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "makespan": 216.66666666666669,
+    "energy": 4033.3333333333335
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.38932384341637005,
+    "transport_frac": 0.8,
+    "qc_frac": 0.2,
+    "per_task_critical": [
+      1.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "makespan": 220.58333333333334,
+    "energy": 4027.0833333333335
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.4270462633451956,
+    "transport_frac": 0.8,
+    "qc_frac": 0.2,
+    "per_task_critical": [
+      0.0,
+      1.0,
+      1.0,
+      0.0
+    ],
+    "makespan": 225.0,
+    "energy": 4018.75
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.4427046263345195,
+    "transport_frac": 0.8,
+    "qc_frac": 0.2,
+    "per_task_critical": [
+      1.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "makespan": 226.83333333333334,
+    "energy": 4006.25
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.4626334519572954,
+    "transport_frac": 0.8,
+    "qc_frac": 0.2,
+    "per_task_critical": [
+      0.0,
+      1.0,
+      1.0,
+      0.0
+    ],
+    "makespan": 229.16666666666669,
+    "energy": 3995.8333333333335
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.496085409252669,
+    "transport_frac": 0.8,
+    "qc_frac": 0.2,
+    "per_task_critical": [
+      1.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "makespan": 233.08333333333334,
+    "energy": 3989.5833333333335
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.5338078291814945,
+    "transport_frac": 0.8,
+    "qc_frac": 0.2,
+    "per_task_critical": [
+      0.0,
+      1.0,
+      1.0,
+      0.0
+    ],
+    "makespan": 237.5,
+    "energy": 3981.25
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.697508896797153,
+    "transport_frac": 0.6666666666666666,
+    "qc_frac": 0.3333333333333333,
+    "per_task_critical": [
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 256.6666666666667,
+    "energy": 3975.0
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.7508896797153024,
+    "transport_frac": 0.6666666666666666,
+    "qc_frac": 0.3333333333333333,
+    "per_task_critical": [
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 262.9166666666667,
+    "energy": 3968.75
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.7629893238434164,
+    "transport_frac": 0.6666666666666666,
+    "qc_frac": 0.3333333333333333,
+    "per_task_critical": [
+      0.0,
+      1.0,
+      0.0,
+      1.0
+    ],
+    "makespan": 264.33333333333337,
+    "energy": 3950.0
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.8163701067615659,
+    "transport_frac": 0.6666666666666666,
+    "qc_frac": 0.3333333333333333,
+    "per_task_critical": [
+      0.0,
+      1.0,
+      0.0,
+      1.0
+    ],
+    "makespan": 270.58333333333337,
+    "energy": 3943.75
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.8398576512455517,
+    "transport_frac": 0.6666666666666666,
+    "qc_frac": 0.3333333333333333,
+    "per_task_critical": [
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 273.33333333333337,
+    "energy": 3925.0
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.8932384341637011,
+    "transport_frac": 0.6666666666666666,
+    "qc_frac": 0.3333333333333333,
+    "per_task_critical": [
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 279.58333333333337,
+    "energy": 3918.75
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 0.9466192170818506,
+    "transport_frac": 0.6666666666666666,
+    "qc_frac": 0.3333333333333333,
+    "per_task_critical": [
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 285.83333333333337,
+    "energy": 3906.25
+  },
+  {
+    "instance_id": "L01",
+    "num_tasks": 4,
+    "num_agvs": 2,
+    "num_qcs": 2,
+    "mean_handling": 60.25,
+    "lam": 1.0,
+    "transport_frac": 0.6666666666666666,
+    "qc_frac": 0.3333333333333333,
+    "per_task_critical": [
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "makespan": 292.08333333333337,
+    "energy": 3900.0
+  }
+]

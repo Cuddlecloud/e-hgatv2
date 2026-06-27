@@ -278,7 +278,7 @@ def train_fused(
             batch_loss = batch_loss / max(len(chunk), 1)
             batch_loss.backward()
             optimizer.step()
-            epoch_loss += float(batch_loss) * len(chunk)
+            epoch_loss += batch_loss.detach().item() * len(chunk)
         scheduler.step()
 
         record = {

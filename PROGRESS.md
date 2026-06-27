@@ -1,117 +1,123 @@
-# Project Progress — E-HGATv2 NeurIPS Workshop Paper
+# Project Progress & Forward Plan — E-HGATv2 Paper
 
-**Last updated:** 2026-06-26
-
----
-
-## COMPLETED
-
-### R2: Landscape Analysis (Feature Importance / Variable-Objective Relationships)
-- [x] `scripts/run_critical_path_demo.py` — full worked-example script with AGV assignments, speeds, distances, QC IDs
-- [x] Uncoupled runs: SD-5, SD-8, SD-10, L07 — all Jaccard = 1.000 (8/8 traversals)
-- [x] Paper section written with real data: per-task speed levels, distances (m), AGV dispatch order, QC workload decomposition
-- [x] Three input variables explicitly covered:
-  - AGV travelling speed → C_max sensitivity (Eq. speed_sens, with real HIGHER/NOMINAL/LOWER values)
-  - Crane workload → per-crane binding time table (QC1: 116s, QC2: 75s, QC3: 70s)
-  - Task dispatch order → precedence chain formation (AGV-0: ⟨0,5,4,8,1,7⟩)
-- [x] Explains why solutions are Pareto-optimal (speed trade-off: 2.4 vs 3.6 m/s → energy vs makespan)
-- [x] Coupled regime paragraph referencing fidelity table (Jaccard 0.91–0.93)
-- [x] v2 data in `experiments/critical_path_demo/critpath_*_v2.json`
-
-### R3: Optimization (Feedback Algorithm / Guidance)
-- [x] TAPE-guided NSGA-II implementation (`src/ehgat/search/tape_guidance.py`)
-- [x] Benchmark on 11 uncoupled instances — TAPE beats mp-BRKGA on all (Friedman p=8e-6)
-- [x] Statistical analysis: Wilcoxon, Holm correction, Cliff's delta, bootstrap CIs
-- [x] Paper section with HV/IGD+/GD+/Spread results
-- [x] Convergence and scaling figures (pgfplots)
-
-### Fidelity Study (20 seeds)
-- [x] Uncoupled: R²=0.997–0.998, Jaccard=0.980–0.991 (N=6–50)
-- [x] Coupled: R²=0.777–0.805, Jaccard=0.913–0.928 (N=10–50)
-- [x] Results in paper Table `tab:fidelity` and Figure `fig:fidelity`
-
-### Paper (`paper/main.tex`)
-- [x] Full methodology: graph representation, E-HGATv2, fused architecture, TAPE, guidance algorithm
-- [x] Computational notations (ReLU, softmax, readout, GATv2 equations)
-- [x] XGBoost/TreeSHAP contrast section
-- [x] All figures as inline pgfplots/TikZ (no external PDFs needed)
-- [x] Statistical protocol section (Friedman, Nemenyi, Wilcoxon, bootstrap CIs)
-- [x] PTS (Pareto Tension Score) section for R4 post-hoc analysis
-
-### Infrastructure
-- [x] VM setup (vast.ai, SSH port 22666)
-- [x] All experiments reproducible from scripts
-- [x] Unit tests passing locally
+**Last updated:** 2026-06-27
+**Purpose:** Authoritative tracker of what is *established by benchmarks*, what is *ambiguous / needs more runs*, what is *open*, and the prioritized plan to advance rigorously.
 
 ---
 
-## IN PROGRESS
+## 1. SOLID — established by benchmarks, in the paper
 
-### Coupled R2 Demo (v2, unroll=4)
-- Running on VM: `--unroll 4 --fused-samples 2000 --fused-epochs 100`
-- Goal: improve makespan-optimal Jaccard from 0.111 to ~0.9
-- First attempt (unroll=2, 1000 samples) got 0.111/1.000 (makespan/energy extremes)
-
----
-
-## TODO
-
-### R4: Pareto Front Behaviour Learning (HIGH PRIORITY)
-**Advisor requirement:** "extract this knowledge in a way the surrogate model learns the Pareto Front behaviour"
-
-**What this means:** Train a model that can *predict* how the critical path (bottleneck structure) shifts across the Pareto front for a *new* instance, without running NSGA-II from scratch. Amortization/generalization benefit.
-
-**Proposed approach:** Front-conditioned fine-tuning with auxiliary head:
-1. For each training instance, run NSGA-II → get Pareto set
-2. For each Pareto solution, compute TAPE → get critical-path structure
-3. Train an auxiliary head: given (instance, λ-weight), predict the critical-set composition
-4. Evaluate on held-out instances: can the model predict which variables bind at different front positions without search?
-
-**Status:** Architecture designed, NOT implemented. Needs:
-- [ ] Implement auxiliary head in `src/ehgat/surrogate/`
-- [ ] Training script (`scripts/run_front_learning.py`)
-- [ ] Run on multiple instances (train on SD-5/8/10, test on L07 or vice versa)
-- [ ] Evaluation metrics (e.g., predicted vs actual QC% on critical path at λ=0 vs λ=1)
-- [ ] Paper section with results
-
-### Coupled Optimization Comparison (R3 extension)
-- [ ] Run TAPE-guided NSGA-II on coupled instances (peak-power 30)
-- [ ] Compare against mp-BRKGA on same coupled instances
-- [ ] Report HV/IGD+ — demonstrates GNN is useful for *optimization* (not just explanation) in coupled regime
-- [ ] Add results to paper
-
-### Seed Sweep (statistical robustness)
-- [ ] 30 seeds for scaling + tape_guided benchmarks
-- [ ] 20 seeds for fused_eval
-- [ ] Update paper confidence intervals
-
-### Paper Finishing
-- [ ] Add coupled R2 v2 results (when run completes) 
-- [ ] Add R4 results section
-- [ ] Add coupled optimization section
-- [ ] Final proofreading and table overflow checks
-- [ ] Compile and verify all figures render
+| Result | Evidence | Status |
+|---|---|---|
+| **R2 uncoupled** — variable→objective attribution (AGV speed, crane workload, dispatch order) | `critpath_*_v2.json`: 4 instances (SD-5/8/10, L07), all 8 traversals Jaccard = **1.000**; real speeds/distances/QC IDs in paper | ✅ Solid |
+| **TAPE faithfulness (uncoupled)** | `tape_bench_*_unc.json`: leg-Jaccard 0.95–0.98, makespan abs err 11s (toy10) | ✅ Solid |
+| **Fidelity study (uncoupled)** | `fused_eval_unc_*`: R²=0.997–0.998, Jaccard=0.98–0.99, 20 seeds, N=6–50 | ✅ Solid |
+| **Attention ≠ explanation** | Spearman ρ ≈ 0 (−0.09 to +0.09) across coupled/uncoupled; TAPE ρ high | ✅ Solid, well-supported |
+| **R3 optimization vs weak baselines** | `paper_stats.json`: TAPE beats mp-BRKGA, single-pop BRKGA, NSGA-II(random) on HV; Friedman p=8e-6, Holm-corrected | ✅ Solid *vs those baselines* |
 
 ---
 
-## Data Locations
+## 2. AMBIGUOUS / WEAK — claims NOT yet established, need more runs or reframing
 
+### 2.1 ⚠️ R3 headline is statistically weak vs the attention variant
+- **Finding:** On HV ratio, `E-HGATv2-TAPE` avg rank = **1.91**, but `E-HGATv2-attn` = **1.45** (attention ranks *better*). TAPE-vs-attn Wilcoxon **p = 0.067 (NOT significant)**, Cliff's δ = −0.21 (small).
+- **Implication:** We cannot currently claim "TAPE guidance optimizes better than attention guidance." The defensible claim is narrower: *both GNN-guided variants beat classical baselines; TAPE adds faithful explanation at no optimization cost.*
+- **Options:** (a) reframe the claim honestly (recommended, cheap); (b) raise seeds 5→20+ to test if separation emerges; (c) add IGD+/GD+/spread as the primary lens if TAPE wins there. **Decision needed.**
+
+### 2.2 ⚠️ Coupled makespan-extreme critical-path recovery is broken
+- **Finding:** `critpath_coupled_toy10_v2.json` makespan-optimal Jaccard = **0.111** (energy-optimal = 1.000). The v2 rerun (unroll=4, 2000 samples) produced **identical** R² (0.898) and Jaccard — **the "fix" did nothing.**
+- **Context:** Front-*averaged* coupled fidelity is fine (leg-Jaccard 0.95 toy10 / 0.87 toy20). The failure is specifically at the **makespan extreme**, where all AGVs run at max speed → maximum power contention → hardest DP point.
+- **Options:** (a) honestly scope as a stated limitation + report front-averaged Jaccard, not the extreme (recommended baseline); (b) investigate root cause — is it sampling (few training schedules near the makespan extreme), unroll depth, or a genuine surrogate-accuracy ceiling? (c) try targeted sampling weighted toward high-speed schedules. **Decision needed: explain-and-scope vs invest in a fix.**
+
+### 2.3 ⚠️ R4 (front-behaviour learning) does NOT generalize
+- **Finding:** `front_learning_results.json` — train corr **0.93**, test corr **−0.49** (transport) / **−0.50** (qc); test MAE 0.126 (4× train).
+- **Confirmed root cause:** all 3 training instances have **num_qcs = 3**; test L07 has **num_qcs = 2**. The predictor never saw a 2-crane structure and its instance-feature encoding can't extrapolate across QC count. Front statistics are similar (train transport 0.80 vs test 0.84), so the *labels* are learnable — the *features* are too few/non-generalizing.
+- **This is the single biggest open scientific gap.** R4 is the advisor's core "search→knowledge" loop and currently fails its one generalization test.
+
+### 2.4 ⚠️ Uneven seed counts undercut rigor
+- Optimization benchmarks (`tape_bench_*`, `paper_stats`): **5 seeds**.
+- Fidelity study: **20 seeds**.
+- Coupled optimization coverage: only **toy:10, toy:20** (2 instances, 5 seeds each).
+- Mismatch invites reviewer pushback. Optimization claims rest on the thinnest sampling.
+
+---
+
+## 3. OPEN PROBLEMS — ranked by value × tractability
+
+| # | Problem | Value | Effort | Recommendation |
+|---|---|---|---|---|
+| **P1** | R4 generalization (§2.3) | **Highest** — core contribution | Medium | **Fix via diverse training set** (infra already written) |
+| **P2** | R3 claim weak vs attn (§2.1) | High — headline integrity | Low | **Reframe + more seeds** |
+| **P3** | Coupled makespan extreme (§2.2) | Medium — honesty/robustness | Low–Med | **Scope as limitation; optional root-cause probe** |
+| **P4** | Seed sweep (§2.4) | Medium — reviewer-proofing | Low (compute) | **20+ seeds where it matters** |
+| **P5** | Commit fleet-scaling work | Plumbing for P1 | Trivial | **Verify tests, commit** |
+
+---
+
+## 4. FORWARD PLAN
+
+### Phase A — Land the in-flight infrastructure (prereq for P1)
+The uncommitted changes (`scripts/run_benchmark.py`, `benchmark/runner.py`, `environment/instance.py`, `tests/unit/test_instance.py`) add `scaled_fleet(N)`, `build_scaling_instance(...)`, and configurable `--agvs/--qcs`. This is exactly the lever P1 needs (vary QC/AGV counts).
+- [ ] Run `pytest tests/unit/test_instance.py` and full unit suite — confirm green.
+- [ ] Sanity-check `scaled_fleet` policy (AGVs/QCs per N) and `AVAILABLE_QCS` bound (≤ cranes in distance matrix).
+- [ ] Commit on a branch.
+
+### Phase B — Fix R4 generalization (P1) — the main scientific work
+**Hypothesis:** R4 failed because of zero structural diversity in training (all qc=3). A training set spanning QC counts {2,3,…}, AGV counts, and N should let the predictor learn the *structural* mapping, not memorize 3-crane fronts.
+- [ ] Build a diverse instance set with `build_scaling_instance` — vary N, num_qcs ∈ {2,3,4,…}, num_agvs.
+- [ ] Regenerate `front_data.json`: NSGA-II front + per-solution TAPE composition per instance.
+- [ ] **Leave-one-structure-out evaluation** — hold out a QC count entirely, test generalization to unseen structure (the honest test).
+- [ ] Possibly enrich instance features (currently num_tasks/agvs/qcs/handling stats) — but first see if diversity alone fixes corr.
+- [ ] **Success criterion:** held-out corr ≳ 0.7 and MAE ≲ 0.08. If it still fails, that is itself a publishable finding (front structure is instance-specific; amortization has limits) — report honestly.
+- [ ] Write R4 results section with the leave-one-out table.
+
+### Phase C — Repair the R3 narrative (P2)
+- [ ] Rewrite the optimization claim to what the data supports: GNN-guided (both TAPE & attn) > classical baselines; TAPE matches attn on HV **and** adds faithful, exact explanation (the differentiator).
+- [ ] Raise optimization seeds 5→20 on at least the core instances; re-run `compute_paper_stats.py`; check whether TAPE/attn separation emerges on any metric.
+
+### Phase D — Coupled honesty pass (P3)
+- [ ] In the paper, report coupled **front-averaged** Jaccard (0.95/0.87) as the headline; explicitly state the makespan-extreme degradation (0.11) as a scoped limitation with the power-contention mechanism.
+- [ ] *Optional probe:* diagnose whether targeted high-speed-schedule sampling lifts the extreme. Time-box it; do not block the paper.
+
+### Phase E — Seed sweep & finishing (P4)
+- [ ] 20+ seeds on scaling + tape_guided; refresh CIs.
+- [ ] Recompile paper, verify all pgfplots/TikZ render, table-overflow check.
+- [ ] Final proofread.
+
+---
+
+## 5. DECISIONS NEEDED FROM USER (before/while executing)
+1. **R3 reframe (§2.1):** accept the honest narrower claim, or invest seeds to chase TAPE>attn significance?
+2. **Coupled extreme (§2.2):** scope as a limitation (fast), or invest in a root-cause fix attempt?
+3. **R4 scope (§2.3/Phase B):** is "leave-one-QC-count-out generalization" the right bar, or a different held-out axis (N? handling-time regime?)?
+4. **Compute budget / VM:** VM is ephemeral — Phase B regeneration + Phase C/E seed sweeps are the compute-heavy steps; sequence them before VM teardown and rsync+commit all artifacts.
+
+---
+
+## 6. DATA LOCATIONS
 | Artifact | Path |
 |---|---|
-| R2 uncoupled results (v2) | `experiments/critical_path_demo/critpath_*_v2.json` |
-| R2 coupled results | `experiments/critical_path_demo/critpath_coupled_toy10.json` |
-| R3 benchmark results | `experiments/fused_tape_guided/` |
-| Fidelity study (coupled) | `experiments/fused_eval/fused_eval_coupled_pp30_gnn_predicts_legs.json` |
-| Fidelity study (uncoupled) | `experiments/fused_eval/fused_eval_unc_c3_gnn_predicts_legs.json` |
-| PTS frontier results | `experiments/fused_tape_guided/pts_frontier_*.json` |
-| Paper stats | `experiments/fused_tape_guided/paper_stats.json` |
+| R2 worked examples (v2) | `experiments/critical_path_demo/critpath_*_v2.json` |
+| R2 coupled (v1+v2, extreme=0.111) | `experiments/critical_path_demo/critpath_coupled_toy10*.json` |
+| R4 front-learning (FAILS generalization) | `experiments/front_learning/front_learning_results.json`, `front_data.json` |
+| Optimization benchmark + stats | `experiments/fused_tape_guided/tape_bench_*.json`, `paper_stats.json` |
+| Coupled optimization (toy10/20, 5 seeds) | `experiments/fused_tape_guided/tape_bench_toy{10,20}_pp30.json` |
+| Fidelity (coupled 20 seeds) | `experiments/fused_eval/fused_eval_coupled_pp30_gnn_predicts_legs.json` |
+| Fidelity (uncoupled 20 seeds) | `experiments/fused_eval/fused_eval_unc_c3_gnn_predicts_legs.json` |
+| PTS frontier | `experiments/fused_tape_guided/pts_frontier_*.json` |
 | Paper source | `paper/main.tex` |
+| R4 script | `scripts/run_front_learning.py` |
+| Fleet-scaling infra (uncommitted) | `src/ehgat/benchmark/runner.py` (`build_scaling_instance`, `scaled_fleet`) |
 
 ---
 
-## VM Info
+## 7. VM
 ```
-ssh -p 22666 root@154.42.3.37 -L 8080:localhost:8080
-Repo: /workspace/e-hgatv2
-Venv: /workspace/venv
+ssh -p 24520 root@154.42.3.37 -L 8080:localhost:8080   # alias: ehvm
+Repo: /workspace/e-hgatv2   Env: uv-managed .venv (torch 2.12.1+cu130)
+Hardware: 255 cores, 2× A40 (49 GB). Python 3.12.
 ```
+⚠️ Ephemeral — rsync results to local and commit before teardown.
+**Parallelism:** fan independent per-instance jobs across cores with `xargs -P`
+(`scripts/run_front_parallel.sh`). GPU does NOT help the front-learning pipeline —
+it is CPU-bound on simulator sample generation, not GNN gradient steps.

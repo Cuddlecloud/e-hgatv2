@@ -145,7 +145,7 @@ def train_surrogate(
             loss = loss_fn(pred, _normalise_targets(model, batch.y))
             loss.backward()
             optimizer.step()
-            epoch_loss += float(loss) * batch.num_graphs
+            epoch_loss += loss.detach().item() * batch.num_graphs
         epoch_loss /= max(len(train_graphs), 1)
 
         record = {"epoch": float(epoch), "train_mse": epoch_loss}
