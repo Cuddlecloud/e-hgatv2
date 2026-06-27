@@ -1,0 +1,4 @@
+[L15] N=16 screening K=2 | training core+fused ...
+  attn+screen   : HV/HV* = 0.9437
+  rand+screen   : HV/HV* = 0.9356
+  rand+noscreen : HV/HV* = 0.8903

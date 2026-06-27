@@ -1,0 +1,7 @@
+[toy:5] N=5 screening K=2 | training core+fused ...
+  attn+screen   : HV/HV* = 0.9859
+  rand+screen   : HV/HV* = 0.9925
+  rand+noscreen : HV/HV* = 0.9876
+  tape+screen   : HV/HV* = 0.9868
+  attention-targeting effect (attn+screen - rand+screen) = -0.0067 (95% CI -0.0067 +/- 0.0228)
+  screening effect (rand+screen - rand+noscreen) = +0.0049

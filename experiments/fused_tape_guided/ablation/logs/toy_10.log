@@ -1,0 +1,4 @@
+[toy:10] N=10 screening K=2 | training core+fused ...
+  attn+screen   : HV/HV* = 0.9680
+  rand+screen   : HV/HV* = 1.0006
+  rand+noscreen : HV/HV* = 0.9146

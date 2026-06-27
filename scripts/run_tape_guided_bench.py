@@ -96,6 +96,12 @@ def main() -> None:
     p.add_argument("--instance", default="toy:10", help="'toy:N' or an L-id like 'L15'")
     p.add_argument("--peak-power", type=float, default=None, help="kW budget => coupled regime")
     p.add_argument("--seeds", type=int, default=5)
+    p.add_argument("--seed-start", type=int, default=0,
+                   help="first seed index (for sharding seeds across parallel processes)")
+    p.add_argument("--out-tag", default=None,
+                   help="override output filename tag (default derived from instance)")
+    p.add_argument("--out-dir", default=None,
+                   help="override output directory (e.g. a shards/ subdir)")
     p.add_argument("--gens", type=int, default=60)
     p.add_argument("--ref-gens", type=int, default=200, help="generations for the PF* proxy runs")
     p.add_argument("--screening", type=int, default=4, help="surrogate screening factor for GAT arms")
@@ -133,7 +139,8 @@ def main() -> None:
     base_pop = args.p_mult * n   # mp per-population size P (paper: 20*N)
     matched_pop = 4 * base_pop   # GAT/BRKGA pop so exact-evals/gen match mp (Omega+Pi=4)
     G = args.gens
-    tag = label.replace(":", "") + ("_pp%g" % args.peak_power if coupled else "_unc")
+    tag = args.out_tag or (label.replace(":", "") + ("_pp%g" % args.peak_power if coupled else "_unc"))
+    out_dir = Path(args.out_dir) if args.out_dir else OUT_DIR
 
     print(f"instance={label} N={n} coupled={coupled} | mp P={base_pop}x4, GAT/BRKGA pop={matched_pop} "
           f"| gens={G} | matched evals/gen={matched_pop}", flush=True)
@@ -208,7 +215,7 @@ def main() -> None:
         for m in methods}
     t0 = time.perf_counter()
     for name, fn in methods.items():
-        for seed in range(args.seeds):
+        for seed in range(args.seed_start, args.seed_start + args.seeds):
             front, evals = fn(seed)
             raw[name]["gd_plus"].append(gd_plus(front, reference))
             raw[name]["igd_plus"].append(igd_plus(front, reference))
@@ -238,8 +245,8 @@ def main() -> None:
                ("igd_plus", "IGD+", 4), ("spread", "Spread", 4), ("evals", "true evals", 0)]
     agg = {m: {k: _ci(raw[m][k]) for k, *_ in metrics} for m in methods}
 
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
-    (OUT_DIR / f"tape_bench_{tag}.json").write_text(json.dumps(
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / f"tape_bench_{tag}.json").write_text(json.dumps(
         {"instance": label, "n": n, "coupled": coupled, "peak_power": args.peak_power,
          "gens": G, "seeds": args.seeds, "p_mult": args.p_mult, "base_pop": base_pop,
          "matched_pop": matched_pop, "screening": args.screening,
@@ -268,7 +275,7 @@ def main() -> None:
            f"\n_TAPE makespan abs-error vs oracle: {tape_cmax_err:.3f}. "
            f"A faithful signal that also tops the optimisation table is the unified Req 2+3 claim._\n"]
     md_text = "\n".join(md) + "\n"
-    (OUT_DIR / f"tape_bench_{tag}.md").write_text(md_text)
+    (out_dir / f"tape_bench_{tag}.md").write_text(md_text)
     print("\n" + md_text, flush=True)
     print(f"wrote experiments/fused_tape_guided/tape_bench_{tag}.* "
           f"(total {time.perf_counter() - t0:.0f}s)", flush=True)

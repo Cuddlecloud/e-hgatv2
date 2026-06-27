@@ -786,12 +786,13 @@ TAPE recovers the exact critical path with leg-critical Jaccard $0.95$--$1.00$ i
 uncoupled regime and $0.87$--$0.95$ under coupling. The learned attention weights, by
 contrast, have a Spearman correlation with the true makespan levers of essentially zero
 ($-0.09\le\rho\le0.17$ across all instances)---they do \emph{not} rank the bottlenecks.
-Attention's precision@1 ($0.67$--$0.80$) looks superficially acceptable only because, with
-few tasks, naming any one of a handful of critical tasks is likely by chance (the random
-baseline is $\approx 0.05$--$0.10$); the near-zero rank correlation exposes that the full
-ranking is noise. This is a clean, quantified instance of the ``attention is not
-explanation'' phenomenon~\cite{jain2019attention} on a real scheduling problem, and it is
-the justification for routing guidance through TAPE rather than attention.
+Attention's precision@1 ($0.67$--$0.80$) looks superficially acceptable only because most
+tasks are on the critical path (the honest baseline is the critical fraction $\approx0.70$,
+not $1/N$): against that baseline, naming an on-path task is no better than chance, and the
+near-zero rank correlation exposes that the full ranking is noise. Section~\ref{sec:ladder}
+makes this precise across granularities. This is a clean, quantified instance of the
+``attention is not explanation'' phenomenon~\cite{jain2019attention} on a real scheduling
+problem, and it is the justification for routing guidance through TAPE rather than attention.
 
 \begin{figure}[t]
 \centering
@@ -801,6 +802,63 @@ critical-path Jaccard against the exact oracle is near $1$; the attention weight
 $|\rho|$ with the true makespan levers is near $0$.}
 \label{fig:faith}
 \end{figure}
+
+\subsection{Attention encodes no critical-path structure---at any granularity}
+\label{sec:ladder}
+The ``is attention explanation?'' debate is unfalsifiable in NLP because there is no ground
+truth. Here the makespan is an \emph{exact} max-plus longest path, so every schedule has a
+known critical path and a known per-task makespan-sensitivity, and the question becomes
+measurable at increasing resolution. We compare the surrogate's AGV-arc attention against
+TAPE's tropical gradient at four granularities, pooled over nine instances ($60$ random
+schedules each), each against its honest random baseline (Table~\ref{tab:ladder}, top):
+coarse hit-rate (precision@1), medium ranking (ROC-AUC for ``task on the critical path''),
+fine ranking (Spearman vs.\ the graded makespan-sensitivity), and effect size (mean-signal
+separation of critical vs.\ off-critical tasks). \textbf{Attention sits on the random
+baseline at every level}---precision@1 $0.69$ vs.\ critical-fraction $0.70$; AUC $0.51$ vs.\
+$0.50$; $\rho=+0.07$; separation $+0.06\sigma$---while TAPE is near-exact at all four
+($0.98$, $0.94$, $+0.70$, $+1.92\sigma$). Attention therefore carries essentially \emph{no}
+critical-path information, coarse or fine: a strictly stronger statement than the near-zero
+rank correlation, and one only a physically grounded objective permits.
+
+\paragraph{Then why does attention guide search as well as TAPE?}
+Because the guidance benefit is not attention's. The attention and TAPE arms share the
+surrogate's offspring \emph{screening} and differ only in which task mutation targets. An
+ablation that adds the missing control---random mutation \emph{with} screening---isolates the
+cause (Table~\ref{tab:ladder}, bottom): replacing attention-targeted by random-targeted
+mutation (both screened) shifts $\mathrm{HV}/\mathrm{HV}^\star$ by only $-0.009$ (mixed sign,
+within noise), whereas adding screening to random mutation improves it by $+0.042$
+(consistent across instances, growing with $N$). The lever is the surrogate's objective
+\emph{regression} used for screening---shared by both guided arms---not the attention
+distribution. This reconciles the two facts: attention guides optimisation as well as TAPE
+(it rides the same screening) while encoding none of the bottleneck structure TAPE recovers.
+The network attains $R^2\!\approx\!0.99$ objective regression with attention that is, by every
+granularity measurable against ground truth, indistinguishable from random---accurate
+prediction does not imply an interpretable attention map.
+
+\begin{table}[t]
+\centering\small
+\caption{Attention vs.\ TAPE against the \emph{exact} critical path. \textbf{Top:} alignment
+at four granularities (coarse$\to$fine), pooled over nine instances; attention matches the
+random baseline at every level while TAPE is near-exact. \textbf{Bottom:} a search-guidance
+ablation (HV/HV$^\star$, mean over instances) showing the optimisation benefit comes from the
+shared surrogate \emph{screening}, not from attention-targeted mutation.}
+\label{tab:ladder}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{lccc}
+\toprule
+Alignment with exact critical path & attention & TAPE & random \\
+\midrule
+precision@1 (top task on critical path) & $0.69$ & $\mathbf{0.98}$ & $0.70$ \\
+ROC-AUC (rank on-path above off-path)   & $0.51$ & $\mathbf{0.94}$ & $0.50$ \\
+Spearman (vs.\ graded sensitivity)      & $+0.07$ & $\mathbf{+0.70}$ & $0.00$ \\
+separation (critical$-$off, $\sigma$)   & $+0.06$ & $\mathbf{+1.92}$ & $0.00$ \\
+\midrule
+\multicolumn{4}{l}{\emph{Search-guidance ablation $\;\Delta(\mathrm{HV}/\mathrm{HV}^\star)$:}}\\
+attention-targeted $-$ random-targeted mutation (both screened) & \multicolumn{3}{c}{$-0.009$ \;(within noise)} \\
+screening added to random mutation & \multicolumn{3}{c}{$\mathbf{+0.042}$ \;(consistent)} \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{Surrogate fidelity and faithfulness scale to $N{=}50$}
 \label{sec:fidelity}
