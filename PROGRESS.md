@@ -29,10 +29,15 @@
 - **Context:** Front-*averaged* coupled fidelity is fine (leg-Jaccard 0.95 toy10 / 0.87 toy20). The failure is specifically at the **makespan extreme**, where all AGVs run at max speed → maximum power contention → hardest DP point.
 - **Options:** (a) honestly scope as a stated limitation + report front-averaged Jaccard, not the extreme (recommended baseline); (b) investigate root cause — is it sampling (few training schedules near the makespan extreme), unroll depth, or a genuine surrogate-accuracy ceiling? (c) try targeted sampling weighted toward high-speed schedules. **Decision needed: explain-and-scope vs invest in a fix.**
 
-### 2.3 ⚠️ R4 (front-behaviour learning) does NOT generalize
-- **Finding:** `front_learning_results.json` — train corr **0.93**, test corr **−0.49** (transport) / **−0.50** (qc); test MAE 0.126 (4× train).
-- **Confirmed root cause:** all 3 training instances have **num_qcs = 3**; test L07 has **num_qcs = 2**. The predictor never saw a 2-crane structure and its instance-feature encoding can't extrapolate across QC count. Front statistics are similar (train transport 0.80 vs test 0.84), so the *labels* are learnable — the *features* are too few/non-generalizing.
-- **This is the single biggest open scientific gap.** R4 is the advisor's core "search→knowledge" loop and currently fails its one generalization test.
+### 2.3 ✅ R4 (front-behaviour learning) — RESOLVED & REFRAMED (2026-06-27)
+- **Original failure:** train corr 0.93 / test corr **−0.49** on a single held-out L07. Root cause was twofold: (a) instance features were hardcoded (num_qcs frozen at 3, num_agvs faked as N/2), and (b) zero structural diversity (all 3 training instances were qc=3). Both fixed in `scripts/run_front_learning.py`.
+- **Honest validation:** leave-one-real-out (LORO) across **all 35 real instances** L01–L35 (`scripts/loro_front_learning.py`, `loro_real_results.json`). Train on 34, test on the held-out real instance, repeat.
+- **Result — a clean dissociation:**
+  - **MAE generalizes (the positive headline):** held-out MAE(transport_frac) **mean 0.048, median 0.047; 97% of instances ≤ 0.08**. The amortized predictor recovers the critical-path composition *magnitude* of unseen real instances WITHOUT running NSGA-II — the "search→knowledge" loop works for composition level.
+  - **Per-front ordering does NOT (honest limitation):** median per-instance corr **+0.12** (range −0.95…+0.75); corr ≥ 0.7 in only 3%.
+- **Why (mechanism, `front_stability.json`):** **80% of real Pareto fronts are compositionally near-flat** (transport_frac std < 0.06; mean 0.048). Critical-path composition is largely an *instance-structural invariant* — nearly constant along the makespan↔energy trade-off — so there is little within-front ordering signal to recover, and the residual is instance-specific noise the features can't rank.
+- **Recommended paper framing:** claim what holds — "predict an unseen instance's critical-path composition from structure alone (MAE ≈ 0.05)" + the structural-invariance finding — and scope the λ-ordering corr as a stated limitation. NOT "predict the λ→composition curve."
+- **Note:** synthetic→real transfer is weaker than real→real. Holding out synthetic qc=5 reached corr ≈ 0.55; but a model trained only on synthetic toys fails on real L07 (corr −0.34) even when L07 is bracketed on N/AGV/QC/handling — real instances carry distribution shift. LORO (real→real) is the honest test and is what the above reports.
 
 ### 2.4 ⚠️ Uneven seed counts undercut rigor
 - Optimization benchmarks (`tape_bench_*`, `paper_stats`): **5 seeds**.
@@ -46,7 +51,7 @@
 
 | # | Problem | Value | Effort | Recommendation |
 |---|---|---|---|---|
-| **P1** | R4 generalization (§2.3) | **Highest** — core contribution | Medium | **Fix via diverse training set** (infra already written) |
+| **P1** | R4 generalization (§2.3) | **Highest** — core contribution | ~~Medium~~ | ✅ **DONE** — LORO over 35 real instances; MAE generalizes (0.048), reframed (§2.3) |
 | **P2** | R3 claim weak vs attn (§2.1) | High — headline integrity | Low | **Reframe + more seeds** |
 | **P3** | Coupled makespan extreme (§2.2) | Medium — honesty/robustness | Low–Med | **Scope as limitation; optional root-cause probe** |
 | **P4** | Seed sweep (§2.4) | Medium — reviewer-proofing | Low (compute) | **20+ seeds where it matters** |
