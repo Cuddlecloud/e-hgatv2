@@ -1,0 +1,4 @@
+instance=toy:20 N=20 coupled=True | mp P=100x4, GAT/BRKGA pop=400 | gens=40 | matched evals/gen=400
+training core + fused TAPE head ...
+  fused R2_makespan=0.8617 R2_energy=1.0000
+reference: non-dominated union of mp-BRKGA + BRKGA + TAPE @ 50 gens | 29 pts | HV*=1470073.6

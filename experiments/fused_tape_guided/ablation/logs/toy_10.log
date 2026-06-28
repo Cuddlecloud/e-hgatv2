@@ -2,3 +2,6 @@
   attn+screen   : HV/HV* = 0.9680
   rand+screen   : HV/HV* = 1.0006
   rand+noscreen : HV/HV* = 0.9146
+  tape+screen   : HV/HV* = 0.9150
+  attention-targeting effect (attn+screen - rand+screen) = -0.0326 (95% CI -0.0326 +/- 0.0875)
+  screening effect (rand+screen - rand+noscreen) = +0.0859
