@@ -196,15 +196,50 @@ $(\max,+)$---the \emph{tropical} or \emph{max-plus} semiring~\cite{baccelli1992s
 is the single structural fact the whole method exploits: the longest path is the
 \emph{critical path}, and the objective is determined by the activities lying on it.
 
-\subsection{The peak-power-coupled regime}
+\subsection{The peak-power-coupled regime (a synthetic stress-test)}
 \label{sec:coupled}
-The uncoupled problem above has a closed-form (longest-path) makespan. We additionally
-study the author's extension in which the fleet shares an instantaneous \emph{peak-power
-budget} $P_{\max}$: the sum of the powers of all vehicle legs running at any instant may not
-exceed $P_{\max}$. A leg may then have to \emph{wait} for budget even when its precedence is
-satisfied. The makespan becomes the output of an event-driven simulator and \emph{no longer
-has a closed form}. This is precisely the regime where a learned surrogate earns its place,
-and where ``which leg is on the critical path'' is no longer obvious by inspection.
+The uncoupled problem above has a closed-form (longest-path) makespan. As a deliberately
+harder, \emph{no-closed-form} stress-test for the differentiable surrogate, we add a
+constraint of our own construction: the fleet shares a single \emph{instantaneous peak-power
+budget} $P_{\max}$, and the total power of all AGV \emph{travel legs} running at any instant
+may not exceed $P_{\max}$ (quay-crane handling draws none). Any
+$P_{\max}\ge\max_\ell \varepsilon_\ell$ ($=19.8$\,kW from Table~\ref{tab:speed}; we use
+$30$\,kW) keeps every leg individually feasible.
+
+\paragraph{Activity model.} Each task $j$ expands into power-drawing legs and zero-power
+timing nodes whose precedence \emph{reproduces the uncoupled recurrence of
+Section~\ref{sec:maxplus} exactly}. The empty (E) and loaded (L) legs draw power
+$e_\ell,\varepsilon_\ell$ for their durations $t^{\mathrm e}_j,t^{\mathrm l}_j$; the
+zero-duration nodes are the AGV release R (at the quay pickup, for a LOAD) and the completion
+C (for an UNLOAD), and node H carries the handling time $\tau_j$. Within a task the order is
+$\mathrm{E}\!\to\!\mathrm{L}\!\to\!\mathrm{R}\!\to\!\mathrm{H}$ (LOAD) or
+$\mathrm{E}\!\to\!\mathrm{C}\!\to\!\mathrm{L}$ (UNLOAD), with R/C gated by the crane chain so
+that, \emph{absent the cap}, the realised completions equal the closed-form $c_j$ of
+Eqs.~(LOAD/UNLOAD); AGV- and crane-chain arcs link consecutive tasks.
+
+\paragraph{Resolution.} A power leg may \emph{start} only once its precedence is met
+\emph{and} starting it keeps the sum of concurrently-running leg powers $\le P_{\max}$;
+otherwise it waits for a running leg to finish and free budget. The schedule is realised by a
+deterministic \emph{parallel schedule-generation scheme}: at each completion event, ready legs
+are started greedily in priority order---earliest available, then task index, then
+empty-before-loaded---until the budget is exhausted. This makes $(\Cmax,E)$ a
+\emph{well-defined, exact} function of the decision $z$ (energy is unchanged, being
+timing-independent), but the makespan is \emph{no longer} a max-plus longest path: the cap
+injects disjunctive \emph{power-wait} arcs (a blocker leg $\to$ the leg it delays) that no
+closed form captures. When $P_{\max}$ is large enough that no leg ever waits, the scheme
+provably reduces to the uncoupled evaluator (a unit test asserts this), so the coupled problem
+is a clean \emph{superset} of the validated uncoupled one.
+
+\paragraph{Scope and honesty.} Two caveats we state plainly. \emph{(i)} The power arbitration
+is a \emph{fixed dispatch policy} (the priority rule above), not a decision variable; the
+regime optimises the assignment, order and speeds \emph{under} that policy. \emph{(ii)} Unlike
+the uncoupled objective---the published recurrence~\cite{fontes2023flowtime}, validated
+against the exact oracle---this coupled constraint is \emph{our own synthetic construction}:
+it is \emph{not} part of the FSMJ/book-chapter benchmark and we make \emph{no} claim that it
+models a specific real installation. Its role is purely methodological: it is the regime where
+the makespan has no closed form, ``which leg binds'' is non-obvious, and a learned
+\emph{differentiable} surrogate with exact gradients (TAPE) earns its place---which is exactly
+why the fused head carries an explicit power-wait term (Section~\ref{sec:fused}).
 
 \section{Method}
 \label{sec:method}
