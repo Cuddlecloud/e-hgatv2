@@ -231,7 +231,7 @@ feasible set,
 \underbrace{V^{2N}}_{\text{speeds}},
 \end{equation}
 grows super-exponentially (already $>10^{40}$ at $N{=}20$, $A{=}3$, $V{=}3$), and the
-underlying assignment--sequencing problem is NP-hard~\cite{homayouni2023}; exact MILP is
+underlying assignment--sequencing problem is NP-hard~\cite{fontes2022mpbrkga}; exact MILP is
 intractable beyond a few dozen tasks. We therefore search with the population-based
 metaheuristic NSGA-II~\cite{deb2002nsga2} and concentrate our contribution on \emph{where}
 in $\mathcal Z$ the search spends its budget: a faithful, physics-anchored explanation of
@@ -1309,12 +1309,20 @@ reaching $+38.8$ points of $\mathrm{HV}^\star$ over BRKGA at $N{=}50$.}
 
 \subsection{Faithfulness is obtained for free}
 TAPE and the unfaithful attention signal are \emph{statistically indistinguishable} on
-hypervolume (Holm-adjusted $p = 0.067$; attention is numerically ahead on the convergence
-indicators). We therefore make the honest, defensible claim: \emph{routing the guidance
-through the faithful TAPE signal preserves the optimisation performance of the unfaithful
-attention signal.} Faithfulness comes at no cost in solution quality, and the same object
-that steers the search is the one that correctly explains it. We do \emph{not} claim that
-faithful guidance converges faster than attention---the data do not support that.
+hypervolume (Holm-adjusted $p = 0.067$ at $5$ seeds; attention is numerically ahead on the
+convergence indicators). This is not a small-sample artifact: a $20$-seed re-run (ten
+instances) \emph{strengthens} the indistinguishability rather than resolving it
+($p = 0.275$, Cliff's $\delta = -0.14$; TAPE wins $3/10$), while both graph-guided variants
+keep crushing the classical baselines (TAPE $>$ mp-BRKGA on $10/10$, Holm $p<0.01$; Friedman
+$p\approx5\times10^{-7}$). We therefore make the honest, defensible claim: \emph{routing the
+guidance through the faithful TAPE signal preserves the optimisation performance of the
+unfaithful attention signal.} Faithfulness comes at no cost in solution quality, and the same
+object that steers the search is the one that correctly explains it. We do \emph{not} claim
+that faithful guidance converges faster than attention---the data do not support that, and
+Section~\ref{sec:ladder} explains \emph{why} they coincide: both arms ride the same surrogate
+\emph{screening}, to which the mutation-targeting signal (attention or TAPE) is nearly
+irrelevant. The two variants are indistinguishable on optimisation because neither's targeting
+is what optimises; TAPE's sole, decisive advantage is that its signal is \emph{faithful}.
 
 \begin{table}[t]
 \centering
@@ -1778,10 +1786,24 @@ of~\cite{homayouni2022book}, which varies AGV and QC counts) is the remaining st
 \subsection{The coupled regime is harder}
 Under the peak-power budget all methods degrade, and the faithful signal is slightly behind
 attention (Table~\ref{tab:main}, \textsf{SD-10-C}/\textsf{SD-20-C}). The surrogate's
-held-out $R^2$ falls to $\approx0.80$ (from $0.99$ uncoupled) and TAPE's Jaccard drops to
-$0.87$ at $N=20$. Both graph-guided methods still beat all three non-learned baselines, but
-the coupled claim is the weakest and is the clearest target for more training budget (more
-samples, epochs and physics-unrolling steps for the power-wait head).
+held-out $R^2$ falls to $\approx0.80$ (from $0.99$ uncoupled) and TAPE's \emph{front-averaged}
+leg-critical Jaccard drops to $0.87$ at $N=20$. Both graph-guided methods still beat all three
+non-learned baselines, but the coupled claim is the weakest.
+
+\paragraph{A scoped limitation at the makespan extreme.} The front-averaged number hides a
+sharp, mechanistically understood failure at \emph{one} end of the front. On
+\textsf{SD-10-C}, the energy-optimal extreme is recovered \emph{exactly} (leg-Jaccard
+$1.00$), but the makespan-optimal extreme collapses to $0.11$. This is where every AGV runs
+at maximum speed, so power contention is maximal and the binding critical path is set by the
+disjunctive power-wait arcs that have no closed form---precisely the structure the fused
+head must learn, and the regime where its makespan $R^2$ is lowest ($0.90$ on this instance).
+A targeted rerun with a deeper physics unroll ($4$ steps) and $2000$ samples reproduced the
+\emph{identical} $0.11$, so this is a genuine surrogate-accuracy ceiling at maximum
+contention, not a sampling artifact. We therefore report the front-averaged Jaccard as the
+headline and state the makespan-extreme degradation as a limitation: faithful coupled
+attribution holds across most of the front but not at the maximum-power-contention corner,
+which is the clearest target for future work (a richer power-wait head or contention-aware
+sampling).
 
 \section{Discussion and limitations}
 \label{sec:limits}
