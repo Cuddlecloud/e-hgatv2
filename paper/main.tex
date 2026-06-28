@@ -76,12 +76,16 @@ instances and the published FSMJ loading benchmark, in both the uncoupled and th
 peak-power-coupled regime) that TAPE recovers the true critical path with
 Jaccard $0.87$--$1.00$ against an exact oracle, whereas the conventional learned
 attention weights are statistically uncorrelated with the true makespan levers
-($|\rho|\le 0.17$). Routing the same faithful signal back into an NSGA-II search makes the
+($|\rho|\le 0.17$)---and, measured against the exact critical path from coarse hit-rate to
+fine ranking, are no better than random at \emph{every} granularity, a verdict only a
+physically grounded objective makes possible. Routing the same faithful signal back into an NSGA-II search makes the
 guided algorithm dominate mp-BRKGA, single-population BRKGA and an unguided control on
 hypervolume in $11/11$ instances (Friedman $\chi^2_4=28.9$, $p=8\times10^{-6}$; all
 post-hoc Holm-adjusted $p<0.006$). Finally, aggregating TAPE over the approximated Pareto
 set with a trade-off-weighted score (Pareto Tension Score) yields an interpretable,
-sparse description of how the binding bottleneck \emph{migrates} along the front. The same
+sparse description of how the binding bottleneck \emph{migrates} along the front; and a single
+structural surrogate \emph{amortises} this front composition to unseen instances (Pearson
+$r=0.945$ on a composition-spanning set), turning the description into prediction. The same
 mathematical object thus explains the front, characterises its behaviour, and guides the
 optimiser---one evidenced mechanism for all of the project's research directions.
 \end{abstract}
