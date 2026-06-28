@@ -80,8 +80,8 @@ attention weights are statistically uncorrelated with the true makespan levers
 fine ranking, are no better than random at \emph{every} granularity, a verdict only a
 physically grounded objective makes possible. Routing the same faithful signal back into an NSGA-II search makes the
 guided algorithm dominate mp-BRKGA, single-population BRKGA and an unguided control on
-hypervolume in $11/11$ instances (Friedman $\chi^2_4=28.9$, $p=8\times10^{-6}$; all
-post-hoc Holm-adjusted $p<0.006$). Finally, aggregating TAPE over the approximated Pareto
+hypervolume in $11/11$ instances (Friedman $\chi^2_4=37.2$, $p=1.6\times10^{-7}$; all
+post-hoc Holm-adjusted $p<0.004$). Finally, aggregating TAPE over the approximated Pareto
 set with a trade-off-weighted score (Pareto Tension Score) yields an interpretable,
 sparse description of how the binding bottleneck \emph{migrates} along the front; and a single
 structural surrogate \emph{amortises} this front composition to unseen instances (Pearson
@@ -1314,11 +1314,11 @@ reaching $+38.8$ points of $\mathrm{HV}^\star$ over BRKGA at $N{=}50$.}
 \subsection{Faithfulness is obtained for free}
 TAPE and the unfaithful attention signal are \emph{statistically indistinguishable} on
 hypervolume (Holm-adjusted $p = 0.067$ at $5$ seeds; attention is numerically ahead on the
-convergence indicators). This is not a small-sample artifact: a $20$-seed re-run (ten
-instances) \emph{strengthens} the indistinguishability rather than resolving it
-($p = 0.275$, Cliff's $\delta = -0.14$; TAPE wins $3/10$), while both graph-guided variants
-keep crushing the classical baselines (TAPE $>$ mp-BRKGA on $10/10$, Holm $p<0.01$; Friedman
-$p\approx5\times10^{-7}$). We therefore make the honest, defensible claim: \emph{routing the
+convergence indicators). This is not a small-sample artifact: a $20$-seed re-run
+\emph{strengthens} the indistinguishability rather than resolving it (Holm $p = 0.175$,
+Cliff's $\delta = -0.12$; TAPE wins $3/11$), while both graph-guided variants keep crushing
+the classical baselines (TAPE $>$ mp-BRKGA on $11/11$, Holm $p<0.01$; Friedman
+$p\approx1.6\times10^{-7}$). We therefore make the honest, defensible claim: \emph{routing the
 guidance through the faithful TAPE signal preserves the optimisation performance of the
 unfaithful attention signal.} Faithfulness comes at no cost in solution quality, and the same
 object that steers the search is the one that correctly explains it. We do \emph{not} claim
@@ -1331,7 +1331,11 @@ is what optimises; TAPE's sole, decisive advantage is that its signal is \emph{f
 \begin{table}[t]
 \centering
 \caption{Main results. $\mathrm{HV}/\mathrm{HV}^\star$ (higher better) for all five methods,
-and the two faithfulness columns. Best HV per row in \textbf{bold}.}
+and the two faithfulness columns. Best HV per row in \textbf{bold}. Values are $20$-seed means
+except \textsf{SD-20-C} ($\dagger$, $5$ seeds---the coupled $N{=}20$ regime is by far the most
+expensive). At $20$ seeds the two graph-guided variants are statistically indistinguishable
+(attention is numerically ahead on $8/11$ rows; see Table~\ref{tab:stats}), while TAPE beats
+every classical baseline on all $11$ rows.}
 \label{tab:main}
 \scriptsize
 \setlength{\tabcolsep}{4pt}
@@ -1342,26 +1346,28 @@ and the two faithfulness columns. Best HV per row in \textbf{bold}.}
 \cmidrule(lr){4-8}\cmidrule(lr){9-10}
 Instance & Regime & $N$ & TAPE & Attn & Random & mp-BRKGA & sp-BRKGA & TAPE Jac. & Attn $\rho$\\
 \midrule
-\textsf{SD-5}  & unc. & 5  & 0.978 & 0.965 & \textbf{0.981} & 0.934 & 0.976 & 0.980 & 0.070\\
-\textsf{SD-8}  & unc. & 8  & 0.942 & \textbf{0.961} & 0.924 & 0.902 & 0.905 & 0.990 & $-0.008$\\
-\textsf{SD-10} & unc. & 10 & 0.948 & \textbf{1.003} & 0.925 & 0.886 & 0.953 & 0.975 & 0.088\\
-\textsf{SD-15} & unc. & 15 & 0.832 & \textbf{0.869} & 0.774 & 0.748 & 0.794 & 0.991 & 0.069\\
-\textsf{SD-20} & unc. & 20 & 0.931 & \textbf{0.957} & 0.810 & 0.890 & 0.832 & 0.949 & 0.016\\
-\textsf{L07}   & unc. & 8  & 0.973 & \textbf{0.978} & 0.965 & 0.895 & 0.950 & 0.985 & 0.171\\
-\textsf{L15}   & unc. & 16 & \textbf{0.959} & 0.953 & 0.894 & 0.874 & 0.891 & 0.996 & 0.081\\
-\textsf{L21}   & unc. & 12 & \textbf{1.014} & 0.985 & 0.938 & 0.842 & 0.955 & 0.988 & 0.057\\
-\textsf{L35}   & unc. & 12 & 0.986 & \textbf{0.993} & 0.944 & 0.930 & 0.933 & 1.000 & 0.085\\
-\textsf{SD-10-C} & coupled & 10 & 0.859 & \textbf{0.919} & 0.741 & 0.798 & 0.791 & 0.952 & $-0.087$\\
-\textsf{SD-20-C} & coupled & 20 & 0.846 & \textbf{0.883} & 0.697 & 0.767 & 0.821 & 0.874 & $-0.035$\\
+\textsf{SD-5}  & unc. & 5  & \textbf{0.973} & 0.972 & 0.969 & 0.928 & 0.962 & 0.980 & 0.062\\
+\textsf{SD-8}  & unc. & 8  & 0.954 & \textbf{0.971} & 0.936 & 0.906 & 0.922 & 0.990 & $-0.023$\\
+\textsf{SD-10} & unc. & 10 & 1.008 & \textbf{1.029} & 0.978 & 0.923 & 0.973 & 0.975 & 0.088\\
+\textsf{SD-15} & unc. & 15 & 0.919 & \textbf{0.919} & 0.830 & 0.807 & 0.829 & 0.975 & 0.081\\
+\textsf{SD-20} & unc. & 20 & 0.907 & \textbf{0.930} & 0.711 & 0.815 & 0.808 & 0.952 & $-0.003$\\
+\textsf{L07}   & unc. & 8  & 0.973 & \textbf{0.976} & 0.949 & 0.929 & 0.935 & 0.985 & 0.176\\
+\textsf{L15}   & unc. & 16 & \textbf{0.904} & 0.888 & 0.802 & 0.761 & 0.779 & 0.996 & 0.064\\
+\textsf{L21}   & unc. & 12 & \textbf{1.017} & 0.976 & 0.935 & 0.853 & 0.941 & 0.988 & 0.054\\
+\textsf{L35}   & unc. & 12 & 0.970 & \textbf{0.973} & 0.934 & 0.913 & 0.920 & 0.989 & 0.084\\
+\textsf{SD-10-C} & coupled & 10 & 1.002 & \textbf{1.074} & 0.934 & 0.844 & 0.904 & 0.955 & $-0.080$\\
+\textsf{SD-20-C}$^\dagger$ & coupled & 20 & 0.846 & \textbf{0.883} & 0.697 & 0.767 & 0.821 & 0.874 & $-0.035$\\
 \bottomrule
 \end{tabular}}
 \end{table}
 
 \begin{table}[t]
 \centering
-\caption{Statistical analysis over all $11$ instances (Friedman + average ranks; lower rank
-= better). Holm-adjusted pairwise $p$-values are TAPE vs.\ each method on
-$\mathrm{HV}/\mathrm{HV}^\star$. ${}^\star$ denotes $p_{\text{Holm}}<0.05$.}
+\caption{Statistical analysis over all $11$ instances at $20$ seeds (\textsf{SD-20-C} at $5$;
+Friedman + average ranks; lower rank = better). Holm-adjusted pairwise $p$-values are TAPE
+vs.\ each method on $\mathrm{HV}/\mathrm{HV}^\star$. ${}^\star$ denotes $p_{\text{Holm}}<0.05$.
+TAPE vs.\ attention is \emph{not} significant ($p=0.175$), and more seeds did not change this
+($5$-seed $p=0.067$)---they are statistically tied, as Section~\ref{sec:ladder} explains.}
 \label{tab:stats}
 \small
 \setlength{\tabcolsep}{6pt}
@@ -1370,18 +1376,18 @@ $\mathrm{HV}/\mathrm{HV}^\star$. ${}^\star$ denotes $p_{\text{Holm}}<0.05$.}
 \toprule
 Method & rank (HV) & rank (GD$^+$) & $p_{\text{Holm}}$ (HV) & Cliff's $\delta$ (HV)\\
 \midrule
-E-HGATv2-attn      & 1.46 & 1.27 & $0.067$ & $-0.21$ (small)\\
-E-HGATv2-TAPE (ours) & 1.91 & 2.09 & --- & ---\\
-single-pop BRKGA   & 3.45 & 3.18 & $0.0059^\star$ & $+0.40$ (medium)\\
-NSGA-II (random)   & 3.64 & 3.45 & $0.0059^\star$ & $+0.44$ (medium)\\
-mp-BRKGA           & 4.55 & 5.00 & $0.0039^\star$ & $+0.62$ (large)\\
+E-HGATv2-attn      & 1.27 & 1.36 & $0.175$ & $-0.12$ (negligible)\\
+E-HGATv2-TAPE (ours) & 1.73 & 1.73 & --- & ---\\
+NSGA-II (random)   & 3.45 & 3.45 & $0.0039^\star$ & $+0.46$ (medium)\\
+single-pop BRKGA   & 3.82 & 3.45 & $0.0020^\star$ & $+0.52$ (large)\\
+mp-BRKGA           & 4.73 & 5.00 & $0.0029^\star$ & $+0.70$ (large)\\
 \bottomrule
 \end{tabular}}
 
 \vspace{3pt}
-{\footnotesize Friedman (HV): $\chi^2_4 = 28.9$, $p = 8.0\times10^{-6}$; Nemenyi
-$\mathrm{CD}_{0.05} = 1.84$.\quad Friedman (GD$^+$): $\chi^2_4 = 35.4$,
-$p = 3.8\times10^{-7}$; Cliff's $\delta$(GD$^+$, TAPE vs.\ mp-BRKGA) $= -0.57$ (large);
+{\footnotesize Friedman (HV): $\chi^2_4 = 37.2$, $p = 1.6\times10^{-7}$; Nemenyi
+$\mathrm{CD}_{0.05} = 1.84$.\quad Friedman (GD$^+$): $\chi^2_4 = 38.3$,
+$p = 9.6\times10^{-8}$; Cliff's $\delta$(GD$^+$, TAPE vs.\ mp-BRKGA) $= -0.62$ (large);
 TAPE $>$ mp-BRKGA on $11/11$ instances.}
 \end{table}
 
