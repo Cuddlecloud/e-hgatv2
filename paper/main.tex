@@ -316,8 +316,8 @@ A decoded schedule $s(z)$ is encoded as a directed heterogeneous graph
 $G_s=(V,E^{\mathrm{agv}},E^{\mathrm{qc}})$ in which every transport task is a node $j\in V$
 and the two resource chains are the two arc types:
 \begin{itemize}[leftmargin=*,itemsep=2pt]
-  \item a \textbf{task-node feature} $x_j\in\R^{d_0}$ ($d_0{=}4$) holds the handling time,
-  task kind, and origin/destination descriptors;
+  \item a \textbf{task-node feature} $x_j\in\R^{d_0}$, $d_0{=}4$, holds the handling time,
+  task kind and origin/\allowbreak destination descriptors;
   \item an \textbf{AGV arc} $(i\!\to\! j)\in E^{\mathrm{agv}}$ exists iff task $i$ is the
   immediate vehicle-predecessor of $j$ under $\alpha,\sigma$; its feature
   $u_{ij}\in\R^{d_e}$ ($d_e{=}3$) carries the leg travel time and the empty/loaded leg
@@ -496,13 +496,15 @@ E=\sum_{j\in\mathcal J}\big(e^{\mathrm e}_j+e^{\mathrm l}_j\big),
 \qquad \frac{\partial E}{\partial e^{\bullet}_j}=1 .
 \label{eq:fusedenergy}
 \end{equation}
-In the coupled regime an additional head predicts a per-leg power wait
-$\delta^{\bullet}_j=\MLP_{\mathrm{wait}}([\,h_i\concat h_j\concat\tilde u_{ij}\concat c_j\,])$,
-$\MLP_{\mathrm{wait}}\colon\R^{2d+d_e+d_c}\!\to\!\R^{2}$, from a contention vector
-$c_j\in\R^{d_c}$ read off the previous timing iterate; the effective leg weight
-becomes $t^{\bullet}_j+\delta^{\bullet}_j$ and the prediction is the fixed point of an
-unrolled timing$\to$contention$\to$wait recursion (the differentiable analogue of the
-simulator's iterative power resolution).
+In the coupled regime an additional head predicts a per-leg power wait from a contention
+vector $c_j\in\R^{d_c}$ read off the previous timing iterate,
+\begin{equation}
+\delta^{\bullet}_j=\MLP_{\mathrm{wait}}\bigl([\,h_i\concat h_j\concat\tilde u_{ij}\concat c_j\,]\bigr),
+\qquad \MLP_{\mathrm{wait}}\colon\R^{2d+d_e+d_c}\to\R^{2},
+\end{equation}
+so the effective leg weight becomes $t^{\bullet}_j+\delta^{\bullet}_j$ and the prediction is
+the fixed point of an unrolled timing$\to$contention$\to$wait recursion (the differentiable
+analogue of the simulator's iterative power resolution).
 
 \paragraph{(ii) Event DAG.} The attributes instantiate a weighted DAG
 $G_{\mathrm{dag}}=(\mathcal N,\mathcal A,b,w)$ whose nodes are task events, whose node
@@ -732,10 +734,10 @@ is on a few tasks. This is the requested front-behaviour knowledge (Section~\ref
 
 \subsection{Instances (datasets)}
 We use three families (Table~\ref{tab:data}). \textbf{Synthetic dual-cycling} instances
-(\textsf{SD-$N$}) alternate LOAD/UNLOAD moves over $3$ cranes served by $2$ vehicles, with
+(\textsf{SD-$N$}) alternate LOAD/\allowbreak UNLOAD moves over $3$ cranes served by $2$ vehicles, with
 handling times drawn from $U[30,80]$\,s; they are fully reproducible and, at $N=5$, small
 enough for an exact brute-force Pareto oracle. The \textbf{FSMJ loading benchmark}
-(\textsf{L07,\,L15,\,L21,\,L35}) are the \emph{published} instances of
+(\textsf{L07}, \textsf{L15}, \textsf{L21}, \textsf{L35}) are the \emph{published} instances of
 \cite{homayouni2022book}: the real QC$\leftrightarrow$LU distance matrix (their Table~4) and
 the real per-crane task lists (their Table~5); every move is a LOAD. The
 \textbf{peak-power-coupled} variants (\textsf{SD-10-C}, \textsf{SD-20-C}) apply the budget
@@ -841,7 +843,7 @@ beats precise}: the more diffuse the targeting, the better the hypervolume
 (random $\ge$ attention $>$ TAPE), because exact bottleneck-targeting is
 \emph{exploitative}---it concentrates mutations on the current critical task and narrows front
 coverage, while HV rewards spread. This is the mechanism behind the small attention-over-TAPE
-edge on HV (Table~\ref{tab:stats}, ranks $1.46$ vs.\ $1.91$, $p_{\text{Holm}}=0.067$):
+edge on HV (Table~\ref{tab:stats}, ranks $1.27$ vs.\ $1.73$, $p_{\text{Holm}}=0.175$):
 accidental exploration, not information. The network attains
 $R^2\!\approx\!0.99$ objective regression with an attention map indistinguishable from random
 at every measurable granularity---accurate prediction does not imply an interpretable
@@ -1198,12 +1200,12 @@ landscape analysis degrades gracefully rather than failing, and the GNN is
 Across the $11$ instances the two graph-guided methods clearly dominate the three
 non-learned baselines on every indicator (Figure~\ref{fig:hv},
 Table~\ref{tab:main}). On the primary indicator (hypervolume ratio) the Friedman test
-rejects equality of the five methods with $\chi^2_4 = 28.9$, $p = 8.0\times10^{-6}$; the
+rejects equality of the five methods with $\chi^2_4 = 37.2$, $p = 1.6\times10^{-7}$; the
 average ranks (Figure~\ref{fig:rank}, Table~\ref{tab:stats}) place the two graph-guided
-methods first, then single-population BRKGA, then the random control, with mp-BRKGA last.
+methods first, then the random control, then single-population BRKGA, with mp-BRKGA last.
 Pairwise Wilcoxon tests with Holm correction confirm that TAPE significantly beats
 mp-BRKGA, the random control and single-population BRKGA on hypervolume (all
-$p_{\text{Holm}} < 0.006$), and on GD$^+$ it beats all four including attention. In a
+$p_{\text{Holm}} < 0.004$), and on GD$^+$ it beats all four including attention. In a
 per-instance head-to-head, TAPE achieves a higher mean hypervolume than the published
 mp-BRKGA on \emph{all $11$ instances}.
 
@@ -1281,7 +1283,7 @@ The metaheuristic baseline in this scaling sweep is single-population BRKGA, bec
 sweep predates the fused head; the published \emph{multi-population} mp-BRKGA is benchmarked
 directly against the fused E-HGATv2 model per instance in Tables~\ref{tab:main}--\ref{tab:stats},
 where it ranks last on every indicator (TAPE $>$ mp-BRKGA on $11/11$ instances, Holm
-$p=0.0039$). Extending this convergence/scaling sweep to include mp-BRKGA is a
+$p=0.0029$). Extending this convergence/scaling sweep to include mp-BRKGA is a
 straightforward additional run.
 
 \begin{figure}[t]
@@ -1402,48 +1404,47 @@ pairwise \emph{Wilcoxon signed-rank} tests of TAPE against each baseline \emph{a
 instances, with \emph{Holm--Bonferroni} correction for the four comparisons
 (Table~\ref{tab:stats}).
 
-\paragraph{Why significance is argued across instances, not per instance.} The headline runs
-use $S{=}5$ seeds. A two-sided Wilcoxon signed-rank test on $5$ paired samples has a minimum
-attainable $p$-value of $1/2^{5}\!\cdot\!2 = 0.0625$: \emph{per-instance} significance at
-$\alpha{=}0.05$ is therefore impossible by construction, regardless of effect size. This is
-precisely why the Dem\v{s}ar protocol aggregates the comparison over the $11$ instances
-(where TAPE vs.\ mp-BRKGA reaches $p_{\text{Holm}}=0.0039$) rather than claiming per-instance
-$p$-values.
+\paragraph{Significance across instances.} The headline runs use $S{=}20$ seeds (the coupled
+\textsf{SD-20-C}, by far the most expensive, uses $5$). The Dem\v{s}ar protocol aggregates the
+comparison over the $11$ instances (where TAPE vs.\ mp-BRKGA reaches $p_{\text{Holm}}=0.0029$);
+at $20$ seeds the per-instance tests are no longer floor-limited (a $5$-seed two-sided Wilcoxon
+cannot drop below $p=0.0625$ by construction, which is why the original $5$-seed runs leaned on
+the across-instance test), and the across-instance and per-instance views now agree.
 
-\paragraph{Per-instance dispersion (95\% CIs).} We do report per-instance uncertainty as
+\paragraph{Per-instance dispersion (95\% CIs).} We report per-instance uncertainty as
 $95\%$ confidence intervals on $\mathrm{HV}/\mathrm{HV}^\star$ (Student-$t$ over the $S$
 seeds). On the well-separated instances these intervals are \emph{non-overlapping} between
 the graph-guided methods and mp-BRKGA---a conservative significance criterion. For example
-on \textsf{L21}, TAPE attains $1.014\pm0.050$ (CI $[0.963,1.064]$) versus mp-BRKGA
-$0.841\pm0.077$ (CI $[0.765,0.918]$), with the gap far starker on the convergence indicator
-($\mathrm{GD}^+$ $3.66\pm3.44$ vs.\ $51.5\pm33.8$); the same non-overlap holds on
+on \textsf{L21}, TAPE attains $1.017\pm0.028$ (CI $[0.989,1.045]$) versus mp-BRKGA
+$0.853\pm0.047$ (CI $[0.806,0.900]$), with the gap far starker on the convergence indicator
+($\mathrm{GD}^+$ $4.8\pm1.8$ vs.\ $37.8\pm11.1$); the same non-overlap holds on
 \textsf{L15} and \textsf{SD-15}. On the near-optimal small instances ($N\le10$) the
 intervals overlap because every method is close to the reference front.
 
 \paragraph{Effect sizes.} Beyond the rank tests we quantify \emph{how large} the advantage
 is with distribution-free Cliff's-$\delta$ (Table~\ref{tab:stats}, last column): against
-mp-BRKGA the effect is \emph{large} ($\delta=+0.62$ on HV and $-0.57$ on GD$^+$), against the
-random control and single-population BRKGA it is \emph{medium} ($\delta=+0.44$ and $+0.40$ on
-HV), and against attention it is \emph{small} and slightly negative ($\delta=-0.21$)---
-exactly the ``faithfulness for free'' reading: TAPE matches attention while strictly
-dominating every non-learned baseline by a medium-to-large margin.
+mp-BRKGA the effect is \emph{large} ($\delta=+0.70$ on HV and $-0.62$ on GD$^+$), against
+single-population BRKGA \emph{large} ($\delta=+0.52$) and against the random control
+\emph{medium} ($\delta=+0.46$) on HV, and against attention it is \emph{negligible} and
+slightly negative ($\delta=-0.12$)---exactly the ``faithfulness for free'' reading: TAPE
+matches attention while strictly dominating every non-learned baseline by a medium-to-large
+margin.
 
-\paragraph{Per-instance bootstrap evidence.} To bypass the $5$-seed Wilcoxon floor we
-bootstrap ($10^{4}$ resamples) the per-instance TAPE$-$mp-BRKGA hypervolume gap
-(Table~\ref{tab:boot}, visualised as a forest plot in Figure~\ref{fig:forest}). The $95\%$
-CI \emph{excludes zero on $8$ of $11$ instances}---a
-genuine per-instance significance criterion stronger than the underpowered Wilcoxon---failing
-only on the three small/near-optimal cases (\textsf{SD-10}, \textsf{SD-20},
-\textsf{SD-20-C}). Raising $S$ to $15$--$30$ seeds would additionally lift the per-instance
-\emph{Wilcoxon} tests over $\alpha=0.05$; the bootstrap already certifies the gap today.
+\paragraph{Per-instance bootstrap evidence.} We bootstrap ($10^{4}$ resamples) the
+per-instance TAPE$-$mp-BRKGA hypervolume gap (Table~\ref{tab:boot}, visualised as a forest
+plot in Figure~\ref{fig:forest}). At $20$ seeds the $95\%$ CI \emph{excludes zero on $10$ of
+$11$ instances}---a genuine per-instance significance criterion---failing only on the
+$5$-seed coupled \textsf{SD-20-C}, whose wide interval reflects its seed count rather than a
+vanishing gap (point estimate still $+0.079$). Moving from $5$ to $20$ seeds lifted this from
+$8/11$ to $10/11$, exactly as expected.
 
 \begin{table}[t]
 \centering\small
 \caption{Per-instance evidence that the fused E-HGATv2 (TAPE) beats the published mp-BRKGA on
-$\mathrm{HV}/\mathrm{HV}^\star$: the $5$-seed paired Wilcoxon statistic $W$ and a
-percentile-bootstrap ($10^{4}$ resamples) $95\%$ CI on the per-seed gap (TAPE$-$mp). A CI
-excluding $0$ is per-instance significance and holds on $8/11$ instances; the $5$-seed
-Wilcoxon cannot drop below $p{=}0.062$ by construction.}
+$\mathrm{HV}/\mathrm{HV}^\star$: the paired Wilcoxon statistic $W$ and a percentile-bootstrap
+($10^{4}$ resamples) $95\%$ CI on the per-seed gap (TAPE$-$mp), at $20$ seeds
+(\textsf{SD-20-C}$^\dagger$: $5$). A CI excluding $0$ is per-instance significance and holds on
+$10/11$ instances; only the $5$-seed coupled case fails (point estimate still $+0.079$).}
 \label{tab:boot}
 \setlength{\tabcolsep}{6pt}
 \resizebox{\textwidth}{!}{%
@@ -1451,17 +1452,17 @@ Wilcoxon cannot drop below $p{=}0.062$ by construction.}
 \toprule
 Instance & TAPE & mp-BRKGA & gap $95\%$ CI (bootstrap) & $W$ & CI ${>}0$\\
 \midrule
-\textsf{SD-5}    & 0.978 & 0.934 & $[+0.030,+0.063]$ & 0 & yes\\
-\textsf{SD-8}    & 0.942 & 0.902 & $[+0.015,+0.065]$ & 0 & yes\\
-\textsf{SD-10}   & 0.948 & 0.886 & $[-0.010,+0.147]$ & 2 & no\\
-\textsf{SD-15}   & 0.832 & 0.748 & $[+0.043,+0.126]$ & 0 & yes\\
-\textsf{SD-20}   & 0.931 & 0.890 & $[-0.063,+0.160]$ & 6 & no\\
-\textsf{L07}     & 0.973 & 0.895 & $[+0.051,+0.110]$ & 0 & yes\\
-\textsf{L15}     & 0.959 & 0.874 & $[+0.075,+0.100]$ & 0 & yes\\
-\textsf{L21}     & 1.014 & 0.841 & $[+0.097,+0.239]$ & 0 & yes\\
-\textsf{L35}     & 0.986 & 0.930 & $[+0.019,+0.099]$ & 0 & yes\\
-\textsf{SD-10-C} & 0.859 & 0.798 & $[+0.009,+0.128]$ & 1 & yes\\
-\textsf{SD-20-C} & 0.846 & 0.767 & $[-0.049,+0.220]$ & 5 & no\\
+\textsf{SD-5}    & 0.973 & 0.928 & $[+0.032,+0.059]$ & 4 & yes\\
+\textsf{SD-8}    & 0.954 & 0.906 & $[+0.033,+0.064]$ & 1 & yes\\
+\textsf{SD-10}   & 1.008 & 0.923 & $[+0.054,+0.117]$ & 11 & yes\\
+\textsf{SD-15}   & 0.919 & 0.807 & $[+0.078,+0.144]$ & 4 & yes\\
+\textsf{SD-20}   & 0.907 & 0.815 & $[+0.039,+0.146]$ & 33 & yes\\
+\textsf{L07}     & 0.973 & 0.929 & $[+0.028,+0.061]$ & 11 & yes\\
+\textsf{L15}     & 0.904 & 0.761 & $[+0.106,+0.184]$ & 0 & yes\\
+\textsf{L21}     & 1.017 & 0.853 & $[+0.116,+0.213]$ & 2 & yes\\
+\textsf{L35}     & 0.970 & 0.913 & $[+0.041,+0.072]$ & 1 & yes\\
+\textsf{SD-10-C} & 1.002 & 0.844 & $[+0.082,+0.234]$ & 22 & yes\\
+\textsf{SD-20-C}$^\dagger$ & 0.846 & 0.767 & $[-0.049,+0.220]$ & 5 & no\\
 \bottomrule
 \end{tabular}}
 \end{table}
@@ -1483,16 +1484,16 @@ Instance & TAPE & mp-BRKGA & gap $95\%$ CI (bootstrap) & $W$ & CI ${>}0$\\
 \addplot[only marks, mark=*, mark size=1.6pt, blue,
          error bars/.cd, x dir=both, x explicit]
   coordinates {
-    (0.044,11) += (0.019,0) -= (0.014,0)
-    (0.040,10) += (0.025,0) -= (0.025,0)
-    (0.062,9)  += (0.085,0) -= (0.072,0)
-    (0.084,8)  += (0.042,0) -= (0.041,0)
-    (0.041,7)  += (0.119,0) -= (0.104,0)
-    (0.078,6)  += (0.032,0) -= (0.027,0)
-    (0.085,5)  += (0.015,0) -= (0.010,0)
-    (0.173,4)  += (0.066,0) -= (0.076,0)
-    (0.056,3)  += (0.043,0) -= (0.037,0)
-    (0.061,2)  += (0.067,0) -= (0.052,0)
+    (0.045,11) += (0.014,0) -= (0.013,0)
+    (0.048,10) += (0.016,0) -= (0.015,0)
+    (0.085,9)  += (0.032,0) -= (0.031,0)
+    (0.112,8)  += (0.032,0) -= (0.034,0)
+    (0.093,7)  += (0.053,0) -= (0.054,0)
+    (0.044,6)  += (0.017,0) -= (0.016,0)
+    (0.143,5)  += (0.041,0) -= (0.037,0)
+    (0.164,4)  += (0.049,0) -= (0.048,0)
+    (0.056,3)  += (0.016,0) -= (0.015,0)
+    (0.158,2)  += (0.076,0) -= (0.076,0)
     (0.079,1)  += (0.141,0) -= (0.128,0)
   };
 \draw[dashed, red, thick] (axis cs:0,0.4) -- (axis cs:0,11.6);
@@ -1500,10 +1501,9 @@ Instance & TAPE & mp-BRKGA & gap $95\%$ CI (bootstrap) & $W$ & CI ${>}0$\\
 \end{tikzpicture}
 \caption{Per-instance bootstrap evidence ($10^4$ resamples) for the fused E-HGATv2 (TAPE)
 hypervolume advantage over the published mp-BRKGA. Each point is the mean per-seed gap and
-its $95\%$ CI; the dashed line marks zero. The CI lies entirely to the right of zero on
-$8/11$ instances---per-instance significance that the $5$-seed Wilcoxon is too underpowered
-to detect---and never excludes zero on the wrong side. This is the visual companion to
-Table~\ref{tab:boot}.}
+its $95\%$ CI; the dashed line marks zero. At $20$ seeds the CI lies entirely to the right of
+zero on $10/11$ instances---failing only on the $5$-seed coupled \textsf{SD-20-C}---and never
+excludes zero on the wrong side. This is the visual companion to Table~\ref{tab:boot}.}
 \label{fig:forest}
 \end{figure}
 
