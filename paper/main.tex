@@ -209,8 +209,20 @@ and where ``which leg is on the critical path'' is no longer obvious by inspecti
 \section{Method}
 \label{sec:method}
 
-Figure~\ref{fig:arch} previews the full pipeline; the rest of this section dissects each
-block with the notation of Table~\ref{tab:notation}.
+\paragraph{The method in one paragraph.} There is no labelled training corpus. An exact
+simulator---the \emph{evaluator} (Section~\ref{sec:evaluator})---scores any candidate schedule
+and, as a by-product, emits the duration of every transport leg; a graph network then learns
+to imitate those durations. Concretely (Figure~\ref{fig:arch}): a search proposal is decoded
+into a feasible schedule (Section~\ref{sec:randomkey}), recast as a heterogeneous graph
+(Section~\ref{sec:graphrep}) and embedded by the E-HGATv2 surrogate (Section~\ref{sec:ehgat});
+projection heads predict each leg's duration, which an \emph{exact} max-plus dynamic program
+(Section~\ref{sec:fused}) recomposes into the makespan. Because the makespan flows through the
+genuine critical-path recurrence, differentiating it returns an \emph{exact} indicator of
+which operations bind the schedule---the TAPE explanation (Section~\ref{sec:tape}). That same
+signal biases the search's variation operators and screens its offspring
+(Section~\ref{sec:guidance}) and, aggregated over the Pareto front, describes how the binding
+bottleneck migrates (Section~\ref{sec:pts}). The rest of this section dissects each block with
+the notation of Table~\ref{tab:notation}.
 
 \subsection{Decision variables, the search space, and why we guide it}
 \label{sec:searchspace}
@@ -251,15 +263,18 @@ screen offspring (Sections~\ref{sec:guidance}).
 Symbol & Meaning\\
 \midrule
 $\mathcal J=\{1,\dots,N\}$ & transport tasks\\
+$A,\,K,\,V$ & \# AGVs, \# quay cranes, \# speed levels per leg\\
 $z=(\alpha,\sigma,\omega^{\mathrm e},\omega^{\mathrm l})$ & a solution (Eq.~\ref{eq:solution})\\
 $s(z)$, $f(s)=(\Cmax,E)$ & decoded schedule and its objective pair\\
-$G_s=(V,\,E^{\mathrm{agv}},E^{\mathrm{qc}})$ & heterogeneous schedule graph\\
+$G_s=(\mathcal V,\,E^{\mathrm{agv}},E^{\mathrm{qc}})$ & heterogeneous schedule graph\\
 $x_j\in\R^{d_0}$, $u_{ij}\in\R^{d_e}$ & task-node and arc input features\\
 $h_j^{(\ell)}\in\R^{d}$ & embedding of task $j$ after layer $\ell$\\
 $\mathcal N_r(j)$ & resource-$r$ predecessors of $j$ ($r\in\{\mathrm{agv},\mathrm{qc}\}$)\\
 $\beta_j^{r}$ & semantic (cross-resource) attention of $j$ on $r$\\
 $t^{\mathrm e}_j,t^{\mathrm l}_j$ & empty/loaded leg times of task $j$\\
+$e^{\mathrm e}_j,e^{\mathrm l}_j$ & empty/loaded leg energies of task $j$ ($E=\sum_j e^{\mathrm e}_j+e^{\mathrm l}_j$)\\
 $\tau_j$ & crane handling delay of task $j$\\
+$M$ & \# sampled schedules used to train the surrogate\\
 $G_{\mathrm{dag}}=(\mathcal N,\mathcal A,b,w)$ & event DAG: node weights $b$, arc weights $w$\\
 $\pi^\star$ & critical (longest) path in $G_{\mathrm{dag}}$\\
 $g_a=\partial\Cmax/\partial w_a$ & TAPE attribution of arc $a$\\
@@ -313,7 +328,7 @@ generation.}
 \subsection{Heterogeneous graph representation of a schedule}
 \label{sec:graphrep}
 A decoded schedule $s(z)$ is encoded as a directed heterogeneous graph
-$G_s=(V,E^{\mathrm{agv}},E^{\mathrm{qc}})$ in which every transport task is a node $j\in V$
+$G_s=(\mathcal V,E^{\mathrm{agv}},E^{\mathrm{qc}})$ in which every transport task is a node $j\in\mathcal V$
 and the two resource chains are the two arc types:
 \begin{itemize}[leftmargin=*,itemsep=2pt]
   \item a \textbf{task-node feature} $x_j\in\R^{d_0}$, $d_0{=}4$, holds the handling time,
@@ -576,6 +591,65 @@ is the critical (longest) path $\pi^\star$; only its arcs carry a nonzero TAPE g
 \label{fig:dag}
 \end{figure}
 
+\subsection{The exact evaluator and the self-supervised learning loop}
+\label{sec:evaluator}
+The reader may ask where the targets for all of the above come from: \emph{there is no
+external dataset}. Every label is produced by an exact physical \emph{evaluator}, and the
+method is best read as a closed loop between that evaluator and the learned surrogate. We make
+both explicit here.
+
+\paragraph{The exact evaluator (the oracle).} Given a decoded schedule $s(z)$, the evaluator
+returns the objective pair $f(s)=(\Cmax,E)$ \emph{and} the per-task physical quantities the
+surrogate is trained to predict. In the uncoupled regime it simply runs the max-plus
+longest-path recurrence of Section~\ref{sec:maxplus} in topological order ($O(N)$): each
+task's completion is the maximum over its AGV-chain and crane-chain predecessors plus its leg
+and handling times, and $\Cmax$ is the longest source-to-sink path; energy is the exact
+additive sum $E=\sum_j (e^{\mathrm e}_j+e^{\mathrm l}_j)$. Under peak-power coupling the
+makespan has no closed form, so the evaluator instead runs a deterministic event-driven
+power simulator that resolves the contention fixed point. Either way it is \emph{exact}: it is
+the ground-truth oracle against which we measure surrogate fidelity
+(Section~\ref{sec:fidelity}) and the realised critical path $\pi^\star$ against which we
+measure TAPE faithfulness (Section~\ref{sec:tape}).
+
+\paragraph{Self-supervised label generation.} Because the evaluator is cheap and exact, we
+synthesise training data by sampling: draw $M$ random-key vectors
+$\chi^{(m)}\!\sim\!\mathcal U[0,1]^{4N}$, decode each to a schedule, and evaluate it, recording
+for every task its empty/loaded leg times $(t^{\mathrm e}_j,t^{\mathrm l}_j)$, handling delay
+$\tau_j$, and the schedule's scalar $\Cmax$. This produces a labelled set
+$\{(G_{s^{(m)}},\{t^{\mathrm e}_j,t^{\mathrm l}_j,\tau_j\}_j,\Cmax^{(m)})\}_{m=1}^{M}$ at no
+annotation cost ($M\!\approx\!10^3$ in our runs). Two regressions are then fit, both supervised
+\emph{only} by these labels: (i) the E-HGATv2 core and its scalar read-out
+(Eq.~\ref{eq:readout}) are fit to $\Cmax$ by MSE---this is the surrogate whose \emph{attention}
+we later show is unfaithful; (ii) the fused projection heads (Eq.~\ref{eq:leghead}) are fit to
+the \emph{local} leg labels $(t^{\mathrm e}_j,t^{\mathrm l}_j,\tau_j)$ by MSE, after which the
+max-plus DP composes $\Cmax$ with no further parameters. Supervising the fused heads on the
+\emph{local physics} rather than the scalar objective is precisely what makes the composed
+gradient (TAPE) coincide with the true binding path.
+
+\paragraph{The search$\,\to\,$knowledge$\,\to\,$search loop.} These pieces close the loop of
+Figure~\ref{fig:arch} and Algorithm~\ref{alg:loop}: NSGA-II proposes schedules; the evaluator
+labels them exactly; the surrogate distils the leg-time landscape into one differentiable
+model; its tropical gradient both \emph{explains} a schedule (R2/R4) and \emph{steers} the
+next generation's mutation and offspring screening (R3); the steered search then visits better
+schedules. The surrogate is trained \emph{once} per instance on the sampled set; on the
+screening path at query time the search calls only the $O(N)$ surrogate, never the simulator.
+
+\begin{algorithm}[t]
+\caption{E-HGATv2 train-and-guide loop (per instance).}
+\label{alg:loop}
+\begin{algorithmic}[1]
+\State sample $M$ random keys; decode + \textbf{evaluate} $\to$ labels $\{t^{\mathrm e},t^{\mathrm l},\tau,\Cmax\}$
+\State train core (fit scalar $\Cmax$) and fused heads (fit leg times) by MSE \Comment{once per instance}
+\State initialise NSGA-II population of random keys
+\For{each generation}
+  \State surrogate predicts $\Cmax$ for $\kappa\lambda$ offspring; keep the best $\lambda$ \Comment{screening}
+  \State TAPE gradient $g_a=\partial\Cmax/\partial w_a$ marks binding tasks; bias mutation toward them
+  \State \textbf{exactly} evaluate the retained $\lambda$ offspring; non-dominated sort + crowding
+\EndFor
+\State \Return Pareto set, with per-front TAPE attributions and Pareto Tension Scores (R4)
+\end{algorithmic}
+\end{algorithm}
+
 \subsection{TAPE: exact critical-path attributions}
 \label{sec:tape}
 Let $\pi^\star$ be the maximising path realised by the stored arcs $a^\star(\cdot)$.
@@ -772,16 +846,42 @@ screening is therefore not a budget advantage---it only changes \emph{which} chi
 evaluated, not how many.
 
 \subsection{Quality and faithfulness metrics}
-Optimisation quality uses Pareto-compliant indicators against a reference front $\mathrm{PF}^\star$
-(the exact oracle for \textsf{SD-5}, otherwise the non-dominated union of long
-reference runs): \textbf{hypervolume} ratio $\mathrm{HV}/\mathrm{HV}^\star$ (higher better),
-\textbf{GD$^+$} and \textbf{IGD$^+$}~\cite{ishibuchi2015igdplus} (convergence/coverage,
-lower better), and Deb's \textbf{spread} $\Delta$~\cite{deb2002nsga2}. Faithfulness uses the
-attention readout's precision@1 and Spearman correlation with the true per-task makespan
-levers, versus TAPE's leg-critical Jaccard against the oracle. Each cell is a mean over $5$
-seeds with a $95\%$ confidence interval. Significance across instances uses the Friedman
-test with average ranks and the Nemenyi critical difference, plus pairwise Wilcoxon
-signed-rank tests with Holm correction, following Dem\v{s}ar~\cite{demsar2006}.
+\label{sec:metrics}
+\paragraph{Optimisation quality.} All indicators compare an approximation front $F$ to a
+reference front $\mathrm{PF}^\star$ (the exact oracle for \textsf{SD-5}; elsewhere the
+non-dominated union of long reference runs), with both objectives normalised to $[0,1]$ by the
+reference extremes. With nadir reference point $r$:
+\begin{itemize}[leftmargin=*,topsep=1pt,itemsep=1pt]
+\item \textbf{Hypervolume ratio} $\mathrm{HV}(F)/\mathrm{HV}(\mathrm{PF}^\star)$, where
+$\mathrm{HV}(F)=\mathrm{vol}\!\big(\bigcup_{p\in F}[\,p,r\,]\big)$ is the objective-space volume
+dominated by $F$ up to $r$ (higher better; $1$ matches the reference).
+\item \textbf{Modified generational distances} $\mathrm{GD}^+,\mathrm{IGD}^+$%
+~\cite{ishibuchi2015igdplus}: mean Pareto-compliant distance from $F$ to $\mathrm{PF}^\star$
+(convergence) and from $\mathrm{PF}^\star$ to $F$ (coverage), using a $d^+$ that counts only
+\emph{dominated} discrepancies (lower better).
+\item \textbf{Spread} $\Delta$~\cite{deb2002nsga2}: Deb's distribution metric---the normalised
+dispersion of consecutive gaps along $F$ together with its boundary gaps (lower = more uniform).
+\end{itemize}
+\paragraph{Faithfulness.} For a fixed schedule the evaluator yields the exact critical path
+(Section~\ref{sec:evaluator}); each guidance signal is scored against it by (a) \emph{precision@1}
+(is the top-scored task on the critical path?), (b) \emph{Spearman $\rho$} between the signal
+and the per-task marginal makespan-sensitivity, and (c) for TAPE the \emph{leg-critical
+Jaccard} (overlap of predicted vs.\ true on-path leg sets). Section~\ref{sec:ladder} reports
+these at four granularities, coarse to fine.
+\paragraph{Protocol.} Each cell is a mean over $20$ seeds (\textsf{SD-20-C}: $5$) with a $95\%$
+confidence interval; significance across instances uses the Friedman test with average ranks
+and the Nemenyi critical difference, plus Holm-corrected pairwise Wilcoxon signed-rank tests,
+following Dem\v{s}ar~\cite{demsar2006}.
+
+\paragraph{Reproducibility and validation.} Every result derives from a single seeded
+generator, so the tables reproduce from the seed alone; the synthetic family ships with its
+generator and the FSMJ instances are the published~\cite{homayouni2022book} tables. The exact
+evaluator doubles as a built-in oracle for validation: a regression suite checks that the
+decoder is a left-inverse of the encoder, that the differentiable max-plus DP reproduces the
+simulator's makespan to floating-point tolerance, and that the surrogate's leg-time
+predictions track the evaluator on held-out random schedules---the fidelity study of
+Section~\ref{sec:fidelity} is the aggregate of that last check. Code, instances, and seeds are
+released with the paper.
 
 \section{Results}
 \label{sec:results}
