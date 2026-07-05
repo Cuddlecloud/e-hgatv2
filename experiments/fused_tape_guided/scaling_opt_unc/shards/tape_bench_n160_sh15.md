@@ -1,13 +1,3 @@
-instance=toy:160 N=160 coupled=False | mp P=800x4, GAT/BRKGA pop=3200 | gens=40 | matched evals/gen=3200
-training core + fused TAPE head ...
-  fused R2_makespan=0.9722 R2_energy=1.0000
-  E-HGATv2-TAPE: done 1 seeds
-  E-HGATv2-attn: done 1 seeds
-  NSGA-II (random): done 1 seeds
-  mp-BRKGA: done 1 seeds
-  single-pop BRKGA: done 1 seeds
-reference: non-dominated union of high-budget mp-BRKGA + BRKGA + TAPE @ 50 gens and all evaluated fronts | 45 pts | HV*=23438810.6
-
 # Faithful-guidance study -- toy:160 (N=160, uncoupled)
 
 _1 seeds, 40 gens, matched exact-eval budget (mp 800x4 = GAT/BRKGA 3200/gen). Reference: non-dominated union of high-budget mp-BRKGA + BRKGA + TAPE @ 50 gens and all evaluated fronts. Cells = mean (95% CI)._
@@ -32,5 +22,3 @@ _1 seeds, 40 gens, matched exact-eval budget (mp 800x4 = GAT/BRKGA 3200/gen). Re
 
 _TAPE makespan abs-error vs oracle: 62.905. A faithful signal that also tops the optimisation table is the unified Req 2+3 claim._
 
-
-wrote experiments/fused_tape_guided/tape_bench_n160_sh15.* (total 24530s)
