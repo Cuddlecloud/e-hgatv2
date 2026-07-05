@@ -1,0 +1,24 @@
+# Faithful-guidance study -- toy:80 (N=80, coupled)
+
+_1 seeds, 40 gens, matched exact-eval budget (mp 400x4 = GAT/BRKGA 1600/gen). Reference: non-dominated union of high-budget mp-BRKGA + BRKGA + TAPE @ 50 gens and all evaluated fronts. Cells = mean (95% CI)._
+
+## Optimisation (Req 3)
+
+| Method | HV / HV* | GD+ | IGD+ | Spread | true evals |
+|---|---|---|---|---|---|
+| E-HGATv2-TAPE | 0.8884 ± 0.0000 | 227.8022 ± 0.0000 | 889.5302 ± 0.0000 | 0.9416 ± 0.0000 | 65600 |
+| E-HGATv2-attn | 0.8437 ± 0.0000 | 175.2301 ± 0.0000 | 649.3470 ± 0.0000 | 0.9004 ± 0.0000 | 65600 |
+| NSGA-II (random) | 0.3755 ± 0.0000 | 1163.4793 ± 0.0000 | 4426.2982 ± 0.0000 | 0.9263 ± 0.0000 | 65600 |
+| mp-BRKGA | 0.4748 ± 0.0000 | 1088.9156 ± 0.0000 | 2217.7631 ± 0.0000 | 0.8494 ± 0.0000 | 65600 |
+| single-pop BRKGA | 0.3793 ± 0.0000 | 1041.9546 ± 0.0000 | 4670.0380 ± 0.0000 | 0.8861 ± 0.0000 | 65600 |
+
+## Guidance-signal faithfulness (Req 2)
+
+| Signal | precision@1 | Spearman rho | leg-critical Jaccard vs oracle |
+|---|---|---|---|
+| attention (Signal #1) | 0.600 | 0.005 | n/a |
+| **TAPE (Signal #3)** | n/a | n/a | **0.925** |
+| random baseline | 0.013 | 0.000 | n/a |
+
+_TAPE makespan abs-error vs oracle: 127.976. A faithful signal that also tops the optimisation table is the unified Req 2+3 claim._
+
