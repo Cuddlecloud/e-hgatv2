@@ -52,8 +52,7 @@
 \title{\textbf{Faithful Tropical Explanations for Guiding\\[2pt]
 Bi-Objective Quay-Crane and Speed-Adjustable-AGV Scheduling}}
 
-\author{Aayush Jha\\[2pt]
-\small Code and data: \url{https://github.com/aayushjha1729/e-hgatv2}}
+\author{Aayush Jha}
 \date{\today}
 
 \begin{document}
@@ -935,9 +934,8 @@ evaluator doubles as a built-in reference for validation: a regression suite che
 decoder is a left-inverse of the encoder, that the differentiable max-plus DP reproduces the
 simulator's makespan to floating-point tolerance, and that the surrogate's leg-time
 predictions track the evaluator on held-out random schedules---the fidelity study of
-Section~\ref{sec:fidelity} is the aggregate of that last check. The source code, instances,
-seeds and result artifacts are available at
-\url{https://github.com/aayushjha1729/e-hgatv2}.
+Section~\ref{sec:fidelity} is the aggregate of that last check. The code, instances, seeds
+and result artifacts are released with the paper (Appendix~\ref{app:repro}).
 
 \section{Results}
 \label{sec:results}
@@ -2129,7 +2127,9 @@ under non-deterministic GPU reductions, and CPU execution makes every number
 bit-reproducible from its recorded seed. The GPUs were used only to profile the batched
 tropical dynamic program and are not required to reproduce any reported number. Throughput
 comes instead from process-level parallelism: search experiments were sharded across cores,
-one single-threaded process per (instance, seed-block) pair.
+one single-threaded process per (instance, seed-block) pair. The source code, the instance
+data, the seeds and the result artifacts from which every reported table and figure is
+regenerated are available at \url{https://github.com/aayushjha1729/e-hgatv2}.
 
 \paragraph{Cost.} The tropical layer adds $\Theta(N)$ arcs and therefore
 $\mathcal{O}(N)$ work per evaluation (approximately $4N$ multiply-adds at the reported
@@ -2239,10 +2239,8 @@ leg remains individually feasible and infeasibility can only arise from concurre
 \section{Software architecture}
 \label{app:software}
 This appendix documents the implementation, since several claims in the paper concern what
-the code computes and are checkable only against it. The source tree described here is
-available at \url{https://github.com/aayushjha1729/e-hgatv2}, together with the instance
-data, the seeds, and the result artifacts from which every reported table and figure is
-regenerated.
+the code computes and are checkable only against it. The source tree described here is the
+one released with the paper (Appendix~\ref{app:repro}).
 
 \paragraph{Stack.} The system is a Python package (\texttt{ehgat}, $\approx\!9.8$k lines
 across the eight modules of Table~\ref{tab:modules}, with $\approx\!3.4$k further lines of
