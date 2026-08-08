@@ -14,10 +14,10 @@ and I did, but I then spent much longer than I expected on the experimental side
 through several architectures before one of them held up, and the runs were slow enough that
 each attempt cost days on a rented machine. For a good while I could not have told you
 whether the approach would work, so I kept waiting for something worth sending. I should
-have written to you mid-way with the uncertainty included instead of going quiet.
+have written mid-way with the uncertainty included instead of going quiet.
 
-The method is settled now and the results are stable, so I would like to share the code and
-the write-up, and to ask for some instance data I need for the final experiments.
+The results are stable now. Below is what the method does, where it is weak, and the points
+I would like your direction on before going further.
 
 Repository: https://github.com/aayushjha1729/e-hgatv2 — the README gives the reading order
 and how each reported number is regenerated.
@@ -25,27 +25,27 @@ and how each reported number is regenerated.
 ## How it follows the three directions
 
 The work stayed on the track you set: knowledge gathered during the search is fed back into
-the search. Concretely, a surrogate-assisted NSGA-II produces `k·λ` offspring per generation,
-ranks them with a learned surrogate of `(C_max, E)`, and passes only the best `λ` to the
-exact evaluator. The exact-evaluation budget per generation is therefore unchanged, so every
-comparison is made at matched exact evaluations. The same screening sits inside mp-BRKGA
-(`run_mp_brkga(..., screen_fn=...)`), which lets the surrogate be switched on and off within
-one algorithm rather than compared across two. That is direction 3.
+the search. A surrogate-assisted NSGA-II produces `k·λ` offspring per generation, ranks them
+with a learned surrogate of `(C_max, E)`, and passes only the best `λ` to the exact
+evaluator, so the exact-evaluation budget per generation is unchanged and every comparison
+is at matched exact evaluations. The same screening sits inside mp-BRKGA
+(`run_mp_brkga(..., screen_fn=...)`), which switches the surrogate on and off within one
+algorithm rather than comparing across two. That is direction 3.
 
-What makes directions 1 and 2 work is where the makespan comes from. The network does not
-regress it. It predicts the individual leg durations and handling delays, and those are
-composed through the exact max-plus critical-path recurrence. The composition is exact by
+Directions 1 and 2 follow from where the makespan comes from. The network does not regress
+it: it predicts the individual leg durations and handling delays, and those are composed
+through the exact max-plus critical-path recurrence. The composition is exact by
 construction, so the model's gradient with respect to each leg is exactly the binary
-critical-path indicator — the surrogate hands back, for free and exactly, which task orders
-and speed choices are binding. That is the feature-importance and landscape analysis of
-direction 2, and aggregating the same quantity across the front, weighted by the local
-trade-off between `C_max` and `E`, is what lets the model describe the Pareto front's
-behaviour rather than only its location. The surrogate is a graph network over the schedule
-rather than a feature vector, so a model fitted on small instances applies unchanged to large
-ones; a tabular surrogate fitted at `N=10` cannot be evaluated at `N=160` at all.
+critical-path indicator — the surrogate returns, exactly and at no extra cost, which task
+orders and speed choices are binding. That is the feature-importance and landscape analysis
+of direction 2, and aggregating the same quantity across the front, weighted by the local
+trade-off between `C_max` and `E`, describes the front's behaviour rather than only its
+location. The surrogate reads the schedule as a graph rather than a feature vector, so a
+model fitted on small instances applies unchanged to large ones; a tabular surrogate fitted
+at `N=10` cannot be evaluated at `N=160` at all.
 
 The physics is your published model, verified rather than assumed: Eqs (2)–(4) and (10)–(18)
-evaluated forward with the binaries fixed by the decoded schedule. It agrees to zero
+evaluated forward with the binaries fixed by the decoded schedule, agreeing to zero
 discrepancy with a line-by-line transcription solved by fixed-point iteration and with
 exhaustive enumeration of all `3^(2N)` speed assignments on small instances. Eqs (5)–(9) and
 (19) hold by construction through the random-key decoder, following §4.2 of the 2022 paper.
@@ -60,22 +60,20 @@ resolved by a deterministic event-driven simulator, and the binding path is set 
 disjunctive power-wait arcs. That is the setting where the bottleneck cannot be read off the
 schedule by inspection, and where the surrogate earns its place.
 
-It is also the weakest part of the results, and I would rather state that plainly than let
-it look settled. Held-out `R²` falls from ≈0.99 to ≈0.80, critical-path recovery to 0.85 at
-`N=20`, and size transfer holds only to about `N=25`, where the uncoupled model holds out to
-very large `N`. The makespan-optimal extreme of the coupled `N=10` front collapses outright
-— the maximum-contention corner, where every vehicle runs at top speed and the binding path
-is dominated by the power-wait arcs that have no closed form. A deeper unroll and a larger
-sample gave the identical number, so it is an accuracy ceiling rather than a sampling
-artefact.
+It is also the weakest part of the results. Held-out `R²` falls from ≈0.99 to ≈0.80,
+critical-path recovery to 0.85 at `N=20`, and size transfer holds only to about `N=25`,
+where the uncoupled model holds out to very large `N`. The makespan-optimal extreme of the
+coupled `N=10` front collapses outright — the maximum-contention corner, where every vehicle
+runs at top speed and the binding path is dominated by the power-wait arcs. A deeper unroll
+and a larger sample gave the identical number, so it is an accuracy ceiling rather than a
+sampling artefact.
 
-I suspect the gap is partly that I am training against instances I generated myself. Your
-ITOR paper states the model for job-shop machines, so I had to decide how the budget applies
-to AGV travel legs, what value it takes, and how contention is arbitrated — I currently use
-a fixed dispatch priority rather than treating the arbitration as a decision. If you have
-the peak-power instances from that work, or would tell me which of those choices matches
-what you had in mind, I could put the coupled results on the same footing as the uncoupled
-ones instead of reporting them as the weaker half.
+Part of the gap may be that I am training on instances I generated myself. Your ITOR paper
+states the model for job-shop machines, so I had to decide how the budget applies to AGV
+travel legs, what value it takes, and how contention is arbitrated — I currently use a fixed
+dispatch priority rather than treating the arbitration as a decision. Your peak-power
+instances, or a word on which of those choices you had in mind, would put the coupled
+results on the same footing as the uncoupled ones.
 
 ## What I need
 
@@ -99,32 +97,27 @@ generated from your Table 4 distance matrix. Five things would close the gaps:
 
 On the discrete-event simulation model from your former student: I have set it aside for now,
 because the attribution needs a deterministic evaluator and stochastic service times would
-remove the exactness the whole analysis rests on. It would be a natural validation asset
-later, and I would be glad to discuss where it fits.
+remove the exactness the analysis rests on. It would be a natural validation asset later.
 
 ## Where I would like your direction
 
-Before I run anything further I would rather have your view than guess, on four points.
+Before running anything further I would rather have your view than guess, on four points.
 
-1. **The architecture.** The surrogate as it stands is a heterogeneous graph attention
-   network with the max-plus critical-path layer composed on top. Is that the form you want
-   this to take, or would you prefer I change it — a different surrogate, or the XGBoost and
-   TreeSHAP pipeline of the XAI paper, which I currently keep as the baseline it is compared
-   against.
+1. **The architecture.** The surrogate is a heterogeneous graph attention network with the
+   max-plus critical-path layer on top. Is that the form you want, or would you prefer a
+   different surrogate — the XGBoost and TreeSHAP pipeline of the XAI paper, say, which I
+   currently keep as the baseline it is compared against.
 2. **Evaluation and metrics.** I report hypervolume and IGD+ against a reference front, with
-   Friedman and Holm-corrected Wilcoxon tests across seeds, and critical-path recovery for
-   the explanation. Are those the comparisons you would want to see, and is there a metric
-   you consider standard here that I have left out.
-3. **Instance sets.** Results are on the Table 5 loading instances and on dual-cycling
-   instances I generate from your Table 4 distances. Which sets would you want the claims
-   made on, and at what sizes.
-4. **How far to generalise.** The findings currently hold on instances up to a few hundred
-   tasks in the uncoupled regime and near the training size in the coupled one. I would like
-   to know whether you want them pushed to larger instances and to the coupled regime, or
-   whether it is better to state them narrowly on the sizes where they are solid.
+   Friedman and Holm-corrected Wilcoxon tests across seeds, plus critical-path recovery for
+   the explanation. Are those the right comparisons, and is there a metric standard in this
+   literature that I have left out.
+3. **Instance sets.** Which sets should the claims be made on, and at what sizes.
+4. **How far to generalise.** The findings hold to a few hundred tasks uncoupled and near the
+   training size coupled. Should I push them to larger instances and to the coupled regime,
+   or state them narrowly where they are solid.
 
-I would also be grateful for any comments on the formulation, particularly on whether the
-baseline configurations are the ones you would consider fair.
+I would also welcome any comment on whether the baseline configurations are ones you would
+consider fair.
 
 Thank you for your patience with the delay.
 
