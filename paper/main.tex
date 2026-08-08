@@ -207,11 +207,13 @@ is the single structural fact the whole method exploits: the longest path is the
 
 \subsection{The peak-power-coupled regime}
 \label{sec:coupled}
-The uncoupled problem above has a closed-form (longest-path) makespan. As a deliberately
-harder, \emph{no-closed-form} stress-test for the differentiable surrogate, we add a
-constraint of our own construction: the fleet shares a single \emph{instantaneous peak-power
-budget} $P_{\max}$, and the total power of all AGV \emph{travel legs} running at any instant
-may not exceed $P_{\max}$ (quay-crane handling draws none). Any
+The uncoupled problem above has a closed-form (longest-path) makespan. The second regime
+adds an instantaneous peak-power constraint, following the speed-adjustable peak-power
+scheduling model of Homayouni and Fontes~\cite{homayouni2025peakpower}: the fleet shares a
+single \emph{instantaneous peak-power budget} $P_{\max}$, and the total power of all AGV
+\emph{travel legs} running at any instant may not exceed $P_{\max}$ (quay-crane handling
+draws none). Their model is stated for job-shop machines; the transfer to AGV travel legs in
+the terminal setting is made here. Any
 $P_{\max}\ge\max_\ell \varepsilon_\ell$ ($=19.8$\,kW from Table~\ref{tab:speed}; we use
 $30$\,kW) keeps every leg individually feasible.
 
@@ -239,16 +241,18 @@ closed form captures. When $P_{\max}$ is large enough that no leg ever waits, th
 provably reduces to the uncoupled evaluator (a unit test asserts this), so the coupled problem
 is a clean \emph{superset} of the validated uncoupled one.
 
-\paragraph{Scope of the construction.} Two limitations delimit this regime. \emph{(i)} The power
+\paragraph{Scope of the regime.} Two properties delimit it. \emph{(i)} The power
 arbitration is a \emph{fixed dispatch policy} (the priority rule above) rather than a decision
 variable; the regime optimises the assignment, order and speeds under that policy.
-\emph{(ii)} Unlike the uncoupled objective---the published recurrence~\cite{fontes2023flowtime},
-validated against the exact evaluator---the coupled constraint is introduced in this work: it does
-not form part of the FSMJ or book-chapter benchmark, and we make no claim that it models a
-specific installation. Its role is methodological. It is the regime in which the makespan admits
-no closed form and the binding leg is not evident by inspection, and therefore the regime in
-which a differentiable surrogate with exact gradients (TAPE) is required; accordingly, the fused
-head carries an explicit power-wait term (Section~\ref{sec:fused}).
+\emph{(ii)} The peak-power model is published for job-shop
+scheduling~\cite{homayouni2025peakpower} and the uncoupled terminal recurrence is published
+in~\cite{fontes2023flowtime}, but their combination---a peak-power budget over AGV travel
+legs in the dual-cycling terminal---has no published instance set, so the coupled results
+are reported on the \textsf{SD-$N$-C} instances of Appendix~\ref{app:repro}. This is the
+regime in which the makespan admits no closed form and the binding leg is not evident by
+inspection, and therefore the regime in which a differentiable surrogate with exact
+gradients (TAPE) is required; accordingly, the fused head carries an explicit power-wait
+term (Section~\ref{sec:fused}).
 
 \section{Method}
 \label{sec:method}
@@ -594,9 +598,9 @@ DP exactly, being that DP's own subgradient. The
 attribution's fidelity to the \emph{physical} critical path is therefore inherited from the
 heads' accuracy. In the uncoupled regime the leg heads attain $R^2\approx0.997$
 (Table~\ref{tab:fidelity}), so the surrogate and physical critical paths coincide up to the
-residual leg error (leg-critical Jaccard $0.87$--$1.00$ against the exact simulator);
-under the \emph{synthetic} coupled constraint the heads degrade to $R^2\approx0.80$ and the
-attribution degrades with them (Jaccard $\geq0.91$). Thus ``exact'' qualifies the attribution
+residual leg error (leg-critical Jaccard $0.95$--$1.00$ against the exact simulator);
+under the coupled constraint the heads degrade to $R^2\approx0.80$ and the
+attribution degrades with them (Jaccard $\geq0.85$). Thus ``exact'' qualifies the attribution
 \emph{relative to the model being explained}. This property renders faithfulness
 decidable in this model class: because an exact attribution of
 the surrogate is available, any residual gap between attention and the critical path is a
@@ -619,7 +623,7 @@ model.
   no closed form (it is the fixed point of an iterative power-resolution loop); the
   fused head approximates the coupled makespan ($R^2\approx 0.80$,
   Table~\ref{tab:fidelity}) and still produces an actionable, if degraded, TAPE signal
-  (Jaccard $\geq 0.91$) without access to the simulator at query time.
+  (Jaccard $\geq 0.85$) without access to the simulator at query time.
 \end{enumerate}
 
 \begin{figure}[t]
@@ -961,7 +965,7 @@ and result artifacts are released with the paper (Appendix~\ref{app:repro}).
 \subsection{Faithfulness of TAPE and of the attention weights}
 Figure~\ref{fig:faith} and Table~\ref{tab:main} show the central explanation result.
 TAPE recovers the exact critical path with leg-critical Jaccard $0.95$--$1.00$ in the
-uncoupled regime and $0.87$--$0.95$ under coupling. The learned attention weights, by
+uncoupled regime and $0.85$--$0.95$ under coupling. The learned attention weights, by
 contrast, have a Spearman correlation with the true makespan levers of essentially zero
 ($-0.09\le\rho\le0.17$ across all instances)---they do not rank the bottlenecks.
 Attention's precision@1 ($0.67$--$0.80$) is to be read against the critical fraction
@@ -2250,10 +2254,12 @@ realistic physics---is therefore reported on the \textsf{L}-instances, and obtai
 would let the dual-cycling results be restated on published data.
 
 \paragraph{Coupled variants.} The \textsf{SD-$N$-C} instances add the peak-power budget
-of Section~\ref{sec:coupled} to an otherwise identical \textsf{SD-$N$} instance. As stated
-there, that constraint is introduced in this work and is not part of the benchmark; the
-budget $P_{\max}=30$\,kW is chosen above the largest single-leg draw ($19.8$\,kW), so every
-leg remains individually feasible and infeasibility can only arise from concurrency.
+of Section~\ref{sec:coupled} to an otherwise identical \textsf{SD-$N$} instance. The
+peak-power model follows~\cite{homayouni2025peakpower}; no published instance set states it
+over AGV travel legs in the terminal setting, so these instances supply the coupled
+evaluation. The budget $P_{\max}=30$\,kW is chosen above the largest single-leg draw
+($19.8$\,kW), so every leg remains individually feasible and infeasibility can only arise
+from concurrency.
 
 \section{Software architecture}
 \label{app:software}
@@ -2356,6 +2362,10 @@ container terminals.} (Single-indexed MILP timing model), 2023.
 \bibitem{homayouni2022book} S. Homayouni and D.~B.~M.~M. Fontes.
 \emph{Energy-efficient scheduling of quay cranes and automated guided vehicles}
 (loading benchmark, Tables~4--5), book chapter, 2022.
+\bibitem{homayouni2025peakpower} S. Homayouni and D.~B.~M.~M. Fontes.
+\emph{Optimizing job shop scheduling with speed-adjustable machines and peak power
+constraints: a mathematical model and heuristic solutions.}
+International Transactions in Operational Research, 32(1):194--220, 2025.
 \bibitem{deb2002nsga2} K. Deb, A. Pratap, S. Agarwal, and T. Meyarivan.
 \emph{A fast and elitist multiobjective genetic algorithm: NSGA-II.}
 IEEE Transactions on Evolutionary Computation, 6(2):182--197, 2002.
