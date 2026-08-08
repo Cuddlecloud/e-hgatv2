@@ -99,13 +99,13 @@ against energy. Two objectives are minimised, the makespan $\Cmax$ and the total
 energy $E$. The reference method is the multi-population biased random-key genetic
 algorithm (mp-BRKGA) of Fontes and Homayouni~\cite{fontes2022mpbrkga}.
 
-Four questions arise in this setting and are treated together here. Which quantities
-drive the objectives, as recovered by post-hoc analysis of solved instances? Why is a
-given solution Pareto-optimal, expressed in terms of the input variables (task order,
-vehicle speed, crane workload)? Can knowledge gathered during the search steer the
-optimiser, in the sense of selecting which neighbourhood to explore and which operator to
-apply? And can that knowledge be extracted in a form that characterises the Pareto front
-rather than a single schedule?
+Four requirements on such a solver are treated together here. The first is to identify,
+by post-hoc analysis of solved instances, the quantities that drive the objectives. The
+second is to account for the Pareto-optimality of a given solution in terms of the input
+variables: task order, vehicle speed and crane workload. The third is to feed knowledge
+gathered during the search back to the optimiser, selecting which neighbourhood to
+explore and which operator to apply. The fourth is to extract that knowledge in a form
+that characterises the Pareto front rather than a single schedule.
 
 A single mathematical object addresses all four: the gradient of an exact max-plus
 longest path embedded inside a learned surrogate. It serves as a post-hoc importance
@@ -587,7 +587,8 @@ the surrogate is available, any residual gap between attention and the critical 
 fact about attention, not an artefact of an approximate explainer.
 
 \paragraph{Role of the surrogate in a deterministic problem.} In the uncoupled regime the
-makespan is a closed-form longest path---so why interpose a learned model? Three reasons.
+makespan is a closed-form longest path. Three considerations nonetheless motivate a learned
+model.
 \begin{enumerate}[nosep,leftmargin=*]
 \item \textbf{Screening throughput.} A batched GNN forward over $\kappa\mu$ candidate
   schedules costs one matrix--multiply pass ($\sim\!3$\,ms for $200$ schedules at $N{=}50$);
@@ -918,7 +919,7 @@ dispersion of consecutive gaps along $F$ together with its boundary gaps (lower 
 \end{itemize}
 \paragraph{Faithfulness.} For a fixed schedule the evaluator yields the exact critical path
 (Section~\ref{sec:evaluator}); each guidance signal is scored against it by (a) \emph{precision@1}
-(is the top-scored task on the critical path?), (b) \emph{Spearman $\rho$} between the signal
+(whether the top-scored task lies on the critical path), (b) \emph{Spearman $\rho$} between the signal
 and the per-task marginal makespan-sensitivity, and (c) for TAPE the \emph{leg-critical
 Jaccard} (overlap of predicted vs.\ true on-path leg sets). Section~\ref{sec:ladder} reports
 these at four granularities, coarse to fine.
@@ -1037,8 +1038,8 @@ random mutation, no screening & \multicolumn{3}{c}{$0.950$ \;\;(null)} \\
 
 \subsection{Surrogate fidelity and faithfulness scale to $N{=}50$}
 \label{sec:fidelity}
-A separate, larger study isolates the fused surrogate's standalone behaviour and asks the
-question a referee will ask: \emph{does the explanation survive as the instance grows?} We
+A separate, larger study isolates the fused surrogate's standalone behaviour and establishes
+whether the explanation survives as the instance grows. We
 retrain the surrogate from scratch and evaluate it on held-out random keys for
 $N\in\{6,10,20,50\}$ over $20$ independent seeds, in both regimes
 (Table~\ref{tab:fidelity}, Figure~\ref{fig:fidelity}). Three facts stand out and all are
@@ -1170,9 +1171,9 @@ size-generalisation is a property of the \emph{uncoupled} physics, and we report
 \subsection{Landscape analysis via critical-path attribution}
 \label{sec:r2worked}
 
-The second requirement is a landscape question: \emph{which input variables (task dispatch
-order, AGV travelling speed, crane workload) causally determine the objective values, and
-why are specific solutions Pareto-optimal?} TAPE answers this question exactly. For any schedule
+The second requirement is a landscape one: to determine which input variables (task dispatch
+order, AGV travelling speed, crane workload) fix the objective values, and thereby why
+specific solutions are Pareto-optimal. TAPE resolves this exactly. For any schedule
 $\sigma$, the tropical subgradient (Eq.~\ref{eq:tapechain}) partitions all activities into
 two sets:
 \begin{itemize}[nosep]
