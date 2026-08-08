@@ -26,7 +26,7 @@ checked independently:
 |---|---|
 | MILP Eqs. (2)–(4) and (10)–(18) as a forward recurrence with the binaries fixed | `src/ehgat/environment/evaluator.py` |
 | Independent line-by-line MILP transcription, solved by fixed-point longest-path iteration | `scripts/verify_timing.py` |
-| Exhaustive `3^(2N)` enumeration of speed assignments against the exact oracle | `tests/unit/test_oracle.py` |
+| Exhaustive `3^(2N)` enumeration of speed assignments against the exact evaluator | `tests/unit/test_oracle.py` |
 | Speed and power constants checked against the published kinematic relation `v = α·v₀` at import time | `src/ehgat/environment/physics.py` |
 | Coupled evaluator reduces to the uncoupled one at a non-binding power budget | `tests/unit/test_power_evaluator.py` |
 
@@ -44,7 +44,8 @@ it are comparisons against a re-implementation.
 ```
 src/ehgat/
   environment/   physics, distances, instance generation, random-key decoder,
-                 exact evaluator (uncoupled and power-coupled), exact oracle
+                 exact evaluator (uncoupled and power-coupled), exhaustive Pareto
+                 enumeration
   baselines/     single-population BRKGA, multi-population BRKGA (mp-BRKGA)
   surrogate/     E-HGATv2 heterogeneous core, graph construction, training,
                  XGBoost/TreeSHAP flat-surrogate baseline
@@ -63,7 +64,7 @@ data/            published Table 4 distance matrix, Table 5 loading instances
 ## Installation
 
 ```bash
-uv sync --python 3.12                              # environment, oracle, BRKGA
+uv sync --python 3.12                              # environment, evaluator, BRKGA
 uv sync --python 3.12 --extra learn --extra viz    # add the surrogate and plotting stack
 ```
 
@@ -112,7 +113,7 @@ alongside its output.
 1. `src/ehgat/environment/evaluator.py`, the physical model, annotated line by line with
    the MILP equation each statement realises.
 2. `src/ehgat/environment/decoder.py`, the random-key encoding and its decode rules.
-3. `src/ehgat/explain/event_dag.py`, the event-DAG assembler. The exact oracle and the
+3. `src/ehgat/explain/event_dag.py`, the event-DAG assembler. The exact evaluator and the
    learned head build the same precedence structure here and differ only in the source of
    the leg and delay values.
 4. `src/ehgat/search/attention_nsga2.py`, the search loop, including offspring screening.

@@ -75,7 +75,7 @@ gradient with respect to each transport leg is an exact binary critical-path ind
 this readout is denoted TAPE (Tropical Attribution for Physical Explanations). On $11$
 problem instances (synthetic dual-cycling instances and the published FSMJ loading
 benchmark, in both the uncoupled and the peak-power-coupled regime) TAPE recovers the
-true critical path with Jaccard $0.85$--$1.00$ against an exact oracle, whereas the
+true critical path with Jaccard $0.85$--$1.00$ against the exact evaluator, whereas the
 learned attention weights are statistically uncorrelated with the true makespan levers
 ($|\rho|\le 0.18$) and, measured against the exact critical path from coarse hit-rate to
 fine ranking, are no better than random at any granularity. Routing the same signal back
@@ -228,7 +228,7 @@ is a clean \emph{superset} of the validated uncoupled one.
 arbitration is a \emph{fixed dispatch policy} (the priority rule above) rather than a decision
 variable; the regime optimises the assignment, order and speeds under that policy.
 \emph{(ii)} Unlike the uncoupled objective---the published recurrence~\cite{fontes2023flowtime},
-validated against the exact oracle---the coupled constraint is introduced in this work: it does
+validated against the exact evaluator---the coupled constraint is introduced in this work: it does
 not form part of the FSMJ or book-chapter benchmark, and we make no claim that it models a
 specific installation. Its role is methodological. It is the regime in which the makespan admits
 no closed form and the binding leg is not evident by inspection, and therefore the regime in
@@ -579,7 +579,7 @@ DP exactly---it is that DP's own subgradient, not a post-hoc saliency heuristic.
 attribution's fidelity to the \emph{physical} critical path is therefore inherited from the
 heads' accuracy. In the uncoupled regime the leg heads attain $R^2\approx0.997$
 (Table~\ref{tab:fidelity}), so the surrogate and physical critical paths coincide up to the
-residual leg error (leg-critical Jaccard $0.87$--$1.00$ against the exact simulator oracle);
+residual leg error (leg-critical Jaccard $0.87$--$1.00$ against the exact simulator);
 under the \emph{synthetic} coupled constraint the heads degrade to $R^2\approx0.80$ and the
 attribution degrades with them (Jaccard $\geq0.91$). Thus ``exact'' qualifies the attribution
 \emph{relative to the model being explained}. This property renders faithfulness
@@ -642,7 +642,7 @@ external dataset}. Every label is produced by an exact physical \emph{evaluator}
 method is best read as a closed loop between that evaluator and the learned surrogate. We make
 both explicit here.
 
-\paragraph{The exact evaluator (the oracle).} Given a decoded schedule $s(z)$, the evaluator
+\paragraph{The exact evaluator.} Given a decoded schedule $s(z)$, the evaluator
 returns the objective pair $f(s)=(\Cmax,E)$ and the per-task physical quantities the
 surrogate is trained to predict. In the uncoupled regime it simply runs the max-plus
 longest-path recurrence of Section~\ref{sec:maxplus} in topological order ($O(N)$): each
@@ -651,7 +651,7 @@ and handling times, and $\Cmax$ is the longest source-to-sink path; energy is th
 additive sum $E=\sum_j (e^{\mathrm e}_j+e^{\mathrm l}_j)$. Under peak-power coupling the
 makespan has no closed form, so the evaluator instead runs a deterministic event-driven
 power simulator that resolves the contention fixed point. Either way it is \emph{exact}: it is
-the ground-truth oracle against which we measure surrogate fidelity
+the reference against which we measure surrogate fidelity
 (Section~\ref{sec:fidelity}) and the realised critical path $\pi^\star$ against which we
 measure TAPE faithfulness (Section~\ref{sec:tape}).
 
@@ -737,7 +737,7 @@ off-path leg changes nothing.} Unlike the attention weights $\beta$ of \eqref{eq
 are a smooth surrogate trained only to fit a scalar---TAPE is a binary critical-path
 indicator \emph{by construction}. The leg times
 themselves are predicted by the graph network~\eqref{eq:leghead}, so the network stays
-load-bearing; TAPE only makes its prediction faithfully inspectable. (An exact oracle
+load-bearing; TAPE only makes its prediction faithfully inspectable. (The exact
 critical path, computed from the resolved simulator with no network, is retained only as a
 ceiling reference.)
 
@@ -773,9 +773,9 @@ parameter counts and software environment.
 
 \begin{definition}[Faithfulness]
 For a schedule, let $\mathcal{C}_{\text{model}}=\{a:g_a>\tfrac12\}$ be the model's binding-leg
-set and $\mathcal{C}_{\text{oracle}}$ the exact critical-path leg set. The \emph{leg-critical
-Jaccard} $|\mathcal{C}_{\text{model}}\cap\mathcal{C}_{\text{oracle}}|/
-|\mathcal{C}_{\text{model}}\cup\mathcal{C}_{\text{oracle}}|$ measures faithfulness; a value of
+set and $\mathcal{C}_{\text{exact}}$ the exact critical-path leg set. The \emph{leg-critical
+Jaccard} $|\mathcal{C}_{\text{model}}\cap\mathcal{C}_{\text{exact}}|/
+|\mathcal{C}_{\text{model}}\cup\mathcal{C}_{\text{exact}}|$ measures faithfulness; a value of
 $1$ means the model identifies exactly the binding legs.
 \end{definition}
 
@@ -862,7 +862,8 @@ is on a few tasks. This is the requested front-behaviour knowledge (Section~\ref
 We use three families (Table~\ref{tab:data}). \textbf{Synthetic dual-cycling} instances
 (\textsf{SD-$N$}) alternate LOAD/\allowbreak UNLOAD moves over $3$ cranes served by $2$ vehicles, with
 handling times drawn from $U[30,80]$\,s; they are fully reproducible and, at $N=5$, small
-enough for an exact brute-force Pareto oracle. Their generator is specified in full in
+enough that the true Pareto front $\mathrm{PF}^\star$ can be obtained by exhaustive
+enumeration. Their generator is specified in full in
 Appendix~\ref{app:instances}, together with an explicit statement of which components are
 taken from the published benchmark and which are constructed here. The \textbf{FSMJ loading benchmark}
 (\textsf{L07}, \textsf{L15}, \textsf{L21}, \textsf{L35}) are the \emph{published} instances of
@@ -902,7 +903,7 @@ evaluated, not how many.
 \subsection{Quality and faithfulness metrics}
 \label{sec:metrics}
 \paragraph{Optimisation quality.} All indicators compare an approximation front $F$ to a
-reference front $\mathrm{PF}^\star$ (the exact oracle for \textsf{SD-5}; elsewhere the
+reference front $\mathrm{PF}^\star$ (exhaustively enumerated for \textsf{SD-5}; elsewhere the
 non-dominated union of long reference runs), with both objectives normalised to $[0,1]$ by the
 reference extremes. With nadir reference point $r$:
 \begin{itemize}[leftmargin=*,topsep=1pt,itemsep=1pt]
@@ -930,7 +931,7 @@ following Dem\v{s}ar~\cite{demsar2006}.
 \paragraph{Reproducibility and validation.} Every result derives from a single seeded
 generator, so the tables reproduce from the seed alone; the synthetic family ships with its
 generator and the FSMJ instances are the published~\cite{homayouni2022book} tables. The exact
-evaluator doubles as a built-in oracle for validation: a regression suite checks that the
+evaluator doubles as a built-in reference for validation: a regression suite checks that the
 decoder is a left-inverse of the encoder, that the differentiable max-plus DP reproduces the
 simulator's makespan to floating-point tolerance, and that the surrogate's leg-time
 predictions track the evaluator on held-out random schedules---the fidelity study of
@@ -959,15 +960,15 @@ problem, and it is the justification for routing guidance through TAPE rather th
 \centering
 \includegraphics[width=0.92\textwidth]{figs/fig_faithfulness.pdf}
 \caption{Faithfulness of the two candidate guidance signals on every instance. TAPE's
-critical-path Jaccard against the exact oracle is near $1$; the attention weights'
+critical-path Jaccard against the exact evaluator is near $1$; the attention weights'
 $|\rho|$ with the true makespan levers is near $0$.}
 \label{fig:faith}
 \end{figure}
 
 \subsection{Granularity of the attention--critical-path comparison}
 \label{sec:ladder}
-In natural-language settings the ``is attention explanation?'' debate rests on \emph{proxy}
-ground truth---erasure, gradient, and adversarial-attention tests---which is why it has
+In natural-language settings the ``is attention explanation?'' debate rests on indirect
+criteria---erasure, gradient, and adversarial-attention tests---which is why it has
 remained contested. Here the makespan is an \emph{exact} max-plus longest path, so every
 schedule has a known critical path and a known per-task makespan-sensitivity, and the
 question becomes directly measurable at increasing resolution. We compare the surrogate's AGV-arc attention against
@@ -1060,7 +1061,7 @@ $\sim\!1.5$ Jaccard points over the same size range.
 \centering\small
 \caption{Standalone fused-surrogate fidelity and TAPE faithfulness as a function of problem
 size $N$, over $20$ seeds (mean with $95\%$ CI). The makespan accuracy ($R^2_{C_{\max}}$)
-and the critical-path faithfulness (leg-Jaccard vs.\ the exact oracle) are essentially flat
+and the critical-path faithfulness (leg-Jaccard vs.\ the exact evaluator) are essentially flat
 in $N$ in the uncoupled regime and degrade only mildly under peak-power coupling. The energy
 head is exact by construction ($R^2=1.000$ at every $N$, omitted).}
 \label{tab:fidelity}
@@ -1087,7 +1088,7 @@ coupled   & 50 & $0.777\ [0.761,0.793]$ & $0.913\ [0.909,0.917]$ & $100.6$\\
 \begin{tikzpicture}
 \begin{axis}[
   width=0.7\textwidth, height=0.42\textwidth,
-  xlabel={problem size $N$ (tasks)}, ylabel={leg-critical Jaccard (TAPE vs.\ oracle)},
+  xlabel={problem size $N$ (tasks)}, ylabel={leg-critical Jaccard (TAPE vs.\ exact)},
   xmode=log, log basis x=2, xtick={6,10,20,50}, xticklabels={6,10,20,50},
   ymin=0.85, ymax=1.01, ymajorgrids, grid style={gray!20},
   legend pos=south west, legend cell align=left, tick label style={font=\footnotesize},
@@ -1104,7 +1105,7 @@ coupled   & 50 & $0.777\ [0.761,0.793]$ & $0.913\ [0.909,0.917]$ & $100.6$\\
 \end{axis}
 \end{tikzpicture}
 \caption{TAPE faithfulness is stable as the instance scales. The critical-path Jaccard
-against the exact oracle stays $\geq 0.98$ (uncoupled) and $\geq 0.91$ (coupled) from
+against the exact evaluator stays $\geq 0.98$ (uncoupled) and $\geq 0.91$ (coupled) from
 $6$ to $50$ tasks; whiskers are $20$-seed $95\%$ CIs. Faithfulness is a property of the
 \emph{model}, not of small-instance luck.}
 \label{fig:fidelity}
@@ -1138,7 +1139,7 @@ published \textsf{DL} benchmark~\cite{homayouni2022book}.
 \caption{Size generalisation of the uncoupled surrogate: trained once at $N{=}16$ and
 evaluated by inference at scale (mean over $3$ training seeds, $24$ random schedules each).
 The physics-fused makespan $R^2$ is flat at $\geq0.98$ to $N{=}5000$ while the black-box
-global-readout core collapses; TAPE faithfulness (leg-Jaccard vs.\ the exact oracle) and the
+global-readout core collapses; TAPE faithfulness (leg-Jaccard vs.\ the exact evaluator) and the
 near-zero attention correlation are preserved throughout. The energy head is exact
 ($R^2=1.000$, omitted).}
 \label{tab:generalize}
@@ -1185,7 +1186,7 @@ two sets:
 \end{itemize}
 Below we walk through the SD-10 instance ($N{=}10$ tasks, $2$~AGVs, $3$~QCs) in detail,
 contrasting the makespan-optimal and energy-optimal Pareto extremes. The analysis is
-produced entirely by querying the fused surrogate's TAPE; the oracle confirms perfect
+produced entirely by querying the fused surrogate's TAPE; the exact evaluator confirms perfect
 agreement (Jaccard~$= 1.00$).
 
 \subsubsection{Makespan-optimal schedule ($\sigma^\star_{C}$): $C_{\max}=454.2\,\mathrm{s}$, $E=12{,}896\,\mathrm{kJ}$}
@@ -1771,7 +1772,7 @@ Input respects precedence DAG & no (flat $4N$ vector) & yes (graph)\\
 Makespan inductive bias & none (axis splits) & $(\max,+)$ longest path\\
 Attribution target & decision variable & physical activity / leg\\
 Critical-path derivative $\partial\Cmax/\partial(\text{leg})$ & not defined & exact (Eq.~\ref{eq:tape})\\
-Faithfulness vs.\ oracle path & n/a (no path) & Jaccard $0.95$--$1.00$\\
+Faithfulness vs.\ exact critical path & n/a (no path) & Jaccard $0.95$--$1.00$\\
 Interaction-dominated effects & additive credit (mismatch) & joint critical path\\
 Routes operator type (AGV vs.\ QC) & no & yes (Sec.~\ref{sec:guidance})\\
 \bottomrule
@@ -2242,7 +2243,8 @@ regenerated.
 \paragraph{Stack.} The system is a Python package (\texttt{ehgat}, $\approx\!9.8$k lines
 across the eight modules of Table~\ref{tab:modules}, with $\approx\!3.4$k further lines of
 tests). Message passing uses PyTorch~2.6 with PyTorch Geometric~2.8; the environment,
-evaluator, oracle and BRKGA baselines depend only on \texttt{numpy} and \texttt{scipy} and
+evaluator, Pareto enumeration and BRKGA baselines depend only on \texttt{numpy} and
+\texttt{scipy} and
 import no learning framework, which is what allows the exact evaluator to be tested
 independently of the surrogate. Statistics use \texttt{scipy.stats} (Wilcoxon, Friedman);
 the tree-surrogate comparison of Section~\ref{sec:xgb} uses \texttt{xgboost} and
@@ -2258,7 +2260,7 @@ above it, so the exact physics layer is independent of the learned layers.}
 \toprule
 \textbf{Module} & \textbf{Torch} & \textbf{Responsibility} \\
 \midrule
-\texttt{environment} & no  & Instance construction, distance matrix, published speed/power constants, random-key decoder, exact evaluator (both regimes), brute-force Pareto oracle \\
+\texttt{environment} & no  & Instance construction, distance matrix, published speed/power constants, random-key decoder, exact evaluator (both regimes), exhaustive Pareto enumeration \\
 \texttt{baselines}   & no  & Single-population BRKGA and mp-BRKGA \\
 \texttt{metrics}     & no  & Hypervolume, $\mathrm{GD}^+/\mathrm{IGD}^+$, spread \\
 \texttt{surrogate}   & yes & Schedule $\to$ \texttt{HeteroData} encoding, E-HGATv2 core, training loop, attention-control models \\
