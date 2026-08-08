@@ -159,7 +159,7 @@ def attention_bottleneck_task(schedule: Schedule, instance: Instance, model: EHG
     criticality (semantic attention weight) is highest. Ties are broken by the lowest
     arc index for determinism.
     """
-    data = build_hetero_graph(schedule, instance)
+    data = build_hetero_graph(schedule, instance).to(next(model.parameters()).device)
     edge_index, alpha = model.attention(data)[AGV_EDGE[1]]
     if alpha.numel() == 0:
         return 0
@@ -178,13 +178,13 @@ def attention_task_probabilities(
     (a hard argmax concentrates ~all mutations on 1-2 tasks and collapses exploration).
     """
     n = instance.num_tasks
-    data = build_hetero_graph(schedule, instance)
+    data = build_hetero_graph(schedule, instance).to(next(model.parameters()).device)
     edge_index, alpha = model.attention(data)[AGV_EDGE[1]]
     if alpha.numel() == 0:
         return np.full(n, 1.0 / n)
     scores = np.zeros(n)
-    tasks = edge_index[1].numpy()
-    scores[tasks] = alpha.numpy()
+    tasks = edge_index[1].cpu().numpy()
+    scores[tasks] = alpha.cpu().numpy()
     logits = (scores - scores.max()) / max(temperature, 1e-6)
     probs = np.exp(logits)
     return np.asarray(probs / probs.sum())
@@ -203,7 +203,7 @@ def attention_bottleneck_type(
     distinct from the *which-task* signal of :func:`attention_task_probabilities`.
     """
     n = instance.num_tasks
-    attn = model.attention(build_hetero_graph(schedule, instance))
+    attn = model.attention(build_hetero_graph(schedule, instance).to(next(model.parameters()).device))
     w_agv = np.zeros(n)
     agv_index, agv_alpha = attn[AGV_EDGE[1]]
     if agv_alpha.numel() > 0:
@@ -267,7 +267,7 @@ def _attention_signals(
     versus the population-mode guided mutation, which already pays for one pass per child.
     """
     n = instance.num_tasks
-    attn = model.attention(build_hetero_graph(schedule, instance))
+    attn = model.attention(build_hetero_graph(schedule, instance).to(next(model.parameters()).device))
     agv_index, agv_alpha = attn[AGV_EDGE[1]]
     w_agv = np.zeros(n)
     if agv_alpha.numel() > 0:

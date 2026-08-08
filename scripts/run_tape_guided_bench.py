@@ -105,8 +105,14 @@ def main() -> None:
     p.add_argument("--gens", type=int, default=60)
     p.add_argument("--ref-gens", type=int, default=200, help="generations for the PF* proxy runs")
     p.add_argument("--screening", type=int, default=4, help="surrogate screening factor for GAT arms")
+    p.add_argument("--mp-screen", action="store_true",
+                   help="add a GNN-screened mp-BRKGA ablation arm (same surrogate + screening_factor "
+                        "as the guided arms) -- tests whether the GNN enhances the mp-BRKGA backbone too")
     p.add_argument("--p-mult", type=int, default=20, help="mp-BRKGA per-population size P = p_mult*N "
                    "(paper: 20; lower for compute tractability -- all methods stay budget-matched)")
+    p.add_argument("--base-pop", type=int, default=None,
+                   help="fixed mp per-population size P independent of N (overrides p_mult*N); "
+                        "use for a fixed-budget scaling sweep so per-instance cost is O(N)")
     p.add_argument("--unroll", type=int, default=2, help="coupled fused unroll steps")
     p.add_argument("--core-samples", type=int, default=2000)
     p.add_argument("--core-epochs", type=int, default=80)
@@ -114,7 +120,10 @@ def main() -> None:
     p.add_argument("--fused-epochs", type=int, default=80)
     p.add_argument("--faith-samples", type=int, default=40)
     p.add_argument("--mutation-temperature", type=float, default=0.25)
-    p.add_argument("--device", default="cpu", help="training device (cuda|cpu); search runs on cpu")
+    p.add_argument("--device", default="cpu", help="training device (cuda|cpu)")
+    p.add_argument("--search-device", default="cpu",
+                   help="device for the surrogate DURING search (cuda batches the guided arms' "
+                        "GNN screening onto the GPU; exact-eval arms stay on CPU regardless)")
     args = p.parse_args()
 
     import torch
@@ -130,13 +139,17 @@ def main() -> None:
     from ehgat.explain.fused_explainer import faithfulness_report
     from ehgat.explain.train_fused import FusedTrainConfig, build_core, train_fused
     from ehgat.metrics import gd_plus, hypervolume, igd_plus, nadir_reference, spread
-    from ehgat.search.attention_nsga2 import AttentionNSGA2Config, run_attention_nsga2
+    from ehgat.search.attention_nsga2 import (
+        AttentionNSGA2Config, _predict_objectives, run_attention_nsga2)
     from ehgat.utils.seeding import make_rng
 
     instance, label = _load_instance(args.instance, args.peak_power)
     n = instance.num_tasks
     coupled = instance.peak_power is not None
-    base_pop = args.p_mult * n   # mp per-population size P (paper: 20*N)
+    # base_pop = mp per-population size P. Default P = p_mult*N (paper: 20*N). --base-pop fixes
+    # P independent of N for a FIXED-budget scaling study (so cost is O(N), not O(N^2), and the
+    # comparison reveals which methods stall as N grows under a constant evaluation budget).
+    base_pop = args.base_pop if args.base_pop else args.p_mult * n
     matched_pop = 4 * base_pop   # GAT/BRKGA pop so exact-evals/gen match mp (Omega+Pi=4)
     G = args.gens
     tag = args.out_tag or (label.replace(":", "") + ("_pp%g" % args.peak_power if coupled else "_unc"))
@@ -152,8 +165,11 @@ def main() -> None:
     fused_res = train_fused(instance, core, FusedTrainConfig(
         num_samples=args.fused_samples, epochs=args.fused_epochs,
         unroll_steps=(args.unroll if coupled else 0), seed=0))
-    fused = fused_res.model.cpu()
-    core = core.cpu()
+    # Keep the surrogate on the search device: the guided arms' offspring screening and
+    # attention/TAPE signals are single batched forwards on the model's device, so CUDA moves
+    # that cost to the GPU. The exact-eval arms (mp/random/sp) are CPU-only regardless.
+    fused = fused_res.model.to(args.search_device)
+    core = core.to(args.search_device)
     print(f"  fused R2_makespan={fused_res.metrics.get('r2_makespan'):.4f} "
           f"R2_energy={fused_res.metrics.get('r2_energy'):.4f}", flush=True)
 
@@ -183,6 +199,17 @@ def main() -> None:
         r = run_brkga(instance, BRKGAConfig(pop_size=matched_pop, generations=G, seed=seed))
         return r.front, r.evaluations
 
+    def run_mp_screen(seed: int):
+        # Same GNN surrogate + screening_factor as the guided arms, ported to the mp-BRKGA
+        # backbone: over-produce k*No offspring per population, surrogate-rank, keep the best
+        # No. Budget-neutral in exact evals (only the kept P are exact-evaluated next gen).
+        def screen(chroms):
+            return _predict_objectives([decode(c, instance) for c in chroms], instance, core)
+        r = run_mp_brkga(instance, MpBRKGAConfig(
+            pop_size=base_pop, generations=G, seed=seed, screening_factor=args.screening),
+            screen_fn=screen)
+        return r.front, r.evaluations
+
     methods = {
         "E-HGATv2-TAPE": run_tape,
         "E-HGATv2-attn": run_attn,
@@ -190,8 +217,25 @@ def main() -> None:
         "mp-BRKGA": run_mp,
         "single-pop BRKGA": run_sp,
     }
+    if args.mp_screen:
+        methods["mp-BRKGA+GNN-screen"] = run_mp_screen
 
-    # ---- reference PF* proxy ----
+    # ---- optimisation runs (collect every front FIRST so PF* can dominate them) ----
+    t0 = time.perf_counter()
+    fronts: dict[str, list[tuple[tuple[float, float], ...]]] = {m: [] for m in methods}
+    evals_by: dict[str, list[float]] = {m: [] for m in methods}
+    for name, fn in methods.items():
+        for seed in range(args.seed_start, args.seed_start + args.seeds):
+            front, evals = fn(seed)
+            fronts[name].append(tuple((float(m), float(e)) for m, e in front))
+            evals_by[name].append(float(evals))
+        print(f"  {name}: done {args.seeds} seeds", flush=True)
+
+    # ---- reference PF* ----
+    # Exact oracle where enumerable; otherwise the non-dominated union of a high-budget
+    # reference pool AND every evaluated front. Folding in the evaluated fronts guarantees
+    # PF* weakly dominates all of them, so no method's HV can exceed HV* (no hv_ratio > 1)
+    # by construction -- a residual ratio > 1 would then signal a real numerical bug.
     if label.startswith("toy:") and n <= EXACT_TOY_TASKS and not coupled:
         reference = tuple((float(m), float(e)) for m, e in exact_pareto_front(instance).front)
         ref_kind = "exact Oracle"
@@ -203,30 +247,34 @@ def main() -> None:
         pool += list(run_attention_nsga2(instance, None, AttentionNSGA2Config(
             matched_pop, rg, seed=1000, guidance="tape", screening_factor=args.screening),
             fused_model=fused).front)
+        for name in methods:
+            for fr in fronts[name]:
+                pool.extend(fr)
         reference = _pareto(pool)
-        ref_kind = f"non-dominated union of mp-BRKGA + BRKGA + TAPE @ {rg} gens"
+        ref_kind = (f"non-dominated union of high-budget mp-BRKGA + BRKGA + TAPE @ {rg} gens "
+                    "and all evaluated fronts")
     ref_point = nadir_reference(reference, margin=0.1)
     ref_hv = hypervolume(reference, ref_point)
     print(f"reference: {ref_kind} | {len(reference)} pts | HV*={ref_hv:.1f}", flush=True)
 
-    # ---- optimisation runs ----
+    # ---- metrics from the stored fronts (against the folded reference) ----
     raw: dict[str, dict[str, list[float]]] = {
         m: {"gd_plus": [], "igd_plus": [], "spread": [], "hv": [], "hv_ratio": [], "evals": []}
         for m in methods}
-    t0 = time.perf_counter()
-    for name, fn in methods.items():
-        for seed in range(args.seed_start, args.seed_start + args.seeds):
-            front, evals = fn(seed)
+    for name in methods:
+        for front, evals in zip(fronts[name], evals_by[name]):
             raw[name]["gd_plus"].append(gd_plus(front, reference))
             raw[name]["igd_plus"].append(igd_plus(front, reference))
             raw[name]["spread"].append(spread(front, reference))
             hv = hypervolume(front, ref_point)
             raw[name]["hv"].append(hv)
             raw[name]["hv_ratio"].append(hv / ref_hv if ref_hv > 0 else float("nan"))
-            raw[name]["evals"].append(float(evals))
-        print(f"  {name}: done {args.seeds} seeds", flush=True)
+            raw[name]["evals"].append(evals)
 
     # ---- faithfulness head-to-head on a fixed schedule sample ----
+    # Move the surrogate back to CPU: the faithfulness helpers build CPU graphs per schedule.
+    core = core.cpu()
+    fused = fused.cpu()
     rng = make_rng(123)
     faith_scheds = [decode(rng.random(NUM_BLOCKS * n), instance) for _ in range(args.faith_samples)]
     attn_faith = evaluate_faithfulness(faith_scheds, instance, core)

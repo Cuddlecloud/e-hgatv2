@@ -1,0 +1,17 @@
+    [toy:10 s0] ep200 loss=0.0032 R²c=0.546 p@1=0.532(rand 0.568) sp=-0.006
+    [toy:10 s0] ep400 loss=0.0034 R²c=0.549 p@1=0.497(rand 0.568) sp=-0.027
+    [toy:10 s0] ep600 loss=0.0001 R²c=0.555 p@1=0.505(rand 0.568) sp=-0.036
+[toy:10 seed=0] pred R²(Cmax/E)=0.555/1.000 | attn p@1=0.505 spearman=-0.036 | baseline p@1(rand/crit-frac)=0.568/0.567
+    [toy:10 s1] ep200 loss=0.0001 R²c=0.487 p@1=0.693(rand 0.566) sp=+0.058
+    [toy:10 s1] ep400 loss=0.0001 R²c=0.477 p@1=0.723(rand 0.566) sp=+0.086
+    [toy:10 s1] ep600 loss=0.0024 R²c=0.467 p@1=0.705(rand 0.566) sp=+0.072
+[toy:10 seed=1] pred R²(Cmax/E)=0.467/1.000 | attn p@1=0.705 spearman=+0.072 | baseline p@1(rand/crit-frac)=0.566/0.568
+    [toy:10 s2] ep200 loss=0.0159 R²c=0.447 p@1=0.772(rand 0.571) sp=+0.005
+    [toy:10 s2] ep400 loss=0.0000 R²c=0.498 p@1=0.787(rand 0.571) sp=+0.009
+    [toy:10 s2] ep600 loss=0.0001 R²c=0.508 p@1=0.770(rand 0.571) sp=+0.036
+[toy:10 seed=2] pred R²(Cmax/E)=0.508/1.000 | attn p@1=0.770 spearman=+0.036 | baseline p@1(rand/crit-frac)=0.571/0.573
+
+=== VERDICT HINT ===
+toy:10: attn p@1=0.660 vs random 0.568 (Δ=+0.092); spearman=+0.024; predR²=0.510 → RICH ATTENTION > RANDOM → attention carries signal (fork bet weaker)
+
+saved → experiments/attn_control/result_toy10.json

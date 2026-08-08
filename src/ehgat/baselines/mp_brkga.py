@@ -64,6 +64,8 @@ from ehgat.utils.seeding import make_rng
 __all__ = ["MpBRKGAConfig", "MpBRKGAResult", "default_mp_config", "run_mp_brkga"]
 
 Objectives = tuple[float, float]
+# Maps an (n, chrom_len) array of candidate chromosomes to predicted (makespan, energy) per row.
+ScreenFn = "Callable[[np.ndarray], list[Objectives]]"
 _ARCHIVE_ROUND = 6
 
 
@@ -80,8 +82,11 @@ class MpBRKGAConfig:
     num_multi: int = 2  # Pi multi-objective populations
     n_exchange: int = 30  # migrate all Pi pops' elites into the pool every n_exchange gens
     seed: int = 0
+    screening_factor: int = 1  # k>1 => over-produce k*No offspring, surrogate-screen to No (needs screen_fn)
 
     def __post_init__(self) -> None:
+        if self.screening_factor < 1:
+            raise ValueError("screening_factor must be >= 1")
         if self.num_objectives not in (0, 2):
             raise ValueError("num_objectives (Omega) must be 0 or 2 for this bi-objective problem")
         if self.num_multi < 1:
@@ -128,6 +133,8 @@ def _breed(
     n_offspring: int,
     n_mutant: int,
     inherit_prob: float,
+    screen_fn: "ScreenFn | None" = None,
+    screening_factor: int = 1,
 ) -> np.ndarray:
     """Build the next population: ``Ne`` elites + ``No`` offspring + ``Nm`` mutants.
 
@@ -136,14 +143,32 @@ def _breed(
     is the ``Ne`` selected from the migration *pool* (so immigrants can be carried). Per the
     paper, each offspring crosses one elite parent with one parent drawn from the **entire**
     population, inheriting elite genes with probability ``inherit_prob``.
+
+    **Surrogate screening (ablation).** When ``screen_fn`` is given and ``screening_factor``
+    ``k>1``, the offspring block is *over-produced* to ``k*No`` crossover children, ranked by
+    the surrogate's predicted objectives (non-dominated rank + crowding), and the best ``No``
+    are kept. Elites and mutants are untouched. Only the kept ``P`` chromosomes are exact-
+    evaluated next generation, so screening adds ZERO exact evaluations -- the same free
+    advantage the GNN-guided NSGA-II arm uses, ported to the mp-BRKGA backbone.
     """
     chrom_len = pop.shape[1]
     nxt = np.empty_like(pop)
     nxt[:n_elite] = elite_chrom[:n_elite]
-    for k in range(n_offspring):
+
+    k = screening_factor if (screen_fn is not None and screening_factor > 1) else 1
+    n_cand = n_offspring * k
+    cand = np.empty((n_cand, chrom_len))
+    for c in range(n_cand):
         ep = elite_chrom[rng.integers(elite_chrom.shape[0])]
         op = pop[rng.integers(pop.shape[0])]
-        nxt[n_elite + k] = _biased_crossover(rng, ep, op, inherit_prob)
+        cand[c] = _biased_crossover(rng, ep, op, inherit_prob)
+    if k > 1:
+        pred = screen_fn(cand)  # surrogate-predicted (makespan, energy) per candidate
+        keep = order_by_rank_crowding(pred, fast_non_dominated_sort(pred))[:n_offspring]
+        nxt[n_elite : n_elite + n_offspring] = cand[keep]
+    else:
+        nxt[n_elite : n_elite + n_offspring] = cand[:n_offspring]
+
     nxt[n_elite + n_offspring :] = rng.random((n_mutant, chrom_len))
     return nxt
 
@@ -179,8 +204,14 @@ def _update_archive(
     return [merged_obj[i] for i in keep], [merged_chrom[i] for i in keep]
 
 
-def run_mp_brkga(instance: Instance, config: MpBRKGAConfig) -> MpBRKGAResult:
-    """Evolve the multi-population BRKGA and return its global non-dominated front."""
+def run_mp_brkga(
+    instance: Instance, config: MpBRKGAConfig, screen_fn: "ScreenFn | None" = None
+) -> MpBRKGAResult:
+    """Evolve the multi-population BRKGA and return its global non-dominated front.
+
+    ``screen_fn`` (with ``config.screening_factor > 1``) enables budget-neutral surrogate
+    screening of each population's offspring block -- the GNN-enhancement ablation.
+    """
     p = config.pop_size
     n_elite = max(1, round(config.elite_frac * p))
     n_mutant = max(1, round(config.mutant_frac * p))
@@ -270,6 +301,7 @@ def run_mp_brkga(instance: Instance, config: MpBRKGAConfig) -> MpBRKGAResult:
                 _breed(
                     rng, pi_pops[pp], elite_block,
                     n_elite, n_offspring, n_mutant, config.inherit_prob,
+                    screen_fn=screen_fn, screening_factor=config.screening_factor,
                 )
             )
 
@@ -278,6 +310,7 @@ def run_mp_brkga(instance: Instance, config: MpBRKGAConfig) -> MpBRKGAResult:
             _breed(
                 rng, omega_pops[o], omega_pops[o][omega_elite_idx[o]],
                 n_elite, n_offspring, n_mutant, config.inherit_prob,
+                screen_fn=screen_fn, screening_factor=config.screening_factor,
             )
             for o in range(omega)
         ]

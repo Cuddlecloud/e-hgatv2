@@ -1,7 +1,9 @@
 # Project Progress & Forward Plan — E-HGATv2 Paper
 
-**Last updated:** 2026-06-27
+**Last updated:** 2026-06-30
 **Purpose:** Authoritative tracker of what is *established by benchmarks*, what is *ambiguous / needs more runs*, what is *open*, and the prioritized plan to advance rigorously.
+
+> **Strategic note (2026-06-30):** Sections 1–7 track the *OR-paper* state. **Section 8 is the reframe-and-elevate plan** that turns this into a TMLR/ICLR-grade **ML interpretability** paper — what to *add*, how to *position* it, the venue/timeline strategy for Fall MS admissions, and the precise honesty constraints. The two are the same body of work. **If the goal is publication, §8 is the live plan.**
 
 ---
 
@@ -87,6 +89,11 @@ The uncommitted changes (`scripts/run_benchmark.py`, `benchmark/runner.py`, `env
 
 ### Phase E — Seed sweep & finishing (P4)
 - [ ] 20+ seeds on scaling + tape_guided; refresh CIs.
+- [ ] **Implementation & reproducibility appendix (REQUIRED for TMLR/workshop checklist):**
+  - [ ] Body: add ~2 sentences naming the tropical layer as a custom `torch.autograd.Function` with a hand-derived backward (forward caches per-node argmax arc; backward routes the cotangent along the cached critical path → Eq. `tapechain` exactly, not via generic autodiff). Reference App. B. Mention the batched variant.
+  - [ ] Create Appendix B: hyperparameter table (GATv2 layers/hidden dim/heads, projection & readout heads, optimizer/lr/wd/epochs=50/batch — from `src/ehgat/surrogate/train.py`), trainable-param count, PyTorch/PyG versions.
+  - [ ] Add hardware + wall-clock-per-instance row (needs one timed VM run to fill; placeholder until then).
+  - [ ] Do NOT paste the `backward()` source in the main body — appendix/repo only.
 - [ ] Recompile paper, verify all pgfplots/TikZ render, table-overflow check.
 - [ ] Final proofread.
 
@@ -127,3 +134,90 @@ Hardware: 255 cores, 2× A40 (49 GB). Python 3.12.
 **Parallelism:** fan independent per-instance jobs across cores with `xargs -P`
 (`scripts/run_front_parallel.sh`). GPU does NOT help the front-learning pipeline —
 it is CPU-bound on simulator sample generation, not GNN gradient steps.
+
+---
+
+# 8. PUBLICATION PLAN — making this TMLR/ICLR-grade (the live plan)
+
+**Last reviewed:** 2026-06-30. Owner-facing decisions flagged ⟶.
+
+## 8.0 The reframe (do this first — it costs nothing and changes everything)
+The publishable contribution is **NOT the scheduling/OR machinery**. It is the **ML interpretability finding about attention**. The OR problem is demoted to *the apparatus that happens to supply an exact ground truth*. Concretely:
+
+- **Thesis (what the paper is about):** *In models whose decision is governed by a structured (tropical / max-plus) inference layer, an **exact** attribution to the decision-determining structure exists for free — the gradient of that layer (TAPE). Using it as ground truth, learned **attention is not faithful** to the decision structure, even though it is **useful** for the downstream task. Usefulness and faithfulness are **dissociable**, and here we dissociate them.*
+- **Headline = the DISSOCIATION, not the bare falsification.** "Attention is unfaithful" is a 2019 debate (Jain–Wallace ↔ Wiegreffe–Pinter) and reviewers have seen it; *table stakes*. What is fresh: (a) a setting with **exact ground truth** (NLP never had one), and (b) the **dissociation** — attention guides search as well as the exact signal yet encodes none of the critical-path structure; the search benefit comes from **screening, not targeting** (the ablation in `screening_ablation.py`).
+- **Drop from the thesis/abstract/intro:** quay cranes, AGVs, makespan/energy, NSGA-II, MILP. Keep them **only** inside the experimental-apparatus section. The title/abstract should read as an interpretability paper (e.g. *"Faithful Attributions for Learning-Augmented Combinatorial Optimization via Tropical Objective Layers"* or a cleaner attention-faithfulness framing).
+- **Never sell TAPE's exactness as the discovery** — it is *definitional* (gradient of a closed-form DP = its optimal path). The contribution is the **falsification + dissociation that the exact oracle enables**. Leading with "our attribution is exact" invites the fatal *"physics solving physics / circular"* critique.
+
+## 8.1 The three holes that block TMLR acceptance (must-do)
+A careful reviewer sinks the current single-architecture, single-domain result on exactly these. All three reuse the existing ladder (`scripts/attention_ladder.py`) + 20-seed stats harness — they are **additive experiments, not a rewrite**.
+
+| # | Hole | Why it sinks the paper | Fix | Effort |
+|---|---|---|---|---|
+| **H1** | **Single architecture.** All evidence is the one GATv2 surrogate. | Reviewer: *"you've shown **this attention** is bad, not **attention**."* Subject of the claim is unproven. **Biggest hole.** | Add a **2nd attention architecture** (transformer-style attention encoder over the *same* node features → same per-task attention vector, plugged into `attention_per_task`'s slot). Show the unfaithfulness reproduces. | ~2–4 days; reuses entire ladder/evaluator/stats |
+| **H2** | **Attention read-out confound** (the whole Wiegreffe–Pinter rebuttal). | Reviewer: *"which layer/head? raw vs rollout vs gradient-weighted? did you try the others?"* One readout = one cherry-pick. | Report **≥4 readouts** — last-layer, mean-over-heads, max-over-heads, attention-rollout, gradient×attention — and show the ρ≈0 / AUC≈0.5 result is **invariant** across all. Implement as a `mode=` arg through the same ladder. | ~1–2 days |
+| **H3** | **Single domain / small N.** toy:5–20 + L-instances is thin and OR-only. | *"Case study, not a phenomenon. Niche OR toy."* | Add a **second, unrelated DP domain: Viterbi/CRF** sequence labeling (see §8.3). Two structurally unrelated DPs from two fields ⇒ "phenomenon" bar cleared. | ~2–3 weeks (see breakdown) |
+
+**Until H1 exists, claims MUST stay scoped** to "our tropical-DP surrogate," not "attention" universally. TMLR rejects *unsupported* claims, not *narrow* ones — but the narrower the claim the more a reviewer questions significance, so H1+H2 are what license broadening to "attention."
+
+## 8.2 Non-issues (de-catastrophized — do NOT spend effort here)
+- **"Large N breaks MILP" is irrelevant to the headline.** The faithfulness oracle is the **O(N) exact critical path of a *given* schedule** (`critical_path_binding`), cheap at any N. MILP solves for the *optimal schedule*; the faithfulness experiment evaluates attention against the critical path of *whatever schedule the decoder emits*. Run the ladder at N=50/200/1000 freely. MILP only ever mattered for (a) **evaluator validation** — already done vs brute force at N=5, exact-by-construction above that; (b) **true-Pareto-front benchmarking** — at large N use the **high-budget reference-front proxy** already in `screening_ablation.py` (`reference = _pareto(pool)`), the accepted MOO standard (`log()` that it's a proxy).
+- **Viterbi does NOT make this a "significantly more complex project."** It doubles the *surface area* (a parallel `seqlabel/` subpackage + NLP deps) but **not the conceptual difficulty** — the exact oracle, the ladder, and the stats are already built and reused. New code is a model + a dataset loader + a ground-truth-attribution wiring.
+
+## 8.3 Viterbi/CRF second domain — detailed work breakdown
+Viterbi **IS** a tropical (max-plus) DP, so it is conceptually native: TAPE = gradient of the Viterbi score; the **Viterbi-decoded path = the "critical path."** This ports the experiment onto the **home turf of the attention-explanation debate**, with a ground truth that turf never had.
+
+| Piece | Effort | Notes |
+|---|---|---|
+| Dataset — CoNLL-2003 NER **or** UD POS via HF `datasets` | ~0.5 day | Standard loader + tokenization |
+| Model — transformer encoder + CRF head (`torch-struct` or `pytorch-crf`) | ~3–4 days | **Must train a *decent* tagger** or the faithfulness test is uninteresting (explaining a bad model proves nothing) |
+| Ground truth — Viterbi path + gradient-of-score = TAPE | ~3–4 days | **The one genuinely tricky bit:** define per-token criticality fairly (on-path indicator + graded marginal sensitivity). `torch-struct` gives the differentiable DP, so the gradient is free; the care is in the *definition* and a fair attention-vs-TAPE comparison |
+| Attention readout (reuse H2 variants) | ~1 day | Transformer self-attention already exists; same pooling modes |
+| Wire into ladder + 20-seed stats | ~1 day | `attention_ladder.py` reused: swap `attention_per_task`→token attention, `critical_path_binding`→Viterbi path, `marginal_makespan_speedup`→potential gradients |
+
+**Realistic total: ~2–3 weeks** focused (~1.5 if the tagger trains cleanly first try). Complexity = a **new parallel subpackage** (`ehgat/seqlabel/` or a sibling), new deps (HF + a CRF lib), **zero disturbance to existing scheduling code** — shares only the ladder + stats utilities. Main risks: (i) tagger quality, (ii) defensible CRF ground-truth definition, (iii) fair attention comparison — all *thinking-hours*, not line-count.
+
+⟶ **Decision:** confirm dataset choice (CoNLL-2003 NER recommended — cleanest, most-cited in the attention debate) and CRF lib (`torch-struct` recommended — gives differentiable Viterbi + backward for free).
+
+**Optional 3rd DP domain** (diminishing returns; only if a spare ~1–1.5 wk before deadline): sequence alignment / edit distance (Needleman–Wunsch) or DTW — also tropical, ground truth = exact alignment path, runs on synthetic data (no dataset curation), but still needs a learned attention-aligner (the model cost recurs). Reviewers credit "≥2 independent domains" heavily; the 2→3 jump is much smaller than 1→2. **Recommendation: skip unless time permits; 2 domains clears the bar.**
+
+## 8.4 ICLR-only extras (skip for TMLR — TMLR doesn't gate on novelty)
+ICLR rejects on **novelty/significance**; the topic fights you regardless of execution. To move ICLR from ~40% → ~50%:
+1. **Positive reframe** — from negative *"attention unfaithful"* to a *lens*: *"models with structured-inference layers already contain an exact, free attribution; the field reaches for attention out of habit — here is the general construction and two demonstrations."* A lens is rewarded; a negative finding is discounted.
+2. **One constructive payoff** (~+1 wk) — show TAPE *does something attention can't*: repair rationale extraction on the CRF task, or **catch a spurious correlation / bug** attention misses, or a faithfulness-certified explanation. Negative-**plus**-constructive >> negative-only. **Single highest-leverage ICLR move.**
+
+## 8.5 Venue + timeline strategy (Fall MS admissions: deadlines mid-Dec 2026 → mid-Jan 2027)
+**Decisive timing fact:** *ICLR 2027 decisions land ~late January 2027 — AFTER most deadlines.* So a Sept ICLR submission is only ever **"under review"** in-window. **TMLR is the only venue that can become an actual acceptance in-window** (rolling, ~2-month first decision; **no page limit** so 12+ pages is fine — speed is governed by **revision rounds, not length**).
+
+**Plan:**
+- **Primary: TMLR.** Submit **early September** (not late — every week earlier buys a revision round inside the window). Keep **main body ~9–10 pp + appendix-load the breadth** (Viterbi details, readout tables, per-instance numbers, reproducibility) so it *reviews like a short paper*. Scope claims conservatively to force **minor-not-major** revisions.
+- **Parallel: a NeurIPS 2026 workshop** (interpretability / XAI / structured prediction). Workshop deadlines ~Sept → notification ~Oct → present Dec. This is the **guaranteed in-window credential**; TMLR is the publication upside.
+- **By mid-December you can truthfully state:** *"Accepted, NeurIPS 2026 workshop [name]; under review at TMLR (public reviews)."* Stronger for MS admissions than "under review at ICLR" (yours includes an actual acceptance).
+- **ICLR:** optionally submit as a *free upside option* (public OpenReview reviews are themselves a credential), but it cannot finalize in-window — do not rely on it. Can also re-target a later ICML/ICLR after admissions, or post to arXiv.
+
+**Odds with the full package:** **TMLR ~70–80%** (clears rigor/scope, the only axis TMLR judges); **ICLR ~35–45%** (~45–55% only with §8.4 reframe + constructive payoff). Strategy: **TMLR is the floor, the workshop is the certainty, ICLR is the lottery ticket.**
+
+## 8.6 Calendar (~10 weeks: late-June → early-Sept submission)
+| Window | Work |
+|---|---|
+| **now → mid-July** | Lock scope/title (§8.0); stand up Viterbi/CRF stack (HF + `torch-struct`); run scheduling **H1 (2nd architecture) + H2 (readout robustness)** sweeps on VM |
+| **mid-July → mid-Aug** | Viterbi/CRF: train tagger, build ground-truth attribution, run ladder + 20-seed stats (§8.3) |
+| **mid-Aug → early-Sept** | Integrate; final 20-seed stats across both domains; **rewrite framing to interpretability thesis**; main-body tighten + appendix-load; proofread |
+| **early Sept** | Submit **TMLR + NeurIPS workshop** (same core paper) |
+| **Oct** | Workshop notification → **in-window acceptance locked** |
+| **Nov–Dec** | TMLR first decision / one revision round |
+
+## 8.7 Carry-over OR-paper items still required (from §§2–5) — fold into the above
+These pre-existing TODOs are *prerequisites* for the elevated paper, not separate work:
+- **R3 reframe (§2.1):** the honest claim is *both GNN-guided variants beat classical baselines; TAPE adds faithful explanation at no optimization cost* — this **is** the dissociation headline. Bump optimization seeds 5→20 (matches §2.4).
+- **Coupled makespan-extreme (§2.2):** scope as a stated limitation (front-averaged Jaccard headline; report the 0.111 extreme + power-contention mechanism). Do not block on a fix.
+- **Seed parity (§2.4):** 20+ seeds everywhere the paper makes a quantitative claim.
+- **mp-BRKGA baseline (pre-advisor punch list):** validate-or-caveat the reproduction against published Cmax/E (VM available).
+- **a^agv_j equation gap + MILP→ours notation bridge + bibliography placeholder** (pre-advisor punch list) — needed before sending to advisor / submission either way.
+
+## 8.8 Honesty constraints (binding — established with the user)
+- Claims stay **scoped** ("our surrogate" / "this tropical-DP setting") until **H1** proves architecture-independence; only then broaden to "attention."
+- **Never** frame TAPE's exactness as a discovery — it is definitional; the contribution is the **falsification/dissociation** it enables.
+- The **"physics-solving-physics / circular"** critique is fatal to the framing *"our attribution is exact"* and harmless to *"we built a setting with ground truth and used it to falsify a deployed explanation method."* Always lead with the latter + the R2/R3 dissociation, pre-empting the critique before a reviewer raises it.
+- Viterbi's honest justification is **positioning** (the debate's home turf), **not** a new epistemic mechanism — do not oversell it as "generalization proof."
+- All heavy runs on the **VM**; rsync + commit artifacts before teardown.

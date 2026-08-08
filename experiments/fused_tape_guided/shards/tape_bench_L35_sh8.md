@@ -1,16 +1,16 @@
 # Faithful-guidance study -- L35 (N=12, uncoupled)
 
-_4 seeds, 40 gens, matched exact-eval budget (mp 60x4 = GAT/BRKGA 240/gen). Reference: non-dominated union of mp-BRKGA + BRKGA + TAPE @ 50 gens. Cells = mean (95% CI)._
+_4 seeds, 40 gens, matched exact-eval budget (mp 60x4 = GAT/BRKGA 240/gen). Reference: non-dominated union of high-budget mp-BRKGA + BRKGA + TAPE @ 50 gens and all evaluated fronts. Cells = mean (95% CI)._
 
 ## Optimisation (Req 3)
 
 | Method | HV / HV* | GD+ | IGD+ | Spread | true evals |
 |---|---|---|---|---|---|
-| E-HGATv2-TAPE | 0.9662 ± 0.0273 | 14.5500 ± 9.5554 | 16.4598 ± 11.9588 | 0.8671 ± 0.0773 | 9840 |
-| E-HGATv2-attn | 0.9622 ± 0.0388 | 7.9784 ± 9.3216 | 11.4258 ± 9.2761 | 0.9488 ± 0.1021 | 9840 |
-| NSGA-II (random) | 0.9248 ± 0.0432 | 29.3541 ± 18.4756 | 36.1067 ± 21.1046 | 0.8572 ± 0.1479 | 9840 |
-| mp-BRKGA | 0.8941 ± 0.0236 | 52.5600 ± 9.3495 | 59.6692 ± 18.4849 | 0.7839 ± 0.1513 | 9840 |
-| single-pop BRKGA | 0.9358 ± 0.0118 | 19.4881 ± 3.5274 | 24.5757 ± 4.1954 | 0.9642 ± 0.1932 | 9840 |
+| E-HGATv2-TAPE | 0.9232 ± 0.0316 | 11.1530 ± 11.0663 | 13.5942 ± 5.1249 | 0.8556 ± 0.1373 | 9840 |
+| E-HGATv2-attn | 0.8939 ± 0.0460 | 13.2151 ± 5.5087 | 16.7846 ± 7.6230 | 0.8862 ± 0.1776 | 9840 |
+| NSGA-II (random) | 0.8425 ± 0.0480 | 39.6088 ± 17.5448 | 35.3602 ± 17.5964 | 0.8896 ± 0.1738 | 9840 |
+| mp-BRKGA | 0.7734 ± 0.0594 | 69.2857 ± 21.4297 | 72.1907 ± 37.4231 | 0.8075 ± 0.1247 | 9840 |
+| single-pop BRKGA | 0.8247 ± 0.1136 | 43.8898 ± 42.4171 | 53.9327 ± 24.5632 | 0.8469 ± 0.1091 | 9840 |
 
 ## Guidance-signal faithfulness (Req 2)
 

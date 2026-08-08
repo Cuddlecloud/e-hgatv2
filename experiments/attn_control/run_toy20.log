@@ -1,0 +1,17 @@
+    [toy:20 s0] ep200 loss=0.0010 R²c=0.060 p@1=0.388(rand 0.556) sp=-0.034
+    [toy:20 s0] ep400 loss=0.0070 R²c=0.069 p@1=0.370(rand 0.556) sp=+0.017
+    [toy:20 s0] ep600 loss=0.0000 R²c=0.096 p@1=0.378(rand 0.556) sp=-0.007
+[toy:20 seed=0] pred R²(Cmax/E)=0.096/1.000 | attn p@1=0.378 spearman=-0.007 | baseline p@1(rand/crit-frac)=0.556/0.557
+    [toy:20 s1] ep200 loss=0.0020 R²c=0.137 p@1=0.725(rand 0.549) sp=+0.050
+    [toy:20 s1] ep400 loss=0.0020 R²c=0.159 p@1=0.708(rand 0.549) sp=+0.059
+    [toy:20 s1] ep600 loss=0.0000 R²c=0.197 p@1=0.708(rand 0.549) sp=+0.062
+[toy:20 seed=1] pred R²(Cmax/E)=0.197/1.000 | attn p@1=0.708 spearman=+0.062 | baseline p@1(rand/crit-frac)=0.549/0.549
+    [toy:20 s2] ep200 loss=0.0056 R²c=0.340 p@1=0.598(rand 0.549) sp=-0.026
+    [toy:20 s2] ep400 loss=0.0000 R²c=0.368 p@1=0.608(rand 0.549) sp=-0.012
+    [toy:20 s2] ep600 loss=0.0001 R²c=0.359 p@1=0.573(rand 0.549) sp=+0.027
+[toy:20 seed=2] pred R²(Cmax/E)=0.359/1.000 | attn p@1=0.573 spearman=+0.027 | baseline p@1(rand/crit-frac)=0.549/0.550
+
+=== VERDICT HINT ===
+toy:20: attn p@1=0.552 vs random 0.551 (Δ=+0.002); spearman=+0.027; predR²=0.217 → RICH ATTENTION ~ RANDOM → unfaithful (fork bet holds)  ⚠ LOW pred R² — undertrained; verdict unreliable
+
+saved → experiments/attn_control/result_toy20.json

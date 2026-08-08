@@ -1,0 +1,8 @@
+instance=toy:80 N=80 coupled=True | mp P=100x4, GAT/BRKGA pop=400 | gens=40 | matched evals/gen=400
+training core + fused TAPE head ...
+  fused R2_makespan=0.8259 R2_energy=1.0000
+  E-HGATv2-TAPE: done 1 seeds
+  E-HGATv2-attn: done 1 seeds
+  NSGA-II (random): done 1 seeds
+  mp-BRKGA: done 1 seeds
+  single-pop BRKGA: done 1 seeds

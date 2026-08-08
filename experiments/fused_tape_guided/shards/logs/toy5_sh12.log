@@ -1,12 +1,12 @@
 instance=toy:5 N=5 coupled=False | mp P=25x4, GAT/BRKGA pop=100 | gens=40 | matched evals/gen=100
 training core + fused TAPE head ...
   fused R2_makespan=0.9875 R2_energy=1.0000
-reference: exact Oracle | 123 pts | HV*=744076.1
   E-HGATv2-TAPE: done 4 seeds
   E-HGATv2-attn: done 4 seeds
   NSGA-II (random): done 4 seeds
   mp-BRKGA: done 4 seeds
   single-pop BRKGA: done 4 seeds
+reference: exact Oracle | 123 pts | HV*=744076.1
 
 # Faithful-guidance study -- toy:5 (N=5, uncoupled)
 
@@ -16,11 +16,11 @@ _4 seeds, 40 gens, matched exact-eval budget (mp 25x4 = GAT/BRKGA 100/gen). Refe
 
 | Method | HV / HV* | GD+ | IGD+ | Spread | true evals |
 |---|---|---|---|---|---|
-| E-HGATv2-TAPE | 0.9744 ± 0.0396 | 0.8686 ± 0.7083 | 20.4765 ± 34.9667 | 0.9185 ± 0.1158 | 4100 |
-| E-HGATv2-attn | 0.9644 ± 0.0395 | 1.6055 ± 1.5109 | 22.7401 ± 35.2611 | 0.9820 ± 0.0654 | 4100 |
-| NSGA-II (random) | 0.9624 ± 0.0355 | 3.1294 ± 3.2919 | 23.5448 ± 36.0051 | 0.9119 ± 0.0734 | 4100 |
+| E-HGATv2-TAPE | 0.9815 ± 0.0381 | 1.4289 ± 1.8058 | 11.8936 ± 31.8070 | 0.9331 ± 0.0495 | 4100 |
+| E-HGATv2-attn | 0.9736 ± 0.0265 | 1.9178 ± 1.3078 | 13.5725 ± 28.3189 | 0.9729 ± 0.0312 | 4100 |
+| NSGA-II (random) | 0.9665 ± 0.0325 | 2.1960 ± 2.5401 | 22.7238 ± 34.2404 | 0.9269 ± 0.0712 | 4100 |
 | mp-BRKGA | 0.9209 ± 0.0506 | 29.3795 ± 34.2707 | 34.8803 ± 26.2241 | 0.8617 ± 0.1988 | 4100 |
-| single-pop BRKGA | 0.9576 ± 0.0260 | 4.5737 ± 5.0645 | 25.9240 ± 33.6636 | 0.8897 ± 0.1014 | 4100 |
+| single-pop BRKGA | 0.9571 ± 0.0324 | 6.0725 ± 8.0917 | 26.0606 ± 34.5448 | 0.9523 ± 0.2333 | 4100 |
 
 ## Guidance-signal faithfulness (Req 2)
 
@@ -33,4 +33,4 @@ _4 seeds, 40 gens, matched exact-eval budget (mp 25x4 = GAT/BRKGA 100/gen). Refe
 _TAPE makespan abs-error vs oracle: 8.114. A faithful signal that also tops the optimisation table is the unified Req 2+3 claim._
 
 
-wrote experiments/fused_tape_guided/tape_bench_toy5_sh12.* (total 427s)
+wrote experiments/fused_tape_guided/tape_bench_toy5_sh12.* (total 1158s)

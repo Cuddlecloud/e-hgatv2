@@ -1,26 +1,26 @@
 instance=L15 N=16 coupled=False | mp P=80x4, GAT/BRKGA pop=320 | gens=40 | matched evals/gen=320
 training core + fused TAPE head ...
   fused R2_makespan=0.9987 R2_energy=1.0000
-reference: non-dominated union of mp-BRKGA + BRKGA + TAPE @ 50 gens | 70 pts | HV*=498710.4
   E-HGATv2-TAPE: done 4 seeds
   E-HGATv2-attn: done 4 seeds
   NSGA-II (random): done 4 seeds
   mp-BRKGA: done 4 seeds
   single-pop BRKGA: done 4 seeds
+reference: non-dominated union of high-budget mp-BRKGA + BRKGA + TAPE @ 50 gens and all evaluated fronts | 124 pts | HV*=1966395.7
 
 # Faithful-guidance study -- L15 (N=16, uncoupled)
 
-_4 seeds, 40 gens, matched exact-eval budget (mp 80x4 = GAT/BRKGA 320/gen). Reference: non-dominated union of mp-BRKGA + BRKGA + TAPE @ 50 gens. Cells = mean (95% CI)._
+_4 seeds, 40 gens, matched exact-eval budget (mp 80x4 = GAT/BRKGA 320/gen). Reference: non-dominated union of high-budget mp-BRKGA + BRKGA + TAPE @ 50 gens and all evaluated fronts. Cells = mean (95% CI)._
 
 ## Optimisation (Req 3)
 
 | Method | HV / HV* | GD+ | IGD+ | Spread | true evals |
 |---|---|---|---|---|---|
-| E-HGATv2-TAPE | 0.9091 ± 0.1049 | 24.4205 ± 23.5077 | 20.6061 ± 19.6550 | 0.8365 ± 0.1892 | 13120 |
-| E-HGATv2-attn | 0.9282 ± 0.0669 | 14.8383 ± 17.8751 | 15.0781 ± 12.6159 | 0.8274 ± 0.0737 | 13120 |
-| NSGA-II (random) | 0.7870 ± 0.0541 | 55.3965 ± 15.0646 | 52.3954 ± 14.5954 | 0.8331 ± 0.0595 | 13120 |
-| mp-BRKGA | 0.7976 ± 0.0685 | 99.8809 ± 26.5971 | 67.5035 ± 16.5309 | 0.7939 ± 0.2031 | 13120 |
-| single-pop BRKGA | 0.7670 ± 0.1483 | 54.1843 ± 61.1826 | 46.6010 ± 35.0614 | 0.7869 ± 0.1166 | 13120 |
+| E-HGATv2-TAPE | 0.9659 ± 0.0313 | 18.1239 ± 29.3956 | 19.5195 ± 26.5773 | 0.8407 ± 0.0500 | 13120 |
+| E-HGATv2-attn | 0.9558 ± 0.0174 | 19.4299 ± 19.8403 | 22.3679 ± 17.6801 | 0.8710 ± 0.1047 | 13120 |
+| NSGA-II (random) | 0.9033 ± 0.0168 | 52.9248 ± 18.9081 | 54.2086 ± 13.6425 | 0.8349 ± 0.0664 | 13120 |
+| mp-BRKGA | 0.9246 ± 0.0342 | 55.8036 ± 22.7524 | 63.8350 ± 16.6490 | 0.7215 ± 0.0838 | 13120 |
+| single-pop BRKGA | 0.9069 ± 0.0523 | 35.9456 ± 33.4924 | 45.8756 ± 34.2529 | 0.8802 ± 0.0609 | 13120 |
 
 ## Guidance-signal faithfulness (Req 2)
 
@@ -33,4 +33,4 @@ _4 seeds, 40 gens, matched exact-eval budget (mp 80x4 = GAT/BRKGA 320/gen). Refe
 _TAPE makespan abs-error vs oracle: 3.289. A faithful signal that also tops the optimisation table is the unified Req 2+3 claim._
 
 
-wrote experiments/fused_tape_guided/tape_bench_L15_sh8.* (total 1834s)
+wrote experiments/fused_tape_guided/tape_bench_L15_sh8.* (total 4558s)

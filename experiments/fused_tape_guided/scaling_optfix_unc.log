@@ -1,0 +1,28 @@
+[opt-scaling] mode=unc ns=[10 20 40 80 160] seeds=6 shard=1 search_dev=cpu -> experiments/fused_tape_guided/scaling_optfix_unc
+[opt-scaling] launched 30 shard processes; waiting ...
+[opt-scaling] all shards done (fail=0); merging ...
+  n10: 6 shards -> 6 seeds  (E-HGATv2-TAPE, E-HGATv2-attn, NSGA-II (random), mp-BRKGA, single-pop BRKGA)  -> tape_bench_n10.json
+  n160: 6 shards -> 6 seeds  (E-HGATv2-TAPE, E-HGATv2-attn, NSGA-II (random), mp-BRKGA, single-pop BRKGA)  -> tape_bench_n160.json
+  n20: 6 shards -> 6 seeds  (E-HGATv2-TAPE, E-HGATv2-attn, NSGA-II (random), mp-BRKGA, single-pop BRKGA)  -> tape_bench_n20.json
+  n40: 6 shards -> 6 seeds  (E-HGATv2-TAPE, E-HGATv2-attn, NSGA-II (random), mp-BRKGA, single-pop BRKGA)  -> tape_bench_n40.json
+  n80: 6 shards -> 6 seeds  (E-HGATv2-TAPE, E-HGATv2-attn, NSGA-II (random), mp-BRKGA, single-pop BRKGA)  -> tape_bench_n80.json
+Merged 5 instances into experiments/fused_tape_guided/scaling_optfix_unc
+# R3 optimization scaling -- HV/HV* by N (mean +- 95% CI)
+
+| Method | N=10 | N=20 | N=40 | N=80 | N=160 |
+|---|---|---|---|---|---|
+| E-HGATv2-TAPE | 0.951±0.025 | 0.879±0.075 | 0.602±0.139 | 0.816±0.038 | 0.740±0.075 |
+| E-HGATv2-attn | 0.965±0.016 | 0.845±0.065 | 0.642±0.105 | 0.805±0.036 | 0.720±0.036 |
+| NSGA-II (random) | 0.902±0.051 | 0.739±0.106 | 0.339±0.144 | 0.616±0.041 | 0.517±0.026 |
+| mp-BRKGA | 0.862±0.070 | 0.808±0.108 | 0.605±0.125 | 0.854±0.049 | 0.810±0.081 |
+| single-pop BRKGA | 0.897±0.032 | 0.728±0.180 | 0.218±0.106 | 0.588±0.090 | 0.419±0.049 |
+
+## HV/HV* gap: guided minus mp-BRKGA (positive = guided ahead)
+
+| Guided arm | N=10 | N=20 | N=40 | N=80 | N=160 |
+|---|---|---|---|---|---|
+| E-HGATv2-TAPE - mp-BRKGA | +0.089 | +0.071 | -0.003 | -0.039 | -0.069 |
+| E-HGATv2-attn - mp-BRKGA | +0.103 | +0.037 | +0.037 | -0.049 | -0.089 |
+
+wrote experiments/fused_tape_guided/scaling_optfix_unc/opt_scaling_summary.md
+[opt-scaling] DONE mode=unc

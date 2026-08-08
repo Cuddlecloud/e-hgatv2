@@ -1,0 +1,6 @@
+[opt-scaling] mode=unc ns=[10 20 40 80 160] seeds=8 shard=2 -> experiments/fused_tape_guided/scaling_opt_unc
+[opt-scaling] launched 20 shard processes; waiting ...
+scripts/run_opt_scaling.sh: line 51:  2123 Killed                  OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 KMP_DUPLICATE_LIB_OK=TRUE nohup python scripts/run_tape_guided_bench.py --instance "toy:$n" $PP_ARG $COMMON --seeds "$ns" --seed-start "$s" --out-tag "$tag" --out-dir "$SH" > "$SH/logs/$tag.log" 2>&1
+scripts/run_opt_scaling.sh: line 51:  2124 Killed                  OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 KMP_DUPLICATE_LIB_OK=TRUE nohup python scripts/run_tape_guided_bench.py --instance "toy:$n" $PP_ARG $COMMON --seeds "$ns" --seed-start "$s" --out-tag "$tag" --out-dir "$SH" > "$SH/logs/$tag.log" 2>&1
+scripts/run_opt_scaling.sh: line 51:  2125 Killed                  OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 KMP_DUPLICATE_LIB_OK=TRUE nohup python scripts/run_tape_guided_bench.py --instance "toy:$n" $PP_ARG $COMMON --seeds "$ns" --seed-start "$s" --out-tag "$tag" --out-dir "$SH" > "$SH/logs/$tag.log" 2>&1
+scripts/run_opt_scaling.sh: line 51:  2126 Killed                  OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 KMP_DUPLICATE_LIB_OK=TRUE nohup python scripts/run_tape_guided_bench.py --instance "toy:$n" $PP_ARG $COMMON --seeds "$ns" --seed-start "$s" --out-tag "$tag" --out-dir "$SH" > "$SH/logs/$tag.log" 2>&1

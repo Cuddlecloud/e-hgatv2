@@ -170,6 +170,7 @@ def build_core(
     batch_size: int = 32,
     lr: float = 1e-3,
     device: str | None = None,
+    graphs: list | None = None,
 ) -> EHGATv2:
     """Train a base E-HGATv2 surrogate to supply the frozen embedding core.
 
@@ -182,6 +183,7 @@ def build_core(
         instance,
         TrainConfig(num_samples=num_samples, epochs=epochs, batch_size=batch_size, lr=lr, seed=seed),
         device=device,
+        graphs=graphs,
     )
     return result.model
 
@@ -190,6 +192,8 @@ def train_fused(
     instance: Instance,
     core: EHGATv2 | None = None,
     config: FusedTrainConfig | None = None,
+    *,
+    samples: list | None = None,
 ) -> FusedTrainResult:
     """Fit the anchored fused head on a frozen core; return model + R^2 history.
 
@@ -212,7 +216,10 @@ def train_fused(
     )
     model.freeze_core()
 
-    samples = build_samples(instance, config.num_samples, seed=config.seed)
+    # ``samples`` lets a caller inject a pre-pooled set (e.g. across a range of instance sizes
+    # for a size-generalisation curriculum); otherwise build from ``instance``.
+    if samples is None:
+        samples = build_samples(instance, config.num_samples, seed=config.seed)
     rng = make_rng(config.seed)
     order = rng.permutation(len(samples)).tolist()
     samples = [samples[i] for i in order]

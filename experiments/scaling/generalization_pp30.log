@@ -1,0 +1,38 @@
+[gen] train-n=16 seeds=[0, 1, 2] ladder=[16, 25, 50, 100, 250, 500, 1000] K=24 peak_power=30.0 rho_max_tasks=256
+[gen] training surrogate at N=16 seed=0 ...
+/venv/main/lib/python3.12/site-packages/torch_geometric/utils/_scatter.py:91: UserWarning: The usage of `scatter(reduce='max')` can be accelerated via the 'torch-scatter' package, but it was not found
+  warnings.warn(
+[gen] seed=0 N=    16 core_r2=-0.858 fused_r2=+0.847 jac=0.965 rho=-0.0985 prec1=0.542
+[gen] seed=0 N=    25 core_r2=-19.101 fused_r2=+0.805 jac=0.938 rho=-0.0083 prec1=0.625
+[gen] seed=0 N=    50 core_r2=-101.410 fused_r2=-2.147 jac=0.779 rho=-0.0797 prec1=0.542
+[gen] seed=0 N=   100 core_r2=-798.180 fused_r2=-70.468 jac=0.713 rho=-0.032 prec1=0.208
+[gen] seed=0 N=   250 core_r2=-9048.816 fused_r2=-986.359 jac=0.491 rho=0.0072 prec1=0.208
+[gen] seed=0 N=   500 core_r2=-19195.967 fused_r2=-3008.941 jac=0.457 rho=-0.0266 prec1=0.083
+[gen] seed=0 N=  1000 core_r2=-43855.340 fused_r2=-8892.713 jac=0.323 rho=-0.0049 prec1=0.083
+[gen] training surrogate at N=16 seed=1 ...
+[gen] seed=1 N=    16 core_r2=+0.180 fused_r2=+0.921 jac=0.935 rho=0.0974 prec1=0.750
+[gen] seed=1 N=    25 core_r2=-19.356 fused_r2=+0.841 jac=0.925 rho=0.0145 prec1=0.708
+[gen] seed=1 N=    50 core_r2=-116.160 fused_r2=-1.737 jac=0.763 rho=0.0406 prec1=0.375
+[gen] seed=1 N=   100 core_r2=-501.075 fused_r2=-31.827 jac=0.725 rho=-0.0492 prec1=0.292
+[gen] seed=1 N=   250 core_r2=-18390.254 fused_r2=-1158.312 jac=0.523 rho=-0.0045 prec1=0.042
+[gen] seed=1 N=   500 core_r2=-40451.086 fused_r2=-3794.882 jac=0.449 rho=0.0136 prec1=0.208
+[gen] seed=1 N=  1000 core_r2=-45168.816 fused_r2=-5507.731 jac=0.392 rho=-0.003 prec1=0.125
+[gen] training surrogate at N=16 seed=2 ...
+[gen] seed=2 N=    16 core_r2=-0.532 fused_r2=+0.824 jac=0.950 rho=-0.0472 prec1=0.708
+[gen] seed=2 N=    25 core_r2=-20.150 fused_r2=+0.847 jac=0.924 rho=-0.0219 prec1=0.542
+[gen] seed=2 N=    50 core_r2=-69.647 fused_r2=-0.492 jac=0.812 rho=0.0115 prec1=0.333
+[gen] seed=2 N=   100 core_r2=-449.077 fused_r2=-31.465 jac=0.692 rho=-0.0178 prec1=0.208
+[gen] seed=2 N=   250 core_r2=-13973.328 fused_r2=-1072.675 jac=0.564 rho=0.0105 prec1=0.083
+[gen] seed=2 N=   500 core_r2=-25729.981 fused_r2=-2932.643 jac=0.463 rho=0.0105 prec1=0.292
+[gen] seed=2 N=  1000 core_r2=-58405.992 fused_r2=-8717.583 jac=0.380 rho=0.0185 prec1=0.083
+
+[gen] per-N means (trained once at N=16, evaluated at scale):
+     N   core_r2  fused_r2  energy_r2  tape_jac  attn_rho  prec@1
+    16    -0.403    +0.864     +1.000     0.950    -0.016   0.667
+    25   -19.536    +0.831     +1.000     0.929    -0.005   0.625
+    50   -95.739    -1.458     +1.000     0.785    -0.009   0.417
+   100  -582.777   -44.587     +1.000     0.710    -0.033   0.236
+   250 -13804.133 -1072.448     +1.000     0.526    +0.004   0.111
+   500 -28459.011 -3245.488     +1.000     0.456    -0.001   0.194
+  1000 -49143.383 -7706.009     +1.000     0.365    +0.004   0.097
+[gen] wrote /workspace/e-hgatv2/experiments/scaling/generalization_pp30.json

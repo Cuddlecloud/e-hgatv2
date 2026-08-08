@@ -1,0 +1,5 @@
+instance=toy:40 N=40 coupled=True | mp P=200x4, GAT/BRKGA pop=800 | gens=40 | matched evals/gen=800
+training core + fused TAPE head ...
+/venv/main/lib/python3.12/site-packages/torch_geometric/utils/_scatter.py:91: UserWarning: The usage of `scatter(reduce='max')` can be accelerated via the 'torch-scatter' package, but it was not found
+  warnings.warn(
+  fused R2_makespan=0.8517 R2_energy=1.0000

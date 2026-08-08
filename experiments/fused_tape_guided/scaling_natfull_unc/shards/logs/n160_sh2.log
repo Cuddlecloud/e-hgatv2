@@ -1,0 +1,3 @@
+instance=toy:160 N=160 coupled=False | mp P=800x4, GAT/BRKGA pop=3200 | gens=40 | matched evals/gen=3200
+training core + fused TAPE head ...
+  fused R2_makespan=0.9722 R2_energy=1.0000

@@ -1,0 +1,24 @@
+[gen] train-n=16 seeds=[0, 1] ladder=[16, 32, 48, 64, 96] K=12 peak_power=30.0 rho_max_tasks=96
+[gen] training surrogate on POOLED sizes [16, 28, 40] seed=0 ...
+/venv/main/lib/python3.12/site-packages/torch_geometric/utils/_scatter.py:91: UserWarning: The usage of `scatter(reduce='max')` can be accelerated via the 'torch-scatter' package, but it was not found
+  warnings.warn(
+[gen] seed=0 N=    16 core_r2=-2.460 fused_r2=+0.923 jac=1.000 rho=-0.1098 prec1=0.417
+[gen] seed=0 N=    32 core_r2=-0.268 fused_r2=+0.260 jac=0.815 rho=0.0818 prec1=0.500
+[gen] seed=0 N=    48 core_r2=-0.508 fused_r2=+0.548 jac=0.773 rho=0.0002 prec1=0.250
+[gen] seed=0 N=    64 core_r2=-10.296 fused_r2=+0.310 jac=0.734 rho=-0.0291 prec1=0.167
+[gen] seed=0 N=    96 core_r2=-44.996 fused_r2=-3.480 jac=0.802 rho=0.0584 prec1=0.333
+[gen] training surrogate on POOLED sizes [16, 28, 40] seed=1 ...
+[gen] seed=1 N=    16 core_r2=-0.559 fused_r2=+0.881 jac=0.946 rho=0.0624 prec1=0.750
+[gen] seed=1 N=    32 core_r2=-0.798 fused_r2=+0.770 jac=0.753 rho=0.034 prec1=0.500
+[gen] seed=1 N=    48 core_r2=-0.145 fused_r2=+0.826 jac=0.790 rho=-0.0186 prec1=0.500
+[gen] seed=1 N=    64 core_r2=-11.075 fused_r2=-0.681 jac=0.775 rho=-0.0553 prec1=0.583
+[gen] seed=1 N=    96 core_r2=-107.365 fused_r2=-5.284 jac=0.621 rho=0.0097 prec1=0.417
+
+[gen] per-N means (trained once at N=16, evaluated at scale):
+     N   core_r2  fused_r2  energy_r2  tape_jac  attn_rho  prec@1
+    16    -1.509    +0.902     +1.000     0.973    -0.024   0.583
+    32    -0.533    +0.515     +1.000     0.784    +0.058   0.500
+    48    -0.327    +0.687     +1.000     0.782    -0.009   0.375
+    64   -10.686    -0.186     +1.000     0.755    -0.042   0.375
+    96   -76.180    -4.382     +1.000     0.712    +0.034   0.375
+[gen] wrote /workspace/e-hgatv2/experiments/scaling/generalization_pp30_curriculum.json

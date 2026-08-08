@@ -102,6 +102,7 @@ def train_surrogate(
     config: TrainConfig | None = None,
     *,
     device: str | torch.device | None = None,
+    graphs: list | None = None,
 ) -> TrainResult:
     """Generate data, train the surrogate, and evaluate on a held-out test split.
 
@@ -116,7 +117,10 @@ def train_surrogate(
     seed_everything(config.seed)
     dev = _resolve_device(device)
 
-    graphs = generate_graphs(instance, config.num_samples, seed=config.seed)
+    # ``graphs`` lets a caller inject a pre-pooled dataset (e.g. samples pooled across a range
+    # of instance sizes for a size-generalisation curriculum); otherwise generate from ``instance``.
+    if graphs is None:
+        graphs = generate_graphs(instance, config.num_samples, seed=config.seed)
     train_graphs, val_graphs, test_graphs = split_graphs(
         graphs, val_frac=config.val_frac, test_frac=config.test_frac, seed=config.seed
     )

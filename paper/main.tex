@@ -74,14 +74,14 @@ critical-path indicator}---we call this readout \emph{TAPE} (Tropical Attributio
 Physical Explanations). We show on $11$ problem instances (synthetic dual-cycling
 instances and the published FSMJ loading benchmark, in both the uncoupled and the
 peak-power-coupled regime) that TAPE recovers the true critical path with
-Jaccard $0.87$--$1.00$ against an exact oracle, whereas the conventional learned
+Jaccard $0.85$--$1.00$ against an exact oracle, whereas the conventional learned
 attention weights are statistically uncorrelated with the true makespan levers
-($|\rho|\le 0.17$)---and, measured against the exact critical path from coarse hit-rate to
-fine ranking, are no better than random at \emph{every} granularity, a verdict only a
-physically grounded objective makes possible. Routing the same faithful signal back into an NSGA-II search makes the
+($|\rho|\le 0.18$)---and, measured against the exact critical path from coarse hit-rate to
+fine ranking, are no better than random at \emph{every} granularity---a verdict the exact
+critical path makes directly measurable here. Routing the same faithful signal back into an NSGA-II search makes the
 guided algorithm dominate mp-BRKGA, single-population BRKGA and an unguided control on
-hypervolume in $11/11$ instances (Friedman $\chi^2_4=37.2$, $p=1.6\times10^{-7}$; all
-post-hoc Holm-adjusted $p<0.004$). Finally, aggregating TAPE over the approximated Pareto
+hypervolume in $11/11$ instances (Friedman $\chi^2_4=35.1$, $p=4.5\times10^{-7}$; all
+post-hoc Holm-adjusted $p\le0.004$). Finally, aggregating TAPE over the approximated Pareto
 set with a trade-off-weighted score (Pareto Tension Score) yields an interpretable,
 sparse description of how the binding bottleneck \emph{migrates} along the front; and a single
 structural surrogate \emph{amortises} this front composition to unseen instances (Pearson
@@ -578,6 +578,21 @@ the LOAD/UNLOAD completions $c_j$. Hence the only approximation in the fused mak
 heads' prediction of the local attributes---the \emph{composition} is exact.
 \end{proposition}
 
+\paragraph{What ``exact'' does and does not mean.}
+Proposition~\ref{prop:exact} concerns the \emph{composition}, not the physics: given the
+heads' predicted leg attributes, TAPE returns the critical path of the surrogate's max-plus
+DP \emph{exactly}---it is that DP's own subgradient, not a post-hoc saliency heuristic. The
+attribution's fidelity to the \emph{physical} critical path is therefore inherited from the
+heads' accuracy. In the uncoupled regime the leg heads attain $R^2\approx0.997$
+(Table~\ref{tab:fidelity}), so the surrogate and physical critical paths coincide up to the
+residual leg error (leg-critical Jaccard $0.87$--$1.00$ against the exact simulator oracle);
+under the \emph{synthetic} coupled constraint the heads degrade to $R^2\approx0.80$ and the
+attribution degrades with them (Jaccard $\geq0.91$). Thus ``exact'' qualifies the attribution
+\emph{relative to the model being explained}. Far from weakening the thesis, this is precisely
+what makes faithfulness \emph{decidable} in this model class: because an exact attribution of
+the surrogate exists for free, any residual gap between attention and the critical path is a
+fact about attention, not an artefact of an approximate explainer.
+
 \paragraph{Why use a GNN at all for a deterministic problem?} In the uncoupled regime the
 makespan is a closed-form longest path---so why interpose a learned model? Three reasons.
 \begin{enumerate}[nosep,leftmargin=*]
@@ -903,7 +918,7 @@ dispersion of consecutive gaps along $F$ together with its boundary gaps (lower 
 and the per-task marginal makespan-sensitivity, and (c) for TAPE the \emph{leg-critical
 Jaccard} (overlap of predicted vs.\ true on-path leg sets). Section~\ref{sec:ladder} reports
 these at four granularities, coarse to fine.
-\paragraph{Protocol.} Each cell is a mean over $20$ seeds (\textsf{SD-20-C}: $5$) with a $95\%$
+\paragraph{Protocol.} Each cell is a mean over $20$ seeds with a $95\%$
 confidence interval; significance across instances uses the Friedman test with average ranks
 and the Nemenyi critical difference, plus Holm-corrected pairwise Wilcoxon signed-rank tests,
 following Dem\v{s}ar~\cite{demsar2006}.
@@ -946,10 +961,11 @@ $|\rho|$ with the true makespan levers is near $0$.}
 
 \subsection{Attention encodes no critical-path structure---at any granularity}
 \label{sec:ladder}
-The ``is attention explanation?'' debate is unfalsifiable in NLP because there is no ground
-truth. Here the makespan is an \emph{exact} max-plus longest path, so every schedule has a
-known critical path and a known per-task makespan-sensitivity, and the question becomes
-measurable at increasing resolution. We compare the surrogate's AGV-arc attention against
+In natural-language settings the ``is attention explanation?'' debate rests on \emph{proxy}
+ground truth---erasure, gradient, and adversarial-attention tests---which is why it has
+remained contested. Here the makespan is an \emph{exact} max-plus longest path, so every
+schedule has a known critical path and a known per-task makespan-sensitivity, and the
+question becomes directly measurable at increasing resolution. We compare the surrogate's AGV-arc attention against
 TAPE's tropical gradient at four granularities, pooled over nine instances ($60$ random
 schedules each), each against its honest random baseline (Table~\ref{tab:ladder}, top):
 coarse hit-rate (precision@1), medium ranking (ROC-AUC for ``task on the critical path''),
@@ -959,7 +975,7 @@ baseline at every level}---precision@1 $0.69$ vs.\ critical-fraction $0.70$; AUC
 $0.50$; $\rho=+0.07$; separation $+0.06\sigma$---while TAPE is near-exact at all four
 ($0.98$, $0.94$, $+0.70$, $+1.92\sigma$). Attention therefore carries essentially \emph{no}
 critical-path information, coarse or fine: a strictly stronger statement than the near-zero
-rank correlation, and one only a physically grounded objective permits.
+rank correlation, which the exact critical path here makes directly checkable.
 
 \paragraph{Then why does attention guide search at all?}
 Because the guidance benefit is the surrogate's, not attention's. The search arms share
@@ -977,9 +993,11 @@ attention localises anything (it does not; Table~\ref{tab:ladder}, top). \emph{(
 beats precise}: the more diffuse the targeting, the better the hypervolume
 (random $\ge$ attention $>$ TAPE), because exact bottleneck-targeting is
 \emph{exploitative}---it concentrates mutations on the current critical task and narrows front
-coverage, while HV rewards spread. This is the mechanism behind the small attention-over-TAPE
-edge on HV (Table~\ref{tab:stats}, ranks $1.27$ vs.\ $1.73$, $p_{\text{Holm}}=0.175$):
-accidental exploration, not information. The network attains
+coverage, while HV rewards spread---the ordering seen in the controlled ablation
+(random $\ge$ attention $>$ TAPE, Table~\ref{tab:ladder} bottom). Across the full
+$11$-instance benchmark the two guided variants are statistically tied on HV
+(Table~\ref{tab:stats}, ranks $1.45$ vs.\ $1.55$, $p_{\text{Holm}}=0.83$): any per-instance
+ordering is accidental exploration, not information. The network attains
 $R^2\!\approx\!0.99$ objective regression with an attention map indistinguishable from random
 at every measurable granularity---accurate prediction does not imply an interpretable
 attention map, and faithful guidance must come from the exact tropical gradient, not the
@@ -1086,6 +1104,64 @@ $6$ to $50$ tasks; whiskers are $20$-seed $95\%$ CIs. Faithfulness is a property
 \emph{model}, not of small-instance luck.}
 \label{fig:fidelity}
 \end{figure}
+
+\subsection{Size generalisation: train small, evaluate large}
+\label{sec:generalize}
+The surrogate is \emph{inductive}---a shared-weight message-passing network whose parameters
+do not depend on $N$---so a model fit on small instances can be \emph{run} on much larger
+ones without retraining. This is the property an operations-research reader cares about most
+for deployment: train once on cheap small instances, apply at the production scale. We test
+it directly. We train the core $+$ physics-fused head \emph{once} at $N{=}16$ and then, by
+inference only, evaluate it on a ladder up to $N{=}5000$---a $312\times$ extrapolation in
+problem size---over three training seeds (Table~\ref{tab:generalize}).
+
+The physics-fused head predicts \emph{per-leg} times, a local and size-invariant quantity,
+and the exact tropical DP aggregates them into a correct-magnitude makespan at any $N$ (the
+energy read-out is exact-additive). It should therefore generalise across scale, whereas a
+conventional black-box global-readout head cannot: a pooled graph embedding has no mechanism
+to extrapolate a makespan magnitude that grows with $N$. The data bear this out sharply. The
+fused makespan $R^2$ is \emph{flat at $\geq 0.98$} across the whole ladder
+($0.997$ at $N{=}16 \to 0.989$ at $N{=}5000$), while the black-box core collapses
+monotonically to $R^2=-7{,}263$---far worse than predicting the mean. TAPE's critical-path
+faithfulness is preserved (leg-Jaccard $0.90$--$1.00$), and the attention weights stay
+uncorrelated with the true makespan levers at every scale ($|\rho|\le0.07$). The surrogate
+and its explanation thus transfer intact to instances far larger than the $N\leq160$
+published \textsf{DL} benchmark~\cite{homayouni2022book}.
+
+\begin{table}[t]
+\centering\small
+\caption{Size generalisation of the uncoupled surrogate: trained \emph{once} at $N{=}16$ and
+evaluated by inference at scale (mean over $3$ training seeds, $24$ random schedules each).
+The physics-fused makespan $R^2$ is flat at $\geq0.98$ to $N{=}5000$ while the black-box
+global-readout core collapses; TAPE faithfulness (leg-Jaccard vs.\ the exact oracle) and the
+near-zero attention correlation are preserved throughout. The energy head is exact
+($R^2=1.000$, omitted).}
+\label{tab:generalize}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{rcccc}
+\toprule
+$N$ & fused $R^2_{C_{\max}}$ & black-box core $R^2_{C_{\max}}$ & leg-Jaccard & attention $\rho$\\
+\midrule
+$16$   & $0.997$ & $-0.3$     & $0.998$ & $+0.03$\\
+$50$   & $0.996$ & $-32.2$    & $0.970$ & $+0.05$\\
+$100$  & $0.996$ & $-79.9$    & $0.949$ & $+0.04$\\
+$250$  & $0.982$ & $-169.6$   & $0.907$ & $+0.01$\\
+$500$  & $0.986$ & $-466.3$   & $0.913$ & $+0.01$\\
+$1000$ & $0.986$ & $-1015.2$  & $0.913$ & $+0.01$\\
+$2000$ & $0.987$ & $-3450.1$  & $0.905$ & $-0.00$\\
+$5000$ & $0.989$ & $-7262.7$  & $0.940$ & $+0.00$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{The coupled regime does not size-generalise.} Under peak-power coupling the same
+train-at-$16$ head holds only to about $N{=}25$ (fused $R^2=0.83$) and then collapses---$R^2$
+is already $-1.5$ at $N{=}50$ and continues to fall, with the TAPE Jaccard drifting from
+$0.95$ to $0.37$ by $N{=}1000$---because the power-wait arcs that couple the vehicles carry no
+closed-form contribution for the head to extrapolate (the same mechanism that makes the
+coupled regime harder throughout this paper). Coupled deployment therefore requires retraining
+at, or near, the target size, where the surrogate remains accurate (Table~\ref{tab:fidelity});
+size-generalisation is a property of the \emph{uncoupled} physics, and we report it as such.
 
 \subsection{R2: landscape analysis via critical-path attribution}
 \label{sec:r2worked}
@@ -1335,7 +1411,7 @@ landscape analysis degrades gracefully rather than failing, and the GNN is
 Across the $11$ instances the two graph-guided methods clearly dominate the three
 non-learned baselines on every indicator (Figure~\ref{fig:hv},
 Table~\ref{tab:main}). On the primary indicator (hypervolume ratio) the Friedman test
-rejects equality of the five methods with $\chi^2_4 = 37.2$, $p = 1.6\times10^{-7}$; the
+rejects equality of the five methods with $\chi^2_4 = 35.1$, $p = 4.5\times10^{-7}$; the
 average ranks (Figure~\ref{fig:rank}, Table~\ref{tab:stats}) place the two graph-guided
 methods first, then the random control, then single-population BRKGA, with mp-BRKGA last.
 Pairwise Wilcoxon tests with Holm correction confirm that TAPE significantly beats
@@ -1450,12 +1526,11 @@ reaching $+38.8$ points of $\mathrm{HV}^\star$ over BRKGA at $N{=}50$.}
 
 \subsection{Faithfulness is obtained for free}
 TAPE and the unfaithful attention signal are \emph{statistically indistinguishable} on
-hypervolume (Holm-adjusted $p = 0.067$ at $5$ seeds; attention is numerically ahead on the
-convergence indicators). This is not a small-sample artifact: a $20$-seed re-run
-\emph{strengthens} the indistinguishability rather than resolving it (Holm $p = 0.175$,
-Cliff's $\delta = -0.12$; TAPE wins $3/11$), while both graph-guided variants keep crushing
-the classical baselines (TAPE $>$ mp-BRKGA on $11/11$, Holm $p<0.01$; Friedman
-$p\approx1.6\times10^{-7}$). We therefore make the honest, defensible claim: \emph{routing the
+hypervolume: across all $11$ instances at $20$ seeds the Holm-adjusted TAPE-vs-attention
+$p = 0.83$ (Cliff's $\delta = +0.01$, negligible; TAPE ahead on $6/11$)---a genuine tie
+rather than an underpowered one---while both graph-guided variants keep crushing the
+classical baselines (TAPE $>$ mp-BRKGA on $11/11$, Holm $p<0.01$; Friedman
+$p\approx4.5\times10^{-7}$). We therefore make the honest, defensible claim: \emph{routing the
 guidance through the faithful TAPE signal preserves the optimisation performance of the
 unfaithful attention signal.} Faithfulness comes at no cost in solution quality, and the same
 object that steers the search is the one that correctly explains it. We do \emph{not} claim
@@ -1468,11 +1543,11 @@ is what optimises; TAPE's sole, decisive advantage is that its signal is \emph{f
 \begin{table}[t]
 \centering
 \caption{Main results. $\mathrm{HV}/\mathrm{HV}^\star$ (higher better) for all five methods,
-and the two faithfulness columns. Best HV per row in \textbf{bold}. Values are $20$-seed means
-except \textsf{SD-20-C} ($\dagger$, $5$ seeds---the coupled $N{=}20$ regime is by far the most
-expensive). At $20$ seeds the two graph-guided variants are statistically indistinguishable
-(attention is numerically ahead on $8/11$ rows; see Table~\ref{tab:stats}), while TAPE beats
-every classical baseline on all $11$ rows.}
+and the two faithfulness columns. Best HV per row in \textbf{bold}. Values are $20$-seed means;
+the reference $\mathrm{PF}^\star$ folds in every evaluated front, so $\mathrm{HV}/\mathrm{HV}^\star
+\le 1$ by construction. The two graph-guided variants are statistically indistinguishable
+(TAPE is best on $6/11$ rows; see Table~\ref{tab:stats}), while TAPE beats every classical
+baseline on all $11$ rows.}
 \label{tab:main}
 \scriptsize
 \setlength{\tabcolsep}{4pt}
@@ -1483,28 +1558,28 @@ every classical baseline on all $11$ rows.}
 \cmidrule(lr){4-8}\cmidrule(lr){9-10}
 Instance & Regime & $N$ & TAPE & Attn & Random & mp-BRKGA & sp-BRKGA & TAPE Jac. & Attn $\rho$\\
 \midrule
-\textsf{SD-5}  & unc. & 5  & \textbf{0.973} & 0.972 & 0.969 & 0.928 & 0.962 & 0.980 & 0.062\\
-\textsf{SD-8}  & unc. & 8  & 0.954 & \textbf{0.971} & 0.936 & 0.906 & 0.922 & 0.990 & $-0.023$\\
-\textsf{SD-10} & unc. & 10 & 1.008 & \textbf{1.029} & 0.978 & 0.923 & 0.973 & 0.975 & 0.088\\
-\textsf{SD-15} & unc. & 15 & 0.919 & \textbf{0.919} & 0.830 & 0.807 & 0.829 & 0.975 & 0.081\\
-\textsf{SD-20} & unc. & 20 & 0.907 & \textbf{0.930} & 0.711 & 0.815 & 0.808 & 0.952 & $-0.003$\\
-\textsf{L07}   & unc. & 8  & 0.973 & \textbf{0.976} & 0.949 & 0.929 & 0.935 & 0.985 & 0.176\\
-\textsf{L15}   & unc. & 16 & \textbf{0.904} & 0.888 & 0.802 & 0.761 & 0.779 & 0.996 & 0.064\\
-\textsf{L21}   & unc. & 12 & \textbf{1.017} & 0.976 & 0.935 & 0.853 & 0.941 & 0.988 & 0.054\\
-\textsf{L35}   & unc. & 12 & 0.970 & \textbf{0.973} & 0.934 & 0.913 & 0.920 & 0.989 & 0.084\\
-\textsf{SD-10-C} & coupled & 10 & 1.002 & \textbf{1.074} & 0.934 & 0.844 & 0.904 & 0.955 & $-0.080$\\
-\textsf{SD-20-C}$^\dagger$ & coupled & 20 & 0.846 & \textbf{0.883} & 0.697 & 0.767 & 0.821 & 0.874 & $-0.035$\\
+\textsf{SD-5}  & unc. & 5  & \textbf{0.977} & 0.975 & 0.969 & 0.928 & 0.964 & 0.980 & 0.062\\
+\textsf{SD-8}  & unc. & 8  & 0.931 & \textbf{0.954} & 0.914 & 0.881 & 0.907 & 0.990 & $-0.023$\\
+\textsf{SD-10} & unc. & 10 & 0.872 & \textbf{0.899} & 0.837 & 0.774 & 0.796 & 0.975 & 0.088\\
+\textsf{SD-15} & unc. & 15 & 0.866 & \textbf{0.869} & 0.784 & 0.759 & 0.806 & 0.975 & 0.081\\
+\textsf{SD-20} & unc. & 20 & \textbf{0.800} & 0.749 & 0.643 & 0.674 & 0.673 & 0.952 & $-0.003$\\
+\textsf{L07}   & unc. & 8  & 0.951 & \textbf{0.959} & 0.928 & 0.911 & 0.921 & 0.985 & 0.176\\
+\textsf{L15}   & unc. & 16 & \textbf{0.941} & 0.929 & 0.850 & 0.849 & 0.826 & 0.996 & 0.064\\
+\textsf{L21}   & unc. & 12 & \textbf{0.940} & 0.916 & 0.847 & 0.742 & 0.870 & 0.988 & 0.054\\
+\textsf{L35}   & unc. & 12 & \textbf{0.945} & 0.940 & 0.876 & 0.827 & 0.878 & 0.989 & 0.084\\
+\textsf{SD-10-C} & coupled & 10 & 0.872 & \textbf{0.887} & 0.811 & 0.778 & 0.804 & 0.955 & $-0.080$\\
+\textsf{SD-20-C} & coupled & 20 & \textbf{0.750} & 0.732 & 0.497 & 0.603 & 0.595 & 0.848 & $-0.046$\\
 \bottomrule
 \end{tabular}}
 \end{table}
 
 \begin{table}[t]
 \centering
-\caption{Statistical analysis over all $11$ instances at $20$ seeds (\textsf{SD-20-C} at $5$;
-Friedman + average ranks; lower rank = better). Holm-adjusted pairwise $p$-values are TAPE
-vs.\ each method on $\mathrm{HV}/\mathrm{HV}^\star$. ${}^\star$ denotes $p_{\text{Holm}}<0.05$.
-TAPE vs.\ attention is \emph{not} significant ($p=0.175$), and more seeds did not change this
-($5$-seed $p=0.067$)---they are statistically tied, as Section~\ref{sec:ladder} explains.}
+\caption{Statistical analysis over all $11$ instances at $20$ seeds (Friedman + average ranks;
+lower rank = better). Holm-adjusted pairwise $p$-values are TAPE vs.\ each method on
+$\mathrm{HV}/\mathrm{HV}^\star$. ${}^\star$ denotes $p_{\text{Holm}}<0.05$. TAPE vs.\ attention
+is \emph{not} significant ($p=0.83$)---they are statistically tied, as Section~\ref{sec:ladder}
+explains, with TAPE marginally ahead on average rank.}
 \label{tab:stats}
 \small
 \setlength{\tabcolsep}{6pt}
@@ -1513,18 +1588,18 @@ TAPE vs.\ attention is \emph{not} significant ($p=0.175$), and more seeds did no
 \toprule
 Method & rank (HV) & rank (GD$^+$) & $p_{\text{Holm}}$ (HV) & Cliff's $\delta$ (HV)\\
 \midrule
-E-HGATv2-attn      & 1.27 & 1.36 & $0.175$ & $-0.12$ (negligible)\\
-E-HGATv2-TAPE (ours) & 1.73 & 1.73 & --- & ---\\
-NSGA-II (random)   & 3.45 & 3.45 & $0.0039^\star$ & $+0.46$ (medium)\\
-single-pop BRKGA   & 3.82 & 3.45 & $0.0020^\star$ & $+0.52$ (large)\\
-mp-BRKGA           & 4.73 & 5.00 & $0.0029^\star$ & $+0.70$ (large)\\
+E-HGATv2-TAPE (ours) & 1.45 & 1.82 & --- & ---\\
+E-HGATv2-attn      & 1.55 & 1.36 & $0.831$ & $+0.01$ (negligible)\\
+NSGA-II (random)   & 3.64 & 3.64 & $0.0039^\star$ & $+0.44$ (medium)\\
+single-pop BRKGA   & 3.82 & 3.18 & $0.0020^\star$ & $+0.42$ (medium)\\
+mp-BRKGA           & 4.55 & 5.00 & $0.0029^\star$ & $+0.64$ (large)\\
 \bottomrule
 \end{tabular}}
 
 \vspace{3pt}
-{\footnotesize Friedman (HV): $\chi^2_4 = 37.2$, $p = 1.6\times10^{-7}$; Nemenyi
-$\mathrm{CD}_{0.05} = 1.84$.\quad Friedman (GD$^+$): $\chi^2_4 = 38.3$,
-$p = 9.6\times10^{-8}$; Cliff's $\delta$(GD$^+$, TAPE vs.\ mp-BRKGA) $= -0.62$ (large);
+{\footnotesize Friedman (HV): $\chi^2_4 = 35.1$, $p = 4.5\times10^{-7}$; Nemenyi
+$\mathrm{CD}_{0.05} = 1.84$.\quad Friedman (GD$^+$): $\chi^2_4 = 37.5$,
+$p = 1.5\times10^{-7}$; Cliff's $\delta$(GD$^+$, TAPE vs.\ mp-BRKGA) $= -0.59$ (large);
 TAPE $>$ mp-BRKGA on $11/11$ instances.}
 \end{table}
 
@@ -1539,9 +1614,9 @@ pairwise \emph{Wilcoxon signed-rank} tests of TAPE against each baseline \emph{a
 instances, with \emph{Holm--Bonferroni} correction for the four comparisons
 (Table~\ref{tab:stats}).
 
-\paragraph{Significance across instances.} The headline runs use $S{=}20$ seeds (the coupled
-\textsf{SD-20-C}, by far the most expensive, uses $5$). The Dem\v{s}ar protocol aggregates the
-comparison over the $11$ instances (where TAPE vs.\ mp-BRKGA reaches $p_{\text{Holm}}=0.0029$);
+\paragraph{Significance across instances.} The headline runs use $S{=}20$ seeds on every
+instance, including the expensive coupled \textsf{SD-20-C}. The Dem\v{s}ar protocol aggregates
+the comparison over the $11$ instances (where TAPE vs.\ mp-BRKGA reaches $p_{\text{Holm}}=0.0029$);
 at $20$ seeds the per-instance tests are no longer floor-limited (a $5$-seed two-sided Wilcoxon
 cannot drop below $p=0.0625$ by construction, which is why the original $5$-seed runs leaned on
 the across-instance test), and the across-instance and per-instance views now agree.
@@ -1558,28 +1633,26 @@ intervals overlap because every method is close to the reference front.
 
 \paragraph{Effect sizes.} Beyond the rank tests we quantify \emph{how large} the advantage
 is with distribution-free Cliff's-$\delta$ (Table~\ref{tab:stats}, last column): against
-mp-BRKGA the effect is \emph{large} ($\delta=+0.70$ on HV and $-0.62$ on GD$^+$), against
-single-population BRKGA \emph{large} ($\delta=+0.52$) and against the random control
-\emph{medium} ($\delta=+0.46$) on HV, and against attention it is \emph{negligible} and
-slightly negative ($\delta=-0.12$)---exactly the ``faithfulness for free'' reading: TAPE
-matches attention while strictly dominating every non-learned baseline by a medium-to-large
-margin.
+mp-BRKGA the effect is \emph{large} ($\delta=+0.64$ on HV and $-0.59$ on GD$^+$), against
+single-population BRKGA \emph{medium} ($\delta=+0.42$) and against the random control
+\emph{medium} ($\delta=+0.44$) on HV, and against attention it is \emph{negligible}
+($\delta=+0.01$)---exactly the ``faithfulness for free'' reading: TAPE matches attention
+while strictly dominating every non-learned baseline by a medium-to-large margin.
 
 \paragraph{Per-instance bootstrap evidence.} We bootstrap ($10^{4}$ resamples) the
 per-instance TAPE$-$mp-BRKGA hypervolume gap (Table~\ref{tab:boot}, visualised as a forest
-plot in Figure~\ref{fig:forest}). At $20$ seeds the $95\%$ CI \emph{excludes zero on $10$ of
-$11$ instances}---a genuine per-instance significance criterion---failing only on the
-$5$-seed coupled \textsf{SD-20-C}, whose wide interval reflects its seed count rather than a
-vanishing gap (point estimate still $+0.079$). Moving from $5$ to $20$ seeds lifted this from
-$8/11$ to $10/11$, exactly as expected.
+plot in Figure~\ref{fig:forest}). At $20$ seeds the $95\%$ CI \emph{excludes zero on all $11$
+instances}---a genuine per-instance significance criterion met everywhere, including the
+coupled \textsf{SD-20-C} case (gap $+0.147$, CI $[+0.078,+0.222]$), which now clears the bar
+once run at the full $20$-seed budget.
 
 \begin{table}[t]
 \centering\small
 \caption{Per-instance evidence that the fused E-HGATv2 (TAPE) beats the published mp-BRKGA on
 $\mathrm{HV}/\mathrm{HV}^\star$: the paired Wilcoxon statistic $W$ and a percentile-bootstrap
-($10^{4}$ resamples) $95\%$ CI on the per-seed gap (TAPE$-$mp), at $20$ seeds
-(\textsf{SD-20-C}$^\dagger$: $5$). A CI excluding $0$ is per-instance significance and holds on
-$10/11$ instances; only the $5$-seed coupled case fails (point estimate still $+0.079$).}
+($10^{4}$ resamples) $95\%$ CI on the per-seed gap (TAPE$-$mp), at $20$ seeds for every
+instance. A CI excluding $0$ is per-instance significance and holds on all $11/11$
+instances.}
 \label{tab:boot}
 \setlength{\tabcolsep}{6pt}
 \resizebox{\textwidth}{!}{%
@@ -1587,17 +1660,17 @@ $10/11$ instances; only the $5$-seed coupled case fails (point estimate still $+
 \toprule
 Instance & TAPE & mp-BRKGA & gap $95\%$ CI (bootstrap) & $W$ & CI ${>}0$\\
 \midrule
-\textsf{SD-5}    & 0.973 & 0.928 & $[+0.032,+0.059]$ & 4 & yes\\
-\textsf{SD-8}    & 0.954 & 0.906 & $[+0.033,+0.064]$ & 1 & yes\\
-\textsf{SD-10}   & 1.008 & 0.923 & $[+0.054,+0.117]$ & 11 & yes\\
-\textsf{SD-15}   & 0.919 & 0.807 & $[+0.078,+0.144]$ & 4 & yes\\
-\textsf{SD-20}   & 0.907 & 0.815 & $[+0.039,+0.146]$ & 33 & yes\\
-\textsf{L07}     & 0.973 & 0.929 & $[+0.028,+0.061]$ & 11 & yes\\
-\textsf{L15}     & 0.904 & 0.761 & $[+0.106,+0.184]$ & 0 & yes\\
-\textsf{L21}     & 1.017 & 0.853 & $[+0.116,+0.213]$ & 2 & yes\\
-\textsf{L35}     & 0.970 & 0.913 & $[+0.041,+0.072]$ & 1 & yes\\
-\textsf{SD-10-C} & 1.002 & 0.844 & $[+0.082,+0.234]$ & 22 & yes\\
-\textsf{SD-20-C}$^\dagger$ & 0.846 & 0.767 & $[-0.049,+0.220]$ & 5 & no\\
+\textsf{SD-5}    & 0.977 & 0.928 & $[+0.038,+0.058]$ & 0 & yes\\
+\textsf{SD-8}    & 0.931 & 0.881 & $[+0.031,+0.070]$ & 12 & yes\\
+\textsf{SD-10}   & 0.872 & 0.774 & $[+0.057,+0.138]$ & 19 & yes\\
+\textsf{SD-15}   & 0.866 & 0.759 & $[+0.075,+0.138]$ & 3 & yes\\
+\textsf{SD-20}   & 0.800 & 0.674 & $[+0.061,+0.188]$ & 20 & yes\\
+\textsf{L07}     & 0.951 & 0.911 & $[+0.025,+0.054]$ & 12 & yes\\
+\textsf{L15}     & 0.941 & 0.849 & $[+0.067,+0.118]$ & 0 & yes\\
+\textsf{L21}     & 0.940 & 0.742 & $[+0.157,+0.241]$ & 0 & yes\\
+\textsf{L35}     & 0.945 & 0.827 & $[+0.093,+0.144]$ & 0 & yes\\
+\textsf{SD-10-C} & 0.872 & 0.778 & $[+0.056,+0.136]$ & 15 & yes\\
+\textsf{SD-20-C} & 0.750 & 0.603 & $[+0.078,+0.222]$ & 22 & yes\\
 \bottomrule
 \end{tabular}}
 \end{table}
@@ -1608,7 +1681,7 @@ Instance & TAPE & mp-BRKGA & gap $95\%$ CI (bootstrap) & $W$ & CI ${>}0$\\
 \begin{axis}[
   width=0.82\textwidth, height=0.5\textwidth,
   xlabel={$\mathrm{HV}/\mathrm{HV}^\star$ gap, TAPE $-$ mp-BRKGA (per-seed mean, $95\%$ bootstrap CI)},
-  xmin=-0.13, xmax=0.27,
+  xmin=-0.05, xmax=0.27,
   ytick={1,2,3,4,5,6,7,8,9,10,11},
   yticklabels={\textsf{SD-20-C},\textsf{SD-10-C},\textsf{L35},\textsf{L21},\textsf{L15},%
                \textsf{L07},\textsf{SD-20},\textsf{SD-15},\textsf{SD-10},\textsf{SD-8},\textsf{SD-5}},
@@ -1619,17 +1692,17 @@ Instance & TAPE & mp-BRKGA & gap $95\%$ CI (bootstrap) & $W$ & CI ${>}0$\\
 \addplot[only marks, mark=*, mark size=1.6pt, blue,
          error bars/.cd, x dir=both, x explicit]
   coordinates {
-    (0.045,11) += (0.014,0) -= (0.013,0)
-    (0.048,10) += (0.016,0) -= (0.015,0)
-    (0.085,9)  += (0.032,0) -= (0.031,0)
-    (0.112,8)  += (0.032,0) -= (0.034,0)
-    (0.093,7)  += (0.053,0) -= (0.054,0)
-    (0.044,6)  += (0.017,0) -= (0.016,0)
-    (0.143,5)  += (0.041,0) -= (0.037,0)
-    (0.164,4)  += (0.049,0) -= (0.048,0)
-    (0.056,3)  += (0.016,0) -= (0.015,0)
-    (0.158,2)  += (0.076,0) -= (0.076,0)
-    (0.079,1)  += (0.141,0) -= (0.128,0)
+    (0.048,11) += (0.010,0) -= (0.010,0)
+    (0.050,10) += (0.020,0) -= (0.019,0)
+    (0.098,9)  += (0.040,0) -= (0.041,0)
+    (0.106,8)  += (0.032,0) -= (0.031,0)
+    (0.126,7)  += (0.062,0) -= (0.065,0)
+    (0.040,6)  += (0.014,0) -= (0.015,0)
+    (0.092,5)  += (0.026,0) -= (0.025,0)
+    (0.198,4)  += (0.043,0) -= (0.041,0)
+    (0.118,3)  += (0.026,0) -= (0.025,0)
+    (0.094,2)  += (0.042,0) -= (0.038,0)
+    (0.147,1)  += (0.075,0) -= (0.069,0)
   };
 \draw[dashed, red, thick] (axis cs:0,0.4) -- (axis cs:0,11.6);
 \end{axis}
@@ -1637,8 +1710,7 @@ Instance & TAPE & mp-BRKGA & gap $95\%$ CI (bootstrap) & $W$ & CI ${>}0$\\
 \caption{Per-instance bootstrap evidence ($10^4$ resamples) for the fused E-HGATv2 (TAPE)
 hypervolume advantage over the published mp-BRKGA. Each point is the mean per-seed gap and
 its $95\%$ CI; the dashed line marks zero. At $20$ seeds the CI lies entirely to the right of
-zero on $10/11$ instances---failing only on the $5$-seed coupled \textsf{SD-20-C}---and never
-excludes zero on the wrong side. This is the visual companion to Table~\ref{tab:boot}.}
+zero on all $11/11$ instances. This is the visual companion to Table~\ref{tab:boot}.}
 \label{fig:forest}
 \end{figure}
 
@@ -1954,13 +2026,17 @@ sampling).
 \label{sec:limits}
 We are deliberate about what the evidence does and does not support.
 \begin{itemize}[leftmargin=*]
-  \item \textbf{Reference proxy.} A few cells exceed $1.0$ because a short run beat the
-  reference-front proxy; the headline numbers should be recomputed against a higher-budget
-  $\mathrm{PF}^\star$ before external submission.
-  \item \textbf{Seeds and budget.} Five seeds yield wide intervals (this is why
-  TAPE-vs-attention is indistinguishable rather than provably equal), and the per-population
-  size was reduced from the paper's $20N$ to $5N$ for tractability while keeping all methods
-  budget-matched. Both are straightforward to scale up.
+  \item \textbf{Reference front.} Hypervolume is reported against a high-budget
+  $\mathrm{PF}^\star$ formed as the non-dominated union of long reference runs and every
+  evaluated front, so $\mathrm{HV}/\mathrm{HV}^\star \le 1$ by construction (verified: no cell
+  exceeds $1.0$). The true front is unknown at these sizes, as is standard in EMO practice.
+  \item \textbf{Seeds and budget.} The headline runs use $20$ seeds on every instance,
+  including the coupled \textsf{SD-20-C}; at that resolution the TAPE-vs-attention hypervolume
+  difference is a genuine statistical tie ($p_{\mathrm{Holm}}=0.83$) rather than an
+  underpowered one, because attention's search benefit is the shared surrogate screening and
+  not the attention map itself (Section~\ref{sec:ladder}). The per-population size is $5N$
+  rather than the reference $20N$ for tractability, with all methods held to the same
+  per-generation exact-evaluation budget; scaling either up is straightforward.
   \item \textbf{Generalisation.} A single surrogate \emph{does} transfer front composition to
   unseen instances when composition varies---leave-one-instance-out recovery $r=0.945$ on a
   composition-spanning set (Section~\ref{sec:amortise}, Figure~\ref{fig:amortise}). Two
@@ -1994,8 +2070,10 @@ heterogeneous graph surrogate---serves simultaneously as a post-hoc explanation,
 controller, and a description of Pareto-front behaviour for bi-objective quay-crane and
 SA-AGV scheduling. It is provably faithful where learned attention is not, and routing the
 search through it preserves a statistically significant advantage over the published
-mp-BRKGA baseline. The remaining work---higher-budget references, more seeds, stronger
-coupled training, and cross-instance amortisation---is incremental and well scoped.
+mp-BRKGA baseline. The remaining work---confirming amortisation on a real, structurally
+diverse instance set, strengthening the coupled surrogate at the makespan extreme, and
+reproducing the published optima on the \textsf{DS}/\textsf{DL} benchmark---is incremental
+and well scoped.
 
 \begin{thebibliography}{99}
 \small

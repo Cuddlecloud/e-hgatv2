@@ -1,0 +1,77 @@
+=== launching shards: 11 instances x 20 seeds (shard=4) ===
+launched 55 shard processes; waiting ...
+=== all shards done; merging ===
+  L07: 5 shards -> 20 seeds  (E-HGATv2-TAPE, E-HGATv2-attn, NSGA-II (random), mp-BRKGA, single-pop BRKGA)  -> tape_bench_L07.json
+  L15: 5 shards -> 20 seeds  (E-HGATv2-TAPE, E-HGATv2-attn, NSGA-II (random), mp-BRKGA, single-pop BRKGA)  -> tape_bench_L15.json
+  L21: 5 shards -> 20 seeds  (E-HGATv2-TAPE, E-HGATv2-attn, NSGA-II (random), mp-BRKGA, single-pop BRKGA)  -> tape_bench_L21.json
+  L35: 5 shards -> 20 seeds  (E-HGATv2-TAPE, E-HGATv2-attn, NSGA-II (random), mp-BRKGA, single-pop BRKGA)  -> tape_bench_L35.json
+  toy10: 5 shards -> 20 seeds  (E-HGATv2-TAPE, E-HGATv2-attn, NSGA-II (random), mp-BRKGA, single-pop BRKGA)  -> tape_bench_toy10.json
+  toy10_pp30: 5 shards -> 20 seeds  (E-HGATv2-TAPE, E-HGATv2-attn, NSGA-II (random), mp-BRKGA, single-pop BRKGA)  -> tape_bench_toy10_pp30.json
+  toy15: 5 shards -> 20 seeds  (E-HGATv2-TAPE, E-HGATv2-attn, NSGA-II (random), mp-BRKGA, single-pop BRKGA)  -> tape_bench_toy15.json
+  toy20: 5 shards -> 20 seeds  (E-HGATv2-TAPE, E-HGATv2-attn, NSGA-II (random), mp-BRKGA, single-pop BRKGA)  -> tape_bench_toy20.json
+  toy20_pp30: 5 shards -> 20 seeds  (E-HGATv2-TAPE, E-HGATv2-attn, NSGA-II (random), mp-BRKGA, single-pop BRKGA)  -> tape_bench_toy20_pp30.json
+  toy5: 5 shards -> 20 seeds  (E-HGATv2-TAPE, E-HGATv2-attn, NSGA-II (random), mp-BRKGA, single-pop BRKGA)  -> tape_bench_toy5.json
+  toy8: 5 shards -> 20 seeds  (E-HGATv2-TAPE, E-HGATv2-attn, NSGA-II (random), mp-BRKGA, single-pop BRKGA)  -> tape_bench_toy8.json
+Merged 11 instances into experiments/fused_tape_guided
+=== computing paper stats ===
+instances (12): L07, L15, L21, L35, toy:10, toy:10/coupled, toy:15, toy:20, toy:20/coupled, toy:5, toy:8, toy:8
+
+=== hv_ratio (higher better) ===
+Friedman chi2=38.067, p=1.086e-07  | Nemenyi CD(alpha=.05)=1.761
+   avg rank 1.500  E-HGATv2-TAPE
+   avg rank 1.500  E-HGATv2-attn
+   avg rank 3.583  NSGA-II (random)
+   avg rank 3.917  single-pop BRKGA
+   avg rank 4.500  mp-BRKGA
+   TAPE vs baseline (Wilcoxon across instances, Holm-adj):
+     * NSGA-II (random)     p=0.0004883  p_holm=0.001953  cliffs_delta=+0.431 (medium)
+     * mp-BRKGA             p=0.0004883  p_holm=0.001465  cliffs_delta=+0.653 (large)
+     * single-pop BRKGA     p=0.0004883  p_holm=0.0009766  cliffs_delta=+0.472 (medium)
+       E-HGATv2-attn        p=0.9097  p_holm=0.9097  cliffs_delta=-0.042 (negligible)
+
+=== igd_plus (lower better) ===
+Friedman chi2=38.667, p=8.163e-08  | Nemenyi CD(alpha=.05)=1.761
+   avg rank 1.167  E-HGATv2-attn
+   avg rank 1.917  E-HGATv2-TAPE
+   avg rank 3.417  NSGA-II (random)
+   avg rank 3.917  single-pop BRKGA
+   avg rank 4.583  mp-BRKGA
+   TAPE vs baseline (Wilcoxon across instances, Holm-adj):
+     * mp-BRKGA             p=0.0004883  p_holm=0.001953  cliffs_delta=-0.458 (medium)
+     * single-pop BRKGA     p=0.0004883  p_holm=0.001465  cliffs_delta=-0.306 (small)
+     * NSGA-II (random)     p=0.001465  p_holm=0.00293  cliffs_delta=-0.222 (small)
+     * E-HGATv2-attn        p=0.02686  p_holm=0.02686  cliffs_delta=+0.139 (negligible)
+
+=== gd_plus (lower better) ===
+Friedman chi2=41.000, p=2.688e-08  | Nemenyi CD(alpha=.05)=1.761
+   avg rank 1.333  E-HGATv2-attn
+   avg rank 1.833  E-HGATv2-TAPE
+   avg rank 3.250  single-pop BRKGA
+   avg rank 3.583  NSGA-II (random)
+   avg rank 5.000  mp-BRKGA
+   TAPE vs baseline (Wilcoxon across instances, Holm-adj):
+     * NSGA-II (random)     p=0.0004883  p_holm=0.001953  cliffs_delta=-0.250 (small)
+     * mp-BRKGA             p=0.0004883  p_holm=0.001465  cliffs_delta=-0.597 (large)
+     * single-pop BRKGA     p=0.0009766  p_holm=0.001953  cliffs_delta=-0.194 (small)
+       E-HGATv2-attn        p=0.3013  p_holm=0.3013  cliffs_delta=+0.097 (negligible)
+
+=== per-instance HV: TAPE vs mp-BRKGA (paired Wilcoxon, bootstrap CI of gap) ===
+   L07              TAPE=0.951 mp=0.911 WIN W=12.0 p=0.000 gapCI=[+0.025,+0.054]
+   L15              TAPE=0.941 mp=0.849 WIN W=0.0 p=0.000 gapCI=[+0.067,+0.118]
+   L21              TAPE=0.940 mp=0.742 WIN W=0.0 p=0.000 gapCI=[+0.157,+0.241]
+   L35              TAPE=0.945 mp=0.827 WIN W=0.0 p=0.000 gapCI=[+0.093,+0.144]
+   toy:10           TAPE=0.872 mp=0.774 WIN W=19.0 p=0.001 gapCI=[+0.057,+0.138]
+   toy:10/coupled   TAPE=0.872 mp=0.778 WIN W=15.0 p=0.000 gapCI=[+0.056,+0.136]
+   toy:15           TAPE=0.866 mp=0.759 WIN W=3.0 p=0.000 gapCI=[+0.075,+0.138]
+   toy:20           TAPE=0.800 mp=0.674 WIN W=20.0 p=0.001 gapCI=[+0.061,+0.188]
+   toy:20/coupled   TAPE=0.750 mp=0.603 WIN W=22.0 p=0.001 gapCI=[+0.078,+0.222]
+   toy:5            TAPE=0.977 mp=0.928 WIN W=0.0 p=0.000 gapCI=[+0.038,+0.058]
+   toy:8            TAPE=0.931 mp=0.881 WIN W=12.0 p=0.000 gapCI=[+0.031,+0.070]
+   toy:8            TAPE=0.915 mp=0.824 WIN W=0.0 p=0.500 gapCI=[+0.079,+0.104]
+   TAPE > mp-BRKGA on 12/12 instances
+
+=== HV: TAPE vs attn (across-instance means) ===
+   mean TAPE=0.897  attn=0.896  Wilcoxon p=0.910 (TAPE wins 6/12)
+
+wrote /workspace/e-hgatv2/experiments/fused_tape_guided/paper_stats.json
+SHARDED_MATRIX_DONE

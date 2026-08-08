@@ -27,11 +27,12 @@ from ehgat.explain.tape_explainer import (
     explain_schedule,
     explain_schedule_coupled,
 )
-from ehgat.surrogate.graph import AGV_EDGE, build_hetero_graph
+from ehgat.surrogate.graph import AGV_EDGE, NODE_TYPE, build_hetero_graph
 
 __all__ = [
     "FaithfulnessReport",
     "explain_fused",
+    "explain_fused_batch",
     "explain_fused_schedules",
     "faithfulness_report",
     "fused_pareto_tension_scores",
@@ -41,7 +42,7 @@ __all__ = [
 def _grad_tuple(t: torch.Tensor) -> tuple[float, ...]:
     if t.grad is None:
         return tuple(0.0 for _ in range(t.numel()))
-    return tuple(float(v) for v in t.grad.detach())
+    return tuple(float(v) for v in t.grad.detach().cpu())
 
 
 def explain_fused(
@@ -54,9 +55,11 @@ def explain_fused(
     energy gradients are ``dE/d(predicted leg energy) = 1`` by additive construction.
     """
     model.eval()
-    data = build_hetero_graph(schedule, instance)
+    device = next(model.parameters()).device
+    data = build_hetero_graph(schedule, instance).to(device)
     # Leg energies are read straight from the input arc features; make them differentiable
-    # so dE/d(leg energy) propagates (it is exactly 1 by additive construction).
+    # so dE/d(leg energy) propagates (it is exactly 1 by additive construction). Set the flag
+    # AFTER moving to device so edge_attr stays a leaf tensor on the model's device.
     data[AGV_EDGE].edge_attr.requires_grad_(True)
     out = model(data)
 
@@ -92,6 +95,67 @@ def explain_fused(
         completion_nodes=tuple(int(v) for v in out.dag.completion_nodes.tolist()),
         surrogate_grad=None,
     )
+
+
+def explain_fused_batch(
+    model: FusedEHGATv2,
+    schedules: list[Schedule],
+    instance: Instance,
+    *,
+    chunk_size: int = 128,
+) -> list[TapeExplanation]:
+    """Batched TAPE for many schedules -- identical result to per-schedule ``explain_fused``,
+    ~O(K)x faster on the GNN pass.
+
+    The expensive part of ``explain_fused`` is the frozen-core message-passing encode; the
+    tropical DP itself is cheap. Here we encode a **whole batch of graphs in one forward**
+    (``model.core.encode``), then run the cheap per-graph physics head + DP using each graph's
+    precomputed embedding slice (the ``h=`` fast path of :meth:`FusedEHGATv2.forward`), and take
+    a **single summed-makespan backward**. Because the batched graphs are disjoint, the gradient
+    of ``sum_i C_max^{(i)}`` w.r.t. graph ``i``'s legs equals ``dC_max^{(i)}/d(leg_i)`` exactly
+    (no cross terms) -- so the per-graph explanations are bit-identical to the serial path, at
+    one GNN forward + one backward per chunk instead of K. Chunked to bound autograd memory.
+    """
+    from torch_geometric.data import Batch
+
+    model.eval()
+    device = next(model.parameters()).device
+    results: list[TapeExplanation] = []
+    for start in range(0, len(schedules), chunk_size):
+        chunk = schedules[start:start + chunk_size]
+        graphs = [build_hetero_graph(s, instance).to(device) for s in chunk]
+        for g in graphs:
+            g[AGV_EDGE].edge_attr.requires_grad_(True)  # after .to(): stays a leaf on device
+        batch = Batch.from_data_list(graphs)
+        h_all = model.core.encode(batch)               # ONE batched message-passing forward
+        ptr = batch[NODE_TYPE].ptr.tolist()            # node offsets per graph
+        outs = [model(g, h=h_all[ptr[i]:ptr[i + 1]]) for i, g in enumerate(graphs)]
+        for out in outs:
+            for leaf in (out.empty_t, out.loaded_t, out.empty_e, out.loaded_e, out.node_delay):
+                leaf.retain_grad()
+            if out.dag.edge_weights.requires_grad:
+                out.dag.edge_weights.retain_grad()
+
+        # One backward over the summed makespan -> per-graph dC_max/d(leg) (disjoint => exact).
+        sum(o.makespan for o in outs).backward(retain_graph=True)
+        m_grads = [(_grad_tuple(o.node_delay), _grad_tuple(o.empty_t),
+                    _grad_tuple(o.loaded_t), _grad_tuple(o.dag.edge_weights)) for o in outs]
+        # Clear leg-energy makespan grads, then one energy backward for the clean dE/d(leg)=1.
+        for o in outs:
+            for leaf in (o.empty_e, o.loaded_e):
+                leaf.grad = None
+        sum(o.energy for o in outs).backward()
+        for o, (node_grad, empty_time_grad, loaded_time_grad, event_edge_grad) in zip(outs, m_grads):
+            results.append(TapeExplanation(
+                makespan=float(o.makespan.detach()), energy=float(o.energy.detach()),
+                node_grad=node_grad, empty_time_grad=empty_time_grad,
+                loaded_time_grad=loaded_time_grad,
+                empty_energy_grad=_grad_tuple(o.empty_e), loaded_energy_grad=_grad_tuple(o.loaded_e),
+                event_edges=tuple(o.dag.meta), event_edge_grad=event_edge_grad,
+                completion_nodes=tuple(int(v) for v in o.dag.completion_nodes.tolist()),
+                surrogate_grad=None,
+            ))
+    return results
 
 
 def explain_fused_schedules(
