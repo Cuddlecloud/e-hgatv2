@@ -118,9 +118,9 @@ throughout by the labels below.
 \end{enumerate}
 
 A single mathematical object addresses all four: the gradient of an exact max-plus
-longest path embedded inside a learned surrogate. The signal is not an explainer fitted to
-a trained model after the fact; it is the dynamic program's own subgradient, computed in
-the same backward pass that trains the network and consumed by the optimiser while it runs.
+longest path embedded inside a learned surrogate. The signal is the dynamic program's own
+subgradient, computed in the same backward pass that trains the network and consumed by the
+optimiser while it runs.
 The surrogate operates on the schedule as a heterogeneous graph of tasks, vehicles, cranes
 and precedence relations, and is therefore size-agnostic: one fitted at $N=16$ is evaluated
 unchanged up to $N=5000$.
