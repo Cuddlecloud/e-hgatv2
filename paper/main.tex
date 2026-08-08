@@ -2243,13 +2243,20 @@ published set does not. First, dual cycling: every move in the \textsf{L}-instan
 exercised by them at all. Second, an exactly enumerable reference: at $N=5$ the Pareto front
 is computed by brute force, giving a $\mathrm{PF}^\star$ that is the true front rather than a
 high-budget approximation. Third, a size ladder to $N=160$ (Section~\ref{sec:scaling}) at
-fixed structure, which the four published instances ($N=8$--$16$) cannot provide. The
-limitation is that the alternation pattern, the crane binding and the station assignment are
-regular by construction and therefore do not reproduce the irregular workload distribution of
-a measured terminal; the strictly round-robin crane binding in particular gives balanced
-per-crane workloads, whereas the imbalance analysis of Section~\ref{sec:front} is the more
-informative regime. Every claim that requires realistic \emph{structure}---rather than
-realistic physics---is therefore reported on the \textsf{L}-instances, and obtaining the
+fixed structure, which the four published instances ($N=8$--$16$) cannot provide.
+
+Two properties distinguish the family from the published task lists. \emph{(i) Station
+spread.} Each \textsf{L}-instance draws on one to three distinct \textsf{LU} stations, with
+\textsf{LU1}--\textsf{LU3} carrying $61\%$ of all $368$ published moves; the round-robin
+rule here cycles all six. Travel therefore samples more of the distance matrix than the
+published instances do, which raises the travel share of the critical path relative to
+handling. \emph{(ii) Dual cycling.} The alternation itself is unvalidated, every published
+move being a \textsf{LOAD}. Crane loading is not a point of difference: the published
+instances assign an equal number of moves to every crane in all $35$ cases, and the
+round-robin rule reproduces that, with per-crane \emph{handling-time} imbalance of a
+comparable magnitude in both ($0.21$ mean relative spread on the published set, $0.31$
+here). Every claim that requires realistic \emph{structure}---rather than realistic
+physics---is therefore reported on the \textsf{L}-instances, and obtaining the
 \textsf{DS}/\textsf{DL} dual-cycling task lists of~\cite{homayouni2022book} is the item that
 would let the dual-cycling results be restated on published data.
 
