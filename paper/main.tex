@@ -121,13 +121,9 @@ A single mathematical object addresses all four: the gradient of an exact max-pl
 longest path embedded inside a learned surrogate. The signal is not an explainer fitted to
 a trained model after the fact; it is the dynamic program's own subgradient, computed in
 the same backward pass that trains the network and consumed by the optimiser while it runs.
-Nor does it rest on a designed feature vector. The surrogate reads the schedule itself, as
-a heterogeneous graph of tasks, vehicles, cranes and precedence relations, so the quantities
-that drive the objectives are located in that structure rather than summarised into
-covariates chosen beforehand. One consequence is that the same trained model applies to
-instances of any size: a model fitted at $N=16$ is evaluated unchanged up to $N=5000$,
-where a surrogate over a fixed-length feature vector fitted at one size cannot be evaluated
-at another at all.
+Its input is the schedule itself, a heterogeneous graph of tasks, vehicles, cranes and
+precedence relations, rather than a fixed-length vector of designed features; the model is
+consequently size-agnostic, and one fitted at $N=16$ is evaluated unchanged up to $N=5000$.
 It is the importance signal over the input variables (\ref{req:importance},
 \ref{req:landscape}), it is the steering signal fed back to NSGA-II (\ref{req:guidance}),
 and, aggregated over the front with a trade-off weight, it is a description of front
@@ -1918,10 +1914,11 @@ composition without running the search. This is tested with one lightweight pred
 $g:(\,\text{structural features},\,\lambda\,)\mapsto\rho$, where $\rho$ is the transport
 share of the critical path (the composition of Table~\ref{tab:critpath_summary}) and the
 features are $N$, the AGV and QC counts, and the mean QC handling time. This predictor is
-separate from the surrogate and is the one place a fixed feature vector is used: the target
-is a single aggregate statistic per instance, and with a $20$-instance training set a model
-of that size is the appropriate one. The surrogate and TAPE supply its inputs, producing
-the fronts and the critical-path compositions it is fitted to. Evaluation is by
+distinct from the surrogate, and is the sole component fitted on designed features; the
+target is one aggregate statistic per instance, for which a model of this size is
+appropriate at the sample sizes available. Its training targets are supplied by the
+surrogate and TAPE, which produce the fronts and their critical-path compositions.
+Evaluation is by
 leave-one-instance-out (LOIO): train on all but one instance, predict the held-out
 instance's front, and compare against a constant baseline that ignores all features and
 emits the training-set mean $\bar\rho$. Improvement over that baseline is the criterion
