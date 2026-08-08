@@ -1,7 +1,7 @@
 # Draft email to Prof. Homayouni
 
-> Working draft. Kept outside the repository on purpose — this file is not in the tree the
-> advisor will read, and must not be copied into it.
+> Working draft. Lives in the working repository only. It is not in the review tree the
+> advisor reads, and must not be copied into it.
 
 ---
 
@@ -13,8 +13,8 @@ I have reached the point where the method is complete and the results are stable
 would like to share the codebase and the current write-up for your review, and to ask for
 some instance data I need for the final experiments.
 
-**Repository:** *(link)* — the README lists where to start reading and how every reported
-number is regenerated.
+**Repository:** https://github.com/aayushjha1729/e-hgatv2 — the README lists where to start
+reading and how every reported number is regenerated.
 
 ## What the method does
 
@@ -132,8 +132,9 @@ Aayush
 
 ## Notes on this draft (for you, not the email)
 
-- **This file lives outside the repository.** It is at `~/ADVISOR_EMAIL_DRAFT.md`, not in
-  the release tree, so it cannot end up in the shared history. Do not move it back in.
+- **This file is in the working repository, not the review one.** It is committed to
+  `/Users/aayushjha/E-HGATv2` (remote: Cuddlecloud, unpushed), and is absent from the public
+  review repo. Do not copy it into the review tree.
 - **Item 2 is the pivotal ask.** It is framed as your algorithm needing to be represented
   correctly, rather than as a baseline you beat. Do not send a version claiming to beat
   mp-BRKGA `11/11` without this caveat attached: the mp-BRKGA in question is your own
@@ -151,5 +152,8 @@ Aayush
   targeted at an ML venue and that Sections 5–7 are the optimisation results.
 - **Deliberately omitted:** hypervolume/IGD+ definitions, Friedman/Nemenyi machinery,
   R² curves, the guidance ablation. They belong in the paper, not the first email.
-- **Fill in before sending:** the repository link, and whether you want to name a target
-  venue.
+- **Fill in before sending:** whether to name a target venue. The repository link is filled
+  in above.
+- **The repository is public.** Anyone with the URL can read it, including the manuscript
+  PDF. Consider whether you want it public before the paper is submitted, or private with
+  him invited.
