@@ -105,25 +105,26 @@ Four requirements on such a solver are treated together here, and are referred t
 throughout by the labels below.
 
 \begin{enumerate}[leftmargin=*,label=\textbf{R\arabic*.},ref=R\arabic*,nosep]
-  \item\label{req:importance} \textbf{Feature engineering.} Derive, from solved instances,
-    the quantities that actually drive the objectives.
-  \item\label{req:landscape} \textbf{Landscape and feature importance.} Account for the
-    Pareto-optimality of a given solution in terms of the input variables: task order,
-    vehicle speed and crane workload.
-  \item\label{req:guidance} \textbf{Feedback to the optimiser.} Use the knowledge gathered
-    during the search to steer it, selecting which neighbourhood to explore and which
-    operator to apply.
-  \item\label{req:front} \textbf{Front behaviour.} Extract that knowledge in a form that
-    characterises the Pareto front itself rather than a single schedule.
+  \item\label{req:importance} \textbf{Feature engineering.} Derive the quantities that
+    actually drive the objectives.
+  \item\label{req:landscape} \textbf{Landscape / feature-importance analysis.} On small
+    instances, explain why particular solutions are Pareto-optimal in terms of the input
+    variables (task order, vehicle speed, crane workload).
+  \item\label{req:guidance} \textbf{Feedback / guidance algorithm.} Use the knowledge
+    gathered during the search to steer the optimiser (which neighbourhood to explore,
+    which operator to apply).
+  \item\label{req:front} \textbf{Front behaviour.} Extract that knowledge in a way that
+    captures the behaviour of the Pareto front itself.
 \end{enumerate}
 
 A single mathematical object addresses all four: the gradient of an exact max-plus
-longest path embedded inside a learned surrogate. It is not an explainer fitted to a
-trained model after the fact but the dynamic program's own subgradient, and it serves as an
-importance signal over the input variables of a solved schedule (\ref{req:importance},
-\ref{req:landscape}), as a steering signal fed back to NSGA-II (\ref{req:guidance}), and,
-aggregated over the front with a trade-off weight, as a description of front behaviour
-(\ref{req:front}).
+longest path embedded inside a learned surrogate. The signal is not an explainer fitted to
+a trained model after the fact; it is the dynamic program's own subgradient, computed in
+the same backward pass that trains the network and consumed by the optimiser while it runs.
+It is the importance signal over the input variables (\ref{req:importance},
+\ref{req:landscape}), it is the steering signal fed back to NSGA-II (\ref{req:guidance}),
+and, aggregated over the front with a trade-off weight, it is a description of front
+behaviour (\ref{req:front}).
 The requirement throughout is faithfulness in a specific sense, that the signal identify
 the operations which set the makespan rather than produce a plausible-looking heat map.
 Learned attention weights read directly as explanations do not meet that requirement in
@@ -2068,10 +2069,10 @@ We delimit what the evidence does and does not support.
 
 \section{Conclusion}
 A single faithful object---the gradient of an exact max-plus longest path embedded in a
-heterogeneous graph surrogate---serves simultaneously as an explanation of a solved
-schedule (\ref{req:importance}, \ref{req:landscape}), a search controller
-(\ref{req:guidance}), and a description of Pareto-front behaviour (\ref{req:front}) for
-bi-objective quay-crane and SA-AGV scheduling. It is provably faithful where learned attention is not, and routing the
+heterogeneous graph surrogate---serves simultaneously as an explanation
+(\ref{req:importance}, \ref{req:landscape}), a search controller (\ref{req:guidance}), and
+a description of Pareto-front behaviour (\ref{req:front}) for bi-objective quay-crane and
+SA-AGV scheduling. It is provably faithful where learned attention is not, and routing the
 search through it preserves a statistically significant advantage over the published
 mp-BRKGA baseline. The remaining work---confirming amortisation on a real, structurally
 diverse instance set, strengthening the coupled surrogate at the makespan extreme, and
