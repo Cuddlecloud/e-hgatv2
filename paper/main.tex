@@ -105,8 +105,8 @@ Four requirements on such a solver are treated together here, and are referred t
 throughout by the labels below.
 
 \begin{enumerate}[leftmargin=*,label=\textbf{R\arabic*.},ref=R\arabic*,nosep]
-  \item\label{req:importance} \textbf{Feature engineering.} Derive the quantities that
-    actually drive the objectives.
+  \item\label{req:importance} \textbf{Driving quantities.} Identify the quantities that
+    actually drive the objectives, without fixing them in advance by hand.
   \item\label{req:landscape} \textbf{Landscape / feature-importance analysis.} On small
     instances, explain why particular solutions are Pareto-optimal in terms of the input
     variables (task order, vehicle speed, crane workload).
@@ -121,6 +121,13 @@ A single mathematical object addresses all four: the gradient of an exact max-pl
 longest path embedded inside a learned surrogate. The signal is not an explainer fitted to
 a trained model after the fact; it is the dynamic program's own subgradient, computed in
 the same backward pass that trains the network and consumed by the optimiser while it runs.
+Nor does it rest on a designed feature vector. The surrogate reads the schedule itself, as
+a heterogeneous graph of tasks, vehicles, cranes and precedence relations, so the quantities
+that drive the objectives are located in that structure rather than summarised into
+covariates chosen beforehand. One consequence is that the same trained model applies to
+instances of any size: a model fitted at $N=16$ is evaluated unchanged up to $N=5000$,
+where a surrogate over a fixed-length feature vector fitted at one size cannot be evaluated
+at another at all.
 It is the importance signal over the input variables (\ref{req:importance},
 \ref{req:landscape}), it is the steering signal fed back to NSGA-II (\ref{req:guidance}),
 and, aggregated over the front with a trade-off weight, it is a description of front
@@ -1910,7 +1917,11 @@ is transfer: that a single model, given only an instance's structure, predicts i
 composition without running the search. This is tested with one lightweight predictor
 $g:(\,\text{structural features},\,\lambda\,)\mapsto\rho$, where $\rho$ is the transport
 share of the critical path (the composition of Table~\ref{tab:critpath_summary}) and the
-features are $N$, the AGV and QC counts, and the mean QC handling time. Evaluation is by
+features are $N$, the AGV and QC counts, and the mean QC handling time. This predictor is
+separate from the surrogate and is the one place a fixed feature vector is used: the target
+is a single aggregate statistic per instance, and with a $20$-instance training set a model
+of that size is the appropriate one. The surrogate and TAPE supply its inputs, producing
+the fronts and the critical-path compositions it is fitted to. Evaluation is by
 leave-one-instance-out (LOIO): train on all but one instance, predict the held-out
 instance's front, and compare against a constant baseline that ignores all features and
 emits the training-set mean $\bar\rho$. Improvement over that baseline is the criterion
