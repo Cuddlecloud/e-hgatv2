@@ -2121,11 +2121,15 @@ exact evaluator labels; the fused physics heads are then fitted with the core fr
 \end{tabular}
 \end{table}
 
-\paragraph{Environment.} Python 3.12.11, PyTorch 2.6.0, PyTorch Geometric 2.8.0. The
-surrogate is executed on CPU for all reported results: the scatter-max aggregation and the
-$(\max,+)$ relaxation are order-sensitive under non-deterministic GPU reductions, and CPU
-execution makes every number bit-reproducible from its recorded seed. Search experiments
-were sharded across CPU cores, one shard per (instance, seed-block) pair.
+\paragraph{Environment.} Python 3.12.11, PyTorch 2.6.0, PyTorch Geometric 2.8.0. All
+reported results were produced on a rented Linux host with $255$ CPU cores, $2$\,TB of RAM
+and two NVIDIA A40 (46\,GB) accelerators. The surrogate is nonetheless executed on CPU
+throughout: the scatter-max aggregation and the $(\max,+)$ relaxation are order-sensitive
+under non-deterministic GPU reductions, and CPU execution makes every number
+bit-reproducible from its recorded seed. The GPUs were used only to profile the batched
+tropical dynamic program and are not required to reproduce any reported number. Throughput
+comes instead from process-level parallelism: search experiments were sharded across cores,
+one single-threaded process per (instance, seed-block) pair.
 
 \paragraph{Cost.} The tropical layer adds $\Theta(N)$ arcs and therefore
 $\mathcal{O}(N)$ work per evaluation (approximately $4N$ multiply-adds at the reported
