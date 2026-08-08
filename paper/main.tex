@@ -14,6 +14,7 @@
 \usepackage{xcolor}
 \usepackage{microtype}
 \usepackage{enumitem}
+\usepackage{needspace}
 \usepackage[hidelinks]{hyperref}
 \usepackage{caption}
 \usepackage{tikz}
@@ -99,18 +100,26 @@ against energy. Two objectives are minimised, the makespan $\Cmax$ and the total
 energy $E$. The reference method is the multi-population biased random-key genetic
 algorithm (mp-BRKGA) of Fontes and Homayouni~\cite{fontes2022mpbrkga}.
 
-Four requirements on such a solver are treated together here. The first is to identify,
-by post-hoc analysis of solved instances, the quantities that drive the objectives. The
-second is to account for the Pareto-optimality of a given solution in terms of the input
-variables: task order, vehicle speed and crane workload. The third is to feed knowledge
-gathered during the search back to the optimiser, selecting which neighbourhood to
-explore and which operator to apply. The fourth is to extract that knowledge in a form
-that characterises the Pareto front rather than a single schedule.
+\Needspace*{10\baselineskip}
+Four requirements on such a solver are treated together here, and are referred to
+throughout by the labels below.
+
+\begin{enumerate}[leftmargin=*,label=\textbf{R\arabic*.},ref=R\arabic*,nosep]
+  \item\label{req:importance} Identify, by post-hoc analysis of solved instances, the
+    quantities that drive the objectives.
+  \item\label{req:landscape} Account for the Pareto-optimality of a given solution in
+    terms of the input variables: task order, vehicle speed and crane workload.
+  \item\label{req:guidance} Feed knowledge gathered during the search back to the
+    optimiser, selecting which neighbourhood to explore and which operator to apply.
+  \item\label{req:front} Extract that knowledge in a form that characterises the Pareto
+    front rather than a single schedule.
+\end{enumerate}
 
 A single mathematical object addresses all four: the gradient of an exact max-plus
 longest path embedded inside a learned surrogate. It serves as a post-hoc importance
-signal over the input variables, as a steering signal fed back to NSGA-II, and,
-aggregated over the front with a trade-off weight, as a description of front behaviour.
+signal over the input variables (\ref{req:importance}, \ref{req:landscape}), as a steering
+signal fed back to NSGA-II (\ref{req:guidance}), and, aggregated over the front with a
+trade-off weight, as a description of front behaviour (\ref{req:front}).
 The requirement throughout is faithfulness in a specific sense, that the signal identify
 the operations which set the makespan rather than produce a plausible-looking heat map.
 Learned attention weights read directly as explanations do not meet that requirement in
@@ -690,7 +699,7 @@ screening path at query time the search calls only the $O(N)$ surrogate, never t
   \State TAPE gradient $g_a=\partial\Cmax/\partial w_a$ marks binding tasks; bias mutation toward them
   \State \textbf{exactly} evaluate the retained $\lambda$ offspring; non-dominated sort + crowding
 \EndFor
-\State \Return Pareto set, with per-front TAPE attributions and Trade-off Criticality Scores
+\State \Return Pareto set, with per-front TAPE attributions and Trade-off Criticality Scores (\ref{req:front})
 \end{algorithmic}
 \end{algorithm}
 
@@ -781,7 +790,8 @@ $1$ means the model identifies exactly the binding legs.
 
 \subsection{Attribution-guided search}
 \label{sec:guidance}
-The TAPE vector is converted into three search signals that mirror the inputs the NSGA-II
+Requirement~\ref{req:guidance} asks that search knowledge be fed back to the optimiser. The
+TAPE vector is converted into three search signals that mirror the inputs the NSGA-II
 mutation already expected, so the explanation is the controller:
 \begin{align}
 w^{\text{agv}}_j &= \tfrac{\partial \Cmax}{\partial t^{\text{empty}}_j}
@@ -853,7 +863,8 @@ $\lambda$-weighted combination of its makespan and energy gradients,
 i.e.\ how strongly task $j$ is binding on the objective mixture that defines that point of
 the front. Sweeping $\lambda$ from the makespan-optimal end to the
 energy-optimal end shows \emph{which bottleneck migrates}, and how concentrated the trade-off criticality
-is on a few tasks. This is the requested front-behaviour knowledge (Section~\ref{sec:front}).
+is on a few tasks. This is the front-behaviour description of requirement~\ref{req:front},
+evaluated in Section~\ref{sec:front}.
 
 \section{Experimental setup}
 \label{sec:setup}
@@ -1171,9 +1182,9 @@ size-generalisation is a property of the \emph{uncoupled} physics, and we report
 \subsection{Landscape analysis via critical-path attribution}
 \label{sec:r2worked}
 
-The second requirement is a landscape one: to determine which input variables (task dispatch
-order, AGV travelling speed, crane workload) fix the objective values, and thereby why
-specific solutions are Pareto-optimal. TAPE resolves this exactly. For any schedule
+Requirement~\ref{req:landscape} is a landscape one: to determine which input variables (task
+dispatch order, AGV travelling speed, crane workload) fix the objective values, and thereby
+why specific solutions are Pareto-optimal. TAPE resolves this exactly. For any schedule
 $\sigma$, the tropical subgradient (Eq.~\ref{eq:tapechain}) partitions all activities into
 two sets:
 \begin{itemize}[nosep]
@@ -2053,8 +2064,9 @@ We delimit what the evidence does and does not support.
 
 \section{Conclusion}
 A single faithful object---the gradient of an exact max-plus longest path embedded in a
-heterogeneous graph surrogate---serves simultaneously as a post-hoc explanation, a search
-controller, and a description of Pareto-front behaviour for bi-objective quay-crane and
+heterogeneous graph surrogate---serves simultaneously as a post-hoc explanation
+(\ref{req:importance}, \ref{req:landscape}), a search controller (\ref{req:guidance}), and a
+description of Pareto-front behaviour (\ref{req:front}) for bi-objective quay-crane and
 SA-AGV scheduling. It is provably faithful where learned attention is not, and routing the
 search through it preserves a statistically significant advantage over the published
 mp-BRKGA baseline. The remaining work---confirming amortisation on a real, structurally
