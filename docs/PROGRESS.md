@@ -105,7 +105,7 @@ restoring the ≥0.99 calibration the directive required. Faithfulness vs the ex
 TAPE oracle: **leg- and arc-critical Jaccard = 1.00** (the fused model's native critical path
 is identical to the exact max-plus critical path — faithful by construction, no smearing).
 The point vs Module-6 Sobol: this is **model-native and scalable** — the GNN's own gradients
-give per-leg/edge Pareto Tension Scores (PTS) in one backward pass.
+give per-leg/edge Trade-off Criticality Scores (TCS) in one backward pass.
 Run: `python scripts/run_fused_tape.py --tasks 6 10 20` → `experiments/fused_tape/fused_tape_n{N}.json`.
 
 ### Tier-1 nonlinear extension — peak-power coupling (the "GNN is load-bearing" ablation)

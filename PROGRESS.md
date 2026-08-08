@@ -117,7 +117,7 @@ The uncommitted changes (`scripts/run_benchmark.py`, `benchmark/runner.py`, `env
 | Coupled optimization (toy10/20, 5 seeds) | `experiments/fused_tape_guided/tape_bench_toy{10,20}_pp30.json` |
 | Fidelity (coupled 20 seeds) | `experiments/fused_eval/fused_eval_coupled_pp30_gnn_predicts_legs.json` |
 | Fidelity (uncoupled 20 seeds) | `experiments/fused_eval/fused_eval_unc_c3_gnn_predicts_legs.json` |
-| PTS frontier | `experiments/fused_tape_guided/pts_frontier_*.json` |
+| TCS frontier | `experiments/fused_tape_guided/tcs_frontier_*.json` |
 | Paper source | `paper/main.tex` |
 | R4 script | `scripts/run_front_learning.py` |
 | Fleet-scaling infra (uncommitted) | `src/ehgat/benchmark/runner.py` (`build_scaling_instance`, `scaled_fleet`) |

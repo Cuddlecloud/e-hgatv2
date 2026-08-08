@@ -1,8 +1,8 @@
-# Pareto-front behaviour via TAPE PTS (uncoupled)
+# Pareto-front behaviour via TAPE TCS (uncoupled)
 
-_Per instance: lambda sweep across the front, the top bottleneck tasks at the makespan-optimal vs energy-optimal extreme, the bottleneck migration (1 - Jaccard of top-3 at the two extremes), and the PTS concentration (share of total tension on the top-3 tasks)._
+_Per instance: lambda sweep across the front, the top bottleneck tasks at the makespan-optimal vs energy-optimal extreme, the bottleneck migration (1 - Jaccard of top-3 at the two extremes), and the TCS concentration (share of total criticality on the top-3 tasks)._
 
-| Instance | N | front | lambda range | top-3 (Cmax end) | top-3 (E end) | migration | PTS conc.@3 |
+| Instance | N | front | lambda range | top-3 (Cmax end) | top-3 (E end) | migration | TCS conc.@3 |
 |---|---|---|---|---|---|---|---|
 | toy:5 | 5 | 84 | [0.20, 1.00] | [1, 2, 3] | [0, 2, 4] | 0.80 | 0.84 |
 | toy:8 | 8 | 116 | [0.00, 1.00] | [2, 3, 5] | [2, 3, 4] | 0.50 | 0.67 |

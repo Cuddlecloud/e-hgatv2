@@ -8,7 +8,7 @@ from ehgat.explain.fused_ehgat import FusedEHGATv2
 from ehgat.explain.fused_explainer import (
     explain_fused,
     faithfulness_report,
-    fused_pareto_tension_scores,
+    fused_tradeoff_criticality_scores,
 )
 from ehgat.surrogate.ehgatv2 import EHGATv2, EHGATv2Config
 from ehgat.utils.seeding import make_rng
@@ -26,7 +26,7 @@ def _is_integer(value: float, tol: float = 1e-6) -> bool:
 
 
 def test_fused_makespan_gradients_are_binary_critical_path() -> None:
-    # Seed locally so the random head induces a *unique* critical path independent of test
+    # Seed locally so the random head induces a unique critical path independent of test
     # order (with ties the max-plus subgradient legitimately splits into fractions; this test
     # checks the no-smearing/binary property, which requires a tie-free critical path).
     from ehgat.utils.seeding import seed_everything
@@ -69,11 +69,11 @@ def test_leg_time_prior_is_exact() -> None:
     assert torch.allclose(loaded_p, legs[:, 1], atol=1e-4)
 
 
-def test_fused_pts_is_json_shaped() -> None:
+def test_fused_tcs_is_json_shaped() -> None:
     inst = build_toy_instance(num_tasks=4)
     rng = make_rng(1)
     schedules = [decode(rng.random(NUM_BLOCKS * inst.num_tasks), inst) for _ in range(3)]
-    out = fused_pareto_tension_scores(_fresh_model(), schedules, inst)
+    out = fused_tradeoff_criticality_scores(_fresh_model(), schedules, inst)
     assert len(out) == 3
     assert "lambda" in out[0]
     assert out[0]["tasks"]

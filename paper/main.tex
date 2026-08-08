@@ -9,6 +9,7 @@
 \usepackage[a4paper,margin=1in]{geometry}
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{booktabs}
+\usepackage{multirow}
 \usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage{microtype}
@@ -51,7 +52,8 @@
 \title{\textbf{Faithful Tropical Explanations for Guiding\\[2pt]
 Bi-Objective Quay-Crane and Speed-Adjustable-AGV Scheduling}}
 
-\author{Aayush Jha\\\small Research report prepared for Prof.\ Mahdi Homayouni}
+\author{Aayush Jha\\[2pt]
+\small Code and data: \url{https://github.com/aayushjha1729/e-hgatv2}}
 \date{\today}
 
 \begin{document}
@@ -59,69 +61,61 @@ Bi-Objective Quay-Crane and Speed-Adjustable-AGV Scheduling}}
 
 \begin{abstract}
 \noindent
-We study the bi-objective scheduling of quay cranes (QCs) and speed-adjustable
-automated guided vehicles (SA-AGVs) in a dual-cycling container terminal, where the
-two competing objectives are the makespan $\Cmax$ and the total AGV travel energy $E$.
-Building on the multi-population biased random-key genetic algorithm (mp-BRKGA) of
-Fontes and Homayouni, we ask a question motivated directly by the project brief: can the
-\emph{explanation} of why a schedule is good be made faithful enough to (i) describe the
-behaviour of the Pareto front and (ii) actively steer the search?
-Our contribution is a \emph{physics-fused heterogeneous graph attention surrogate}
-(E-HGATv2) whose makespan is produced by an exact \emph{max-plus (tropical) longest-path}
-layer. Because the makespan flows through the genuine critical-path recurrence, the
-network's own gradient with respect to each transport leg is an \emph{exact binary
-critical-path indicator}---we call this readout \emph{TAPE} (Tropical Attribution for
-Physical Explanations). We show on $11$ problem instances (synthetic dual-cycling
-instances and the published FSMJ loading benchmark, in both the uncoupled and the
-peak-power-coupled regime) that TAPE recovers the true critical path with
-Jaccard $0.85$--$1.00$ against an exact oracle, whereas the conventional learned
-attention weights are statistically uncorrelated with the true makespan levers
-($|\rho|\le 0.18$)---and, measured against the exact critical path from coarse hit-rate to
-fine ranking, are no better than random at \emph{every} granularity---a verdict the exact
-critical path makes directly measurable here. Routing the same faithful signal back into an NSGA-II search makes the
-guided algorithm dominate mp-BRKGA, single-population BRKGA and an unguided control on
-hypervolume in $11/11$ instances (Friedman $\chi^2_4=35.1$, $p=4.5\times10^{-7}$; all
-post-hoc Holm-adjusted $p\le0.004$). Finally, aggregating TAPE over the approximated Pareto
-set with a trade-off-weighted score (Pareto Tension Score) yields an interpretable,
-sparse description of how the binding bottleneck \emph{migrates} along the front; and a single
-structural surrogate \emph{amortises} this front composition to unseen instances (Pearson
-$r=0.945$ on a composition-spanning set), turning the description into prediction. The same
-mathematical object thus explains the front, characterises its behaviour, and guides the
-optimiser---one evidenced mechanism for all of the project's research directions.
+This paper treats the bi-objective scheduling of quay cranes (QCs) and speed-adjustable
+automated guided vehicles (SA-AGVs) in a dual-cycling container terminal, where the two
+competing objectives are the makespan $\Cmax$ and the total AGV travel energy $E$. The
+reference method is the multi-population biased random-key genetic algorithm (mp-BRKGA)
+of Fontes and Homayouni. The question addressed is whether an explanation of why a
+schedule is good can be made faithful enough to describe the behaviour of the Pareto
+front and to steer the search.
+The model introduced here is a physics-fused heterogeneous graph attention surrogate
+(E-HGATv2) whose makespan is produced by an exact max-plus (tropical) longest-path layer.
+Because the makespan flows through the critical-path recurrence itself, the network's
+gradient with respect to each transport leg is an exact binary critical-path indicator;
+this readout is denoted TAPE (Tropical Attribution for Physical Explanations). On $11$
+problem instances (synthetic dual-cycling instances and the published FSMJ loading
+benchmark, in both the uncoupled and the peak-power-coupled regime) TAPE recovers the
+true critical path with Jaccard $0.85$--$1.00$ against an exact oracle, whereas the
+learned attention weights are statistically uncorrelated with the true makespan levers
+($|\rho|\le 0.18$) and, measured against the exact critical path from coarse hit-rate to
+fine ranking, are no better than random at any granularity. Routing the same signal back
+into an NSGA-II search makes the guided algorithm dominate mp-BRKGA, single-population
+BRKGA and an unguided control on hypervolume in $11/11$ instances (Friedman
+$\chi^2_4=35.1$, $p=4.5\times10^{-7}$; all post-hoc Holm-adjusted $p\le0.004$).
+Aggregating TAPE over the approximated Pareto set with a trade-off-weighted score
+(Trade-off Criticality Score) yields a sparse description of how the binding bottleneck
+migrates along the front, and a single structural surrogate transfers this front
+composition to unseen instances (Pearson $r=0.945$ on a composition-spanning set). The
+same mathematical object thus explains the front, characterises its behaviour, and guides
+the optimiser.
 \end{abstract}
 
-\section{Introduction and research directions}
+\section{Introduction}
 \label{sec:intro}
 
-The container terminal scheduling problem treated here couples three decisions that an
-operations-research reader will recognise immediately: \emph{assignment} of container
-moves (tasks) to vehicles, \emph{sequencing} of tasks on each vehicle and on each crane,
-and the \emph{speed level} of every vehicle leg, which trades travel time against energy.
-The objective is bi-objective: minimise the makespan $\Cmax$ and the total travel energy
-$E$. The reference method is the multi-population biased random-key genetic algorithm
-(mp-BRKGA) of Fontes and Homayouni~\cite{fontes2022mpbrkga}.
+The container terminal scheduling problem treated here couples three decisions:
+assignment of container moves (tasks) to vehicles, sequencing of tasks on each vehicle
+and on each crane, and the speed level of every vehicle leg, which trades travel time
+against energy. Two objectives are minimised, the makespan $\Cmax$ and the total travel
+energy $E$. The reference method is the multi-population biased random-key genetic
+algorithm (mp-BRKGA) of Fontes and Homayouni~\cite{fontes2022mpbrkga}.
 
-This report responds to four research directions stated in the project brief:
-\begin{enumerate}[label=(R\arabic*),leftmargin=*]
-  \item \textbf{Feature engineering / post-hoc analysis.} Derive, by post-hoc analysis of
-  solved instances, the quantities that actually drive the objectives.
-  \item \textbf{Landscape / feature-importance analysis.} On small instances, explain
-  \emph{why} particular solutions are Pareto-optimal in terms of the input variables
-  (task order, vehicle speed, crane workload).
-  \item \textbf{Feedback / guidance algorithm.} Use the knowledge gathered during the
-  search to steer the optimiser (which neighbourhood to explore, which operator to apply).
-  \item \textbf{Front behaviour.} Extract that knowledge in a way that captures the
-  behaviour of the Pareto front itself.
-\end{enumerate}
+Four questions arise in this setting and are treated together here. Which quantities
+drive the objectives, as recovered by post-hoc analysis of solved instances? Why is a
+given solution Pareto-optimal, expressed in terms of the input variables (task order,
+vehicle speed, crane workload)? Can knowledge gathered during the search steer the
+optimiser, in the sense of selecting which neighbourhood to explore and which operator to
+apply? And can that knowledge be extracted in a form that characterises the Pareto front
+rather than a single schedule?
 
-\noindent\textbf{Our thesis.} A single mathematical object---the gradient of an exact
-max-plus longest path that is embedded inside a learned surrogate---answers all four. It is
-the post-hoc importance signal (R1, R2), it is the steering signal fed back to NSGA-II
-(R3), and, aggregated over the front with a trade-off weight, it is a description of front
-behaviour (R4). Crucially we insist this signal be \emph{faithful}: it must point at the
-operations that truly set the makespan, not merely produce a plausible-looking heat map.
-This faithfulness requirement is what distinguishes the present work from the common
-practice of reading a neural network's attention weights as if they were explanations.
+A single mathematical object addresses all four: the gradient of an exact max-plus
+longest path embedded inside a learned surrogate. It serves as a post-hoc importance
+signal over the input variables, as a steering signal fed back to NSGA-II, and,
+aggregated over the front with a trade-off weight, as a description of front behaviour.
+The requirement throughout is faithfulness in a specific sense, that the signal identify
+the operations which set the makespan rather than produce a plausible-looking heat map.
+Learned attention weights read directly as explanations do not meet that requirement in
+this problem, and Section~\ref{sec:results} quantifies the gap.
 
 \section{Problem formulation}
 \label{sec:problem}
@@ -196,7 +190,7 @@ $(\max,+)$---the \emph{tropical} or \emph{max-plus} semiring~\cite{baccelli1992s
 is the single structural fact the whole method exploits: the longest path is the
 \emph{critical path}, and the objective is determined by the activities lying on it.
 
-\subsection{The peak-power-coupled regime (a synthetic stress-test)}
+\subsection{The peak-power-coupled regime}
 \label{sec:coupled}
 The uncoupled problem above has a closed-form (longest-path) makespan. As a deliberately
 harder, \emph{no-closed-form} stress-test for the differentiable surrogate, we add a
@@ -218,7 +212,7 @@ that, \emph{absent the cap}, the realised completions equal the closed-form $c_j
 Eqs.~(LOAD/UNLOAD); AGV- and crane-chain arcs link consecutive tasks.
 
 \paragraph{Resolution.} A power leg may \emph{start} only once its precedence is met
-\emph{and} starting it keeps the sum of concurrently-running leg powers $\le P_{\max}$;
+and starting it keeps the sum of concurrently-running leg powers $\le P_{\max}$;
 otherwise it waits for a running leg to finish and free budget. The schedule is realised by a
 deterministic \emph{parallel schedule-generation scheme}: at each completion event, ready legs
 are started greedily in priority order---earliest available, then task index, then
@@ -230,21 +224,21 @@ closed form captures. When $P_{\max}$ is large enough that no leg ever waits, th
 provably reduces to the uncoupled evaluator (a unit test asserts this), so the coupled problem
 is a clean \emph{superset} of the validated uncoupled one.
 
-\paragraph{Scope and honesty.} Two caveats we state plainly. \emph{(i)} The power arbitration
-is a \emph{fixed dispatch policy} (the priority rule above), not a decision variable; the
-regime optimises the assignment, order and speeds \emph{under} that policy. \emph{(ii)} Unlike
-the uncoupled objective---the published recurrence~\cite{fontes2023flowtime}, validated
-against the exact oracle---this coupled constraint is \emph{our own synthetic construction}:
-it is \emph{not} part of the FSMJ/book-chapter benchmark and we make \emph{no} claim that it
-models a specific real installation. Its role is purely methodological: it is the regime where
-the makespan has no closed form, ``which leg binds'' is non-obvious, and a learned
-\emph{differentiable} surrogate with exact gradients (TAPE) earns its place---which is exactly
-why the fused head carries an explicit power-wait term (Section~\ref{sec:fused}).
+\paragraph{Scope of the construction.} Two limitations delimit this regime. \emph{(i)} The power
+arbitration is a \emph{fixed dispatch policy} (the priority rule above) rather than a decision
+variable; the regime optimises the assignment, order and speeds under that policy.
+\emph{(ii)} Unlike the uncoupled objective---the published recurrence~\cite{fontes2023flowtime},
+validated against the exact oracle---the coupled constraint is introduced in this work: it does
+not form part of the FSMJ or book-chapter benchmark, and we make no claim that it models a
+specific installation. Its role is methodological. It is the regime in which the makespan admits
+no closed form and the binding leg is not evident by inspection, and therefore the regime in
+which a differentiable surrogate with exact gradients (TAPE) is required; accordingly, the fused
+head carries an explicit power-wait term (Section~\ref{sec:fused}).
 
 \section{Method}
 \label{sec:method}
 
-\paragraph{The method in one paragraph.} There is no labelled training corpus. An exact
+\paragraph{Overview.} There is no labelled training corpus. An exact
 simulator---the \emph{evaluator} (Section~\ref{sec:evaluator})---scores any candidate schedule
 and, as a by-product, emits the duration of every transport leg; a graph network then learns
 to imitate those durations. Concretely (Figure~\ref{fig:arch}): a search proposal is decoded
@@ -259,7 +253,7 @@ signal biases the search's variation operators and screens its offspring
 bottleneck migrates (Section~\ref{sec:pts}). The rest of this section dissects each block with
 the notation of Table~\ref{tab:notation}.
 
-\subsection{Decision variables, the search space, and why we guide it}
+\subsection{Decision variables and the search space}
 \label{sec:searchspace}
 An instance has $N$ transport tasks $\mathcal{J}=\{1,\dots,N\}$, a fleet of $A$
 speed-adjustable AGVs, $K$ quay cranes, and $V$ admissible speed levels per leg. A
@@ -284,7 +278,7 @@ feasible set,
 grows super-exponentially (already $>10^{40}$ at $N{=}20$, $A{=}3$, $V{=}3$), and the
 underlying assignment--sequencing problem is NP-hard~\cite{fontes2022mpbrkga}; exact MILP is
 intractable beyond a few dozen tasks. We therefore search with the population-based
-metaheuristic NSGA-II~\cite{deb2002nsga2} and concentrate our contribution on \emph{where}
+metaheuristic NSGA-II~\cite{deb2002nsga2} and concentrate our contribution on where
 in $\mathcal Z$ the search spends its budget: a faithful, physics-anchored explanation of
 \emph{which decisions bind the objectives} is used to bias the variation operators and to
 screen offspring (Sections~\ref{sec:guidance}).
@@ -406,7 +400,7 @@ $4$ heads) applies, per task $j$:
 
 \paragraph{(i) Within-resource attention and max reduction.}
 For each relation $r\in\{\mathrm{agv},\mathrm{qc}\}$ we run a GATv2
-operator~\cite{brody2022gatv2}. GATv2 scores an arc $(i\!\to\! j)$ \emph{after} the
+operator~\cite{brody2022gatv2}. GATv2 scores an arc $(i\!\to\! j)$ after the
 nonlinearity, which (unlike GAT) makes the attention a universal function of the
 endpoint--edge triple:
 \begin{equation}
@@ -430,10 +424,10 @@ $\sum_i\alpha_{ij}(\cdot)$ of a standard attention layer. (Because $|\mathcal N_
 per-relation softmax is degenerate---$\alpha^{r}_{ij}\equiv1$---so the \emph{non-degenerate}
 selection happens across relations, next.)
 
-\paragraph{Why GATv2 (dynamic attention) and not GAT.} The original
+\paragraph{Choice of GATv2 over GAT.} The original
 GAT~\cite{velickovic2018gat} scores an arc as
 $\LeakyReLU\!\big(\mathbf a^{\!\top}[\,W h_i\concat W h_j\,]\big)$, applying the learned
-vector $\mathbf a$ and the matrix $W$ \emph{before} the nonlinearity. Brody et
+vector $\mathbf a$ and the matrix $W$ before the nonlinearity. Brody et
 al.~\cite{brody2022gatv2} prove this yields \emph{static attention}: the induced ranking of
 source nodes is global---the most-attended key is the \emph{same for every query node} $j$.
 That is the wrong inductive bias here, because which predecessor (and which resource chain)
@@ -504,9 +498,9 @@ sum-aggregation network must instead \emph{approximate} $\max$ with depth/width,
 E-HGATv2 represents it exactly in the limit $\beta\!\to\!\{0,1\}$.
 \end{proposition}
 
-\paragraph{Why the attention weights are not enough.} It is tempting to read
-$\beta^{r}_j$ from \eqref{eq:sem} as ``how critical arc $r$ of task $j$ is.'' We show in
-Section~\ref{sec:results} that this reading is \emph{not faithful}: the $\beta$ ranking is
+\paragraph{Limits of the attention weights as an explanation.} A natural reading of
+$\beta^{r}_j$ from \eqref{eq:sem} takes it as a measure of how critical arc $r$ of task $j$
+is. Section~\ref{sec:results} shows this reading to be unfaithful: the $\beta$ ranking is
 statistically uncorrelated with the true critical path (the softmax is a smooth surrogate,
 not the argmax, and it is trained only to fit the \emph{scalar} $\Cmax$, with no constraint
 tying it to the binding path). This is the gap the fused head closes.
@@ -539,7 +533,7 @@ that the tropical layer~\eqref{eq:troprec} requires---a negative leg time or han
 is unphysical and would corrupt the longest-path semantics (it could shorten $\Cmax$ below a
 genuine bottleneck). The heads thus map abstract embeddings to a strictly non-negative
 physical parametrisation $(b_v,w_a)$ of the event DAG. The leg \emph{energies}
-$e^{\mathrm e}_j,e^{\mathrm l}_j$ are read \emph{exactly} from the arc
+$e^{\mathrm e}_j,e^{\mathrm l}_j$ are read exactly from the arc
 features (not learned), so energy is a strictly linear head,
 \begin{equation}
 E=\sum_{j\in\mathcal J}\big(e^{\mathrm e}_j+e^{\mathrm l}_j\big),
@@ -578,22 +572,22 @@ the LOAD/UNLOAD completions $c_j$. Hence the only approximation in the fused mak
 heads' prediction of the local attributes---the \emph{composition} is exact.
 \end{proposition}
 
-\paragraph{What ``exact'' does and does not mean.}
+\paragraph{Scope of the term ``exact''.}
 Proposition~\ref{prop:exact} concerns the \emph{composition}, not the physics: given the
 heads' predicted leg attributes, TAPE returns the critical path of the surrogate's max-plus
-DP \emph{exactly}---it is that DP's own subgradient, not a post-hoc saliency heuristic. The
+DP exactly---it is that DP's own subgradient, not a post-hoc saliency heuristic. The
 attribution's fidelity to the \emph{physical} critical path is therefore inherited from the
 heads' accuracy. In the uncoupled regime the leg heads attain $R^2\approx0.997$
 (Table~\ref{tab:fidelity}), so the surrogate and physical critical paths coincide up to the
 residual leg error (leg-critical Jaccard $0.87$--$1.00$ against the exact simulator oracle);
 under the \emph{synthetic} coupled constraint the heads degrade to $R^2\approx0.80$ and the
 attribution degrades with them (Jaccard $\geq0.91$). Thus ``exact'' qualifies the attribution
-\emph{relative to the model being explained}. Far from weakening the thesis, this is precisely
-what makes faithfulness \emph{decidable} in this model class: because an exact attribution of
-the surrogate exists for free, any residual gap between attention and the critical path is a
+\emph{relative to the model being explained}. This property renders faithfulness
+decidable in this model class: because an exact attribution of
+the surrogate is available, any residual gap between attention and the critical path is a
 fact about attention, not an artefact of an approximate explainer.
 
-\paragraph{Why use a GNN at all for a deterministic problem?} In the uncoupled regime the
+\paragraph{Role of the surrogate in a deterministic problem.} In the uncoupled regime the
 makespan is a closed-form longest path---so why interpose a learned model? Three reasons.
 \begin{enumerate}[nosep,leftmargin=*]
 \item \textbf{Screening throughput.} A batched GNN forward over $\kappa\mu$ candidate
@@ -606,7 +600,7 @@ makespan is a closed-form longest path---so why interpose a learned model? Three
   perturbation runs. The fused head produces the full TAPE vector in \emph{one backward
   pass} ($O(N)$ time, zero additional simulations).
 \item \textbf{Coupled-regime generalisation.} Under peak-power coupling the makespan has
-  \emph{no} closed form (it is the fixed point of an iterative power-resolution loop); the
+  no closed form (it is the fixed point of an iterative power-resolution loop); the
   fused head approximates the coupled makespan ($R^2\approx 0.80$,
   Table~\ref{tab:fidelity}) and still produces an actionable, if degraded, TAPE signal
   (Jaccard $\geq 0.91$) without access to the simulator at query time.
@@ -649,7 +643,7 @@ method is best read as a closed loop between that evaluator and the learned surr
 both explicit here.
 
 \paragraph{The exact evaluator (the oracle).} Given a decoded schedule $s(z)$, the evaluator
-returns the objective pair $f(s)=(\Cmax,E)$ \emph{and} the per-task physical quantities the
+returns the objective pair $f(s)=(\Cmax,E)$ and the per-task physical quantities the
 surrogate is trained to predict. In the uncoupled regime it simply runs the max-plus
 longest-path recurrence of Section~\ref{sec:maxplus} in topological order ($O(N)$): each
 task's completion is the maximum over its AGV-chain and crane-chain predecessors plus its leg
@@ -668,7 +662,7 @@ for every task its empty/loaded leg times $(t^{\mathrm e}_j,t^{\mathrm l}_j)$, h
 $\tau_j$, and the schedule's scalar $\Cmax$. This produces a labelled set
 $\{(G_{s^{(m)}},\{t^{\mathrm e}_j,t^{\mathrm l}_j,\tau_j\}_j,\Cmax^{(m)})\}_{m=1}^{M}$ at no
 annotation cost ($M\!\approx\!10^3$ in our runs). Two regressions are then fit, both supervised
-\emph{only} by these labels: (i) the E-HGATv2 core and its scalar read-out
+only by these labels: (i) the E-HGATv2 core and its scalar read-out
 (Eq.~\ref{eq:readout}) are fit to $\Cmax$ by MSE---this is the surrogate whose \emph{attention}
 we later show is unfaithful; (ii) the fused projection heads (Eq.~\ref{eq:leghead}) are fit to
 the \emph{local} leg labels $(t^{\mathrm e}_j,t^{\mathrm l}_j,\tau_j)$ by MSE, after which the
@@ -679,9 +673,9 @@ gradient (TAPE) coincide with the true binding path.
 \paragraph{The search$\,\to\,$knowledge$\,\to\,$search loop.} These pieces close the loop of
 Figure~\ref{fig:arch} and Algorithm~\ref{alg:loop}: NSGA-II proposes schedules; the evaluator
 labels them exactly; the surrogate distils the leg-time landscape into one differentiable
-model; its tropical gradient both \emph{explains} a schedule (R2/R4) and \emph{steers} the
-next generation's mutation and offspring screening (R3); the steered search then visits better
-schedules. The surrogate is trained \emph{once} per instance on the sampled set; on the
+model; its tropical gradient both explains a schedule and steers the
+next generation's mutation and offspring screening; the steered search then visits better
+schedules. The surrogate is trained once per instance on the sampled set; on the
 screening path at query time the search calls only the $O(N)$ surrogate, never the simulator.
 
 \begin{algorithm}[t]
@@ -696,7 +690,7 @@ screening path at query time the search calls only the $O(N)$ surrogate, never t
   \State TAPE gradient $g_a=\partial\Cmax/\partial w_a$ marks binding tasks; bias mutation toward them
   \State \textbf{exactly} evaluate the retained $\lambda$ offspring; non-dominated sort + crowding
 \EndFor
-\State \Return Pareto set, with per-front TAPE attributions and Pareto Tension Scores (R4)
+\State \Return Pareto set, with per-front TAPE attributions and Trade-off Criticality Scores
 \end{algorithmic}
 \end{algorithm}
 
@@ -741,7 +735,7 @@ We call the vector $g=(g_a)_{a\in\mathcal A}$, $g_a=\partial\Cmax/\partial w_a$,
 \emph{delaying an on-path leg by $\Delta$ raises the makespan by exactly $\Delta$; delaying an
 off-path leg changes nothing.} Unlike the attention weights $\beta$ of \eqref{eq:sem}---which
 are a smooth surrogate trained only to fit a scalar---TAPE is a binary critical-path
-indicator \emph{by construction}, so there is nothing to misread. Crucially the leg times
+indicator \emph{by construction}. The leg times
 themselves are predicted by the graph network~\eqref{eq:leghead}, so the network stays
 load-bearing; TAPE only makes its prediction faithfully inspectable. (An exact oracle
 critical path, computed from the resolved simulator with no network, is retained only as a
@@ -759,7 +753,7 @@ of the projection heads~\eqref{eq:leghead}, for any core/head parameter $\theta$
    \frac{\partial b_v}{\partial \theta},
 \label{eq:tapechain}
 \end{equation}
-so the makespan gradient reaches \emph{only} the heads of legs and events that lie on the
+so the makespan gradient reaches only the heads of legs and events that lie on the
 binding path $\pi^\star$; every off-path prediction receives \emph{exactly zero} makespan
 signal. The surrogate therefore concentrates its capacity on the activities that actually
 set $\Cmax$, instead of smearing credit across all $\sim\!4N$ pooled features the way the
@@ -769,6 +763,14 @@ counterpart of the inference-time faithfulness in~\eqref{eq:tape}: the same bina
 $\mathbf 1[\cdot\in\pi^\star]$ that makes the explanation exact also makes the learning
 signal critical-path-localised.
 
+This routing is not obtained from generic automatic differentiation. The layer is
+implemented as a hand-written \texttt{torch.\allowbreak autograd.\allowbreak Function} whose forward pass caches the
+argmax incoming arc of each node and whose backward pass propagates the cotangent along that
+cached path, so~\eqref{eq:tapechain} holds exactly rather than as a smoothed approximation; a
+batched block-diagonal variant differentiates many schedules in one relaxation.
+Appendix~\ref{app:impl} gives the details and Appendix~\ref{app:repro} the hyper-parameters,
+parameter counts and software environment.
+
 \begin{definition}[Faithfulness]
 For a schedule, let $\mathcal{C}_{\text{model}}=\{a:g_a>\tfrac12\}$ be the model's binding-leg
 set and $\mathcal{C}_{\text{oracle}}$ the exact critical-path leg set. The \emph{leg-critical
@@ -777,10 +779,10 @@ Jaccard} $|\mathcal{C}_{\text{model}}\cap\mathcal{C}_{\text{oracle}}|/
 $1$ means the model identifies exactly the binding legs.
 \end{definition}
 
-\subsection{Faithful guidance: the explanation steers the search (R3)}
+\subsection{Attribution-guided search}
 \label{sec:guidance}
 The TAPE vector is converted into three search signals that mirror the inputs the NSGA-II
-mutation already expected, so the explanation \emph{is} the controller:
+mutation already expected, so the explanation is the controller:
 \begin{align}
 w^{\text{agv}}_j &= \tfrac{\partial \Cmax}{\partial t^{\text{empty}}_j}
 + \tfrac{\partial \Cmax}{\partial t^{\text{loaded}}_j}
@@ -813,12 +815,12 @@ specifies one generation.
 \EndFor
 \State $\widehat f\gets\mathcal F.\textsc{predict}(\mathcal O)$ \Comment{cheap surrogate screen of all $\kappa\mu$}
 \State $\mathcal O^\star\gets$ top $\mu$ of $\mathcal O$ by non-dominated rank of $\widehat f$
-\State evaluate $\mathcal O^\star$ \emph{exactly} (Sec.~\ref{sec:maxplus}/\ref{sec:coupled})
+\State evaluate $\mathcal O^\star$ exactly (Sec.~\ref{sec:maxplus}/\ref{sec:coupled})
 \State \Return environmental-selection$(P\cup\mathcal O^\star)$ \Comment{elitist $\mu$-survival}
 \end{algorithmic}
 \end{algorithm}
 
-\paragraph{Worked example (why TAPE focuses the search).} Consider a $20$-task schedule
+\paragraph{Worked example.} Consider a $20$-task schedule
 where TAPE marks legs $\{3^{\mathrm e},7^{\mathrm l},12^{\mathrm e},12^{\mathrm l}\}$ as
 critical ($g_a=1$). Without guidance, the mutation operator picks one of $20$ tasks
 uniformly at random; the probability of perturbing a bottleneck task is $\le 3/20=15\%$.
@@ -838,19 +840,19 @@ Thus the TAPE guidance adds negligible wall-time ($<\!2\%$ of the generation bud
 $N{=}50$) while reducing the number of exact evaluations needed to reach a target
 hypervolume by $\sim\!2.4\times$ (Section~\ref{sec:scaling}).
 
-\subsection{Front behaviour: Pareto Tension Scores (R4)}
+\subsection{Front behaviour: Trade-off Criticality Scores}
 \label{sec:pts}
 To describe the \emph{front} rather than a single schedule, we aggregate TAPE over the
 approximated Pareto set. At a front point, the local trade-off weight $\lambda\in[0,1]$ is
 read from the front tangent $(\Delta \Cmax,\Delta E)$ (the slope at which one objective is
-traded for the other). The \emph{Pareto Tension Score} of task $j$ is the
+traded for the other). The \emph{Trade-off Criticality Score} of task $j$ is the
 $\lambda$-weighted combination of its makespan and energy gradients,
 \begin{equation}
-\mathrm{PTS}_j \;=\; \big|\,\lambda\,\partial_{t_j}\Cmax + (1-\lambda)\,\partial_{e_j}E\,\big| ,
+\mathrm{TCS}_j \;=\; \big|\,\lambda\,\partial_{t_j}\Cmax + (1-\lambda)\,\partial_{e_j}E\,\big| ,
 \end{equation}
-i.e.\ how strongly task $j$ is \emph{tense}---binding on the objective mixture that defines
-that point of the front. Sweeping $\lambda$ from the makespan-optimal end to the
-energy-optimal end shows \emph{which bottleneck migrates}, and how concentrated the tension
+i.e.\ how strongly task $j$ is binding on the objective mixture that defines that point of
+the front. Sweeping $\lambda$ from the makespan-optimal end to the
+energy-optimal end shows \emph{which bottleneck migrates}, and how concentrated the trade-off criticality
 is on a few tasks. This is the requested front-behaviour knowledge (Section~\ref{sec:front}).
 
 \section{Experimental setup}
@@ -860,7 +862,9 @@ is on a few tasks. This is the requested front-behaviour knowledge (Section~\ref
 We use three families (Table~\ref{tab:data}). \textbf{Synthetic dual-cycling} instances
 (\textsf{SD-$N$}) alternate LOAD/\allowbreak UNLOAD moves over $3$ cranes served by $2$ vehicles, with
 handling times drawn from $U[30,80]$\,s; they are fully reproducible and, at $N=5$, small
-enough for an exact brute-force Pareto oracle. The \textbf{FSMJ loading benchmark}
+enough for an exact brute-force Pareto oracle. Their generator is specified in full in
+Appendix~\ref{app:instances}, together with an explicit statement of which components are
+taken from the published benchmark and which are constructed here. The \textbf{FSMJ loading benchmark}
 (\textsf{L07}, \textsf{L15}, \textsf{L21}, \textsf{L35}) are the \emph{published} instances of
 \cite{homayouni2022book}: the real QC$\leftrightarrow$LU distance matrix (their Table~4) and
 the real per-crane task lists (their Table~5); every move is a LOAD. The
@@ -892,7 +896,7 @@ null control), the published \textbf{mp-BRKGA}~\cite{fontes2022mpbrkga}, and a
 \textbf{single-population BRKGA}. Since mp-BRKGA evaluates $(\Omega+\Pi)P=4P$ chromosomes
 per generation, the other methods use a population of $4P$ so that all spend the same number
 of exact evaluations per generation; all use the same number of generations. The surrogate
-screening is therefore not a budget advantage---it only changes \emph{which} children are
+screening is therefore not a budget advantage---it only changes which children are
 evaluated, not how many.
 
 \subsection{Quality and faithfulness metrics}
@@ -930,18 +934,19 @@ evaluator doubles as a built-in oracle for validation: a regression suite checks
 decoder is a left-inverse of the encoder, that the differentiable max-plus DP reproduces the
 simulator's makespan to floating-point tolerance, and that the surrogate's leg-time
 predictions track the evaluator on held-out random schedules---the fidelity study of
-Section~\ref{sec:fidelity} is the aggregate of that last check. Code, instances, and seeds are
-released with the paper.
+Section~\ref{sec:fidelity} is the aggregate of that last check. The source code, instances,
+seeds and result artifacts are available at
+\url{https://github.com/aayushjha1729/e-hgatv2}.
 
 \section{Results}
 \label{sec:results}
 
-\subsection{R2: TAPE is faithful, attention is not}
+\subsection{Faithfulness of TAPE and of the attention weights}
 Figure~\ref{fig:faith} and Table~\ref{tab:main} show the central explanation result.
 TAPE recovers the exact critical path with leg-critical Jaccard $0.95$--$1.00$ in the
 uncoupled regime and $0.87$--$0.95$ under coupling. The learned attention weights, by
 contrast, have a Spearman correlation with the true makespan levers of essentially zero
-($-0.09\le\rho\le0.17$ across all instances)---they do \emph{not} rank the bottlenecks.
+($-0.09\le\rho\le0.17$ across all instances)---they do not rank the bottlenecks.
 Attention's precision@1 ($0.67$--$0.80$) looks superficially acceptable only because most
 tasks are on the critical path (the honest baseline is the critical fraction $\approx0.70$,
 not $1/N$): against that baseline, naming an on-path task is no better than chance, and the
@@ -959,7 +964,7 @@ $|\rho|$ with the true makespan levers is near $0$.}
 \label{fig:faith}
 \end{figure}
 
-\subsection{Attention encodes no critical-path structure---at any granularity}
+\subsection{Granularity of the attention--critical-path comparison}
 \label{sec:ladder}
 In natural-language settings the ``is attention explanation?'' debate rests on \emph{proxy}
 ground truth---erasure, gradient, and adversarial-attention tests---which is why it has
@@ -973,17 +978,17 @@ fine ranking (Spearman vs.\ the graded makespan-sensitivity), and effect size (m
 separation of critical vs.\ off-critical tasks). \textbf{Attention sits on the random
 baseline at every level}---precision@1 $0.69$ vs.\ critical-fraction $0.70$; AUC $0.51$ vs.\
 $0.50$; $\rho=+0.07$; separation $+0.06\sigma$---while TAPE is near-exact at all four
-($0.98$, $0.94$, $+0.70$, $+1.92\sigma$). Attention therefore carries essentially \emph{no}
+($0.98$, $0.94$, $+0.70$, $+1.92\sigma$). Attention therefore carries essentially no
 critical-path information, coarse or fine: a strictly stronger statement than the near-zero
 rank correlation, which the exact critical path here makes directly checkable.
 
-\paragraph{Then why does attention guide search at all?}
-Because the guidance benefit is the surrogate's, not attention's. The search arms share
-everything except which task mutation targets and whether offspring are screened; isolating
-those two factors is decisive (Table~\ref{tab:ladder}, bottom). Adding the missing
-control---\emph{random} mutation \emph{with} screening---yields the \emph{best} arm of all
-($\mathrm{HV}/\mathrm{HV}^\star=0.991$), ahead of attention-targeted ($0.977$) and
-TAPE-targeted ($0.956$); the only arm that trails is random mutation \emph{without} screening
+\paragraph{Source of the guidance benefit under attention targeting.}
+The benefit originates in the surrogate rather than in attention. The search arms share
+everything except which task mutation targets and whether offspring are screened, and
+isolating those two factors separates their contributions (Table~\ref{tab:ladder},
+bottom). The missing control, random mutation with screening, gives the highest value of
+any arm ($\mathrm{HV}/\mathrm{HV}^\star=0.991$), ahead of attention-targeted ($0.977$) and
+TAPE-targeted ($0.956$); the only arm that trails is random mutation without screening
 ($0.950$). Two readings follow. \emph{(i) Screening is the engine}: it lifts random mutation
 by $+0.041$ and accounts for the entire gap between the guided arms and the published null.
 NSGA-II's convergence comes from screening surrogate-predicted-good offspring and selecting by
@@ -1008,7 +1013,7 @@ attention weights.
 \caption{Attention vs.\ TAPE against the \emph{exact} critical path. \textbf{Top:} alignment
 at four granularities (coarse$\to$fine), pooled over nine instances; attention matches the
 random baseline at every level while TAPE is near-exact. \textbf{Bottom:} a search-guidance
-ablation (mean HV/HV$^\star$ over three instances, $N{=}5,8,10$): random mutation \emph{with}
+ablation (mean HV/HV$^\star$ over three instances, $N{=}5,8,10$): random mutation with
 screening is the best arm, so the optimisation benefit comes from the shared surrogate
 \emph{screening}, not from attention- or TAPE-targeted mutation.}
 \label{tab:ladder}
@@ -1026,7 +1031,7 @@ separation (critical$-$off, $\sigma$)   & $+0.06$ & $\mathbf{+1.92}$ & $0.00$ \\
 random mutation $+$ screening      & \multicolumn{3}{c}{$\mathbf{0.991}$ \;\;(best)} \\
 attention-targeted $+$ screening   & \multicolumn{3}{c}{$0.977$} \\
 TAPE-targeted $+$ screening        & \multicolumn{3}{c}{$0.956$} \\
-random mutation, \emph{no} screening & \multicolumn{3}{c}{$0.950$ \;\;(null)} \\
+random mutation, no screening & \multicolumn{3}{c}{$0.950$ \;\;(null)} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1044,7 +1049,7 @@ problem size, $0.998\!\to\!0.997$, and the energy head is \emph{exact}
 ($R^2=1.000\pm0.000$)---as it must be, since energy is the additive read-out of
 Eq.~\eqref{eq:fusedenergy}. Second, and most important for our central claim, the
 leg-critical Jaccard of the TAPE explanation barely moves, $0.991\!\to\!0.980$: the
-explanation is \emph{not} an artefact of tiny instances but stays $\geq 0.98$-faithful at
+explanation is not an artefact of tiny instances but stays $\geq 0.98$-faithful at
 $50$ tasks. Third, peak-power coupling degrades both quantities \emph{gracefully and
 predictably}---$R^2$ $0.805\!\to\!0.777$ and Jaccard $0.928\!\to\!0.913$ from $N{=}10$ to
 $50$---which both confirms that coupling is the genuinely harder regime (there is no
@@ -1111,7 +1116,7 @@ The surrogate is \emph{inductive}---a shared-weight message-passing network whos
 do not depend on $N$---so a model fit on small instances can be \emph{run} on much larger
 ones without retraining. This is the property an operations-research reader cares about most
 for deployment: train once on cheap small instances, apply at the production scale. We test
-it directly. We train the core $+$ physics-fused head \emph{once} at $N{=}16$ and then, by
+it directly. We train the core $+$ physics-fused head once at $N{=}16$ and then, by
 inference only, evaluate it on a ladder up to $N{=}5000$---a $312\times$ extrapolation in
 problem size---over three training seeds (Table~\ref{tab:generalize}).
 
@@ -1130,7 +1135,7 @@ published \textsf{DL} benchmark~\cite{homayouni2022book}.
 
 \begin{table}[t]
 \centering\small
-\caption{Size generalisation of the uncoupled surrogate: trained \emph{once} at $N{=}16$ and
+\caption{Size generalisation of the uncoupled surrogate: trained once at $N{=}16$ and
 evaluated by inference at scale (mean over $3$ training seeds, $24$ random schedules each).
 The physics-fused makespan $R^2$ is flat at $\geq0.98$ to $N{=}5000$ while the black-box
 global-readout core collapses; TAPE faithfulness (leg-Jaccard vs.\ the exact oracle) and the
@@ -1163,12 +1168,12 @@ coupled regime harder throughout this paper). Coupled deployment therefore requi
 at, or near, the target size, where the surrogate remains accurate (Table~\ref{tab:fidelity});
 size-generalisation is a property of the \emph{uncoupled} physics, and we report it as such.
 
-\subsection{R2: landscape analysis via critical-path attribution}
+\subsection{Landscape analysis via critical-path attribution}
 \label{sec:r2worked}
 
-The advisor's second requirement asks: \emph{which input variables (task dispatch order,
-AGV travelling speed, crane workload) causally determine the objective values, and why are
-specific solutions Pareto-optimal?} TAPE answers this question exactly. For any schedule
+The second requirement is a landscape question: \emph{which input variables (task dispatch
+order, AGV travelling speed, crane workload) causally determine the objective values, and
+why are specific solutions Pareto-optimal?} TAPE answers this question exactly. For any schedule
 $\sigma$, the tropical subgradient (Eq.~\ref{eq:tapechain}) partitions all activities into
 two sets:
 \begin{itemize}[nosep]
@@ -1277,7 +1282,7 @@ $C_{\max}$), QC2 ($45+30=75\,\mathrm{s}$, $8.1\%$), QC3 ($38+32=70\,\mathrm{s}$,
 $7.6\%$). QC1 is the most loaded crane, with consecutive handlings of tasks~0 and~3
 creating a $116\,\mathrm{s}$ serialisation chain.
 
-\paragraph{Why is this solution Pareto-optimal?}
+\paragraph{Pareto-optimality of this solution.}
 TAPE makes the trade-off legible: $\sigma^\star_E$ achieves $15\%$ lower energy than
 $\sigma^\star_C$ by running AGVs at LOWER speed ($2.4$ vs.\ $3.6\,\mathrm{m/s}$), but the
 resulting serialisation doubles the makespan ($925.6$ vs.\ $454.2\,\mathrm{s}$). Every
@@ -1327,7 +1332,7 @@ and $v_i$ the AGV speed, the chain rule gives the makespan sensitivity to speed:
   = \frac{\partial C_{\max}}{\partial d_{i,\text{leg}}} \cdot \frac{\partial d_{i,\text{leg}}}{\partial v_i}
   = \mathbf{1}[(i,\text{leg})\in\mathcal{P}^\star] \cdot \Bigl(-\frac{\ell_i}{v_i^2}\Bigr).
 \end{equation}
-For off-path legs ($\partial C_{\max}/\partial d = 0$), the speed has \emph{zero} effect on
+For off-path legs ($\partial C_{\max}/\partial d = 0$), the speed has zero effect on
 makespan---the AGV can be slowed arbitrarily to save energy without schedule penalty. For
 on-path legs, the sensitivity is $-\ell_i/v_i^2$: increasing speed yields diminishing
 returns proportional to the inverse square. Three discrete speed levels are available
@@ -1387,27 +1392,27 @@ two successive tasks on AGV-0. Reordering the dispatch (e.g., scheduling task~5-
 longest loaded leg---earlier, so it overlaps with a shorter task on AGV-1) would
 break this chain and potentially reduce $C_{\max}$.
 
-In $\sigma^\star_E$, by contrast, the critical path threads through \emph{both} AGVs and
+In $\sigma^\star_E$, by contrast, the critical path threads through both AGVs and
 all three QCs, indicating that the dispatch order is less decisive than crane service
 order: even if tasks were reshuffled across AGVs, the QC serialisation would still
 dominate.
 
-This is the ``landscape analysis'' requested in R2: not a global feature importance
+This constitutes the landscape analysis: not a global feature importance
 ranking, but a \emph{per-solution, per-variable} causal attribution that explains
-\emph{why} each schedule occupies its position on the Pareto front.
+why each schedule occupies its position on the Pareto front.
 
 \paragraph{Extension to the coupled regime.}
 Under peak-power coupling, an additional class of binding variable emerges: simultaneous
 AGV power draw. When two AGVs attempt high-speed legs concurrently, the power budget
 forces one to wait, creating an additional ``power arc'' in the event DAG. TAPE attributes
-through these arcs, identifying \emph{which} concurrent leg pair caused the delay and
+through these arcs, identifying which concurrent leg pair caused the delay and
 quantifying its contribution to $C_{\max}$. The fidelity study
 (Table~\ref{tab:fidelity}) confirms that the surrogate's TAPE remains actionable in this
 regime (Jaccard $0.928$, $0.919$, $0.913$ at $N{=}10, 20, 50$ respectively)---the
 landscape analysis degrades gracefully rather than failing, and the GNN is
 \emph{indispensable} here because no closed-form critical path exists to fall back on.
 
-\subsection{R3: faithful guidance dominates the metaheuristics}
+\subsection{Optimisation quality against the metaheuristic baselines}
 Across the $11$ instances the two graph-guided methods clearly dominate the three
 non-learned baselines on every indicator (Figure~\ref{fig:hv},
 Table~\ref{tab:main}). On the primary indicator (hypervolume ratio) the Friedman test
@@ -1436,14 +1441,14 @@ mp-BRKGA on \emph{all $11$ instances}.
 \end{minipage}
 \end{figure}
 
-\subsection{Convergence speed and scaling (R3)}
+\subsection{Convergence speed and scaling}
 \label{sec:scaling}
-The hypervolume-ratio table reports the \emph{end state} of the search; the more striking
-result is \emph{how fast} the graph-guided search gets there and how the advantage grows
-with problem size. Figure~\ref{fig:conv} plots the hypervolume against the NSGA-II
+The hypervolume-ratio table reports the end state of the search. The rate at which the
+graph-guided search reaches it, and the dependence of the advantage on problem size, are
+reported here. Figure~\ref{fig:conv} plots the hypervolume against the NSGA-II
 generation on the largest instance ($N{=}50$, $100$ generations, $30$ seeds, all methods at
 the same exact-evaluation budget). The E-HGATv2-guided search reaches the hypervolume that
-BRKGA attains only after the \emph{full} $100$ generations already by generation
+BRKGA attains only after the full $100$ generations already by generation
 $\approx\!42$ (a $2.4\times$ reduction in iterations), and the unguided random control's
 $100$-generation value by generation $\approx\!39$; it then keeps climbing to a final
 hypervolume $2.5\times$ that of BRKGA and $2.8\times$ that of random. On the convergence
@@ -1478,7 +1483,7 @@ BRKGA's \emph{final} hypervolume by generation ${\approx}42$ and ends $2.5\times
 \end{figure}
 
 This advantage is not constant---it \emph{amplifies with scale}. Figure~\ref{fig:scale}
-normalises each method's final hypervolume by the per-instance golden reference
+normalises each method's final hypervolume by the per-instance reference
 $\mathrm{HV}^\star$ and sweeps $N\in\{5,10,20,50\}$. At $N{=}5$ all three methods are within
 $2$ points of optimal ($0.98$--$0.99$); the problem is too small to discriminate. As $N$
 grows the metaheuristics fall away while the guided search degrades gracefully: at $N{=}50$
@@ -1517,28 +1522,27 @@ straightforward additional run.
 \legend{E-HGATv2-guided, single-pop BRKGA, random}
 \end{axis}
 \end{tikzpicture}
-\caption{Scaling of solution quality. Final hypervolume (fraction of the golden
+\caption{Scaling of solution quality. Final hypervolume (fraction of the reference
 $\mathrm{HV}^\star$) at $100$ generations versus instance size $N$. The methods are
 indistinguishable at $N{=}5$; the guided search's advantage grows sharply with $N$,
 reaching $+38.8$ points of $\mathrm{HV}^\star$ over BRKGA at $N{=}50$.}
 \label{fig:scale}
 \end{figure}
 
-\subsection{Faithfulness is obtained for free}
-TAPE and the unfaithful attention signal are \emph{statistically indistinguishable} on
-hypervolume: across all $11$ instances at $20$ seeds the Holm-adjusted TAPE-vs-attention
-$p = 0.83$ (Cliff's $\delta = +0.01$, negligible; TAPE ahead on $6/11$)---a genuine tie
-rather than an underpowered one---while both graph-guided variants keep crushing the
-classical baselines (TAPE $>$ mp-BRKGA on $11/11$, Holm $p<0.01$; Friedman
-$p\approx4.5\times10^{-7}$). We therefore make the honest, defensible claim: \emph{routing the
-guidance through the faithful TAPE signal preserves the optimisation performance of the
-unfaithful attention signal.} Faithfulness comes at no cost in solution quality, and the same
-object that steers the search is the one that correctly explains it. We do \emph{not} claim
-that faithful guidance converges faster than attention---the data do not support that, and
-Section~\ref{sec:ladder} explains \emph{why} they coincide: both arms ride the same surrogate
-\emph{screening}, to which the mutation-targeting signal (attention or TAPE) is nearly
-irrelevant. The two variants are indistinguishable on optimisation because neither's targeting
-is what optimises; TAPE's sole, decisive advantage is that its signal is \emph{faithful}.
+\subsection{Cost of faithfulness}
+TAPE and the attention signal are statistically indistinguishable on hypervolume: across
+all $11$ instances at $20$ seeds the Holm-adjusted TAPE-vs-attention $p = 0.83$ (Cliff's
+$\delta = +0.01$, negligible; TAPE ahead on $6/11$), while both graph-guided variants
+remain well ahead of the classical baselines (TAPE $>$ mp-BRKGA on $11/11$, Holm
+$p<0.01$; Friedman $p\approx4.5\times10^{-7}$). The supported claim is therefore that
+routing the guidance through the faithful TAPE signal preserves the optimisation
+performance obtained with the attention signal, at no cost in solution quality, while
+the object that steers the search is also the one that explains it. The data do not
+support a claim that faithful guidance converges faster than attention.
+Section~\ref{sec:ladder} accounts for the coincidence: both arms use the same surrogate
+screening, to which the mutation-targeting signal is nearly irrelevant, so the two
+variants are indistinguishable on optimisation because the targeting is not what drives
+it. The distinction between them lies in the faithfulness of the signal.
 
 \begin{table}[t]
 \centering
@@ -1578,7 +1582,7 @@ Instance & Regime & $N$ & TAPE & Attn & Random & mp-BRKGA & sp-BRKGA & TAPE Jac.
 \caption{Statistical analysis over all $11$ instances at $20$ seeds (Friedman + average ranks;
 lower rank = better). Holm-adjusted pairwise $p$-values are TAPE vs.\ each method on
 $\mathrm{HV}/\mathrm{HV}^\star$. ${}^\star$ denotes $p_{\text{Holm}}<0.05$. TAPE vs.\ attention
-is \emph{not} significant ($p=0.83$)---they are statistically tied, as Section~\ref{sec:ladder}
+is not significant ($p=0.83$)---they are statistically tied, as Section~\ref{sec:ladder}
 explains, with TAPE marginally ahead on average rank.}
 \label{tab:stats}
 \small
@@ -1636,8 +1640,8 @@ is with distribution-free Cliff's-$\delta$ (Table~\ref{tab:stats}, last column):
 mp-BRKGA the effect is \emph{large} ($\delta=+0.64$ on HV and $-0.59$ on GD$^+$), against
 single-population BRKGA \emph{medium} ($\delta=+0.42$) and against the random control
 \emph{medium} ($\delta=+0.44$) on HV, and against attention it is \emph{negligible}
-($\delta=+0.01$)---exactly the ``faithfulness for free'' reading: TAPE matches attention
-while strictly dominating every non-learned baseline by a medium-to-large margin.
+($\delta=+0.01$): TAPE matches attention while dominating every non-learned baseline by a
+medium-to-large margin.
 
 \paragraph{Per-instance bootstrap evidence.} We bootstrap ($10^{4}$ resamples) the
 per-instance TAPE$-$mp-BRKGA hypervolume gap (Table~\ref{tab:boot}, visualised as a forest
@@ -1714,47 +1718,48 @@ zero on all $11/11$ instances. This is the visual companion to Table~\ref{tab:bo
 \label{fig:forest}
 \end{figure}
 
-\subsection{Why a flat tree surrogate is the wrong tool (XGBoost + TreeSHAP)}
+\subsection{Comparison with a flat tree surrogate (XGBoost + TreeSHAP)}
 \label{sec:xgb}
-A natural and popular alternative to a graph network is a gradient-boosted tree ensemble
+An established alternative to a graph network is a gradient-boosted tree ensemble
 (XGBoost~\cite{chen2016xgboost}) that regresses $(\Cmax,E)$ from the flat $4N$
-decision-variable vector---per task its sequence position, vehicle assignment, and the two
-speed levels---explained globally by TreeSHAP~\cite{lundberg2020treeshap}, the exact
-Shapley attribution for trees. This is precisely the localized-search-guidance recipe of the
-sequencing/speed XAI literature, and we include it as a baseline surrogate in our codebase.
-It is, however, structurally unable to serve the goal of this paper, for three reasons.
+decision-variable vector, comprising for each task its sequence position, vehicle
+assignment and two speed levels, explained globally by
+TreeSHAP~\cite{lundberg2020treeshap}, the exact Shapley attribution for trees. This is
+the localised-search-guidance approach of the sequencing and speed XAI literature, and it
+is included here as a baseline surrogate. Three properties of the present problem
+determine what such a model can attribute.
 
-\paragraph{(1) No precedence structure, no $(\max,+)$ inductive bias.} The tree ingests a
-fixed-length coordinate vector and is blind to the precedence DAG. The makespan is a
-longest path~\eqref{eq:troprec}; representing a $\max$ of sums over a data-dependent path
-with axis-aligned splits requires the ensemble to \emph{memorise} regions rather than
-\emph{compose} the recurrence, so the structural signal E-HGATv2 attains for free
-($R^2\!\approx\!0.99$, Section~\ref{sec:results}) is not available by construction.
+\paragraph{(1) Precedence structure and the $(\max,+)$ inductive bias.} The tree ingests a
+fixed-length coordinate vector and does not observe the precedence DAG. The makespan is a
+longest path~\eqref{eq:troprec}, and representing a $\max$ of sums over a data-dependent
+path with axis-aligned splits requires the ensemble to memorise regions rather than
+compose the recurrence. The structural signal that E-HGATv2 obtains from the fused layer
+($R^2\!\approx\!0.99$, Section~\ref{sec:results}) is therefore not available to it by
+construction.
 
-\paragraph{(2) The attribution is on the wrong object.} TreeSHAP credits \emph{decision
-variables} (the speed level of task $j$, its assignment, its position). It has no notion of
-a physical activity, so it cannot produce the statement that defines our explanation---
-``delaying leg $a$ by $\Delta$ raises $\Cmax$ by exactly $\Delta$ iff $a\in\pi^\star$''
-(Eq.~\ref{eq:tape}). A Shapley value is an \emph{additive credit on an input coordinate},
-not a derivative of the makespan with respect to a physical quantity and not a critical-path
-indicator; there is no $\partial\Cmax/\partial(\text{leg})$ to read off.
+\paragraph{(2) The attribution target.} TreeSHAP credits decision variables: the speed
+level of task $j$, its assignment, its position. Its output is an additive credit on an
+input coordinate, not a derivative of the makespan with respect to a physical quantity,
+so the statement of Eq.~\ref{eq:tape}---that delaying leg $a$ by $\Delta$ raises $\Cmax$
+by exactly $\Delta$ iff $a\in\pi^\star$---has no counterpart in it, and
+$\partial\Cmax/\partial(\text{leg})$ is not defined. The two methods therefore attribute
+to different objects: decision variables in one case, physical activities in the other.
 
-\paragraph{(3) The landscape is interaction-dominated, where additive attribution fails.}
-A Sobol variance decomposition~\cite{sobol2001} on \textsf{SD-10} (1024 base samples, $6{,}144$
-evaluations) shows that the sequence and assignment variables have \emph{first-order} indices
-of $0.00$ for the makespan but \emph{total-order} indices of $0.71$ and $0.72$ respectively:
-essentially \emph{all} of their influence is carried through interactions, with negligible
-main effects (for energy: total-order $0.75/0.57$ with first-order $0.36/0.31$). TreeSHAP's
-per-feature mean-$|\text{SHAP}|$ is an additive, main-effect-like decomposition; in a regime
-where main effects vanish and interactions dominate, that credit is split among the
-interacting variables in a way that does not localise the bottleneck. TAPE attributes
-instead to the \emph{activity that jointly binds}---the critical path---which is exactly the
-interaction the Sobol indices say matters.
+\paragraph{(3) The landscape is interaction-dominated.} A Sobol variance
+decomposition~\cite{sobol2001} on \textsf{SD-10} (1024 base samples, $6{,}144$
+evaluations) gives the sequence and assignment variables first-order indices of $0.00$ for
+the makespan against total-order indices of $0.71$ and $0.72$ respectively, so their
+influence is carried almost entirely through interactions, with negligible main effects
+(for energy, total-order $0.75/0.57$ against first-order $0.36/0.31$). TreeSHAP's
+per-feature mean-$|\text{SHAP}|$ is an additive, main-effect-like decomposition, and where
+main effects vanish and interactions dominate that credit is divided among the interacting
+variables without localising the bottleneck. TAPE attributes instead to the jointly
+binding activity, the critical path, which is the interaction the Sobol indices identify.
 
 \begin{table}[t]
 \centering\small
-\caption{Capability contrast: a flat tree surrogate with TreeSHAP versus the
-physics-fused graph surrogate with TAPE, for the requirements of this problem.}
+\caption{A flat tree surrogate with TreeSHAP and the physics-fused graph surrogate with
+TAPE, compared on the requirements of this problem.}
 \label{tab:xgb}
 \setlength{\tabcolsep}{5pt}
 \resizebox{\textwidth}{!}{%
@@ -1773,30 +1778,31 @@ Routes operator type (AGV vs.\ QC) & no & yes (Sec.~\ref{sec:guidance})\\
 \end{tabular}}
 \end{table}
 
-In short, even a tree that fit the scalar objective well would still explain the
-\emph{wrong object}: it cannot name the binding leg, cannot give a makespan derivative, and
-its additive importances are confounded exactly where the Sobol indices show the action is
-(Table~\ref{tab:xgb}). The graph surrogate is not a stylistic choice---it is what makes a
-faithful, physically meaningful, search-actionable explanation possible.
+A tree that fits the scalar objective accurately would still attribute to input
+coordinates rather than to activities: it does not identify the binding leg, does not
+supply a makespan derivative, and its additive importances are divided among interacting
+variables in the regime the Sobol indices describe (Table~\ref{tab:xgb}). The graph
+surrogate is used here because the explanation required---faithful to the physics,
+localised on an activity, and usable by the search---follows from these properties.
 
-\subsection{R4: behaviour of the Pareto front}
+\subsection{Behaviour of the Pareto front}
 \label{sec:front}
-We now use the same faithful object to describe the front rather than a single schedule.
+The same object is now applied to the front rather than to a single schedule.
 For each instance we take the approximated Pareto set produced by the guided search, read
-the local trade-off weight $\lambda$ at every front point, and compute the Pareto Tension
+the local trade-off weight $\lambda$ at every front point, and compute the Trade-off Criticality
 Score of Section~\ref{sec:pts}. Table~\ref{tab:pts} and Figure~\ref{fig:r4} report, per
 instance: the range of
 $\lambda$ actually swept along the front; the top bottleneck tasks at the
 makespan-optimal extreme versus the energy-optimal extreme; the \emph{bottleneck migration}
 ($1$ minus the Jaccard overlap of the top-$3$ tasks at the two extremes, so larger means the
-binding bottleneck genuinely changes as one walks the front); and the \emph{PTS
-concentration} (the share of the total tension carried by the top-$3$ tasks). Two patterns
-emerge. First, the tension is concentrated on a few tasks---the top three carry
-$27$--$87\%$ of the total tension (most concentrated at small $N$)---so each front point has
+binding bottleneck genuinely changes as one walks the front); and the \emph{TCS
+concentration} (the share of the total trade-off criticality carried by the top-$3$ tasks). Two patterns
+emerge. First, the criticality is concentrated on a few tasks---the top three carry
+$27$--$87\%$ of the total criticality (most concentrated at small $N$)---so each front point has
 a short, human-readable explanation. Second, on $9$ of the $11$ instances the binding
 bottleneck \emph{migrates} between the makespan-optimal and energy-optimal ends of the front
 (migration $\ge 0.5$): this is exactly the ``why is this solution Pareto-optimal'' knowledge
-requested in R2/R4---different solutions are non-dominated because \emph{different} operations
+different solutions are non-dominated because different operations
 bind their objectives. The two exceptions (\textsf{SD-10}, \textsf{SD-20-C}) keep the same
 three top tasks across the front. The $\lambda$ range column confirms the runs actually span
 the trade-off, from near-energy-optimal ($\lambda\!\approx\!0$) to makespan-optimal
@@ -1804,11 +1810,11 @@ the trade-off, from near-energy-optimal ($\lambda\!\approx\!0$) to makespan-opti
 
 \begin{table}[t]
 \centering
-\caption{Pareto-front behaviour via TAPE Pareto Tension Scores. ``front'' = number of
+\caption{Pareto-front behaviour via TAPE Trade-off Criticality Scores. ``front'' = number of
 non-dominated points; ``$\lambda$ range'' = trade-off weight swept along the front; ``top-3''
-= the three highest-PTS (most binding) tasks at the makespan-optimal ($\Cmax$) and
+= the three highest-TCS (most binding) tasks at the makespan-optimal ($\Cmax$) and
 energy-optimal ($E$) extremes; ``migr.'' $=1-$Jaccard of those two task sets (higher = the
-bottleneck changes more along the front); ``conc.'' = share of total tension on the top-3 tasks.}
+bottleneck changes more along the front); ``conc.'' = share of total criticality on the top-3 tasks.}
 \label{tab:pts}
 \footnotesize
 \setlength{\tabcolsep}{4pt}
@@ -1839,7 +1845,7 @@ Instance & $N$ & front & $\lambda$ range & top-3 ($\Cmax$ end) & top-3 ($E$ end)
 \begin{tikzpicture}
 \begin{axis}[
   width=\textwidth, height=0.86\textwidth,
-  xlabel={number of tasks $N$}, ylabel={PTS concentration (top-3 share)},
+  xlabel={number of tasks $N$}, ylabel={TCS concentration (top-3 share)},
   xmin=3, xmax=22, ymin=0, ymax=1, font=\footnotesize,
   legend pos=north east, legend cell align=left,
   grid=both, grid style={gray!20},
@@ -1852,7 +1858,7 @@ Instance & $N$ & front & $\lambda$ range & top-3 ($\Cmax$ end) & top-3 ($E$ end)
 \addplot[dashed, black!55, no marks] coordinates {(5,0.82)(20,0.30)};
 \end{axis}
 \end{tikzpicture}\\[-2pt]
-{\footnotesize (a) Tension de-concentrates as $N$ grows.}
+{\footnotesize (a) Criticality de-concentrates as $N$ grows.}
 \end{minipage}\hfill
 \begin{minipage}{0.49\textwidth}
 \centering
@@ -1872,8 +1878,8 @@ Instance & $N$ & front & $\lambda$ range & top-3 ($\Cmax$ end) & top-3 ($E$ end)
 \end{tikzpicture}\\[-2pt]
 {\footnotesize (b) The binding bottleneck changes along the front.}
 \end{minipage}
-\caption{Pareto-front behaviour (R4) from TAPE Pareto Tension Scores. \textbf{(a)} the share
-of total tension borne by the three most-binding tasks falls from ${\approx}0.87$ at $N{=}5$
+\caption{Pareto-front behaviour from TAPE Trade-off Criticality Scores. \textbf{(a)} the share
+of total criticality borne by the three most-binding tasks falls from ${\approx}0.87$ at $N{=}5$
 to ${\approx}0.30$ at $N{=}20$---larger fronts spread the binding constraints over more
 operations. \textbf{(b)} on $9$ of $11$ instances the top-3 binding tasks at the
 makespan-optimal end of the front differ substantially from those at the energy-optimal end
@@ -1881,49 +1887,47 @@ makespan-optimal end of the front differ substantially from those at the energy-
 \label{fig:r4}
 \end{figure}
 
-\subsection{Amortising front behaviour across instances (R4)}
+\subsection{Transferring front behaviour across instances}
 \label{sec:amortise}
-Section~\ref{sec:front} \emph{describes} each front with a faithful object; the stronger R4
-claim is \emph{amortisation}---that a single model, given only an instance's structure,
-predicts its front composition \emph{without} running the search. We test this directly. We
-fit one lightweight predictor $g:(\,\text{structural features},\,\lambda\,)\mapsto\rho$, where
-$\rho$ is the transport share of the critical path (the composition of
-Table~\ref{tab:critpath_summary}) and the features are $N$, the AGV and QC counts, and the
-mean QC handling time. We evaluate by \emph{leave-one-instance-out} (LOIO): train on all but
-one instance, predict the held-out instance's front, and---crucially---compare against a
-\emph{constant} baseline that ignores all features and emits the training-set mean
-$\bar\rho$. Beating that baseline is the only honest evidence that structure was used.
+Section~\ref{sec:front} describes each front with a faithful object. A stronger property
+is transfer: that a single model, given only an instance's structure, predicts its front
+composition without running the search. This is tested with one lightweight predictor
+$g:(\,\text{structural features},\,\lambda\,)\mapsto\rho$, where $\rho$ is the transport
+share of the critical path (the composition of Table~\ref{tab:critpath_summary}) and the
+features are $N$, the AGV and QC counts, and the mean QC handling time. Evaluation is by
+leave-one-instance-out (LOIO): train on all but one instance, predict the held-out
+instance's front, and compare against a constant baseline that ignores all features and
+emits the training-set mean $\bar\rho$. Improvement over that baseline is the criterion
+for structure having been used.
 
-\textbf{On the public benchmark, amortisation is untestable, not failed.} On the $35$ real
-instances \textsf{L01}--\textsf{L35} (the small set of~\cite{homayouni2022book}),
-LOIO attains a held-out $\mathrm{MAE}(\rho)=0.048$. But the constant baseline attains
-\emph{the same} $0.048$, and the learned model beats it on only $14/35$ instances: the
-features carry no usable signal here. The cause is a saturated target---across all $35$
-instances and every front point the critical path is transport-bound ($\rho=0.88\pm0.04$
-between instances; $87\%$ of all front points have $\rho>0.80$). With essentially no
-composition variance, \emph{no} predictor can beat a constant, so these instances cannot
-exhibit amortisation. This is itself a finding: for this terminal layout, ``transport binds
-the critical path'' is a near-invariant structural fact, and the qualitative explanation
-generalises trivially and robustly.
+\paragraph{The public benchmark does not discriminate between predictors.} On the $35$
+instances \textsf{L01}--\textsf{L35} (the small set of~\cite{homayouni2022book}), LOIO
+attains a held-out $\mathrm{MAE}(\rho)=0.048$. The constant baseline attains the same
+$0.048$, and the learned model improves on it for $14/35$ instances, so the features carry
+no usable signal on this set. The target is saturated: across all $35$ instances and every
+front point the critical path is transport-bound ($\rho=0.88\pm0.04$ between instances,
+with $87\%$ of all front points at $\rho>0.80$). With no composition variance to predict,
+no predictor can improve on a constant, and these instances therefore cannot test transfer
+in either direction. The saturation is itself informative: for this terminal layout,
+transport binding the critical path is a near-invariant structural property.
 
-\textbf{When composition varies, a single surrogate recovers it.} To obtain instances whose
-binding resource actually differs, we vary the fleet/crane ratio: many AGVs with few cranes
-makes transport cheap and QC handling bind ($\rho$ small), while few AGVs with many cranes
-makes transport bind ($\rho\!\to\!1$). A $20$-instance set built this way spans
+\paragraph{Transfer where composition varies.} To obtain instances whose binding resource
+differs, the fleet-to-crane ratio is varied: many AGVs with few cranes makes transport
+cheap and QC handling bind ($\rho$ small), while few AGVs with many cranes makes transport
+bind ($\rho\!\to\!1$). A $20$-instance set built this way spans
 $\rho\in[0.19,0.99]$ (between-instance std $0.29$, versus $0.04$ on the public set). On it,
-LOIO is decisive (Table~\ref{tab:amortise}): $\mathrm{MAE}(\rho)=0.107$ against a constant
-baseline of $0.289$ ($2.7\times$ better; model wins on $17/20$ instances), and the predicted
-and true per-instance transport shares correlate at $r=0.945$. A single surrogate, shown only
-an unseen instance's fleet and crane structure, correctly places it on the QC-bound
-($\rho=0.19$)\,--\,transport-bound ($\rho=0.99$) axis. This is the requested
-``search$\rightarrow$knowledge'' transfer, demonstrated where there is knowledge to transfer.
+LOIO separates the two (Table~\ref{tab:amortise}): $\mathrm{MAE}(\rho)=0.107$ against a
+constant baseline of $0.289$, a factor of $2.7$, with the model ahead on $17/20$ instances,
+and the predicted and true per-instance transport shares correlate at $r=0.945$. A single
+surrogate, given only an unseen instance's fleet and crane structure, places it on the
+QC-bound ($\rho=0.19$) to transport-bound ($\rho=0.99$) axis.
 
 \begin{table}[t]
 \centering\small
-\caption{Amortisation of front composition (R4), leave-one-instance-out. The model beats a
+\caption{Transfer of front composition, leave-one-instance-out. The model beats a
 constant-mean baseline only where the target $\rho$ (transport share of the critical path)
-actually varies. The public small set is transport-saturated, so amortisation is untestable
-there; on a composition-spanning set the structural predictor recovers $\rho$ across unseen
+varies. The public small set is transport-saturated and does not discriminate between the
+two; on a composition-spanning set the structural predictor recovers $\rho$ across unseen
 instances at $r=0.945$.}
 \label{tab:amortise}
 \setlength{\tabcolsep}{5pt}
@@ -1978,7 +1982,7 @@ composition-diverse (synthetic) & 20 & $0.29$ / $[0.19,0.99]$ & $\mathbf{0.107}$
 \end{tikzpicture}\\[-2pt]
 {\footnotesize (b) The real set is transport-saturated; only the diverse set varies.}
 \end{minipage}
-\caption{Amortising front composition (R4). \textbf{(a)} On a composition-spanning set,
+\caption{Transfer of front composition. \textbf{(a)} On a composition-spanning set,
 leave-one-instance-out predictions of the transport share $\rho$ track the truth
 ($r=0.945$): a single surrogate reads an unseen instance's fleet/crane structure and places
 it on the QC-bound\,/\,transport-bound axis. \textbf{(b)} Why the public benchmark cannot
@@ -1988,10 +1992,10 @@ $\rho\in[0.19,0.99]$.}
 \label{fig:amortise}
 \end{figure}
 
-\textbf{What does \emph{not} amortise.} Two finer targets resist prediction, and we report
+\textbf{What does not amortise.} Two finer targets resist prediction, and we report
 them. (i) The \emph{within-front} ordering of $\rho$ along a single instance's front is
 recovered only weakly (median per-instance correlation ${\approx}0.12$): real fronts are
-compositionally near-flat, so there is little ordering signal. (ii) Predicting \emph{which}
+compositionally near-flat, so there is little ordering signal. (ii) Predicting which
 task is on the critical path from static task features is at chance---LOIO
 $\mathrm{AUC}=0.53$, no better than a $\lambda$-only baseline---because task-level
 criticality is set by the realised schedule, not by static attributes. The amortisation
@@ -2009,7 +2013,7 @@ non-learned baselines, but the coupled claim is the weakest.
 
 \paragraph{A scoped limitation at the makespan extreme.} The front-averaged number hides a
 sharp, mechanistically understood failure at \emph{one} end of the front. On
-\textsf{SD-10-C}, the energy-optimal extreme is recovered \emph{exactly} (leg-Jaccard
+\textsf{SD-10-C}, the energy-optimal extreme is recovered exactly (leg-Jaccard
 $1.00$), but the makespan-optimal extreme collapses to $0.11$. This is where every AGV runs
 at maximum speed, so power contention is maximal and the binding critical path is set by the
 disjunctive power-wait arcs that have no closed form---precisely the structure the fused
@@ -2024,7 +2028,7 @@ sampling).
 
 \section{Discussion and limitations}
 \label{sec:limits}
-We are deliberate about what the evidence does and does not support.
+We delimit what the evidence does and does not support.
 \begin{itemize}[leftmargin=*]
   \item \textbf{Reference front.} Hypervolume is reported against a high-budget
   $\mathrm{PF}^\star$ formed as the non-dominated union of long reference runs and every
@@ -2037,31 +2041,14 @@ We are deliberate about what the evidence does and does not support.
   not the attention map itself (Section~\ref{sec:ladder}). The per-population size is $5N$
   rather than the reference $20N$ for tractability, with all methods held to the same
   per-generation exact-evaluation budget; scaling either up is straightforward.
-  \item \textbf{Generalisation.} A single surrogate \emph{does} transfer front composition to
+  \item \textbf{Generalisation.} A single surrogate does transfer front composition to
   unseen instances when composition varies---leave-one-instance-out recovery $r=0.945$ on a
   composition-spanning set (Section~\ref{sec:amortise}, Figure~\ref{fig:amortise}). Two
-  honest caveats remain: the public small benchmark is transport-saturated, so it cannot
+  qualifications apply: the public small benchmark is transport-saturated and therefore cannot
   exhibit the effect (a constant matches any predictor there), and the composition-spanning
   demonstration is synthetic. Confirming amortisation on a real, structurally diverse set
   (the large \textsf{DL} instances of~\cite{homayouni2022book}) is the natural next step;
   per-task criticality, by contrast, is set by the realised schedule and does not amortise.
-\end{itemize}
-
-\section{Mapping to the research directions}
-\label{sec:mapping}
-\begin{itemize}[leftmargin=*]
-  \item \textbf{R1/R2 (post-hoc importance, landscape).} TAPE is an exact, faithful,
-  post-hoc importance signal over the input variables (leg times, crane delays) of any
-  solved schedule; it explains \emph{why} a solution is Pareto-optimal in terms of the
-  binding critical path (Section~\ref{sec:tape}, Figure~\ref{fig:faith}).
-  \item \textbf{R3 (feedback/guidance).} The same signal drives task selection, operator
-  choice and offspring screening, and the guided search dominates the metaheuristics
-  (Section~\ref{sec:guidance}, Table~\ref{tab:stats}).
-  \item \textbf{R4 (front behaviour).} The $\lambda$-weighted Pareto Tension Score
-  aggregates TAPE over the front and exhibits how the bottleneck migrates and how
-  concentrated the tension is (Section~\ref{sec:front}); a single structural surrogate then
-  \emph{amortises} the front composition to unseen instances ($r=0.945$ where composition
-  varies, Section~\ref{sec:amortise}).
 \end{itemize}
 
 \section{Conclusion}
@@ -2074,6 +2061,264 @@ mp-BRKGA baseline. The remaining work---confirming amortisation on a real, struc
 diverse instance set, strengthening the coupled surrogate at the makespan extreme, and
 reproducing the published optima on the \textsf{DS}/\textsf{DL} benchmark---is incremental
 and well scoped.
+
+\appendix
+
+\section{Implementation of the tropical layer}
+\label{app:impl}
+The $(\max,+)$ longest-path layer of Section~\ref{sec:fused} is implemented as a
+hand-written \texttt{torch.\allowbreak autograd.\allowbreak Function} rather than as a composition of generic
+autodiff primitives. The forward pass relaxes nodes in topological order and \emph{caches
+the argmax incoming arc} of every node; the backward pass routes the incoming cotangent
+along that cached path, assigning unit sensitivity to the arcs and nodes on the binding
+path and exactly zero elsewhere. This realises~\eqref{eq:tapechain} directly, at the cost
+of one traversal, and is what makes the attribution binary rather than a softened
+approximation.
+
+A batched variant evaluates a block-diagonal stack of schedule DAGs in a single
+vectorised relaxation. Because the blocks share no arcs,
+$\nabla \sum_i \Cmax^{(i)}$ decomposes exactly into the per-schedule subgradients with no
+cross terms, which yields the throughput reported in Section~\ref{sec:ladder}; the batched
+and per-graph paths are asserted bit-identical by a parity test in both regimes.
+
+\section{Hyper-parameters, model size and environment}
+\label{app:repro}
+
+\begin{table}[h]
+\centering
+\small
+\caption{Architecture and optimisation settings. The heterogeneous core is trained on
+exact evaluator labels; the fused physics heads are then fitted with the core frozen.}
+\label{tab:hyper}
+\begin{tabular}{@{}llr@{}}
+\toprule
+\textbf{Component} & \textbf{Setting} & \textbf{Value} \\
+\midrule
+\multirow{5}{*}{E-HGATv2 core}
+ & message-passing layers & 3 \\
+ & hidden width $d$ & 64 \\
+ & attention heads (width $d/4$ each) & 4 \\
+ & relation types (AGV, QC) & 2 \\
+ & trainable parameters & 73{,}410 \\
+\midrule
+\multirow{5}{*}{Core optimisation}
+ & optimiser & Adam \\
+ & learning rate & $1\times10^{-3}$ \\
+ & weight decay & $1\times10^{-5}$ \\
+ & epochs & 50 \\
+ & batch size (graphs) & 32 \\
+\midrule
+\multirow{7}{*}{Fused physics heads}
+ & trainable parameters (uncoupled) & 12{,}867 \\
+ & trainable parameters (coupled, incl.\ wait head) & 22{,}213 \\
+ & core parameters during fine-tune & frozen \\
+ & optimiser / schedule & Adam, cosine annealing \\
+ & learning rate ($\to\eta_{\min}$) & $1\times10^{-3}\to1\times10^{-5}$ \\
+ & epochs & 30 \\
+ & self-supervised training schedules per instance & 800 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Environment.} Python 3.12.11, PyTorch 2.6.0, PyTorch Geometric 2.8.0. The
+surrogate is executed on CPU for all reported results: the scatter-max aggregation and the
+$(\max,+)$ relaxation are order-sensitive under non-deterministic GPU reductions, and CPU
+execution makes every number bit-reproducible from its recorded seed. Search experiments
+were sharded across CPU cores, one shard per (instance, seed-block) pair.
+
+\paragraph{Cost.} The tropical layer adds $\Theta(N)$ arcs and therefore
+$\mathcal{O}(N)$ work per evaluation (approximately $4N$ multiply-adds at the reported
+sizes), which is negligible beside message passing. Wall-clock timings for search and
+screening are reported in Section~\ref{sec:ladder}.
+
+\paragraph{Search configuration of the headline runs.} Table~\ref{tab:runconf} records the
+settings behind Table~\ref{tab:stats} and Section~\ref{sec:guidance}. Every instance is run
+at the same generation count, seed count and screening factor; the population differs across
+instances only through $N$.
+
+\begin{table}[h]
+\centering
+\small
+\caption{Search configuration of the $11$ headline instances. $P$ is the mp-BRKGA
+per-population size and $4P=(\Omega+\Pi)P$ the matched population of every other method, so
+all five methods spend the same number of exact evaluations per generation. Seeds are
+executed as five shards of four seeds each and merged.}
+\label{tab:runconf}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+\textbf{Instance} & $N$ & \textbf{Regime} & $P=5N$ & \textbf{Matched pop.\ }$4P$ & \textbf{Ref.\ HV runs} \\
+\midrule
+\textsf{SD-5}     &  5 & uncoupled          &  25 & 100 & $50$ gen.\\
+\textsf{SD-8}     &  8 & uncoupled          &  40 & 160 & $50$ gen.\\
+\textsf{SD-10}    & 10 & uncoupled          &  50 & 200 & $50$ gen.\\
+\textsf{SD-15}    & 15 & uncoupled          &  75 & 300 & $50$ gen.\\
+\textsf{SD-20}    & 20 & uncoupled          & 100 & 400 & $50$ gen.\\
+\textsf{SD-10-C}  & 10 & coupled ($30$\,kW) &  50 & 200 & $50$ gen.\\
+\textsf{SD-20-C}  & 20 & coupled ($30$\,kW) & 100 & 400 & $50$ gen.\\
+\textsf{L07}      &  8 & uncoupled          &  40 & 160 & $50$ gen.\\
+\textsf{L21}      & 12 & uncoupled          &  60 & 240 & $50$ gen.\\
+\textsf{L35}      & 12 & uncoupled          &  60 & 240 & $50$ gen.\\
+\textsf{L15}      & 16 & uncoupled          &  80 & 320 & $50$ gen.\\
+\midrule
+\multicolumn{6}{@{}l}{\emph{Common to all instances:}}\\
+\multicolumn{3}{@{}l}{generations $G$} & \multicolumn{3}{l}{$40$}\\
+\multicolumn{3}{@{}l}{seeds $S$ (5 shards $\times$ 4)} & \multicolumn{3}{l}{$20$}\\
+\multicolumn{3}{@{}l}{screening factor $\kappa$} & \multicolumn{3}{l}{$2$}\\
+\multicolumn{3}{@{}l}{mutation temperature $T$} & \multicolumn{3}{l}{$0.25$}\\
+\multicolumn{3}{@{}l}{crossover / mutation probability} & \multicolumn{3}{l}{$0.9$ / $0.9$}\\
+\multicolumn{3}{@{}l}{crossover inheritance bias $p_e$} & \multicolumn{3}{l}{$0.7$}\\
+\multicolumn{3}{@{}l}{tournament size} & \multicolumn{3}{l}{$2$}\\
+\multicolumn{3}{@{}l}{mp-BRKGA elite / mutant fraction} & \multicolumn{3}{l}{$0.2$ / $0.1$}\\
+\multicolumn{3}{@{}l}{mp-BRKGA $\Omega$ / $\Pi$ / exchange interval} & \multicolumn{3}{l}{$2$ / $2$ / $30$ gen.}\\
+\multicolumn{3}{@{}l}{faithfulness sample per instance} & \multicolumn{3}{l}{$40$ schedules}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{The synthetic dual-cycling instance family}
+\label{app:instances}
+The results rest on two instance families of different provenance. The
+\textsf{L}-instances are the published benchmark: both the QC$\leftrightarrow$LU distance
+matrix and the per-crane task lists are read from Tables~4 and~5
+of~\cite{homayouni2022book} without modification. The \textsf{SD} family is generated
+here; its inherited and constructed components are separated below.
+
+\paragraph{Inherited components.} The vehicle physics is not synthetic. Both the kinematics
+$v=\alpha v_0$ and the per-leg power draws are the published constants of
+Table~\ref{tab:speed}, taken from~\cite{fontes2022mpbrkga,fontes2023flowtime}; the
+implementation asserts the kinematic relation at import time and fails if a constant drifts.
+Travel times are $t=d/v$ and leg energies $E=\varepsilon\, t$ over the same published
+asymmetric distance matrix used by the \textsf{L}-instances, so an \textsf{SD} instance moves
+containers over real terminal geometry (nodes \textsf{QC1}--\textsf{QC6},
+\textsf{LU1}--\textsf{LU6}) at real speeds and powers. The timing recurrence and the
+objectives are likewise those of Section~\ref{sec:maxplus}, unchanged.
+
+\paragraph{Constructed components.} Only the task list is synthetic, and it is generated
+by a deterministic rule rather than sampled from a demand model. For $N$ tasks indexed
+$j=0,\dots,N-1$ with crane set $\mathcal Q$ and stations $\textsf{LU1},\dots,\textsf{LU6}$:
+\begin{align*}
+\text{crane}(j) &= \mathcal Q\big[\,j \bmod |\mathcal Q|\,\big], &
+\text{station}(j) &= \textsf{LU}\big[(j \bmod 6)+1\big],\\
+\text{kind}(j) &= \begin{cases}\textsf{LOAD} & j \text{ even}\\ \textsf{UNLOAD} & j \text{ odd}\end{cases}, &
+\tau_j &\sim \mathcal U\{30,\dots,80\}\ \text{s},
+\end{align*}
+with all vehicles initially parked at \textsf{LU1} and $\tau_j$ drawn from a seeded
+\texttt{numpy} generator, so the instance is a pure function of its seed. Fleet size is a
+pure function of $N$ as well, $|\mathcal A| = \max(2,\operatorname{round}(N/12))$ and
+$|\mathcal Q| = \operatorname{clip}(\operatorname{round}(N/40),3,6)$; determinism here is a
+requirement rather than a convenience, because the search process and the reference-front
+process construct the instance independently and must obtain the identical object.
+
+\paragraph{Purpose and limitations of the family.} It supplies three properties the
+published set does not. First, dual cycling: every move in the \textsf{L}-instances is a
+\textsf{LOAD}, so LOAD/UNLOAD alternation, the setting treated in this paper, is not
+exercised by them at all. Second, an exactly enumerable reference: at $N=5$ the Pareto front
+is computed by brute force, giving a $\mathrm{PF}^\star$ that is the true front rather than a
+high-budget approximation. Third, a size ladder to $N=160$ (Section~\ref{sec:scaling}) at
+fixed structure, which the four published instances ($N=8$--$16$) cannot provide. The
+limitation is that the alternation pattern, the crane binding and the station assignment are
+regular by construction and therefore do not reproduce the irregular workload distribution of
+a measured terminal; the strictly round-robin crane binding in particular gives balanced
+per-crane workloads, whereas the imbalance analysis of Section~\ref{sec:front} is the more
+informative regime. Every claim that requires realistic \emph{structure}---rather than
+realistic physics---is therefore reported on the \textsf{L}-instances, and obtaining the
+\textsf{DS}/\textsf{DL} dual-cycling task lists of~\cite{homayouni2022book} is the item that
+would let the dual-cycling results be restated on published data.
+
+\paragraph{Coupled variants.} The \textsf{SD-$N$-C} instances add the peak-power budget
+of Section~\ref{sec:coupled} to an otherwise identical \textsf{SD-$N$} instance. As stated
+there, that constraint is introduced in this work and is not part of the benchmark; the
+budget $P_{\max}=30$\,kW is chosen above the largest single-leg draw ($19.8$\,kW), so every
+leg remains individually feasible and infeasibility can only arise from concurrency.
+
+\section{Software architecture}
+\label{app:software}
+This appendix documents the implementation, since several claims in the paper concern what
+the code computes and are checkable only against it. The source tree described here is
+available at \url{https://github.com/aayushjha1729/e-hgatv2}, together with the instance
+data, the seeds, and the result artifacts from which every reported table and figure is
+regenerated.
+
+\paragraph{Stack.} The system is a Python package (\texttt{ehgat}, $\approx\!9.8$k lines
+across the eight modules of Table~\ref{tab:modules}, with $\approx\!3.4$k further lines of
+tests). Message passing uses PyTorch~2.6 with PyTorch Geometric~2.8; the environment,
+evaluator, oracle and BRKGA baselines depend only on \texttt{numpy} and \texttt{scipy} and
+import no learning framework, which is what allows the exact evaluator to be tested
+independently of the surrogate. Statistics use \texttt{scipy.stats} (Wilcoxon, Friedman);
+the tree-surrogate comparison of Section~\ref{sec:xgb} uses \texttt{xgboost} and
+\texttt{shap}.
+
+\begin{table}[h]
+\centering
+\small
+\caption{Package structure. The dependency direction is downward: no module imports a module
+above it, so the exact physics layer is independent of the learned layers.}
+\label{tab:modules}
+\begin{tabular}{@{}llp{7.1cm}@{}}
+\toprule
+\textbf{Module} & \textbf{Torch} & \textbf{Responsibility} \\
+\midrule
+\texttt{environment} & no  & Instance construction, distance matrix, published speed/power constants, random-key decoder, exact evaluator (both regimes), brute-force Pareto oracle \\
+\texttt{baselines}   & no  & Single-population BRKGA and mp-BRKGA \\
+\texttt{metrics}     & no  & Hypervolume, $\mathrm{GD}^+/\mathrm{IGD}^+$, spread \\
+\texttt{surrogate}   & yes & Schedule $\to$ \texttt{HeteroData} encoding, E-HGATv2 core, training loop, attention-control models \\
+\texttt{explain}     & yes & Event DAG assembly, tropical DP layers, fused model, TAPE extraction, Trade-off Criticality Scores \\
+\texttt{search}      & yes & NSGA-II, the guided/screened variant, TAPE guidance signals \\
+\texttt{benchmark}   & yes & Experiment drivers, faithfulness scoring, statistics, landscape studies, plots \\
+\texttt{utils}       & no  & Seeding, semantic tensor assertions \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{The tropical layer as an autograd primitive.} The $(\max,+)$ recurrence is not
+expressed as a composition of framework operators. It is a subclass of
+\texttt{torch.\allowbreak autograd.\allowbreak Function} whose \texttt{forward} relaxes nodes in topological order
+and stores the argmax in-arc of each node, and whose \texttt{backward} walks that stored
+structure to route the cotangent (Appendix~\ref{app:impl}). Two consequences matter for the
+paper's claims. Since the argmax is stored rather than recomputed from a differentiable
+surrogate of the maximum, the returned attribution is exactly the binary indicator
+of~\eqref{eq:tape} and not a softened approximation; and since the backward pass is a single
+traversal of the stored path, the attribution costs one $O(N)$ pass rather than the $O(4N)$
+perturbation runs a black-box evaluator would need. A second implementation evaluates a
+block-diagonal stack of schedule DAGs in one vectorised relaxation, and a parity test asserts
+that the two agree bit-for-bit in both regimes.
+
+\paragraph{Where the surrogate enters the optimiser.} Screening is implemented as an
+over-produce-and-rank step inside the generation loop: $\kappa\mu$ offspring are generated,
+the surrogate predicts $(\Cmax,E)$ for all of them in one batched forward pass, they are
+ordered by non-dominated rank and crowding distance under the \emph{predicted} objectives,
+and only the best $\mu$ are passed to the exact evaluator. The exact-evaluation counter is
+incremented by $\mu$, which is what makes the matched-budget claim of
+Section~\ref{sec:setup} an identity in the code rather than an approximate accounting.
+Screening consumes the fused head's regression output only; the attribution signal is used
+solely for mutation targeting, so the two mechanisms are separately switchable and are
+separately ablated in Section~\ref{sec:ladder}. The same screening step is exposed as an
+injectable argument of the mp-BRKGA implementation, which allows the surrogate to be inserted
+into the published algorithm rather than only compared against it.
+
+\paragraph{Semantic tensor assertions.} Feature vectors carry a fixed, named order
+(nodes: handling time, LOAD indicator, UNLOAD indicator, crane index; arcs: travel time,
+empty energy, loaded energy). Every tensor crossing a module boundary is checked against that
+named signature, so a silently transposed or reordered feature raises rather than degrading
+accuracy---a failure mode that is otherwise invisible in a regression metric.
+
+\paragraph{Determinism.} A single integer seeds Python, \texttt{numpy} and PyTorch, and each
+stochastic component draws from its own derived generator so that, for example, instance
+generation and BRKGA evolution cannot perturb one another. PyTorch runs with deterministic
+algorithms enabled and on CPU throughout: the scatter-max aggregation and the $(\max,+)$
+relaxation are order-sensitive, and non-deterministic GPU reductions would break exact
+reproducibility of both the makespan and the argmax path. Search experiments are parallelised
+by sharding over (instance, seed-block) pairs, one process per shard, which changes only the
+assignment of seeds to processes and not the per-seed result.
+
+\paragraph{Verification.} The test suite is $239$ tests over $29$ modules and is the basis
+for the exactness claims. The evaluator is checked against a literal line-by-line
+transcription of the MILP timing constraints solved by fixed-point longest-path iteration,
+and against exhaustive enumeration of all $3^{2N}$ speed assignments at small $N$; the
+decoder is checked to be a left inverse of the encoder; the differentiable DP is checked
+against the simulator's makespan; the batched tropical layer is checked against the
+per-graph one; and the coupled simulator is checked to reduce to the uncoupled evaluator when
+the power budget never binds.
 
 \begin{thebibliography}{99}
 \small

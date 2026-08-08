@@ -19,7 +19,7 @@
       2
     ],
     "bottleneck_migration": 0.8,
-    "pts_concentration_topk": 0.5074821446469396,
+    "tcs_concentration_topk": 0.5074821446469396,
     "topk": 3,
     "fused_r2_makespan": 0.9993778467178345
   }

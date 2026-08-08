@@ -1,16 +1,16 @@
-"""scripts/run_fused_tape.py -- Req 2 entrypoint (physics-fused TAPE validation).
+"""scripts/run_fused_tape.py -- physics-fused TAPE validation.
 
 Trains the anchored fused E-HGATv2 head (tropical Max-Plus DP makespan + exact additive
 energy) on a frozen surrogate core, then validates:
 
-1. **Calibration** -- held-out R^2 for (C_max, E) restores to >= 0.99 once the heads snap
+1. Calibration -- held-out R^2 for (C_max, E) restores to >= 0.99 once the heads snap
    onto the physics layer.
-2. **Faithfulness-by-construction** -- the fused model's native gradients (its critical
+2. Faithfulness-by-construction -- the fused model's native gradients (its critical
    path) agree with the exact, simulator-based TAPE oracle (leg/arc critical Jaccard ~ 1).
-3. **Pareto Tension Scores** -- per-task/edge PTS over a sampled near-front, the explainer
+3. Trade-off Criticality Scores -- per-task/edge TCS over a sampled near-front, the explainer
    output for the Homayouni_XAI+MOO landscape.
 
-Writes a JSON artifact per instance size to ``experiments/fused_tape/fused_tape_n{N}.json``.
+Writes a JSON artifact per instance size to experiments/fused_tape/fused_tape_n{N}.json.
 
 Usage::
 
@@ -33,7 +33,7 @@ from rich.table import Table
 
 from ehgat.environment.decoder import NUM_BLOCKS, decode
 from ehgat.environment.instance import build_toy_instance
-from ehgat.explain.fused_explainer import faithfulness_report, fused_pareto_tension_scores
+from ehgat.explain.fused_explainer import faithfulness_report, fused_tradeoff_criticality_scores
 from ehgat.explain.train_fused import FusedTrainConfig, build_core, train_fused
 from ehgat.utils.seeding import make_rng
 
@@ -63,7 +63,7 @@ def _summary(num_tasks: int, args: argparse.Namespace) -> dict[str, object]:
         for _ in range(args.explain_samples)
     ]
     reports = [faithfulness_report(result.model, s, instance) for s in schedules]
-    pts = fused_pareto_tension_scores(result.model, schedules, instance)
+    pts = fused_tradeoff_criticality_scores(result.model, schedules, instance)
 
     n = len(reports)
     faith = {
@@ -83,7 +83,7 @@ def _summary(num_tasks: int, args: argparse.Namespace) -> dict[str, object]:
         "calibration": result.metrics,
         "history": result.history,
         "faithfulness": faith,
-        "pareto_tension_scores": pts,
+        "tradeoff_criticality_scores": pts,
     }
 
 
@@ -110,7 +110,7 @@ def _print(payload: dict[str, object]) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Physics-fused TAPE validation (Req 2).")
+    parser = argparse.ArgumentParser(description="Physics-fused TAPE validation.")
     parser.add_argument("--tasks", type=int, nargs="+", default=[6])
     parser.add_argument("--core-samples", type=int, default=1500)
     parser.add_argument("--core-epochs", type=int, default=60)

@@ -7,7 +7,7 @@ from ehgat.explain.fused_explainer import (
     explain_fused,
     explain_fused_schedules,
     faithfulness_report,
-    fused_pareto_tension_scores,
+    fused_tradeoff_criticality_scores,
 )
 from ehgat.explain.gnn_landscape import (
     FEATURE_FAMILIES,
@@ -17,7 +17,7 @@ from ehgat.explain.gnn_landscape import (
     gnn_landscape,
     landscape_rank_agreement,
 )
-from ehgat.explain.pts_calculator import ParetoPoint, pareto_tension_scores
+from ehgat.explain.tcs_calculator import ParetoPoint, tradeoff_criticality_scores
 from ehgat.explain.tape_explainer import TapeExplanation, explain_schedule, explain_schedules
 from ehgat.explain.tropical_dp import TropicalMaxPlus, tropical_longest_path, tropical_makespan
 
@@ -40,10 +40,10 @@ __all__ = [
     "explain_schedules",
     "extract_precedence",
     "faithfulness_report",
-    "fused_pareto_tension_scores",
+    "fused_tradeoff_criticality_scores",
     "gnn_landscape",
     "landscape_rank_agreement",
-    "pareto_tension_scores",
+    "tradeoff_criticality_scores",
     "tropical_longest_path",
     "tropical_makespan",
 ]

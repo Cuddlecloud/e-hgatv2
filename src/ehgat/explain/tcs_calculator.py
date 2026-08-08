@@ -1,4 +1,4 @@
-"""Pareto Tension Score (PTS) for TAPE explanations."""
+"""Trade-off Criticality Score (TCS) for TAPE explanations."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from typing import Any
 
 from ehgat.explain.tape_explainer import TapeExplanation
 
-__all__ = ["ParetoPoint", "local_lambda", "pareto_tension_scores"]
+__all__ = ["ParetoPoint", "local_lambda", "tradeoff_criticality_scores"]
 
 
 @dataclass(frozen=True, slots=True)
@@ -21,10 +21,10 @@ class ParetoPoint:
 
 
 def local_lambda(points: list[ParetoPoint], idx: int) -> float:
-    """Trade-off weight λ from the local front tangent at ``points[idx]``.
+    """Trade-off weight λ from the local front tangent at points[idx].
 
     For a bi-objective minimisation front sorted by makespan, the local tangent
-    ``(ΔC, ΔE)`` satisfies ``λ ΔC + (1-λ) ΔE = 0`` for a weighted-sum normal.
+    (ΔC, ΔE) satisfies λ ΔC + (1-λ) ΔE = 0 for a weighted-sum normal.
     """
     if len(points) < 2:
         return 0.5
@@ -48,8 +48,8 @@ def _combine(lam: float, c_grad: float, e_grad: float) -> float:
     return abs(lam * c_grad + (1.0 - lam) * e_grad)
 
 
-def pareto_tension_scores(points: list[ParetoPoint]) -> list[dict[str, Any]]:
-    """Compute edge/task PTS values for a Pareto set."""
+def tradeoff_criticality_scores(points: list[ParetoPoint]) -> list[dict[str, Any]]:
+    """Compute edge/task TCS values for a Pareto set."""
     ordered = sorted(points, key=lambda p: (p.makespan, p.energy))
     rows: list[dict[str, Any]] = []
     for i, point in enumerate(ordered):
@@ -58,8 +58,8 @@ def pareto_tension_scores(points: list[ParetoPoint]) -> list[dict[str, Any]]:
         n = len(ex.empty_time_grad)
         tasks = []
         for j in range(n):
-            empty_pts = _combine(lam, ex.empty_time_grad[j], ex.empty_energy_grad[j])
-            loaded_pts = _combine(lam, ex.loaded_time_grad[j], ex.loaded_energy_grad[j])
+            empty_tcs = _combine(lam, ex.empty_time_grad[j], ex.empty_energy_grad[j])
+            loaded_tcs = _combine(lam, ex.loaded_time_grad[j], ex.loaded_energy_grad[j])
             tasks.append(
                 {
                     "task": j,
@@ -67,9 +67,9 @@ def pareto_tension_scores(points: list[ParetoPoint]) -> list[dict[str, Any]]:
                     "loaded_time_grad": ex.loaded_time_grad[j],
                     "empty_energy_grad": ex.empty_energy_grad[j],
                     "loaded_energy_grad": ex.loaded_energy_grad[j],
-                    "pts_empty": empty_pts,
-                    "pts_loaded": loaded_pts,
-                    "pts_total": empty_pts + loaded_pts,
+                    "tcs_empty": empty_tcs,
+                    "tcs_loaded": loaded_tcs,
+                    "tcs_total": empty_tcs + loaded_tcs,
                 }
             )
         arcs = [

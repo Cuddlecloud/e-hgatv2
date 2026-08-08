@@ -7,7 +7,7 @@ import torch
 from ehgat.environment.decoder import NUM_BLOCKS, decode
 from ehgat.environment.evaluator import evaluate
 from ehgat.environment.instance import build_toy_instance
-from ehgat.explain.pts_calculator import ParetoPoint, pareto_tension_scores
+from ehgat.explain.tcs_calculator import ParetoPoint, tradeoff_criticality_scores
 from ehgat.explain.tape_explainer import explain_schedule
 from ehgat.explain.tropical_dp import tropical_longest_path
 from ehgat.utils.seeding import make_rng
@@ -37,8 +37,8 @@ def test_tape_matches_exact_evaluator_objectives() -> None:
 
 
 def test_critical_path_durations_sum_to_makespan() -> None:
-    # The makespan is the max-plus longest path, so the on-path activity durations
-    # (empty/loaded legs + QC handling) must sum exactly to C_max. This is the precise
+    # The makespan is the max-plus longest path, under which the on-path activity
+    # durations (empty and loaded legs plus QC handling) sum exactly to C_max. This is the
     # additive quantification used by scripts/run_critical_path_demo.py.
     rng = make_rng(3)
     for num_tasks in (5, 8, 10):
@@ -60,7 +60,7 @@ def test_critical_path_durations_sum_to_makespan() -> None:
             )
 
 
-def test_pts_output_is_json_shaped() -> None:
+def test_tcs_output_is_json_shaped() -> None:
     inst = build_toy_instance(num_tasks=4)
     rng = make_rng(1)
     pts = []
@@ -68,7 +68,7 @@ def test_pts_output_is_json_shaped() -> None:
         schedule = decode(rng.random(NUM_BLOCKS * inst.num_tasks), inst)
         ex = explain_schedule(schedule, inst)
         pts.append(ParetoPoint(str(i), ex.makespan, ex.energy, ex))
-    out = pareto_tension_scores(pts)
+    out = tradeoff_criticality_scores(pts)
     assert len(out) == 2
     assert "lambda" in out[0]
     assert out[0]["tasks"]
