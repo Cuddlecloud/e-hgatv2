@@ -1262,7 +1262,7 @@ contrasting the makespan-optimal and energy-optimal Pareto extremes. The analysi
 produced entirely by querying the fused surrogate's TAPE; the exact evaluator confirms perfect
 agreement (Jaccard~$= 1.00$).
 
-\subsubsection{Makespan-optimal schedule ($\sigma^\star_{C}$): $C_{\max}=454.2\,\mathrm{s}$, $E=12{,}896\,\mathrm{kJ}$}
+\subsubsection{Makespan-optimal schedule ($\sigma^\star_{C}$): $C_{\max}=454.2\,\mathrm{s}$, $E=14{,}317\,\mathrm{kJ}$}
 
 TAPE identifies $12$ binding activities forming a single chain through AGV-0 (dispatch
 order $\langle 0, 5, 4, 8, 1, 7\rangle$). No QC handling appears on the critical path:
@@ -1307,7 +1307,7 @@ discrete speed, no further speedup is available within the current fleet. The on
 remaining option is to \emph{re-dispatch} task~5 to AGV-1, splitting the critical chain.
 TAPE identifies this operational decision directly.
 
-\subsubsection{Energy-optimal schedule ($\sigma^\star_{E}$): $C_{\max}=925.6\,\mathrm{s}$, $E=10{,}938\,\mathrm{kJ}$}
+\subsubsection{Energy-optimal schedule ($\sigma^\star_{E}$): $C_{\max}=925.6\,\mathrm{s}$, $E=10{,}744\,\mathrm{kJ}$}
 
 TAPE now identifies $17$ binding activities with a qualitatively different structure:
 
@@ -1357,7 +1357,7 @@ $7.6\%$). QC1 is the most loaded crane, with consecutive handlings of tasks~0 an
 creating a $116\,\mathrm{s}$ serialisation chain.
 
 \paragraph{Pareto-optimality of this solution.}
-TAPE makes the trade-off legible: $\sigma^\star_E$ achieves $15\%$ lower energy than
+TAPE makes the trade-off legible: $\sigma^\star_E$ achieves $25\%$ lower energy than
 $\sigma^\star_C$ by running AGVs at LOWER speed ($2.4$ vs.\ $3.6\,\mathrm{m/s}$), but the
 resulting serialisation doubles the makespan ($925.6$ vs.\ $454.2\,\mathrm{s}$). Every
 on-path loaded leg already operates at the energy-minimum speed level; accelerating any one
@@ -1365,15 +1365,21 @@ would reduce $C_{\max}$ but increase $E$ proportionally---hence non-dominance.
 
 \subsubsection{Aggregate critical-path composition}
 
-Table~\ref{tab:critpath_summary} aggregates the critical-path composition across all four
-evaluated instances and both Pareto extremes.
+Table~\ref{tab:critpath_summary} aggregates the critical-path composition across the four
+uncoupled instances and the coupled one, at both Pareto extremes.
 
 \begin{table}[t]
 \centering\small
 \caption{Composition of the critical path across Pareto extremes: fraction of on-path
-activities attributable to AGV transport vs.\ QC handling. The makespan-optimal solutions
-are transport-dominated (AGV speed is the binding variable); the energy-optimal solutions
-are crane-dominated (QC workload and service order are binding).}
+activities attributable to AGV transport vs.\ QC handling. Makespan-optimal solutions are
+transport-dominated everywhere ($83$--$100\%$): AGV speed is the binding variable. Moving
+to the energy-optimal extreme shifts mass onto the cranes on three of the five instances
+(\textsf{SD-5} $17\!\to\!33\%$, \textsf{SD-10} $0\!\to\!35\%$, \textsf{SD-10-C}
+$17\!\to\!35\%$) but not on \textsf{SD-8} ($14\!\to\!18\%$) or \textsf{L07}
+($11\!\to\!6\%$), whose critical chains lengthen through additional slow legs instead of
+through crane queueing. Bottleneck migration is therefore an instance-level property that
+the attribution has to be read to establish, not a consequence of the energy extreme
+as such.}
 \label{tab:critpath_summary}
 \setlength{\tabcolsep}{5pt}
 \begin{tabular}{lcccc}
@@ -1383,20 +1389,27 @@ are crane-dominated (QC workload and service order are binding).}
 Instance & \% transport & \% QC & \% transport & \% QC \\
 \midrule
 SD-5  & 83\% (5/6) & 17\% (1/6) & 67\% (8/12) & 33\% (4/12) \\
-SD-8  & 100\% (6/6) & 0\% (0/6) & 67\% (4/6)  & 33\% (2/6) \\
+SD-8  & 86\% (6/7) & 14\% (1/7) & 82\% (9/11) & 18\% (2/11) \\
 SD-10 & 100\% (12/12) & 0\% (0/12) & 65\% (11/17) & 35\% (6/17) \\
-L07   & 63\% (5/8) & 37\% (3/8) & 50\% (4/8)  & 50\% (4/8) \\
+L07   & 89\% (8/9) & 11\% (1/9) & 94\% (16/17) & 6\% (1/17) \\
+\midrule
+SD-10-C & 83\% (10/12) & 17\% (2/12) & 65\% (11/17) & 35\% (6/17) \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The pattern is consistent across all instances: \textbf{makespan-optimal solutions are
-bound by AGV travelling speed} (the transport network is the bottleneck), while
-\textbf{energy-optimal solutions are bound by crane workload and service order} (QC
-serialisation is the bottleneck). TAPE makes this causal structure explicit and
-quantitative---for each individual activity, the derivative $\partial C_{\max}/\partial
-d_{i,a}\in\{0,1\}$ identifies whether it contributes to the schedule's binding constraint,
-and the magnitude of its duration quantifies its contribution to $C_{\max}$.
+One half of the pattern holds everywhere: \textbf{makespan-optimal solutions are bound by
+AGV travelling speed}, with $83$--$100\%$ of binding activities on the transport side in
+all five instances. The other half is instance-dependent. On \textsf{SD-5}, \textsf{SD-10}
+and the coupled \textsf{SD-10-C}, slowing the AGVs to save energy serialises the cranes and
+the bottleneck migrates onto them, reaching $33$--$35\%$ of on-path activities and
+$28$--$32\%$ of $C_{\max}$ in binding crane time. On \textsf{SD-8} and \textsf{L07} it does
+not: the energy extreme stretches the same transport chain and the crane share stays at
+$6$--$18\%$. Whether the bottleneck migrates is a fact about the instance, and TAPE is what
+makes it visible per instance rather than assumed: for each individual activity the
+derivative $\partial C_{\max}/\partial d_{i,a}\in\{0,1\}$ identifies whether it
+contributes to the schedule's binding constraint, and the magnitude of its duration
+quantifies its contribution to $C_{\max}$.
 
 \paragraph{Sensitivity to AGV travelling speed.}
 Since leg duration $d_{i,\text{leg}} = \ell_i / v_i$ where $\ell_i$ is the travel distance
