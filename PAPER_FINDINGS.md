@@ -643,3 +643,67 @@ tropical-layer appendix (no such throughput number is reported).
 - N=40 fleet-provisioning attribution still INFERRED, not isolated (controlled rerun at
   fixed AGV/QC ratio, ~1h, unrun).
 - Nothing is compile-verified: no pdflatex/tectonic/latexmk on this machine.
+
+## 2026-08-09 (later) — Second sweep: critical_path_demo + front_learning
+
+The first audit swept `fused_tape_guided/`, `scaling_*`, `landscape/`, `fused_eval/`.
+This pass finished the two directories left over. Both had real problems.
+
+### ★ CORRECTED: the R2 worked-example section quoted SUPERSEDED v1 artifacts
+`experiments/critical_path_demo/` holds two generations: `critpath_*.json` (v1) and
+`critpath_*_v2.json` (v2, adds `distance_m` / `speed_ms` / `speed_level` / `qc` /
+`agv_sequences` / `per_qc_on_path` — v1 has all of those as `null`). Commit `1f3ba8c`
+regenerated the paper's per-step tables from v2 but left other numbers on v1. Fixed:
+
+| item | was (v1) | now (v2) |
+|---|---|---|
+| SD-10 σ*_C energy | 12,896 kJ | **14,317 kJ** |
+| SD-10 σ*_E energy | 10,938 kJ | **10,744 kJ** |
+| energy saving at E-extreme | 15% | **25%** |
+| `tab:critpath_summary` SD-8 | 100%/0% → 67%/33% | **86%/14% → 82%/18%** |
+| `tab:critpath_summary` L07 | 63%/37% → 50%/50% | **89%/11% → 94%/6%** |
+
+SD-5 and SD-10 rows were already correct. Added the coupled **SD-10-C** row
+(83%/17% → 65%/35%) — that instance was in the directory and never in the table.
+
+**Claim that had to be weakened.** The old caption + following paragraph said the
+bottleneck migrates from transport to cranes at the energy extreme "consistently across
+all instances." On v2 that is false: it holds on SD-5 (17→33%), SD-10 (0→35%) and
+SD-10-C (17→35%), and NOT on SD-8 (14→18%) or L07 (11→6%), where the energy extreme just
+stretches the same transport chain. Rewritten to state migration as an instance-level
+property the attribution has to be read to establish. The transport-dominance of the
+*makespan* extreme does hold everywhere (83–100%).
+Note this is a per-instance/extreme statement and is NOT in tension with §sec:pts, which
+reports migration ≥0.5 on 9/11 instances under a different metric (1 − Jaccard of the
+top-3 *tasks*, not the transport/QC activity share).
+
+### ★ NEW: two front-learning structural holdouts were never reported
+`front_learning/results_holdout_qc5_smallN.json` and `results_holdout_qc235out.json` test
+**grouped fleet-structure holdout**, which LOIO does not.
+- Hold out a whole crane count (train 2–6 QC, test the unseen 5-QC instances + L07):
+  test MAE(ρ) **0.113**, r **0.44** (train 0.049 / 0.87).
+- Also remove the small-fleet end (train 3–6 QC, test contains 2-QC instances *below* the
+  trained range): MAE **0.158**, r **−0.01**. Damage is concentrated on the out-of-range
+  instances — toy:24:2:2 0.242, toy:40:2:3 0.237, vs 0.113–0.161 in-range.
+Conclusion added to the paper as amortisation limitation (iii): **R4 transfer is
+interpolative in fleet structure**, not extrapolative.
+
+### Verified clean (no action needed)
+- All 11 `fused_tape_guided/tcs_frontier_*.json` — every migration/concentration pair
+  matches `tab:pts` and both `fig:r4` panels exactly.
+- `front_learning/`: `loro_real_results` (0.048 saturated), `loro_composition_proof`
+  (0.107 vs 0.289, 17/20, r=0.945), `loro_baseline_comparison` (14/35),
+  `loro_pertask_results` (AUC 0.529), `front_stability` (0.048 mean within-front std,
+  80% below 0.06) — all already in §sec:amortise.
+- `experiments/benchmark_results.json` (top level) — N=5, 10 seeds, superseded sweep,
+  correctly not incorporated.
+- `critpath_coupled_toy10_v2.json` makespan-extreme Jaccard 0.111 — already reported as a
+  limitation at the end of the coupled section.
+
+Commits: `a592ef2` (worked-example v1→v2 fix), `a52e092` (structural holdouts).
+Structure re-verified after both: 10/10 figure, 17/17 table, 11/11 tikzpicture, 9/9 axis,
+20/20 tabular, 5/5 itemize, 2/2 enumerate, 20/20 equation, zero dangling refs.
+
+### Sweep status: COMPLETE
+Every directory under `experiments/` has now been checked against `paper/main.tex`.
+The "Still open" list above is unchanged by this pass.
