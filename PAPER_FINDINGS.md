@@ -578,3 +578,67 @@ Jaccard, attention ρ/prec@1 vs N. VM-only. See `memory/scaling-is-train-small-e
 Ephemeral vast.ai box; address changes per session. Current (2026-07-02): `ssh -i
 ~/.ssh/e_hgatv2_instance_ed25519 -p 23856 root@154.42.3.13` (2× A40 46GB, 255 cores, bare — needs
 repo + env). All heavy runs on VM (see `memory/compute-runs-on-vm.md`).
+
+## 2026-08-09 — Remnant-data audit of main.tex (COMPLETE)
+
+Swept all 557 experiment JSONs against the paper. Everything now reported, except the
+explicitly-listed gaps at the bottom. What got added this pass:
+
+- **`fig:conv` CI bands.** `scaling_bench/N50/benchmark_results.json` stored
+  `hv_curve_lo`/`hv_curve_hi` (101 pts × 3 methods, 30 seeds) that the figure never drew.
+  Added as shaded polygons + the `HV*` = 3.454e6 ceiling line. Guided band separates from
+  BOTH baselines **from generation 18**. Finals as fractions of HV*: 0.645 / 0.257 / 0.230.
+- **`fig:conv` CANNOT be extended to mp-BRKGA** — that run has only BRKGA,
+  E-HGATv2-NSGA-II, NSGA-II(random). Would need a new run. Caption now says so explicitly.
+- **Attention architectural control** (`experiments/attn_control/`, was flagged in its own
+  commit msg as "not used by any reported result"). Global self-attention encoder, learned
+  readout query over all N tasks → answers the reviewer objection that attention only looks
+  unfaithful because E-HGATv2's per-relation softmax is degenerate (α≡1, one predecessor per
+  resource). Result: p@1 0.66/0.50/0.55 vs random 0.57/0.55/0.55 (mean gap **+0.013**),
+  ρ ≈ 0. Degeneracy explanation is DEAD. Caveat stated in the paper: control's own
+  R²_Cmax = 0.51/0.33/0.22, so it is a negative control on a *weaker* predictor.
+- **Aggregated TAPE landscape** (`experiments/gnn_landscape/`). 256 schedules over 4
+  decision families → assignment .35 > sequence .26 > loaded .21 > empty .18, stable ±0.01
+  over N=10/20/50. Validated against the SAME aggregator run on the exact oracle: agrees to
+  **≤0.0013** per family at N=10,20. AGV-side share 0.72–0.74. Negative reported too:
+  pareto-vs-dominated family contrast ≤0.026, so this aggregate describes the INSTANCE, not
+  solution quality.
+- **Full 35-instance real L-set fidelity** (`fused_eval_real_Lset_full.json`, 5 seeds).
+  R² mean 0.9994 / worst 0.9989; leg-Jaccard mean 0.995 / worst 0.989; arc 0.994; MAE 1.8s.
+  Fidelity section previously only had synthetic instances (fixed 2 AGV/3 QC).
+- **Coupled size curriculum** (`generalization_pp30_curriculum.json`). Pooling training over
+  N∈{16,28,40} lifts coupled R² from −1.5 @ N=50 → +0.69 @ N=48, +0.52 @ N=32; still
+  collapses after (−0.19 @ 64, −4.4 @ 96). Extends usable coupled extrapolation ~25 → ~50.
+- **`tab:generalize` N=25 row** existed in the artifact, was missing from the table.
+- **Tree-surrogate fit + TreeSHAP/Sobol divergence** (`landscape/landscape_n10.json`,
+  `tabular_boundary`). Tree held-out R² = **0.12** (makespan) / 0.27 (energy). Sobol puts
+  0.94 of makespan mass on the structural families; TreeSHAP puts **0.51** → absolute
+  under-weighting **0.43** (same 0.43 for energy). Claims (1) and (3) of §XGBoost were
+  argument-only before; now measured.
+
+### ★ CORRECTED: the screening-throughput claim was WRONG (was main.tex item 1)
+Old text: "~3ms for 200 schedules at N=50 vs ~45ms per schedule exact → ~15× throughput."
+Internally inconsistent (3ms/200 vs 45ms/1 is 3000×, not 15×) and **not reproducible**.
+Measured on this machine, 1 CPU thread, N=50, 200 schedules:
+
+| regime | exact eval | surrogate fwd | + HeteroData build | fwd-only | incl. graph |
+|---|---|---|---|---|---|
+| uncoupled | 15.9 ms | 8.0 ms | 34.3 ms | 2.0× | **0.38× (LOSS)** |
+| coupled pp30 | 74.3 ms | 9.9 ms | 28.7 ms | **7.5×** | 1.9× |
+
+Uncoupled evaluator is just an O(N) longest path over closed-form leg times — it is cheap.
+Paper now says plainly: **uncoupled screening is budget-neutral, not faster**; the
+comparison is matched on *exact evaluations*, which is what makes the HV advantage
+attributable to the ranking. The speed win is real only in the coupled regime. Also
+removed the "throughput reported in Section~\ref{sec:ladder}" back-reference in the
+tropical-layer appendix (no such throughput number is reported).
+(Pairs with `memory/verify-mechanism-before-asserting.md` — measured, not recalled.)
+
+### Still open after this audit
+- `fig:conv` has no mp-BRKGA arm (needs a new run).
+- No Related Work section.
+- R4 (amortisation) has no coupled result.
+- `fig:dag`, `tab:hyper` defined but never `\ref`'d.
+- N=40 fleet-provisioning attribution still INFERRED, not isolated (controlled rerun at
+  fixed AGV/QC ratio, ~1h, unrun).
+- Nothing is compile-verified: no pdflatex/tectonic/latexmk on this machine.
