@@ -590,13 +590,14 @@ explicitly-listed gaps at the bottom. What got added this pass:
   BOTH baselines **from generation 18**. Finals as fractions of HV*: 0.645 / 0.257 / 0.230.
 - **`fig:conv` CANNOT be extended to mp-BRKGA** — that run has only BRKGA,
   E-HGATv2-NSGA-II, NSGA-II(random). Would need a new run. Caption now says so explicitly.
-- **Attention architectural control** (`experiments/attn_control/`, was flagged in its own
-  commit msg as "not used by any reported result"). Global self-attention encoder, learned
-  readout query over all N tasks → answers the reviewer objection that attention only looks
-  unfaithful because E-HGATv2's per-relation softmax is degenerate (α≡1, one predecessor per
-  resource). Result: p@1 0.66/0.50/0.55 vs random 0.57/0.55/0.55 (mean gap **+0.013**),
-  ρ ≈ 0. Degeneracy explanation is DEAD. Caveat stated in the paper: control's own
-  R²_Cmax = 0.51/0.33/0.22, so it is a negative control on a *weaker* predictor.
+- **Attention architectural control** (`experiments/attn_control/`) — I wrote this up, then
+  REMOVED it (commit f254fc1) at the user's direction: it is September interp-fork material,
+  not OR-thesis scope. Numbers kept here only so the artifact is not re-discovered and
+  re-litigated: global self-attention encoder, learned readout query over all N tasks,
+  p@1 0.66/0.50/0.55 vs random 0.57/0.55/0.55 (gap +0.013), rho ~ 0 — but its own
+  R2_Cmax is only 0.51/0.33/0.22, so it is a negative control on a weaker predictor and the
+  paragraph argued a point then hedged it to near-nothing. Bad paper content either way.
+  If the fork ever uses it, it needs a like-for-like control that actually fits Cmax.
 - **Aggregated TAPE landscape** (`experiments/gnn_landscape/`). 256 schedules over 4
   decision families → assignment .35 > sequence .26 > loaded .21 > empty .18, stable ±0.01
   over N=10/20/50. Validated against the SAME aggregator run on the exact oracle: agrees to
