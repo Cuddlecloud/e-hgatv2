@@ -158,9 +158,20 @@ one understates the result by a wide margin. Provenance from the shard jsons:
   SUPERSEDED `natfull` k=2 ladder.** At canonical k=4/20-seeds it is +0.022 / +0.123. The dip
   narrows but never inverts. The `PAPER_FINDINGS.md:186-199` and `:297-310` tables still carry
   the old natfull numbers — **they are stale; do not quote them.**
-- The N=40 narrowing is still real and still explained by `scaled_fleet` fleet-provisioning
-  discontinuity (`instance.py:199`): N=40 is both the most AGV-contended point (13.3 tasks/AGV,
-  ladder max) and the AGV/QC=1.0 bottleneck crossover. Paper states this.
+- **The N=40 narrowing is NOT the guided arms degrading — mp-BRKGA spikes.** Checked from the
+  canonical summaries 2026-08-09. N=20→40 absolute HV/HV* deltas (unc): TAPE **+0.018**, attn
+  **+0.065** (both IMPROVE), random −0.030, sp-BRKGA −0.108, **mp-BRKGA +0.194** — the largest
+  single move any method makes anywhere on the ladder. Same shape coupled (TAPE +0.050, attn
+  +0.057, mp +0.117). Per-seed TAPE-beats-mp: 20/20 @N=20, **13/20 @N=40**, 19/20 @N=80.
+  Surrogate fidelity is FLAT across the interval (TAPE leg-Jaccard 0.952/0.978/0.974 at
+  N=20/40/80 unc) ⇒ **not a model/fidelity effect, not k, not training-composition diversity.**
+- Attributed to `scaled_fleet` (`instance.py:199`, verified): `max(2,round(N/12))` AGVs,
+  `clamp(round(N/40),3,6)` QCs ⇒ AGV/QC = 0.67/0.67/**1.00**/2.33/3.25 and tasks/AGV =
+  5.0/10.0/**13.3**/11.4/12.3 at N=10/20/40/80/160. N=40 is simultaneously the balance point
+  and the contention max — where a structure-agnostic multi-pop search is relatively strongest.
+  ⚠️ **This attribution is INFERRED from the sizing rule, not isolated.** The controlled test
+  (rerun N=40 with 4 AGVs → tasks/AGV≈10, matching N=20/80; dip should vanish) is still unrun.
+  The paper says so explicitly. Cheap — one cell, ~1h.
 - At N=160 uncoupled the classical baselines have effectively **not converged** in 40 gens
   (sp-BRKGA 0.003, random 0.012, mp-BRKGA 0.040 vs TAPE 0.597). Absolute HV/HV* still falls
   with N uncoupled (0.944->0.597), so the widening margin is RELATIVE. Coupled does not fall
