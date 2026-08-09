@@ -1527,8 +1527,9 @@ BRKGA's \emph{final} hypervolume by generation ${\approx}42$ and ends $2.5\times
 \label{fig:conv}
 \end{figure}
 
-This advantage is not constant---it \emph{amplifies with scale}. Table~\ref{tab:optladder}
-sweeps $N\in\{10,20,40,80,160\}$ in both regimes with every baseline present, at $20$ seeds
+This advantage is not constant---it \emph{amplifies with scale}. Figure~\ref{fig:scale} and
+Table~\ref{tab:optladder}
+sweep $N\in\{10,20,40,80,160\}$ in both regimes with every baseline present, at $20$ seeds
 per cell, $40$ generations, matched exact-evaluation budget, $P=5N$ and screening factor
 $k=4$; the trace above is one point of that sweep. Margins are quoted for the TAPE-guided
 arm, fixed in advance, the attention-guided arm overlapping it within intervals at every
@@ -1548,16 +1549,79 @@ Two qualifications. Absolute quality still falls with $N$ uncoupled
 ($0.944\!\to\!0.597$), so the widening margin is relative to the baselines at matched
 budget, not an absolute gain; under coupling it does not fall ($0.871\!\to\!0.879$), the
 power budget having contracted the reachable objective space and the reference front with
-it. And the one margin that does not separate---uncoupled $N{=}40$ against mp-BRKGA
-($+0.022$; $+0.123$ coupled, the two smallest in the table)---is a tie rather than a loss,
-and it reverses by $N{=}80$. It coincides with a discontinuity in the instance generator
-rather than with anything in the model: \texttt{scaled\_fleet} allocates $\lceil N/12
-\rfloor$ AGVs and $3$ QCs, making $N{=}40$ both the most AGV-contended point on the ladder
-($13.3$ tasks per AGV, the ladder maximum) and the crossover at which the binding resource
-flips from the cranes to transport (AGV/QC $=1.0$). The guided arms earn their margin by
-exploiting a clear bottleneck, so it is smallest exactly where the bottleneck is most
-ambiguous, and returns once the instances are transport-bound---a property of the instance
-family, not a size limit of the surrogate.
+it. And one margin does not separate: uncoupled $N{=}40$ against mp-BRKGA ($+0.022$;
+$+0.123$ coupled, the two smallest in the table), a tie rather than a loss, which reverses
+by $N{=}80$ ($+0.233$, TAPE ahead on $19/20$ seeds against $13/20$ at $N{=}40$).
+
+The narrowing is not a degradation of the guided arms. Between $N{=}20$ and $N{=}40$ the
+guided arms \emph{improve} ($0.828\!\to\!0.846$ TAPE, $0.804\!\to\!0.870$ attention,
+uncoupled) while the two unguided controls decline ($0.608\!\to\!0.578$ random,
+$0.624\!\to\!0.516$ single-population BRKGA); what happens at $N{=}40$ is that mp-BRKGA
+jumps by $+0.194$, more than any other method moves anywhere on the ladder, and it is that
+spike alone that closes the gap. Surrogate fidelity is flat across the same interval
+(critical-path Jaccard $0.952$ at $N{=}20$, $0.978$ at $N{=}40$, $0.974$ at $N{=}80$), so
+the model is not the cause. The likely mechanism is the instance generator's discrete fleet
+provisioning: \texttt{scaled\_fleet} allocates $\max(2,\mathrm{round}(N/12))$ AGVs and at
+least $3$ QCs, so $N{=}40$ is the single point on the ladder at which AGVs and QCs are
+balanced (AGV/QC $=1.0$, against $0.67$ below and $2.33$ above) and transport contention
+peaks ($13.3$ tasks per AGV, the ladder maximum). A structure-agnostic multi-population
+search is relatively strongest there, and its advantage disappears once the instances become
+transport-bound again. We report this as the pattern the data show---a property of the
+instance family rather than a size limit of the surrogate---while noting that the
+attribution to fleet provisioning is inferred from the generator's sizing rule and has not
+been isolated by a controlled re-run at fixed AGV/QC ratio.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.84\textwidth, height=0.38\textwidth,
+  ybar, bar width=4.2pt,
+  symbolic x coords={10,20,40,80,160}, xtick=data,
+  xlabel={number of tasks $N$ (uncoupled)}, ylabel={final $\mathrm{HV}/\mathrm{HV}^\star$},
+  ymin=0, ymax=1.05, enlarge x limits=0.16,
+  ytick={0,0.25,0.5,0.75,1},
+  error bars/error bar style={black, thin},
+  legend pos=north east, legend cell align=left, font=\small, legend columns=2,
+  grid=both, grid style={gray!20}, tick label style={font=\footnotesize},
+]
+\addplot[fill=blue!55, error bars/.cd, y dir=both, y explicit] coordinates {(10,0.944) +- (0,0.022)(20,0.828) +- (0,0.028)(40,0.846) +- (0,0.029)(80,0.574) +- (0,0.046)(160,0.597) +- (0,0.068)};
+\addplot[fill=blue!20, error bars/.cd, y dir=both, y explicit] coordinates {(10,0.929) +- (0,0.028)(20,0.804) +- (0,0.030)(40,0.870) +- (0,0.026)(80,0.617) +- (0,0.038)(160,0.678) +- (0,0.055)};
+\addplot[fill=orange!60, error bars/.cd, y dir=both, y explicit] coordinates {(10,0.771) +- (0,0.037)(20,0.630) +- (0,0.062)(40,0.824) +- (0,0.022)(80,0.341) +- (0,0.066)(160,0.040) +- (0,0.052)};
+\addplot[fill=red!55, error bars/.cd, y dir=both, y explicit] coordinates {(10,0.800) +- (0,0.039)(20,0.624) +- (0,0.064)(40,0.516) +- (0,0.039)(80,0.071) +- (0,0.031)(160,0.003) +- (0,0.006)};
+\addplot[fill=black!35, error bars/.cd, y dir=both, y explicit] coordinates {(10,0.843) +- (0,0.032)(20,0.608) +- (0,0.057)(40,0.578) +- (0,0.034)(80,0.149) +- (0,0.041)(160,0.012) +- (0,0.012)};
+\legend{TAPE-guided, attn-guided, mp-BRKGA, sp-BRKGA, random}
+\end{axis}
+\end{tikzpicture}
+
+\vspace{4pt}
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.84\textwidth, height=0.34\textwidth,
+  ybar, bar width=4.2pt,
+  symbolic x coords={10,20,40,80,160}, xtick=data,
+  xlabel={number of tasks $N$ (coupled, $P_{\max}=30$\,kW)}, ylabel={final $\mathrm{HV}/\mathrm{HV}^\star$},
+  ymin=0, ymax=1.05, enlarge x limits=0.16,
+  ytick={0,0.25,0.5,0.75,1},
+  error bars/error bar style={black, thin},
+  grid=both, grid style={gray!20}, tick label style={font=\footnotesize},
+]
+\addplot[fill=blue!55, error bars/.cd, y dir=both, y explicit] coordinates {(10,0.871) +- (0,0.038)(20,0.826) +- (0,0.051)(40,0.876) +- (0,0.036)(80,0.823) +- (0,0.029)(160,0.879) +- (0,0.030)};
+\addplot[fill=blue!20, error bars/.cd, y dir=both, y explicit] coordinates {(10,0.864) +- (0,0.035)(20,0.812) +- (0,0.045)(40,0.869) +- (0,0.035)(80,0.788) +- (0,0.031)(160,0.818) +- (0,0.039)};
+\addplot[fill=orange!60, error bars/.cd, y dir=both, y explicit] coordinates {(10,0.732) +- (0,0.040)(20,0.635) +- (0,0.065)(40,0.752) +- (0,0.034)(80,0.500) +- (0,0.065)(160,0.264) +- (0,0.074)};
+\addplot[fill=red!55, error bars/.cd, y dir=both, y explicit] coordinates {(10,0.756) +- (0,0.041)(20,0.574) +- (0,0.084)(40,0.432) +- (0,0.049)(80,0.285) +- (0,0.055)(160,0.175) +- (0,0.049)};
+\addplot[fill=black!35, error bars/.cd, y dir=both, y explicit] coordinates {(10,0.765) +- (0,0.048)(20,0.462) +- (0,0.063)(40,0.440) +- (0,0.054)(80,0.338) +- (0,0.057)(160,0.205) +- (0,0.048)};
+\end{axis}
+\end{tikzpicture}
+\caption{Scaling of solution quality, $20$ seeds per cell at matched exact-evaluation
+budget, error bars $95\%$ CI (same runs as Table~\ref{tab:optladder}). Both graph-guided
+arms lead every baseline at every size in both regimes, and the margin widens with $N$: by
+$N{=}160$ the classical baselines have effectively not converged within the $40$-generation
+budget (uncoupled: sp-BRKGA $0.003$, random $0.012$, mp-BRKGA $0.040$, against $0.597$ for
+TAPE). At $N{=}40$ it is mp-BRKGA that jumps rather than the guided arms that fall; see the
+text.}
+\label{fig:scale}
+\end{figure}
 
 \begin{table}[t]
 \centering\small
