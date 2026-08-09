@@ -105,8 +105,8 @@ Four requirements on such a solver are treated together here, and are referred t
 throughout by the labels below.
 
 \begin{enumerate}[leftmargin=*,label=\textbf{R\arabic*.},ref=R\arabic*,nosep]
-  \item\label{req:importance} \textbf{Driving quantities.} Identify the quantities that
-    actually drive the objectives, without fixing them in advance by hand.
+  \item\label{req:importance} \textbf{Feature engineering.} Derive the quantities that
+    actually drive the objectives.
   \item\label{req:landscape} \textbf{Landscape / feature-importance analysis.} On small
     instances, explain why particular solutions are Pareto-optimal in terms of the input
     variables (task order, vehicle speed, crane workload).
@@ -118,19 +118,17 @@ throughout by the labels below.
 \end{enumerate}
 
 A single mathematical object addresses all four: the gradient of an exact max-plus
-longest path embedded inside a learned surrogate. The signal is the dynamic program's own
-subgradient, computed in the same backward pass that trains the network and consumed by the
-optimiser while it runs.
-The surrogate operates on the schedule as a heterogeneous graph of tasks, vehicles, cranes
-and precedence relations, and is therefore size-agnostic: one fitted at $N=16$ is evaluated
-unchanged up to $N=5000$.
+longest path embedded inside a learned surrogate. The signal is not an explainer fitted to
+a trained model after the fact; it is the dynamic program's own subgradient, computed in
+the same backward pass that trains the network and consumed by the optimiser while it runs.
 It is the importance signal over the input variables (\ref{req:importance},
 \ref{req:landscape}), it is the steering signal fed back to NSGA-II (\ref{req:guidance}),
 and, aggregated over the front with a trade-off weight, it is a description of front
 behaviour (\ref{req:front}).
-Faithfulness is used throughout in a specific sense: the signal identifies the operations
-that set the makespan. Learned attention weights read directly as explanations do not meet
-this criterion here, and Section~\ref{sec:results} quantifies the gap.
+The requirement throughout is faithfulness in a specific sense, that the signal identify
+the operations which set the makespan rather than produce a plausible-looking heat map.
+Learned attention weights read directly as explanations do not meet that requirement in
+this problem, and Section~\ref{sec:results} quantifies the gap.
 
 \section{Problem formulation}
 \label{sec:problem}
@@ -204,6 +202,15 @@ is exactly a \emph{longest path} in the precedence graph under the algebra
 $(\max,+)$---the \emph{tropical} or \emph{max-plus} semiring~\cite{baccelli1992synch}. This
 is the single structural fact the whole method exploits: the longest path is the
 \emph{critical path}, and the objective is determined by the activities lying on it.
+
+This recurrence is the critical path method of Kelley and Walker~\cite{kelley1959cpm}: the
+forward pass is CPM's earliest-start computation and the backward trace of argmax
+predecessors is CPM's critical-path recovery. Given the leg durations of a resolved
+schedule, CPM returns the critical path exactly, at negligible cost, and no learned model
+improves on it. What CPM cannot do is supply the durations. Section~\ref{sec:fused}
+therefore embeds the same recurrence as a differentiable layer over \emph{predicted}
+durations, which is what makes the path available for schedules the exact evaluator has not
+been run on, and makes it a gradient that trains the network that produced them.
 
 \subsection{The peak-power-coupled regime}
 \label{sec:coupled}
@@ -760,6 +767,21 @@ network~\eqref{eq:leghead}; TAPE reports which of those predictions the makespan
 on. (The exact critical path, computed from the resolved simulator with no network, is
 retained as a ceiling reference.)
 
+\paragraph{Relation to CPM and to differentiable dynamic programming.} Equation~\eqref{eq:tape}
+restates the slack property of the critical path method~\cite{kelley1959cpm}, and the
+backward routing of the proof is CPM's critical-path trace. On a schedule already passed
+through the exact evaluator the leg durations are known, CPM returns $\pi^\star$ exactly,
+and TAPE returns the same set: the two coincide, and the learned model contributes nothing.
+Differentiating through a dynamic program is likewise
+established~\cite{mensch2018ddp,rush2020torchstruct}, though that line smooths the $\max$ to
+obtain a dense Jacobian, where the hard $\argmax$ retained here is what keeps the
+attribution a binary path indicator. What the present construction adds is the pairing:
+the durations are supplied by the graph network, so $\pi^\star$ is obtained for schedules
+the evaluator has \emph{not} been run on, and the same indicator is the gradient by which
+those durations are learned~\eqref{eq:tapechain}. The novelty claimed is therefore not the
+attribution rule but its availability off the evaluated set, and the exact reference it
+provides for auditing the attention weights (Section~\ref{sec:results}).
+
 \paragraph{Selective gradient flow into the surrogate.} TAPE is the \emph{first factor} of
 the chain rule whenever the makespan is differentiated through the network, so it shapes
 \emph{training}, not only inference. Because the leg times and delays are themselves outputs
@@ -1058,7 +1080,7 @@ random mutation, no screening & \multicolumn{3}{c}{$0.950$ \;\;(null)} \\
 \end{tabular}
 \end{table}
 
-\subsection{Surrogate fidelity and faithfulness scale to $N{=}50$}
+\subsection{Surrogate fidelity and faithfulness up to $N{=}50$}
 \label{sec:fidelity}
 A separate, larger study isolates the fused surrogate's standalone behaviour and establishes
 whether the explanation survives as the instance grows. We
@@ -1179,7 +1201,7 @@ $5000$ & $0.989$ & $-7262.7$  & $0.940$ & $+0.00$\\
 \end{tabular}
 \end{table}
 
-\paragraph{The coupled regime does not size-generalise.} Under peak-power coupling the same
+\paragraph{Size generalisation under coupling.} Under peak-power coupling the same
 train-at-$16$ head holds only to about $N{=}25$ (fused $R^2=0.83$) and then collapses---$R^2$
 is already $-1.5$ at $N{=}50$ and continues to fall, with the TAPE Jaccard drifting from
 $0.95$ to $0.37$ by $N{=}1000$---because the power-wait arcs that couple the vehicles carry no
@@ -1246,7 +1268,7 @@ AGV-1 and its assigned tasks ($\{6, 2, 3, 9\}$) are entirely off the critical pa
 speeds could be reduced to LOWER ($2.4\,\mathrm{m/s}$) without affecting makespan, saving
 energy. Zero QC handlings appear on-path: \textbf{crane workload is not the bottleneck.}
 
-\paragraph{Actionable insight.}
+\paragraph{Implied intervention.}
 The highest-marginal-return intervention is task~5's loaded leg (300\,m at $3.6\,\mathrm{m/s}$,
 $d=83.3\,\mathrm{s}$, $18\%$ of $C_{\max}$). Since it already runs at the maximum
 discrete speed, no further speedup is available within the current fleet. The only
@@ -1309,7 +1331,7 @@ resulting serialisation doubles the makespan ($925.6$ vs.\ $454.2\,\mathrm{s}$).
 on-path loaded leg already operates at the energy-minimum speed level; accelerating any one
 would reduce $C_{\max}$ but increase $E$ proportionally---hence non-dominance.
 
-\subsubsection{Summary: from TAPE to variable-objective relationships}
+\subsubsection{Aggregate critical-path composition}
 
 Table~\ref{tab:critpath_summary} aggregates the critical-path composition across all four
 evaluated instances and both Pareto extremes.
@@ -1549,7 +1571,7 @@ reaching $+38.8$ points of $\mathrm{HV}^\star$ over BRKGA at $N{=}50$.}
 \label{fig:scale}
 \end{figure}
 
-\subsection{Cost of faithfulness}
+\subsection{Optimisation cost of the faithful signal}
 TAPE and the attention signal are statistically indistinguishable on hypervolume: across
 all $11$ instances at $20$ seeds the Holm-adjusted TAPE-vs-attention $p = 0.83$ (Cliff's
 $\delta = +0.01$, negligible; TAPE ahead on $6/11$), while both graph-guided variants
@@ -1913,16 +1935,13 @@ is transfer: that a single model, given only an instance's structure, predicts i
 composition without running the search. This is tested with one lightweight predictor
 $g:(\,\text{structural features},\,\lambda\,)\mapsto\rho$, where $\rho$ is the transport
 share of the critical path (the composition of Table~\ref{tab:critpath_summary}) and the
-features are $N$, the AGV and QC counts, and the mean QC handling time. The predictor is a
-separate model from the surrogate; its target is a single aggregate statistic per instance,
-and its training targets are the fronts and critical-path compositions produced by the
-surrogate and TAPE. Evaluation is by
+features are $N$, the AGV and QC counts, and the mean QC handling time. Evaluation is by
 leave-one-instance-out (LOIO): train on all but one instance, predict the held-out
 instance's front, and compare against a constant baseline that ignores all features and
 emits the training-set mean $\bar\rho$. Improvement over that baseline is the criterion
 for structure having been used.
 
-\paragraph{The public benchmark does not discriminate between predictors.} On the $35$
+\paragraph{Discriminative power of the public benchmark.} On the $35$
 instances \textsf{L01}--\textsf{L35} (the small set of~\cite{homayouni2022book}), LOIO
 attains a held-out $\mathrm{MAE}(\rho)=0.048$. The constant baseline attains the same
 $0.048$, and the learned model improves on it for $14/35$ instances, so the features carry
@@ -1933,7 +1952,7 @@ no predictor can improve on a constant, and these instances therefore cannot tes
 in either direction. The saturation is itself informative: for this terminal layout,
 transport binding the critical path is a near-invariant structural property.
 
-\paragraph{Transfer where composition varies.} To obtain instances whose binding resource
+\paragraph{Transfer under varying front composition.} To obtain instances whose binding resource
 differs, the fleet-to-crane ratio is varied: many AGVs with few cranes makes transport
 cheap and QC handling bind ($\rho$ small), while few AGVs with many cranes makes transport
 bind ($\rho\!\to\!1$). A $20$-instance set built this way spans
@@ -2014,7 +2033,7 @@ $\rho\in[0.19,0.99]$.}
 \label{fig:amortise}
 \end{figure}
 
-\textbf{What does not amortise.} Two finer targets resist prediction, and we report
+\textbf{Targets that do not transfer.} Two finer targets resist prediction, and we report
 them. (i) The \emph{within-front} ordering of $\rho$ along a single instance's front is
 recovered only weakly (median per-instance correlation ${\approx}0.12$): real fronts are
 compositionally near-flat, so there is little ordering signal. (ii) Predicting which
@@ -2026,14 +2045,14 @@ Finally, the composition-spanning evidence is synthetic; confirming it on a real
 structurally diverse benchmark (e.g.\ the large \textsf{DL} set
 of~\cite{homayouni2022book}, which varies AGV and QC counts) is the remaining step.
 
-\subsection{The coupled regime is harder}
+\subsection{Fidelity and faithfulness under peak-power coupling}
 Under the peak-power budget all methods degrade, and the faithful signal is slightly behind
 attention (Table~\ref{tab:main}, \textsf{SD-10-C}/\textsf{SD-20-C}). The surrogate's
 held-out $R^2$ falls to $\approx0.80$ (from $0.99$ uncoupled) and TAPE's \emph{front-averaged}
 leg-critical Jaccard drops to $0.87$ at $N=20$. Both graph-guided methods still beat all three
 non-learned baselines, but the coupled claim is the weakest.
 
-\paragraph{A scoped limitation at the makespan extreme.} The front-averaged number hides a
+\paragraph{Behaviour at the makespan-optimal extreme.} The front-averaged number hides a
 sharp, mechanistically understood failure at \emph{one} end of the front. On
 \textsf{SD-10-C}, the energy-optimal extreme is recovered exactly (leg-Jaccard
 $1.00$), but the makespan-optimal extreme collapses to $0.11$. This is where every AGV runs
@@ -2397,6 +2416,14 @@ Journal of Machine Learning Research, 7:1--30, 2006.
 \bibitem{lundberg2020treeshap} S.~M. Lundberg et al.
 \emph{From local explanations to global understanding with explainable AI for trees.}
 Nature Machine Intelligence, 2:56--67, 2020.
+\bibitem{kelley1959cpm} J.~E. Kelley and M.~R. Walker.
+\emph{Critical-path planning and scheduling.} Eastern Joint Computer Conference, 1959,
+160--173.
+\bibitem{mensch2018ddp} A. Mensch and M. Blondel.
+\emph{Differentiable dynamic programming for structured prediction and attention.}
+ICML 2018, 3462--3471.
+\bibitem{rush2020torchstruct} A.~M. Rush.
+\emph{Torch-Struct: Deep structured prediction library.} ACL 2020 (demo), 335--342.
 \bibitem{sobol2001} I.~M. Sobol'.
 \emph{Global sensitivity indices for nonlinear mathematical models and their Monte Carlo
 estimates.} Mathematics and Computers in Simulation, 55(1--3):271--280, 2001.

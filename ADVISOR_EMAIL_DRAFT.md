@@ -32,17 +32,29 @@ is at matched exact evaluations. The same screening sits inside mp-BRKGA
 (`run_mp_brkga(..., screen_fn=...)`), which switches the surrogate on and off within one
 algorithm rather than comparing across two. That is direction 3.
 
-Directions 1 and 2 follow from where the makespan comes from. The network does not regress
-it: it predicts the individual leg durations and handling delays, and those are composed
-through the exact max-plus critical-path recurrence. The composition is exact by
-construction, so the model's gradient with respect to each leg is exactly the binary
-critical-path indicator — the surrogate returns, exactly and at no extra cost, which task
-orders and speed choices are binding. That is the feature-importance and landscape analysis
-of direction 2, and aggregating the same quantity across the front, weighted by the local
-trade-off between `C_max` and `E`, describes the front's behaviour rather than only its
-location. The surrogate reads the schedule as a graph rather than a feature vector, so a
-model fitted on small instances applies unchanged to large ones; a tabular surrogate fitted
-at `N=10` cannot be evaluated at `N=160` at all.
+Directions 1 and 2 follow from where the makespan comes from. Because every completion is a
+maximum of sums along the vehicle and crane chains, the makespan is a longest path, and the
+analysis rests on the critical path method: for a schedule the evaluator has already run,
+CPM returns the binding activities exactly and in milliseconds, and no learned model
+improves on that. Direction 2 is therefore answered with the exact computation rather than
+with an approximation of it.
+
+What the network adds is the same computation for schedules that have *not* been evaluated.
+It does not regress the makespan: it predicts the individual leg durations and handling
+delays, and the max-plus recurrence composes them. Written as a differentiable layer, the
+recurrence returns its own critical-path indicator as a gradient, which does two things. It
+gives the binding legs of a candidate schedule without evaluating it, which is what the
+screening in direction 3 consumes; and it routes the training error only to the legs that
+set `C_max`, so the model is supervised on local physics rather than on a scalar. Aggregated
+across the front and weighted by the local trade-off between `C_max` and `E`, the same
+quantity describes the front's behaviour rather than only its location.
+
+Because the model reads the schedule as a graph and predicts a per-leg quantity, it applies
+unchanged at sizes it was not fitted on: fitted at `N=16`, the leg predictions hold to
+`R² ≈ 0.98` out to very large instances, where a tabular surrogate fitted at `N=10` cannot
+be evaluated at `N=160` at all. That is what lets the direction-3 screening run at sizes
+well beyond the training set, and it is the sense in which the analysis extends to the
+larger instance set of direction 1.
 
 The physics is your published model, verified rather than assumed: Eqs (2)–(4) and (10)–(18)
 evaluated forward with the binaries fixed by the decoded schedule, agreeing to zero
@@ -61,12 +73,13 @@ disjunctive power-wait arcs. That is the setting where the bottleneck cannot be 
 schedule by inspection, and where the surrogate earns its place.
 
 It is also the weakest part of the results. Held-out `R²` falls from ≈0.99 to ≈0.80,
-critical-path recovery to 0.85 at `N=20`, and size transfer holds only to about `N=25`,
-where the uncoupled model holds out to very large `N`. The makespan-optimal extreme of the
-coupled `N=10` front collapses outright — the maximum-contention corner, where every vehicle
-runs at top speed and the binding path is dominated by the power-wait arcs. A deeper unroll
-and a larger sample gave the identical number, so it is an accuracy ceiling rather than a
-sampling artefact.
+critical-path recovery to 0.85 at `N=20`, and the size transfer that holds to very large `N`
+uncoupled does not carry over: fitted at `N=16`, the coupled model degrades quickly beyond
+its training size. The makespan-optimal extreme of the coupled `N=10` front collapses
+outright — the maximum-contention corner, where every vehicle runs at top speed and the
+binding path is dominated by the power-wait arcs. A deeper unroll and a larger sample did
+not move it, so I suspect the model rather than the sample, but I have not isolated the
+cause.
 
 Part of the gap may be that I am training on instances I generated myself. Your ITOR paper
 states the model for job-shop machines, so I had to decide how the budget applies to AGV
@@ -78,7 +91,12 @@ results on the same footing as the uncoupled ones.
 ## What I need
 
 The results rest on the Table 5 loading instances plus synthetic dual-cycling instances
-generated from your Table 4 distance matrix. Five things would close the gaps:
+generated from your Table 4 distance matrix. The 2023 FSMJ paper points to
+`fastmanufacturingproject.wordpress.com/problem-instances` for the 36 instances; the page
+currently hosts the JSPT, FJSPT and JSPT+SR sets, and I could not find the container
+terminal ones there or elsewhere on the site. If they sit behind the private area, or in a
+file I have missed, a pointer would save you assembling anything. Five things would close
+the gaps:
 
 1. **Your published per-instance `C_max` and `E` values.** I have re-implemented mp-BRKGA
    from the published description and it is my main comparison, but I have not been able to
@@ -86,9 +104,10 @@ generated from your Table 4 distance matrix. Five things would close the gaps:
    re-implementation rather than as your algorithm. Even a subset of instances would let me
    state the agreement quantitatively. This is the one I would value most.
 2. **The peak-power instances and budget values from the ITOR 2025 paper**, together with
-   whatever you can tell me about how the budget should carry over to AGV travel legs. This
-   is what would let the coupled regime rest on your data rather than on my reading of the
-   model, and it is where the results are weakest.
+   whatever you can tell me about how the budget should carry over to AGV travel legs. I did
+   not find them in the EEJSP library on the project site either. This is what would let the
+   coupled regime rest on your data rather than on my reading of the model, and it is where
+   the results are weakest.
 3. **The DS instance task lists (dual-cycling)**, which is presently demonstrated only on my
    synthetic instances.
 4. **An extended QC↔LU distance matrix.** Table 4 spans QC1–QC6 and LU1–LU6; the larger DL
@@ -101,7 +120,7 @@ remove the exactness the analysis rests on. It would be a natural validation ass
 
 ## Where I would like your direction
 
-Before running anything further I would rather have your view than guess, on four points.
+Before running anything further I would rather have your view than guess, on five points.
 
 1. **The architecture.** The surrogate is a heterogeneous graph attention network with the
    max-plus critical-path layer on top. Is that the form you want, or would you prefer a
@@ -111,8 +130,15 @@ Before running anything further I would rather have your view than guess, on fou
    Friedman and Holm-corrected Wilcoxon tests across seeds, plus critical-path recovery for
    the explanation. Are those the right comparisons, and is there a metric standard in this
    literature that I have left out.
-3. **Instance sets.** Which sets should the claims be made on, and at what sizes.
-4. **How far to generalise.** The findings hold to a few hundred tasks uncoupled and near the
+3. **How to validate the importance analysis.** Critical-path recovery measures agreement
+   with CPM on the same schedule, which does not by itself establish that the ranking is
+   right. The check I have in mind is causal: delay a leg by `Δ` on the exact evaluator and
+   record the response, then score the attributions against that — the critical-path
+   indicator alongside CPM slack, TreeSHAP and Sobol indices, on one common measure. It is
+   cheap to run. Is that the comparison you would want, or is there an established one in
+   this literature I should use instead.
+4. **Instance sets.** Which sets should the claims be made on, and at what sizes.
+5. **How far to generalise.** The findings hold to a few hundred tasks uncoupled and near the
    training size coupled. Should I push them to larger instances and to the coupled regime,
    or state them narrowly where they are solid.
 
