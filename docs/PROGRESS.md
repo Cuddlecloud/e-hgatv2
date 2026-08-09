@@ -30,16 +30,24 @@ entries marked **UNVERIFIED** are from prior notes and still need checking.
    screening as *sample efficiency at matched exact-evaluation budget*, which is what the
    experiments actually establish.
 
-2. **`power_arcs` is passed as `[]` in both coupled paths. VERIFIED (read the code).**
-   `src/ehgat/explain/tape_explainer.py:150-152` (the coupled *oracle*) and
-   `src/ehgat/explain/fused_ehgat.py:448-450` (the unrolled forward) both call
+2. **`power_arcs` passed as `[]` in both coupled paths — a DESIGN CHOICE, not an error.
+   VERIFIED (read the code).** `src/ehgat/explain/tape_explainer.py:150-152` (the coupled
+   *oracle*) and `src/ehgat/explain/fused_ehgat.py:448-450` (the unrolled forward) both call
    `assemble_coupled_event_dag(..., [])`, folding the simulator's waits into effective leg
-   durations instead of materialising the disjunctive power-wait arcs the signature accepts
-   (`event_dag.py:164-172`). This may be deliberate (waits reproduce the coupled makespan
-   exactly) but it means **the attributed critical path contains no power arcs**, so the
-   binding structure at maximum contention cannot be recovered even in principle. This is
-   the prime suspect for the Jaccard 0.11 collapse (item B1). Action: pass `ev.power_arcs`,
-   re-run coupled fidelity, and compare. Until then, do not report 0.11 as a model ceiling.
+   durations rather than materialising the disjunctive power-wait arcs the signature accepts
+   (`event_dag.py:164-172`). The docstring states the rationale and it holds: the
+   precedence-only DAG then reproduces the coupled makespan **exactly**. Both sides of the
+   Jaccard measurement use the same folding, so 0.11 (item B1) is head error and cannot be
+   blamed on the oracle.
+   **The open question is the attribution TARGET, not correctness.** With waits folded in,
+   `d C_max / d(leg time)` answers "if this leg's travel takes delta longer, holding its wait
+   fixed, does C_max rise by delta?" — but the wait is not fixed: lengthening a leg changes
+   who contends with whom, so the true derivative carries a term this construction cannot
+   see. With explicit power arcs the delay would instead be attributed to the leg that
+   *caused* the wait. Two defensible notions of "critical", and at maximum contention (where
+   the 0.11 lives) they may differ sharply. **This is a modelling choice to state in the
+   paper, not a bug to fix.** Settled empirically by item D2 (delta-perturbation on the exact
+   simulator), NOT by acquiring DS/DL — different task lists reproduce the same ambiguity.
 
 3. **Known-false sentence in the advisor email.** `ADVISOR_EMAIL_DRAFT.md` previously claimed
    a deeper unroll and larger sample "gave the identical number, so it is an accuracy ceiling
@@ -116,6 +124,25 @@ entries marked **UNVERIFIED** are from prior notes and still need checking.
    constant, r=0.945) and the coupled physics are where it wins. See
    `docs/CANONICAL_CONTEXT.md:69-84` and `:101-117`, which already forbid collapsing these.
 
+### C-bis. Regime coverage of R2/R3/R4 (checked 2026-08-09)
+
+| req | uncoupled | coupled | note |
+|---|---|---|---|
+| R2 landscape / importance | yes | partial (`main.tex` "Extension to the coupled regime") | uncoupled is the primary study |
+| R3 guidance | yes, N=10-80 | yes, pp30 N=10-40 | pp30 N=80 **pending**, see table `PAPER_FINDINGS.md:186-199` |
+| R4 amortisation | yes (20-instance composition-diverse set) | **NOT RUN** | the entire R4 result is uncoupled |
+
+- **R3 holds in BOTH regimes and the coupled margins are the larger ones**: guided minus
+  random-NSGA-II is +0.104/+0.130/+0.192/+0.284 uncoupled at N=10/20/40/80 versus
+  +0.161/+0.293/+0.315/(pending) coupled; guided minus sp-BRKGA +0.081->+0.404 uncoupled
+  versus +0.073/+0.148/+0.366/(pending) coupled. Against mp-BRKGA — the one baseline that
+  does not stall — the margin goes NEGATIVE at N=40 in both regimes (-0.040 unc, -0.050
+  pp30). State that, do not bury it.
+- **R4 has no coupled result at all.** Every amortisation number (LOIO MAE 0.107 vs 0.289,
+  r=0.945) is uncoupled. Either run the composition-diverse set with a power budget, or say
+  in the paper that R4 is claimed for the uncoupled regime only. Currently the paper implies
+  broader coverage than the artifacts support. **Add to the D list; roughly a day, local.**
+
 5. **Advisor scope, for the record.** The correspondence sets the domain as the **container
    terminal**; the JSP work (XAI+MOO abstract, ITOR 2025 peak power) supplies the *method*
    template and the power model, not the problem. The XAI+MOO document is a 2-page abstract
@@ -139,15 +166,33 @@ entries marked **UNVERIFIED** are from prior notes and still need checking.
 
 ### D. Cheap experiments that would close the above (all local, no VM)
 
-- Pass `ev.power_arcs`, re-run coupled fidelity, recheck the 0.11 (settles A2 + B1).
-- delta-perturbation ground truth: score TAPE / CPM slack / TreeSHAP / Sobol on measured
-  `delta C_max`, at N=8/10/16, both regimes (settles C2).
-- Per-schedule error distribution, worst case and tail quantiles (settles B6).
-- Repeat the black-box-vs-fused ablation at 2-3 more sizes (settles B3).
-- Check whether the 30 kW budget ever binds on L01-L35; if it does, a coupled study on
-  *published* task lists becomes available immediately (partially addresses C6).
-- LU-concentration sweep in the generator to test whether rho=0.88 saturation is structural
-  (settles B5).
+Effort estimates are implementation + run time on the local machine, assuming the exact
+evaluator's measured cost (uncoupled 6.8 ms at N=20 to 50 ms at N=160; coupled 30 ms to
+329 ms). None of these needs the VM and none needs DS/DL.
+
+- **D1. Per-schedule error distribution** — worst case and tail quantiles instead of only the
+  mean R². Aggregation over artifacts that already exist. **~1 hour.** (settles B6)
+- **D2. delta-perturbation ground truth** — add delta to a leg's travel time, re-run the exact
+  evaluator, record the measured `delta C_max`; score TAPE, CPM slack, TreeSHAP and Sobol
+  against that common yardstick, at N=8/10/16, both regimes. ~N re-evaluations per schedule,
+  so minutes of compute; the cost is writing the slack and OAT baselines, which do not exist
+  in the repo. **~1 day.** (settles C2, and decides the A2 attribution-target question)
+- **D3. Budget-binding check on L01-L35** — count how often a leg actually waits at 30 kW. If
+  it binds, a coupled study on *published* task lists becomes available immediately; if it
+  never binds, the regime collapses to uncoupled and the idea is dead. Run this before D4.
+  **~2 hours.** (partially addresses C6)
+- **D4. Black-box-vs-fused ablation at 2-3 more sizes** — `scripts/diag_coupled.py` already
+  exists; this is re-running it at N=10/16/20. Training time dominates. **~half a day.**
+  (settles B3)
+- **D5. LU-concentration sweep** in the generator, to test whether the rho=0.88 saturation is
+  structural or an artefact of how LU points are placed. Generator change plus a sweep.
+  **~1 day.** (settles B5)
+- **D6. Screening-path audit** — confirm in code that screening ranks genuinely unevaluated
+  offspring, and re-read the two suspect docstrings (A4). **~1 hour.** (settles B4, A4)
+
+**Total: roughly 3-4 days of local work** to close every item in B and C2. D2 is the highest
+value single item — it is the only external check on whether any of the importance results
+are correct, and it is what an OR reviewer asks for first.
 
 ## Physics-unrolled GNN+TAPE — closes the coupled makespan gap (NEW, 2026-06-20)
 **Problem.** Under peak-power coupling the per-leg wait is a *timing fixed-point* (it depends
