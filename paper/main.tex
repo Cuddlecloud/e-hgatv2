@@ -620,11 +620,22 @@ property of the attention weights, and cannot be attributed to error in the expl
 makespan is a closed-form longest path. Three considerations nonetheless motivate a learned
 model.
 \begin{enumerate}[nosep,leftmargin=*]
-\item \textbf{Screening throughput.} A batched GNN forward over $\kappa\mu$ candidate
-  schedules costs one matrix--multiply pass ($\sim\!3$\,ms for $200$ schedules at $N{=}50$);
-  the exact simulator requires sequentially decoding every event ($\sim\!45$\,ms per schedule
-  at $N{=}50$). The surrogate thus provides a $\sim\!15\times$ throughput gain for the
-  screening step, which is the inner loop of Algorithm~\ref{alg:tape}.
+\item \textbf{Screening is budget-neutral, not faster.} We state this plainly because it
+  is easy to overclaim. On one CPU thread, a batched forward over $200$ candidate schedules
+  at $N{=}50$ takes $8.0$\,ms against $15.9$\,ms for the same $200$ exact evaluations---a
+  factor of $2$ on the forward pass alone, and a \emph{net loss} once the
+  \texttt{HeteroData} construction the forward needs ($34$\,ms) is charged to it. The
+  uncoupled evaluator is simply cheap: an $O(N)$ longest path over closed-form leg times.
+  The surrogate therefore does not buy wall-clock in this regime, and the comparison in
+  Section~\ref{sec:scaling} is budget-matched precisely because \emph{exact evaluations},
+  not seconds, are the scarce resource: screening $\kappa P$ offspring and exactly
+  evaluating the best $P$ costs the same $P$ exact calls per generation as the baselines,
+  so the hypervolume advantage is attributable to the ranking and not to a larger budget.
+  Where the surrogate does buy time is the coupled regime, whose evaluator runs an
+  iterative power-resolution loop rather than a single pass: the same $200$-schedule
+  screen at $N{=}50$ then costs $9.9$\,ms against $74.3$\,ms exact, a $7.5\times$ gain
+  ($1.9\times$ with graph construction charged in), and that margin grows with the
+  contention the loop must resolve (item 3).
 \item \textbf{Differentiable explanations without finite differences.} The exact simulator
   is a black box; extracting $\partial\Cmax/\partial(\text{leg})$ would require $O(4N)$
   perturbation runs. The fused head produces the full TAPE vector in \emph{one backward
@@ -905,6 +916,7 @@ evaluated in Section~\ref{sec:front}.
 \label{sec:setup}
 
 \subsection{Instances (datasets)}
+\label{sec:instances}
 We use three families (Table~\ref{tab:data}). \textbf{Synthetic dual-cycling} instances
 (\textsf{SD-$N$}) alternate LOAD/\allowbreak UNLOAD moves over $3$ cranes served by $2$ vehicles, with
 handling times drawn from $U[30,80]$\,s; they are fully reproducible and, at $N=5$, small
@@ -1083,6 +1095,28 @@ random mutation, no screening & \multicolumn{3}{c}{$0.950$ \;\;(null)} \\
 \end{tabular}
 \end{table}
 
+\paragraph{Architectural control: does rich attention do better?}
+\label{sec:attncontrol}
+One objection survives the ladder. In a \emph{resolved} schedule each task has at most one
+predecessor per resource, so E-HGATv2's per-relation softmax is degenerate
+($\alpha^{r}_{ij}\equiv1$, Section~\ref{sec:ehgat}) and only the cross-relation weights
+$\beta^{r}_j$ carry information---a two-way choice. A reviewer may reasonably ask whether
+attention fails here because it is \emph{structurally starved} rather than because
+attention is unfaithful. We therefore trained a control with no such constraint: a global
+self-attention (Transformer) encoder over the whole task set, $3$ layers, $4$ heads,
+in which a learned read-out query attends over \emph{all} $N$ tasks, and that read-out
+distribution is the audited explanation. It is scored by the same oracle, on the same
+graphs, at $N\in\{10,15,20\}$, $2000$ schedules and $3$ seeds each.
+Rich attention does not help: precision@1 is $0.66/0.50/0.55$ against the matched random
+baselines $0.57/0.55/0.55$ (mean gap $+0.013$), and Spearman with the graded
+makespan-sensitivity is $+0.02/{-}0.04/{+}0.03$---indistinguishable from zero, exactly as
+for $\beta$. The failure is therefore not an artefact of the degenerate neighbourhood.
+Two caveats bound the claim. The control's makespan fit is weak
+($R^2_{\Cmax}=0.51/0.33/0.22$, versus $R^2_{E}>0.999$ on the additive energy objective),
+so it is a \emph{negative control on a weaker predictor}, not a like-for-like architectural
+match; and the sizes are small. It rules out the degeneracy explanation; it does not
+establish that \emph{no} attention architecture could be faithful.
+
 \subsection{Surrogate fidelity and faithfulness up to $N{=}50$}
 \label{sec:fidelity}
 A separate, larger study isolates the fused surrogate's standalone behaviour and establishes
@@ -1100,6 +1134,16 @@ tasks. Third, peak-power coupling lowers both quantities---$R^2$ $0.805\!\to\!0.
 Jaccard $0.928\!\to\!0.913$ from $N{=}10$ to $50$---placing the coupled regime below the
 uncoupled one at every size, with the makespan head unanchored by a closed form, while the
 explanation loses $\sim\!1.5$ Jaccard points over the same size range.
+
+\paragraph{The same result on the real benchmark.} The table above is measured on the
+synthetic family, whose fleet is fixed at $2$ AGVs and $3$ QCs. Repeating the identical
+protocol on \emph{all $35$} published \textsf{L} instances~\cite{homayouni2022book}
+($5$ seeds each, $N{=}4$--$16$, $2$--$6$ quay cranes) gives the same picture and a tighter
+one: makespan $R^2 = 0.9994$ on average with a worst instance of $0.9989$, leg-critical
+Jaccard $0.995$ on average and never below $0.989$, arc-Jaccard $0.994$, and a makespan MAE
+of $1.8$\,s (worst $3.2$\,s). Fidelity and faithfulness are therefore not artefacts of the
+generator, and they are unaffected by the crane-count variation the published set provides,
+which the synthetic family holds constant.
 
 \begin{table}[t]
 \centering\small
@@ -1193,6 +1237,7 @@ near-zero attention correlation are preserved throughout. The energy head is exa
 $N$ & fused $R^2_{C_{\max}}$ & black-box core $R^2_{C_{\max}}$ & leg-Jaccard & attention $\rho$\\
 \midrule
 $16$   & $0.997$ & $-0.3$     & $0.998$ & $+0.03$\\
+$25$   & $0.997$ & $-16.3$    & $0.987$ & $+0.07$\\
 $50$   & $0.996$ & $-32.2$    & $0.970$ & $+0.05$\\
 $100$  & $0.996$ & $-79.9$    & $0.949$ & $+0.04$\\
 $250$  & $0.982$ & $-169.6$   & $0.907$ & $+0.01$\\
@@ -1209,9 +1254,15 @@ train-at-$16$ head holds only to about $N{=}25$ (fused $R^2=0.83$) and then coll
 is already $-1.5$ at $N{=}50$ and continues to fall, with the TAPE Jaccard drifting from
 $0.95$ to $0.37$ by $N{=}1000$---because the power-wait arcs that couple the vehicles carry no
 closed-form contribution for the head to extrapolate (the same mechanism that makes the
-coupled regime harder throughout this paper). Coupled deployment therefore requires retraining
-at, or near, the target size, where the surrogate remains accurate (Table~\ref{tab:fidelity});
-size-generalisation is a property of the \emph{uncoupled} physics, and we report it as such.
+coupled regime harder throughout this paper). Training-size diversity buys back part of the
+range but not the property: pooling the training set over $N\in\{16,28,40\}$ instead of the
+single size $16$ (a size curriculum, $2$ seeds, $12$ schedules per cell) lifts the coupled
+head from $R^2=-1.5$ at $N{=}50$ to $+0.69$ at $N{=}48$ and $+0.52$ at $N{=}32$, extending
+usable extrapolation from ${\approx}25$ to ${\approx}50$ tasks, after which it still collapses
+($-0.19$ at $N{=}64$, $-4.4$ at $N{=}96$) with the Jaccard flat at $0.71$--$0.78$. Coupled
+deployment therefore requires retraining at, or near, the target size, where the surrogate
+remains accurate (Table~\ref{tab:fidelity}); size-generalisation is a property of the
+\emph{uncoupled} physics, and we report it as such.
 
 \subsection{Landscape analysis via critical-path attribution}
 \label{sec:r2worked}
@@ -1446,6 +1497,34 @@ This constitutes the landscape analysis: a \emph{per-solution, per-variable} cau
 attribution, at the resolution of the individual schedule rather than a global feature
 importance ranking, accounting for each schedule's position on the Pareto front.
 
+\paragraph{Aggregating the landscape, and validating it against the exact oracle.}
+The per-schedule attribution also aggregates into the global profile a landscape analysis
+conventionally reports. Pooling the TAPE criticality mass of $256$ sampled schedules over
+the four decision families named in Requirement~\ref{req:landscape}---\emph{sequence}
+(dispatch and QC precedence), \emph{assignment} (which AGV), and \emph{empty}/\emph{loaded}
+leg speed---gives the makespan-importance profile
+\[
+\text{assignment } 0.35 \;>\; \text{sequence } 0.26 \;>\; \text{loaded speed } 0.21 \;>\;
+\text{empty speed } 0.18 ,
+\]
+stable to $\pm0.01$ across $N\in\{10,20,50\}$. The three AGV-side families (assignment and
+the two leg speeds) carry $0.72$--$0.74$ of the mass against $0.26$--$0.28$ for crane
+sequencing, so the instances are transport-bound---a structural property of
+Section~\ref{sec:instances} read off the attribution rather than assumed. Because the
+identical aggregator also runs on the exact evaluator's critical path, the profile is
+checkable: at $N{=}10$ and $N{=}20$ the surrogate-derived and exact profiles agree in rank
+order and coincide numerically to $\le\!0.0013$ per family. The cost argument is the
+point of doing it this way. A grouped Sobol decomposition of the same landscape needs
+$\mathrm{base}\times(2+\text{families})$ \emph{exact} evaluations ($6{,}144$ at
+$N{=}10$ alone, Section~\ref{sec:xgb}) and grows with $N$; the attribution route is one
+forward/backward pass per schedule, flat in the number of families and batchable, so the
+whole profile at $N{=}50$---where the exact cascade is already impractical---costs under
+three minutes end to end including surrogate training. One negative belongs here: the
+profile is nearly invariant between Pareto-optimal and dominated schedules (family-wise
+contrast $\le0.026$), so this aggregate is a description of the \emph{instance}, not a
+discriminator of solution quality; discriminating between front points is what the
+per-schedule attribution above and the trade-off scores of Section~\ref{sec:front} do.
+
 \paragraph{Extension to the coupled regime.}
 Under peak-power coupling, an additional class of binding variable emerges: simultaneous
 AGV power draw. When two AGVs attempt high-speed legs concurrently, the power budget
@@ -1506,10 +1585,15 @@ indicator the guided search is $\sim\!5\times$ tighter to the reference front
 \begin{axis}[
   width=0.84\textwidth, height=0.40\textwidth,
   xlabel={NSGA-II generation}, ylabel={hypervolume ($\times10^{6}$)},
-  xmin=0, xmax=100, ymin=0, ymax=2.4,
-  legend pos=north west, legend cell align=left, font=\small,
+  xmin=0, xmax=100, ymin=0, ymax=3.9,
+  legend style={at={(0.02,0.98)}, anchor=north west, fill=white,
+                fill opacity=0.85, text opacity=1, draw=gray!40},
+  legend cell align=left, font=\small,
   grid=both, grid style={gray!20}, tick label style={font=\footnotesize},
 ]
+\addplot[blue!12, draw=none, forget plot] coordinates {(0,0.0000)(7,0.0000)(14,0.0000)(21,0.0457)(28,0.2806)(35,0.5445)(42,0.7735)(49,0.9864)(56,1.1928)(63,1.3868)(70,1.5438)(77,1.6905)(84,1.8200)(91,1.9351)(99,2.0467)(99,2.3832)(91,2.2753)(84,2.1604)(77,2.0290)(70,1.8692)(63,1.7008)(56,1.4841)(49,1.2623)(42,1.0318)(35,0.7618)(28,0.4567)(21,0.1410)(14,0.0181)(7,0.0000)(0,0.0000)} \closedcycle;
+\addplot[red!12, draw=none, forget plot] coordinates {(0,0.0000)(7,0.0000)(14,0.0000)(21,0.0000)(28,0.0000)(35,0.0000)(42,0.0000)(49,0.0000)(56,0.0000)(63,0.0087)(70,0.0406)(77,0.1054)(84,0.2059)(91,0.3322)(99,0.5260)(99,1.2069)(91,0.8626)(84,0.6110)(77,0.4194)(70,0.2298)(63,0.1083)(56,0.0345)(49,0.0184)(42,0.0184)(35,0.0000)(28,0.0000)(21,0.0000)(14,0.0000)(7,0.0000)(0,0.0000)} \closedcycle;
+\addplot[black!12, draw=none, forget plot] coordinates {(0,0.0000)(7,0.0000)(14,0.0000)(21,0.0000)(28,0.0000)(35,0.0000)(42,0.0000)(49,0.0055)(56,0.0526)(63,0.1293)(70,0.2135)(77,0.3201)(84,0.4166)(91,0.5160)(99,0.6256)(99,0.9449)(91,0.8228)(84,0.6922)(77,0.5741)(70,0.4461)(63,0.3314)(56,0.1936)(49,0.1103)(42,0.0512)(35,0.0279)(28,0.0003)(21,0.0000)(14,0.0000)(7,0.0000)(0,0.0000)} \closedcycle;
 \addplot[thick, blue, mark=*, mark size=1.1pt] coordinates {
 (0,0)(7,0)(14,0.0061)(21,0.0933)(28,0.3686)(35,0.6531)(42,0.9027)(49,1.1243)(56,1.3384)(63,1.5438)(70,1.7065)(77,1.8597)(84,1.9902)(91,2.1052)(99,2.2267)};
 \addlegendentry{E-HGATv2-guided NSGA-II}
@@ -1519,11 +1603,18 @@ indicator the guided search is $\sim\!5\times$ tighter to the reference front
 \addplot[thick, black!55, mark=triangle*, mark size=1.1pt] coordinates {
 (0,0)(7,0)(14,0)(21,0)(28,0.0001)(35,0.0094)(42,0.0188)(49,0.0579)(56,0.1231)(63,0.2304)(70,0.3298)(77,0.4471)(84,0.5544)(91,0.6694)(99,0.7954)};
 \addlegendentry{NSGA-II (random)}
+\addplot[dashed, thick, black!70] coordinates {(0,3.454)(100,3.454)};
+\addlegendentry{reference $\mathrm{HV}^\star$}
 \end{axis}
 \end{tikzpicture}
-\caption{Hypervolume convergence on the largest instance ($N{=}50$, mean over $30$ seeds).
-The E-HGATv2-guided search dominates at every generation: it matches single-population
-BRKGA's \emph{final} hypervolume by generation ${\approx}42$ and ends $2.5\times$ higher.}
+\caption{Hypervolume convergence on the largest instance of the convergence study
+($N{=}50$, mean over $30$ seeds, shaded bands $95\%$ CI, dashed line the reference
+$\mathrm{HV}^\star$ against which Table~\ref{tab:optladder} normalises). The E-HGATv2-guided
+search dominates at every generation, its band separating from both baselines from
+generation ${\approx}18$ onwards; it matches single-population BRKGA's \emph{final}
+hypervolume by generation ${\approx}42$ and ends $2.5\times$ higher, at $0.64\,
+\mathrm{HV}^\star$ against $0.26$ and $0.23$. The baseline here is single-population BRKGA;
+mp-BRKGA enters the comparison in Table~\ref{tab:optladder}.}
 \label{fig:conv}
 \end{figure}
 
@@ -1877,7 +1968,11 @@ fixed-length coordinate vector and does not observe the precedence DAG. The make
 longest path~\eqref{eq:troprec}, and representing a $\max$ of sums over a data-dependent
 path with axis-aligned splits requires the ensemble to memorise regions rather than
 compose the recurrence. The structural signal that E-HGATv2 obtains from the fused layer
-($R^2\!\approx\!0.99$, Section~\ref{sec:results}) is unavailable to it by construction.
+($R^2\!\approx\!0.99$, Section~\ref{sec:results}) is unavailable to it by construction, and
+the gap is measured rather than asserted: fitted on the same \textsf{SD-10} sample the flat
+tree reaches held-out $R^2 = 0.12$ on the makespan and $0.27$ on energy, against $0.997$ and
+$1.000$ for the fused graph surrogate. An attribution computed on top of that fit explains a
+model that has not learned the objective.
 
 \paragraph{(2) The attribution target.} TreeSHAP credits decision variables: the speed
 level of task $j$, its assignment, its position. Its output is an additive credit on an
@@ -1895,8 +1990,12 @@ influence is carried almost entirely through interactions, with negligible main 
 (for energy, total-order $0.75/0.57$ against first-order $0.36/0.31$). TreeSHAP's
 per-feature mean-$|\text{SHAP}|$ is an additive, main-effect-like decomposition, and where
 main effects vanish and interactions dominate that credit is divided among the interacting
-variables without localising the bottleneck. TAPE attributes instead to the jointly
-binding activity, the critical path, which is the interaction the Sobol indices identify.
+variables without localising the bottleneck. The divergence is measurable on the same
+instance: Sobol places $0.94$ of the makespan importance mass on the two structural
+families (sequence, assignment), whereas TreeSHAP places only $0.51$ there and spills the
+remainder onto the speed coordinates---an absolute under-weighting of $0.43$, and the same
+$0.43$ for energy. TAPE attributes instead to the jointly binding activity, the critical
+path, which is the interaction the Sobol indices identify.
 
 \begin{table}[t]
 \centering\small
@@ -2137,7 +2236,9 @@ $\rho\in[0.19,0.99]$.}
 \textbf{Targets that do not transfer.} Two finer targets resist prediction, and we report
 them. (i) The \emph{within-front} ordering of $\rho$ along a single instance's front is
 recovered only weakly (median per-instance correlation ${\approx}0.12$): real fronts are
-compositionally near-flat, so there is little ordering signal. (ii) Predicting which
+compositionally near-flat---the within-front standard deviation of the transport share is
+$0.048$ on average and below $0.06$ for $80\%$ of instances, against a between-instance
+spread of $0.29$---so there is little ordering signal to recover. (ii) Predicting which
 task is on the critical path from static task features is at chance---LOIO
 $\mathrm{AUC}=0.53$, no better than a $\lambda$-only baseline---because task-level
 criticality is set by the realised schedule, not by static attributes. The amortisation
@@ -2220,7 +2321,7 @@ approximation.
 A batched variant evaluates a block-diagonal stack of schedule DAGs in a single
 vectorised relaxation. Because the blocks share no arcs,
 $\nabla \sum_i \Cmax^{(i)}$ decomposes exactly into the per-schedule subgradients with no
-cross terms, which yields the throughput reported in Section~\ref{sec:ladder}; the batched
+cross terms, so a whole generation's offspring are attributed in one pass; the batched
 and per-graph paths are asserted bit-identical by a parity test in both regimes.
 
 \section{Hyper-parameters, model size and environment}
