@@ -129,15 +129,43 @@ entries marked **UNVERIFIED** are from prior notes and still need checking.
 | req | uncoupled | coupled | note |
 |---|---|---|---|
 | R2 landscape / importance | yes | partial (`main.tex` "Extension to the coupled regime") | uncoupled is the primary study |
-| R3 guidance | yes, N=10-80 | yes, pp30 N=10-80 | **CORRECTED 2026-08-09** — pp30 N=80 is NOT pending, it exists (8 seeds) in `experiments/fused_tape_guided/scaling_natfull_pp30/opt_scaling_summary.json`. Full ladder now in the paper as Table `tab:optladder` (`paper/main.tex`, §Convergence speed and scaling). |
+| R3 guidance | yes, **N=10-160** | yes, **pp30 N=10-160** | **CORRECTED AGAIN 2026-08-09** — see the canonical-ladder note below. Full ladder is now in the paper as Table `tab:optladder` + `fig:scale` (`paper/main.tex`, §Convergence speed and scaling). |
 | R4 amortisation | yes (20-instance composition-diverse set) | **NOT RUN** | the entire R4 result is uncoupled |
 
-- **R3 holds in BOTH regimes and the coupled margins are the larger ones**: guided minus
-  random-NSGA-II is +0.104/+0.130/+0.192/+0.284 uncoupled at N=10/20/40/80 versus
-  +0.161/+0.293/+0.315/(pending) coupled; guided minus sp-BRKGA +0.081->+0.404 uncoupled
-  versus +0.073/+0.148/+0.366/(pending) coupled. Against mp-BRKGA — the one baseline that
-  does not stall — the margin goes NEGATIVE at N=40 in both regimes (-0.040 unc, -0.050
-  pp30). State that, do not bury it.
+#### ★ WHICH R3 LADDER IS CANONICAL (resolved 2026-08-09 — READ BEFORE QUOTING ANY R3 NUMBER)
+There are **four** ladders on disk with **different numbers**. They are not redundant; they
+differ in seeds, screening factor k, population, and reference-front budget. Quoting the wrong
+one understates the result by a wide margin. Provenance from the shard jsons:
+
+| dir | ns | seeds | k | base_pop | PF* budget | status |
+|---|---|---|---|---|---|---|
+| **`scaling_opt_{unc,pp30}`** | **10-160** | **20** | **4** | 50 | 50 gens | ✅ **CANONICAL** — commits `4efd9b5`/`61e719e`, "FULL ... COMPLETE" |
+| `scaling_natfull_{unc,pp30}` | 10-80 | 8 | 2 | 50 | 15 gens | superseded (weaker PF*, under-cranked k) |
+| `scaling_optfix_unc` | 10-160 | 6 | 2 | 100 | 50 gens | superseded; `optfix_pp30` has shards but **no summary json** |
+| `scaling_opt_{cpu,gpu}_*` | — | — | — | — | — | shards only, no summary — device-timing runs |
+
+**Canonical numbers (`scaling_opt_*`, 20 seeds, HV/HV* ± 95% CI), TAPE-guided margins:**
+
+| vs | unc N=10/20/40/80/160 | pp30 N=10/20/40/80/160 |
+|---|---|---|
+| random-NSGA-II | +0.101 +0.221 +0.268 +0.425 **+0.584** | +0.107 +0.364 +0.435 +0.485 **+0.674** |
+| sp-BRKGA | +0.144 +0.204 +0.330 +0.503 **+0.593** | +0.116 +0.252 +0.444 +0.538 **+0.704** |
+| mp-BRKGA | +0.173 +0.198 **+0.022** +0.233 **+0.557** | +0.140 +0.191 +0.123 +0.323 **+0.615** |
+
+- **Every one of the 30 cells is a win**, and 29/30 exceed the combined 95% CI. The sole
+  non-separated cell is unc N=40 vs mp-BRKGA (+0.022) = a **tie, not a loss**.
+- ⚠️ **The "N=40 dip goes NEGATIVE vs mp-BRKGA (-0.040 unc / -0.050 pp30)" claim was from the
+  SUPERSEDED `natfull` k=2 ladder.** At canonical k=4/20-seeds it is +0.022 / +0.123. The dip
+  narrows but never inverts. The `PAPER_FINDINGS.md:186-199` and `:297-310` tables still carry
+  the old natfull numbers — **they are stale; do not quote them.**
+- The N=40 narrowing is still real and still explained by `scaled_fleet` fleet-provisioning
+  discontinuity (`instance.py:199`): N=40 is both the most AGV-contended point (13.3 tasks/AGV,
+  ladder max) and the AGV/QC=1.0 bottleneck crossover. Paper states this.
+- At N=160 uncoupled the classical baselines have effectively **not converged** in 40 gens
+  (sp-BRKGA 0.003, random 0.012, mp-BRKGA 0.040 vs TAPE 0.597). Absolute HV/HV* still falls
+  with N uncoupled (0.944->0.597), so the widening margin is RELATIVE. Coupled does not fall
+  (0.871->0.879) because the power budget contracts the reachable objective space. The paper
+  says both.
 - **R4 has no coupled result at all.** Every amortisation number (LOIO MAE 0.107 vs 0.289,
   r=0.945) is uncoupled. Either run the composition-diverse set with a power budget, or say
   in the paper that R4 is claimed for the uncoupled regime only. Currently the paper implies
