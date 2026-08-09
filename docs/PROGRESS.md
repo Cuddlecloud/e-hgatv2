@@ -129,7 +129,7 @@ entries marked **UNVERIFIED** are from prior notes and still need checking.
 | req | uncoupled | coupled | note |
 |---|---|---|---|
 | R2 landscape / importance | yes | partial (`main.tex` "Extension to the coupled regime") | uncoupled is the primary study |
-| R3 guidance | yes, N=10-80 | yes, pp30 N=10-40 | pp30 N=80 **pending**, see table `PAPER_FINDINGS.md:186-199` |
+| R3 guidance | yes, N=10-80 | yes, pp30 N=10-80 | **CORRECTED 2026-08-09** — pp30 N=80 is NOT pending, it exists (8 seeds) in `experiments/fused_tape_guided/scaling_natfull_pp30/opt_scaling_summary.json`. Full ladder now in the paper as Table `tab:optladder` (`paper/main.tex`, §Convergence speed and scaling). |
 | R4 amortisation | yes (20-instance composition-diverse set) | **NOT RUN** | the entire R4 result is uncoupled |
 
 - **R3 holds in BOTH regimes and the coupled margins are the larger ones**: guided minus
