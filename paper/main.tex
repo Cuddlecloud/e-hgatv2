@@ -1541,8 +1541,59 @@ The metaheuristic baseline in this scaling sweep is single-population BRKGA, bec
 sweep predates the fused head; the published \emph{multi-population} mp-BRKGA is benchmarked
 directly against the fused E-HGATv2 model per instance in Tables~\ref{tab:main}--\ref{tab:stats},
 where it ranks last on every indicator (TAPE $>$ mp-BRKGA on $11/11$ instances, Holm
-$p=0.0029$). Extending this convergence/scaling sweep to include mp-BRKGA is a
-straightforward additional run.
+$p=0.0029$).
+
+\paragraph{Ladder over both regimes with all baselines.} Table~\ref{tab:optladder} repeats the
+sweep at $N\in\{10,20,40,80\}$ with every baseline present, including mp-BRKGA, and with the
+peak-power-coupled regime run alongside the uncoupled one ($8$ seeds per cell, $40$
+generations, matched exact-evaluation budget). Margins are quoted for the TAPE-guided arm,
+which is fixed in advance; the attention-guided arm is reported alongside it, and the two are
+within one seed standard deviation of each other in all eight cells, so the choice between
+them is not resolved by this ladder.
+
+Three readings. \emph{(i)} Against the unguided control and against single-population BRKGA,
+TAPE-guided search wins at every size in both regimes, and the margin grows with $N$ rather
+than shrinking: $+0.087\!\to\!+0.257$ and $+0.064\!\to\!+0.377$ uncoupled,
+$+0.161\!\to\!+0.385$ and $+0.073\!\to\!+0.478$ coupled. Both baselines fall away with size
+(random $0.825\!\to\!0.575$, sp-BRKGA $0.848\!\to\!0.455$ uncoupled) where over the same range
+the guided arms end at $0.832$ and $0.859$. \emph{(ii)} The coupled margins are the larger ones, so the guidance
+is not weakened in the regime where the makespan has no closed form and the binding path runs
+partly through power-wait arcs. \emph{(iii)} mp-BRKGA is the one baseline that does not
+degrade, and it \emph{overtakes} the guided arms at $N=40$ in both regimes ($0.890$ vs.\
+$0.849$ uncoupled; $0.858$ vs.\ $0.808$ coupled) before falling behind again at $N=80$. The
+advantage over a tuned multi-population metaheuristic is therefore not uniform in $N$, and we
+do not claim that it is; the claim supported by this ladder is the one against the unguided
+and single-population controls, where the ordering is consistent across all eight cells.
+Seed standard deviations span $0.03$--$0.13$ and are given in Table~\ref{tab:optladder}'s
+source artefacts; the $N=40$ crossing is within one standard deviation, the $N=80$ recovery
+is not.
+
+\begin{table}[t]
+\centering\small
+\caption{Optimisation ladder: final $\mathrm{HV}/\mathrm{HV}^\star$ after $40$ generations,
+mean over $8$ seeds, matched exact-evaluation budget, offspring multiplier $k=5$. Seed
+standard deviations range from $0.03$ to $0.13$. Bold marks the best method in each column;
+margins are quoted for the TAPE-guided arm.}
+\label{tab:optladder}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}lcccccccc@{}}
+\toprule
+& \multicolumn{4}{c}{uncoupled} & \multicolumn{4}{c}{coupled ($P_{\max}=30$\,kW)}\\
+\cmidrule(lr){2-5}\cmidrule(lr){6-9}
+Method & $N{=}10$ & $20$ & $40$ & $80$ & $N{=}10$ & $20$ & $40$ & $80$\\
+\midrule
+E-HGATv2, TAPE-guided      & 0.912 & \textbf{0.929} & 0.849 & 0.832 & \textbf{0.925} & \textbf{0.882} & 0.774 & \textbf{0.831}\\
+E-HGATv2, attention-guided & \textbf{0.929} & 0.879 & 0.851 & \textbf{0.859} & 0.911 & 0.815 & 0.808 & 0.772\\
+mp-BRKGA                   & 0.768 & 0.838 & \textbf{0.890} & 0.773 & 0.774 & 0.712 & \textbf{0.858} & 0.774\\
+single-pop BRKGA           & 0.848 & 0.773 & 0.570 & 0.455 & 0.852 & 0.734 & 0.442 & 0.353\\
+NSGA-II (random screening) & 0.825 & 0.799 & 0.659 & 0.575 & 0.764 & 0.589 & 0.493 & 0.446\\
+\midrule
+TAPE $-$ random            & $+0.087$ & $+0.130$ & $+0.190$ & $+0.257$ & $+0.161$ & $+0.293$ & $+0.281$ & $+0.385$\\
+TAPE $-$ sp-BRKGA          & $+0.064$ & $+0.156$ & $+0.279$ & $+0.377$ & $+0.073$ & $+0.148$ & $+0.332$ & $+0.478$\\
+TAPE $-$ mp-BRKGA          & $+0.144$ & $+0.091$ & $-0.041$ & $+0.059$ & $+0.151$ & $+0.170$ & $-0.084$ & $+0.057$\\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \begin{figure}[t]
 \centering
