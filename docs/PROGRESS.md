@@ -5,7 +5,149 @@ full context. Pair this with `docs/NEURIPS_PAPER_PLAN.md` (the scientific plan) 
 saved Cascade memories (infra/workflow). To pull the live conversation into a new window,
 `@mention` the originating Cascade conversation.
 
-_Last updated: 2026-06-20._
+_Last updated: 2026-08-09._
+
+---
+
+## ⚠️ OPEN ISSUES / CONTENTION POINTS — attend before submission (2026-08-09)
+
+Collected during a full audit of the paper claims against the code and against fresh
+measurements. Each entry states what is wrong, where, and what settles it. Nothing here is
+fixed yet. Entries marked **VERIFIED** were confirmed in code or by measurement in-session;
+entries marked **UNVERIFIED** are from prior notes and still need checking.
+
+### A. Errors in the write-up (correct these)
+
+1. **Throughput claim is inverted. VERIFIED (measured).** `paper/main.tex:613-617` claims the
+   surrogate is ~15x faster than the exact evaluator (~3 ms/200 schedules vs ~45 ms/schedule);
+   `docs/PROGRESS.md` line ~57 below claims "21-81x faster than the simulator". Measured
+   through the *deployed* batched screening path (`tape_predict_objectives` ->
+   `batched_longest_path`), exact / surrogate wall-clock is:
+   uncoupled 0.02 / 0.04 / 0.04 / 0.04x and coupled 0.10 / 0.11 / 0.12 / 0.15x at
+   N=20/50/100/160. **The exact evaluator is 7-25x FASTER than the surrogate in every cell.**
+   The earlier "coupled favours the surrogate 1.43x" figure used the per-graph forward, not
+   the batched path the optimiser actually calls. Action: delete the speed claim; restate
+   screening as *sample efficiency at matched exact-evaluation budget*, which is what the
+   experiments actually establish.
+
+2. **`power_arcs` is passed as `[]` in both coupled paths. VERIFIED (read the code).**
+   `src/ehgat/explain/tape_explainer.py:150-152` (the coupled *oracle*) and
+   `src/ehgat/explain/fused_ehgat.py:448-450` (the unrolled forward) both call
+   `assemble_coupled_event_dag(..., [])`, folding the simulator's waits into effective leg
+   durations instead of materialising the disjunctive power-wait arcs the signature accepts
+   (`event_dag.py:164-172`). This may be deliberate (waits reproduce the coupled makespan
+   exactly) but it means **the attributed critical path contains no power arcs**, so the
+   binding structure at maximum contention cannot be recovered even in principle. This is
+   the prime suspect for the Jaccard 0.11 collapse (item B1). Action: pass `ev.power_arcs`,
+   re-run coupled fidelity, and compare. Until then, do not report 0.11 as a model ceiling.
+
+3. **Known-false sentence in the advisor email.** `ADVISOR_EMAIL_DRAFT.md` previously claimed
+   a deeper unroll and larger sample "gave the identical number, so it is an accuracy ceiling
+   rather than a sampling artefact". Reworded 2026-08-09 to state the cause is not isolated.
+   The same over-claim still stands in the paper at the "Behaviour at the makespan-optimal
+   extreme" paragraph ("locating the cause in the surrogate's accuracy ceiling") and must be
+   softened until item A2 is settled.
+
+4. **Docstrings describe behaviour the code does not have. UNVERIFIED.**
+   `tape_explainer.py:136` and `fused_explainer.py:213` were previously flagged as false.
+   Re-read both before trusting either.
+
+5. **No Related Work section. VERIFIED.** `main.tex` goes Introduction -> Problem formulation.
+   For an ML venue this is a structural gap a reviewer will flag.
+
+### B. Results that do not support the strength of their claim
+
+1. **Coupled makespan-optimal extreme collapses to Jaccard 0.11** (SD-10-C) while the
+   energy-optimal extreme is 1.00. The front-averaged 0.87 hides the split. See item A2 —
+   this may be a measurement artefact, not a ceiling.
+
+2. **Coupled does not size-generalise. VERIFIED (artifact).**
+   `experiments/scaling/generalization_pp30_curriculum.json`: fused R² 0.92 (N=16) -> -5.28
+   (N=96). Holds only to about N=25. Uncoupled is flat >=0.98 to N=5000.
+
+3. **The 0.235 vs 0.872 black-box-vs-fused ablation is a single config at N=8.** VERIFIED in
+   `docs/PROGRESS.md` (table below), and it is the strongest GNN-necessity evidence in the
+   repo. One instance size, one budget. Needs 2-3 more sizes before it carries paper weight.
+
+4. **Screening, not TAPE, is the optimisation engine.** The ablation
+   (`PAPER_FINDINGS.md:168-177`) reports random+screen **0.991** > attention 0.977 >
+   **TAPE-guided 0.956** > no-screen 0.950. The R3 gap table (`PAPER_FINDINGS.md:186-199`)
+   compares guided-vs-*unguided*, which is a weaker control. The ablation is the more
+   controlled experiment; the write-up should not attribute the optimisation win to TAPE.
+   UNVERIFIED in code: confirm the screening path ranks genuinely unevaluated offspring.
+
+5. **L01-L35 are saturated and cannot discriminate any predictor.** rho = 0.88 +/- 0.04,
+   transport-bound on all 35; LOIO MAE equals the constant baseline (0.048). The 20-instance
+   varying fleet-to-crane set exists precisely to escape this. Open question: is the
+   saturation a property of the terminal layout or an artefact of the LU concentration in
+   the generator? A LU-concentration sweep would settle it.
+
+6. **Only aggregate R² is reported.** 0.997 mean says nothing about worst-case per-schedule
+   error. No tail quantiles anywhere. Cheap to compute and a reviewer will ask.
+
+### C. Framing problems (not errors, but they will be attacked)
+
+1. **CPM was uncited until 2026-08-09.** The max-plus recurrence *is* the critical path
+   method (Kelley & Walker 1959): the forward pass is CPM's earliest-start computation, the
+   argmax backtrace is CPM's critical-path recovery, and Eq. (tape) restates the slack
+   property. Differentiable DP (Mensch & Blondel 2018, torch-struct) was also uncited. All
+   three are now cited (`main.tex:206`, `:771`, `:776`). **Do not present the attribution
+   rule itself as the contribution.** What is defensible: the path is obtained for schedules
+   the evaluator has *not* run; it is a gradient, so it trains the network; and it provides
+   an exact reference against which attention is falsified.
+
+2. **Jaccard-vs-exact-critical-path is not an accuracy test of the attribution.** Both sides
+   are the same DP, so the metric can only ever measure leg-head error. It cannot show the
+   attribution is *wrong*. **There is no comparison of importance rankings against routine OR
+   baselines** — no CPM slack ranking, no one-at-a-time perturbation (grep finds no slack or
+   perturbation code anywhere). The external yardstick is measured `delta C_max` under
+   intervention: perturb a leg on the exact evaluator, record the response, then score TAPE,
+   CPM slack, TreeSHAP and Sobol on the same measure. Cheap, local, and it is the single
+   experiment that would make the R2 section credible to an OR reviewer.
+
+3. **The GNN adds nothing to R2 uncoupled, and the paper should say so.** Uncoupled leg
+   durations are a closed-form lookup (`environment/physics.py:89-98`, `distance / speed`),
+   so CPM runs directly on any decoded schedule in ~7 ms at N=20. The surrogate predicts,
+   more slowly and approximately, something computable exactly for free. Stating this is a
+   *strength* (it is why faithfulness is decidable here), and pre-empts the obvious attack.
+
+4. **Per-objective, not one axis.** R1-R4 are separate requirements. Evaluation is the one
+   axis where the GNN loses; R3 (screening), R4 (front amortisation, LOIO MAE 0.107 vs 0.289
+   constant, r=0.945) and the coupled physics are where it wins. See
+   `docs/CANONICAL_CONTEXT.md:69-84` and `:101-117`, which already forbid collapsing these.
+
+5. **Advisor scope, for the record.** The correspondence sets the domain as the **container
+   terminal**; the JSP work (XAI+MOO abstract, ITOR 2025 peak power) supplies the *method*
+   template and the power model, not the problem. The XAI+MOO document is a 2-page abstract
+   with no results ("preliminary experiments suggest", "runtime analysis is ongoing"). His
+   pipeline is: retrain XGBoost every T generations -> TreeSHAP -> cluster the population by
+   SHAP pattern -> localized neighbourhood search per cluster. Two departures worth naming:
+   we train once offline rather than periodically, and we screen globally rather than
+   clustering into neighbourhoods. The coupled regime was requested in a meeting, so it is
+   not an unprompted extension.
+
+6. **DS/DL would buy credibility, not physics.** The physics is already the published model;
+   what is synthetic is the *task list*. DS closes the "dual cycling shown only on synthetic
+   instances" gap; DL (40-160 containers, 8-16 QCs) tests size transfer on workloads we did
+   not generate, but needs an extended QC-LU distance matrix (Table 4 spans QC1-6/LU1-6).
+   Expect fidelity to *drop* on real task lists — that is the honest test passing.
+   Note also: `fastmanufacturingproject.wordpress.com/problem-instances`, cited by the 2023
+   FSMJ paper for "all the data pertaining to the 36 problem instances", hosts only the JSPT,
+   FJSPT and JSPT+SR sets. The terminal instances are not there (checked 2026-08-09; the site
+   has 21 pages, one password-protected private area, and an EEJSP library with no ITOR
+   peak-power entry).
+
+### D. Cheap experiments that would close the above (all local, no VM)
+
+- Pass `ev.power_arcs`, re-run coupled fidelity, recheck the 0.11 (settles A2 + B1).
+- delta-perturbation ground truth: score TAPE / CPM slack / TreeSHAP / Sobol on measured
+  `delta C_max`, at N=8/10/16, both regimes (settles C2).
+- Per-schedule error distribution, worst case and tail quantiles (settles B6).
+- Repeat the black-box-vs-fused ablation at 2-3 more sizes (settles B3).
+- Check whether the 30 kW budget ever binds on L01-L35; if it does, a coupled study on
+  *published* task lists becomes available immediately (partially addresses C6).
+- LU-concentration sweep in the generator to test whether rho=0.88 saturation is structural
+  (settles B5).
 
 ## Physics-unrolled GNN+TAPE — closes the coupled makespan gap (NEW, 2026-06-20)
 **Problem.** Under peak-power coupling the per-leg wait is a *timing fixed-point* (it depends
@@ -54,8 +196,10 @@ retraining. Trained on N=10, pp=30, 8 seeds (R²_makespan, zero-shot):
 The **static head collapses** with N (0.80→0.46: it memorises N=10 wait magnitudes); the
 **unrolled model transfers** (0.86→0.78) and the gap **widens with N** (+0.07 @N=10 → +0.32
 @N=40) -- it learns the contention-*resolution mechanism*, not the magnitudes. MAE @N=40:
-88s (unrolled) vs 145s (static). Solver-free forward is 21-81x faster than the simulator
-(grows with N; far larger vs CP-SAT labels). Energy transfers exactly (additive, R²=1.0).
+88s (unrolled) vs 145s (static). ~~Solver-free forward is 21-81x faster than the simulator
+(grows with N; far larger vs CP-SAT labels).~~ **[RETRACTED 2026-08-09 — see open issue A1.
+Measured through the deployed batched path the exact evaluator is 7-25x FASTER than the
+surrogate in every cell, both regimes, N=20-160.]** Energy transfers exactly (additive, R²=1.0).
 **v2 upgrade (richer features + deep supervision, 2026-06-20).** `_peak_contention` now emits
 6 per-leg features (added: start-time **rank** = queue position, and **time-to-next-budget-free**
 = soonest a concurrent leg finishes after this leg's start, the quantity that sets the wait
