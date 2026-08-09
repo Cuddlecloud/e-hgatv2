@@ -183,6 +183,15 @@ mp-BRKGA)."* It compares against baselines **as configured**. A "screened mp-BRK
 fairness bar, NOT the thesis bar; "would a cheaper surrogate also screen" is a secondary robustness
 question (the GNN-vs-classical ablation), not a threat to the headline. DO NOT gate the OR claim on it.
 
+> ⚠️ **SUPERSEDED 2026-08-09 — DO NOT QUOTE THE TABLE BELOW.** It is the `scaling_natfull_*`
+> ladder (8 seeds, k=2, N≤80, 15-gen PF*). The canonical ladder is `scaling_opt_{unc,pp30}`
+> (N=10–160, **20 seeds, k=4**, 50-gen PF*), which is stronger everywhere: TAPE wins **all 30
+> cells**, 29/30 beyond the combined 95% CI, margins up to **+0.674**. In particular the
+> "N=40 goes negative vs mp-BRKGA (−0.040/−0.050)" line below is **WRONG at canonical
+> settings** — it is +0.022 (unc) / +0.123 (pp30): the dip narrows but never inverts.
+> Canonical numbers and the four-ladder provenance table: `docs/PROGRESS.md` §"WHICH R3
+> LADDER IS CANONICAL". In the paper as Table `tab:optladder` + `fig:scale`.
+
 Native budget, k=2, 8-seed cells, **best-guided minus baseline** (hv_ratio):
 | regime | N=10 | N=20 | N=40 | N=80 |
 |---|---|---|---|---|
@@ -293,7 +302,7 @@ the win. A sharp reviewer will demand the channels be separated. **Fix:** run th
 {random, attn, tape} × screening ∈ {on, off}) at a couple of cells; rewrite R3 to say what's true —
 "regression head amortizes + screens (workhorse); faithful guidance is a modest/neutral add-on."
 
-### NATIVE-budget k=2 scaling — COMPLETE N=10–80 both regimes, 8 seeds (DONE 2026-07-04)
+### NATIVE-budget k=2 scaling — COMPLETE N=10–80 both regimes, 8 seeds (DONE 2026-07-04) — ⚠️ SUPERSEDED by `scaling_opt_*` (20 seeds, k=4, N→160); see the banner above and `docs/PROGRESS.md`
 Native budget (P=20N), 8 seeds, k=2. Aggregated `scaling_natfull_{unc,pp30}/opt_scaling_summary.md`,
 rsync'd to local `experiments/fused_tape_guided/`. **TAPE − mp-BRKGA (HV/HV\*):**
 
@@ -402,7 +411,11 @@ regimes. GPU-enabled search (`--search-device cuda`) needed for N≥80 (TAPE gui
 ~90–120 min/seed on CPU at N=160). Ladder: uncoupled N=10/20/40/80/160, coupled N=10/20/40/80.
 - Early points (uncoupled, HV/HV*): N=10 guided ~0.905 (TAPE)/0.909 (attn) vs mp-BRKGA 0.794,
   random 0.826, sp-BRKGA 0.841. Guided leads mp-BRKGA by ~0.11 at N=10.
-- The gap-vs-N (does mp-BRKGA "stall" as N grows) is the deliverable — FILL when sweep completes.
+- The gap-vs-N (does mp-BRKGA "stall" as N grows) is the deliverable — ✅ **COMPLETE 2026-07-06**,
+  landed in `scaling_opt_{unc,pp30}` at 20 seeds/k=4, N=10–160, BOTH regimes. **Answer: yes,
+  mp-BRKGA stalls hard** — at N=160 it reaches 0.040 (unc) / 0.264 (pp30) of HV* against TAPE's
+  0.597 / 0.879. TAPE−mp margin +0.557 unc, +0.615 pp30. Canonical table in `docs/PROGRESS.md`
+  §"WHICH R3 LADDER IS CANONICAL"; in the paper as Table `tab:optladder` + `fig:scale`.
 - Key compute fact (see `COMPUTE_SCALING.md`): exact evaluator is FAST (1259 evals/s @N=160);
   mp-BRKGA @N=160 40-gen ≈ 228s/seed. The cost is the per-schedule TAPE guidance/screening; GPU
   helps modestly (per-schedule launches, not batched). Batching `explain_fused` would give ~10×.
