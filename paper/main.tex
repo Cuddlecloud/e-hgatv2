@@ -81,7 +81,10 @@ learned attention weights are statistically uncorrelated with the true makespan 
 fine ranking, are no better than random at any granularity. Routing the same signal back
 into an NSGA-II search makes the guided algorithm dominate mp-BRKGA, single-population
 BRKGA and an unguided control on hypervolume in $11/11$ instances (Friedman
-$\chi^2_4=35.1$, $p=4.5\times10^{-7}$; all post-hoc Holm-adjusted $p\le0.004$).
+$\chi^2_4=35.1$, $p=4.5\times10^{-7}$; all post-hoc Holm-adjusted $p\le0.004$), and the
+advantage widens with instance size on a $N{=}10$--$160$ ladder in both regimes, where at
+$N{=}160$ the classical baselines reach at most $0.04$ of the reference hypervolume within
+the same budget against $0.60$ for the guided search.
 Aggregating TAPE over the approximated Pareto set with a trade-off-weighted score
 (Trade-off Criticality Score) yields a sparse description of how the binding bottleneck
 migrates along the front, and a single structural surrogate transfers this front
@@ -1485,9 +1488,9 @@ mp-BRKGA on \emph{all $11$ instances}.
 
 \subsection{Convergence speed and scaling}
 \label{sec:scaling}
-The hypervolume-ratio table reports the end state of the search. The rate at which the
-graph-guided search reaches it, and the dependence of the advantage on problem size, are
-reported here. Figure~\ref{fig:conv} plots the hypervolume against the NSGA-II
+The hypervolume-ratio table reports the end state of the search; the rate at which it is
+reached, and how the advantage depends on problem size, are reported here.
+Figure~\ref{fig:conv} plots the hypervolume against the NSGA-II
 generation on the largest instance ($N{=}50$, $100$ generations, $30$ seeds, all methods at
 the same exact-evaluation budget). The E-HGATv2-guided search reaches the hypervolume that
 BRKGA attains only after the full $100$ generations already by generation
@@ -1524,51 +1527,37 @@ BRKGA's \emph{final} hypervolume by generation ${\approx}42$ and ends $2.5\times
 \label{fig:conv}
 \end{figure}
 
-This advantage is not constant---it \emph{amplifies with scale}. Figure~\ref{fig:scale}
-normalises each method's final hypervolume by the per-instance reference
-$\mathrm{HV}^\star$ and sweeps $N\in\{10,20,40,80,160\}$ in both regimes. Intuitively, at
-fixed budget the combinatorial volume $|\mathcal Z|=A^N N!\,V^{2N}$ explodes, so an unguided
-search cannot cover it; the surrogate's critical-path signal concentrates the same budget on
-the binding decisions, and that concentration matters more the larger the space. The
-convergence trace of Figure~\ref{fig:conv} is a single point of that sweep ($N{=}50$,
-$100$ generations) against single-population BRKGA; the full ladder below carries every
-baseline, including mp-BRKGA, at $20$ seeds per cell.
+This advantage is not constant---it \emph{amplifies with scale}. Table~\ref{tab:optladder}
+sweeps $N\in\{10,20,40,80,160\}$ in both regimes with every baseline present, at $20$ seeds
+per cell, $40$ generations, matched exact-evaluation budget, $P=5N$ and screening factor
+$k=4$; the trace above is one point of that sweep. Margins are quoted for the TAPE-guided
+arm, fixed in advance, the attention-guided arm overlapping it within intervals at every
+size. TAPE leads all four baselines at all five sizes in both regimes, and $29$ of the $30$
+margins exceed the combined $95\%$ confidence interval. The margin widens with $N$: against
+the unguided control $+0.101\!\to\!+0.584$ uncoupled and $+0.107\!\to\!+0.674$ coupled,
+against mp-BRKGA $+0.173\!\to\!+0.557$ and $+0.140\!\to\!+0.615$. It widens because the
+classical baselines collapse where the guided arms do not---at $N{=}160$ uncoupled,
+single-population BRKGA reaches $0.003$ of $\mathrm{HV}^\star$, the unguided control $0.012$
+and mp-BRKGA $0.040$, against $0.597$ for TAPE, so within a $40$-generation budget a search
+without a surrogate has effectively not started at this size. At fixed budget the
+combinatorial volume $|\mathcal Z|=A^N N!\,V^{2N}$ explodes and an unguided search cannot
+cover it, whereas the critical-path signal concentrates the same budget on the binding
+decisions; that concentration matters more the larger the space.
 
-\paragraph{Ladder to $N{=}160$ over both regimes with all baselines.}
-Table~\ref{tab:optladder} extends the sweep to $N\in\{10,20,40,80,160\}$ with every baseline
-present, including mp-BRKGA, and with the peak-power-coupled regime run alongside the
-uncoupled one: $20$ seeds per cell, $40$ generations, matched exact-evaluation budget,
-population $P=5N$, offspring screening factor $k=4$. Margins are quoted for the TAPE-guided
-arm, fixed in advance; the attention-guided arm is reported beside it and the two overlap
-within their intervals at every size, so this ladder does not separate them.
-
-Three readings. \emph{(i)} \textbf{Every cell is a win.} TAPE-guided search leads all four
-baselines at all five sizes in both regimes, and in $29$ of the $30$ comparisons the margin
-exceeds the combined $95\%$ confidence interval; the single exception is uncoupled $N{=}40$
-against mp-BRKGA ($+0.022$), which is a tie rather than a loss. \emph{(ii)} \textbf{The
-advantage widens with $N$.} Against the unguided control the TAPE margin runs
-$+0.101\!\to\!+0.584$ uncoupled and $+0.107\!\to\!+0.674$ coupled; against mp-BRKGA,
-$+0.173\!\to\!+0.557$ and $+0.140\!\to\!+0.615$. The mechanism is that the classical
-baselines collapse at the top of the ladder while the guided arms do not: at $N{=}160$
-uncoupled, single-population BRKGA reaches $0.003$, the unguided control $0.012$ and
-mp-BRKGA $0.040$ of $\mathrm{HV}^\star$, against $0.597$ for TAPE. At a fixed budget of $40$
-generations, a search without a surrogate has effectively not started at this size.
-\emph{(iii)} \textbf{Absolute quality still falls with $N$ uncoupled} ($0.944\!\to\!0.597$),
-so the widening margin is relative, not an absolute gain; under coupling it does not fall
-($0.871\!\to\!0.879$), because the power budget contracts the reachable objective space and
-the reference front with it. We report the dominance as relative to the baselines at matched
-budget, which is what the ladder measures.
-
-The narrowing at $N{=}40$ is visible in both regimes ($+0.022$ and $+0.123$ against
-mp-BRKGA, the two smallest margins in the table) and then reverses. It coincides with a
-discontinuity in the instance generator's fleet provisioning rather than with anything in
-the model: \texttt{scaled\_fleet} allocates $\lceil N/12 \rfloor$ AGVs and $3$ QCs, so
-$N{=}40$ is simultaneously the most AGV-contended point on the ladder ($13.3$ tasks per AGV,
-the ladder maximum) and the crossover at which the binding resource flips from the cranes to
-transport (AGV/QC $=1.0$). The guided arms earn their margin by exploiting a clear
-bottleneck, so the margin is smallest exactly where the bottleneck is most ambiguous, and it
-returns at $N{=}80$ and $N{=}160$ once the instances are transport-bound. The effect is a
-property of the instance family, not a size limit of the surrogate.
+Two qualifications. Absolute quality still falls with $N$ uncoupled
+($0.944\!\to\!0.597$), so the widening margin is relative to the baselines at matched
+budget, not an absolute gain; under coupling it does not fall ($0.871\!\to\!0.879$), the
+power budget having contracted the reachable objective space and the reference front with
+it. And the one margin that does not separate---uncoupled $N{=}40$ against mp-BRKGA
+($+0.022$; $+0.123$ coupled, the two smallest in the table)---is a tie rather than a loss,
+and it reverses by $N{=}80$. It coincides with a discontinuity in the instance generator
+rather than with anything in the model: \texttt{scaled\_fleet} allocates $\lceil N/12
+\rfloor$ AGVs and $3$ QCs, making $N{=}40$ both the most AGV-contended point on the ladder
+($13.3$ tasks per AGV, the ladder maximum) and the crossover at which the binding resource
+flips from the cranes to transport (AGV/QC $=1.0$). The guided arms earn their margin by
+exploiting a clear bottleneck, so it is smallest exactly where the bottleneck is most
+ambiguous, and returns once the instances are transport-bound---a property of the instance
+family, not a size limit of the surrogate.
 
 \begin{table}[t]
 \centering\small
@@ -1618,55 +1607,6 @@ TAPE $-$ mp-BRKGA  & $+.173$ & $+.198$ & $+.022^\dagger$ & $+.233$ & $+.557$ & $
 \bottomrule
 \end{tabular}
 \end{table}
-
-\begin{figure}[t]
-\centering
-\begin{tikzpicture}
-\begin{axis}[
-  width=0.84\textwidth, height=0.38\textwidth,
-  ybar, bar width=4.2pt,
-  symbolic x coords={10,20,40,80,160}, xtick=data,
-  xlabel={number of tasks $N$ (uncoupled)}, ylabel={final $\mathrm{HV}/\mathrm{HV}^\star$},
-  ymin=0, ymax=1.05, enlarge x limits=0.16,
-  ytick={0,0.25,0.5,0.75,1},
-  legend pos=north east, legend cell align=left, font=\small, legend columns=2,
-  grid=both, grid style={gray!20}, tick label style={font=\footnotesize},
-]
-\addplot[fill=blue!55] coordinates {(10,0.944)(20,0.828)(40,0.846)(80,0.574)(160,0.597)};
-\addplot[fill=blue!20] coordinates {(10,0.929)(20,0.804)(40,0.870)(80,0.617)(160,0.678)};
-\addplot[fill=orange!60] coordinates {(10,0.771)(20,0.630)(40,0.824)(80,0.341)(160,0.040)};
-\addplot[fill=red!55] coordinates {(10,0.800)(20,0.624)(40,0.516)(80,0.071)(160,0.003)};
-\addplot[fill=black!35] coordinates {(10,0.843)(20,0.608)(40,0.578)(80,0.149)(160,0.012)};
-\legend{TAPE-guided, attn-guided, mp-BRKGA, sp-BRKGA, random}
-\end{axis}
-\end{tikzpicture}
-
-\vspace{4pt}
-\begin{tikzpicture}
-\begin{axis}[
-  width=0.84\textwidth, height=0.34\textwidth,
-  ybar, bar width=4.2pt,
-  symbolic x coords={10,20,40,80,160}, xtick=data,
-  xlabel={number of tasks $N$ (coupled, $P_{\max}=30$\,kW)}, ylabel={final $\mathrm{HV}/\mathrm{HV}^\star$},
-  ymin=0, ymax=1.05, enlarge x limits=0.16,
-  ytick={0,0.25,0.5,0.75,1},
-  grid=both, grid style={gray!20}, tick label style={font=\footnotesize},
-]
-\addplot[fill=blue!55] coordinates {(10,0.871)(20,0.826)(40,0.876)(80,0.823)(160,0.879)};
-\addplot[fill=blue!20] coordinates {(10,0.864)(20,0.812)(40,0.869)(80,0.788)(160,0.818)};
-\addplot[fill=orange!60] coordinates {(10,0.732)(20,0.635)(40,0.752)(80,0.500)(160,0.264)};
-\addplot[fill=red!55] coordinates {(10,0.756)(20,0.574)(40,0.432)(80,0.285)(160,0.175)};
-\addplot[fill=black!35] coordinates {(10,0.765)(20,0.462)(40,0.440)(80,0.338)(160,0.205)};
-\end{axis}
-\end{tikzpicture}
-\caption{Scaling of solution quality, $20$ seeds per cell at matched exact-evaluation budget
-(same data as Table~\ref{tab:optladder}). Both graph-guided arms lead every baseline at every
-size in both regimes, and the margin widens with $N$: by $N{=}160$ the classical baselines
-have effectively not converged within the $40$-generation budget (uncoupled: sp-BRKGA
-$0.003$, random $0.012$, mp-BRKGA $0.040$, against $0.597$ for TAPE). The narrowing at
-$N{=}40$ tracks a discontinuity in fleet provisioning, discussed in the text.}
-\label{fig:scale}
-\end{figure}
 
 \subsection{Optimisation cost of the faithful signal}
 TAPE and the attention signal are statistically indistinguishable on hypervolume: across
