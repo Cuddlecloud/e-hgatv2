@@ -2234,6 +2234,18 @@ task is on the critical path from static task features is at chance---LOIO
 $\mathrm{AUC}=0.53$, no better than a $\lambda$-only baseline---because task-level
 criticality is set by the realised schedule, not by static attributes. The amortisation
 benefit is therefore at the level of \emph{instance composition}, not per-task criticality.
+(iii) The transfer is interpolative in fleet structure. Two grouped holdouts test this
+directly. Holding out an entire crane count---train on $16$ instances with $2$--$6$ quay
+cranes, test on the unseen $5$-crane instances plus the real \textsf{L07}---gives test
+$\mathrm{MAE}(\rho)=0.113$ at $r=0.44$, against $0.049$ / $0.87$ in training. Removing the
+small-fleet end as well, so training spans only $3$--$6$ cranes and the test set contains
+$2$-crane instances below that range, degrades the test correlation to zero
+($\mathrm{MAE}=0.158$, $r=-0.01$), and the damage is concentrated exactly on the
+out-of-range instances (\textsf{toy:24:2:2} $0.242$, \textsf{toy:40:2:3} $0.237$, versus
+$0.113$--$0.161$ for the in-range ones). The predictor places an unseen instance on the
+composition axis when its fleet structure is bracketed by the training set and not when it
+falls outside; scaling to genuinely novel terminal configurations needs training coverage,
+not just more instances.
 Finally, the composition-spanning evidence is synthetic; confirming it on a real,
 structurally diverse benchmark (e.g.\ the large \textsf{DL} set
 of~\cite{homayouni2022book}, which varies AGV and QC counts) is the remaining step.
