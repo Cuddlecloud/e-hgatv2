@@ -1095,28 +1095,6 @@ random mutation, no screening & \multicolumn{3}{c}{$0.950$ \;\;(null)} \\
 \end{tabular}
 \end{table}
 
-\paragraph{Architectural control: does rich attention do better?}
-\label{sec:attncontrol}
-One objection survives the ladder. In a \emph{resolved} schedule each task has at most one
-predecessor per resource, so E-HGATv2's per-relation softmax is degenerate
-($\alpha^{r}_{ij}\equiv1$, Section~\ref{sec:ehgat}) and only the cross-relation weights
-$\beta^{r}_j$ carry information---a two-way choice. A reviewer may reasonably ask whether
-attention fails here because it is \emph{structurally starved} rather than because
-attention is unfaithful. We therefore trained a control with no such constraint: a global
-self-attention (Transformer) encoder over the whole task set, $3$ layers, $4$ heads,
-in which a learned read-out query attends over \emph{all} $N$ tasks, and that read-out
-distribution is the audited explanation. It is scored by the same oracle, on the same
-graphs, at $N\in\{10,15,20\}$, $2000$ schedules and $3$ seeds each.
-Rich attention does not help: precision@1 is $0.66/0.50/0.55$ against the matched random
-baselines $0.57/0.55/0.55$ (mean gap $+0.013$), and Spearman with the graded
-makespan-sensitivity is $+0.02/{-}0.04/{+}0.03$---indistinguishable from zero, exactly as
-for $\beta$. The failure is therefore not an artefact of the degenerate neighbourhood.
-Two caveats bound the claim. The control's makespan fit is weak
-($R^2_{\Cmax}=0.51/0.33/0.22$, versus $R^2_{E}>0.999$ on the additive energy objective),
-so it is a \emph{negative control on a weaker predictor}, not a like-for-like architectural
-match; and the sizes are small. It rules out the degeneracy explanation; it does not
-establish that \emph{no} attention architecture could be faithful.
-
 \subsection{Surrogate fidelity and faithfulness up to $N{=}50$}
 \label{sec:fidelity}
 A separate, larger study isolates the fused surrogate's standalone behaviour and establishes
