@@ -22,23 +22,24 @@ htmlcov/
 # Editor / OS
 .idea/
 .vscode/
+.snowflake/
 .DS_Store
 
 # Vendored libs / scratch (regenerable, heavy)
 .pylibs/
 tmp/
 
-# Secrets / local env (NEVER commit)
+# Secrets / local environment
 .env
 *.env
 secrets/
 
-# Reference papers / advisor materials (local only, never commit)
+# Reference papers / third-party materials
 *.pdf
 refs/
 typeset_equations/
 
-# Experiment artifacts (heavy / regenerable). Golden references are tracked.
+# Experiment artifacts (heavy / regenerable). 
 experiments/**/runs/
 experiments/**/*.pt
 experiments/**/*.png
@@ -50,5 +51,5 @@ paper/*.aux
 paper/*.out
 paper/*.synctex.gz
 
-# Stray local vector store (not used by any code)
+# Local vector store
 data/chromadb/
