@@ -5,131 +5,44 @@
 
 ---
 
-**Subject:** Thesis progress, code and paper for review, and a data request
+Dear professor,
 
-Dear Dr. Homayouni,
+Apologies for the delay. I held off writing earlier because my work only recently reached a state that is defensible and much of the intervening time went on understanding the scheduling model well enough to design a surrogate around it while reading the surrounding ML literature; I spent the rest of the time on validation runs until the results were statistically sound. Please find attached the paper demonstrating the progress I have made so far.
 
-I am sorry for the long silence. Most of it went on the experimental side, and I went through
-several designs that did not survive contact with the data, so for a long stretch I could not
-have told you whether the approach would hold. It has settled now. The paper is attached, and
-the code is at https://github.com/aayushjha1729/e-hgatv2 — the README gives a reading order and
-says how each reported number is regenerated.
+Link to the public repo: https://github.com/aayushjha1729/e-hgatv2
 
-I would like to walk you through how I got here rather than only the results, because the route
-is what my questions at the end are about.
+**There are two components.**
 
-I started with the pipeline in the XAI+MOO plan, a tabular surrogate with TreeSHAP on top. It
-fits the objective, but I got stuck on validation. TreeSHAP attributes to the surrogate's own
-function, so if that function is wrong about the scheduling structure the attribution is
-confidently wrong along with it, and I had nothing to check it against. I built it anyway and
-kept it as the comparison. On the small instances the flat surrogate reaches an out-of-sample
-R² of about 0.12 on makespan, and its importance profile moves roughly 43% of the mass off the
-assignment and sequencing decisions and onto the speed settings, where a variance decomposition
-on the exact evaluator puts almost none.
+- **E-HGATv2** is the surrogate, an edge-conditioned heterogeneous graph attention network. The schedule goes in as a graph where I have assumed tasks as the nodes, and the AGV precedences and the crane precedences are two separate kinds of arc, so the surrogate model sees the same structure the evaluator does. It predicts the individual travel and handling times, and a max-plus (longest-path) layer composes those into the completion times.
 
-What changed the approach was noticing something about your model that I should have seen
-earlier. Once a solution fixes the AGV assignments, the sequences and the speeds, the
-disjunctive constraints are resolved, and what remains is an acyclic precedence graph with one
-chain per vehicle and one per crane. Every completion time in Eqs. (10)–(18) is then a maximum
-of sums along those chains, so the makespan is a longest path — the same reduction as the
-disjunctive graph in job shop. On that graph, the classical forward earliest-start pass and the
-backward trace of binding predecessors return the critical activities, and the float on every
-other one, exactly.
+- **TAPE (Tropical Attributions for Physical Explanations)** is the attribution layer. It differentiates the surrogate's own makespan prediction back through the schedule and returns, for every travel leg and crane handling, its exact contribution — what is binding and what has float. Because it works on predicted durations it applies to a candidate before that candidate has been evaluated, which is what lets it select the neighbourhood the optimiser explores next — the feedback algorithm of your third direction.
 
-I want to be direct that this is the critical path method and that I am not presenting it as
-new. Given the durations of a solution the evaluator has already run, it is exact, it costs
-almost nothing, and no learned model improves on it. What I think is worth something is what it
-makes available.
+**Against your three directions, and the front-behaviour point from your second email, in order.**
 
-For your second direction it gives precisely the relationship you described. The partition is
-into activities that bind and activities that carry float, and float is the operationally
-meaningful quantity: a leg with float is a leg whose AGV can be slowed to save energy at no cost
-in makespan, which is the mechanism that puts a solution on the front. Aggregating over sampled
-solutions and grouping by decision type — which AGV, position in that AGV's sequence, loaded
-speed, empty speed — produces the landscape you asked for, and because the attribution is exact
-it can be checked rather than argued for. Separately, comparing the non-dominated set against
-dominated solutions, the descriptor that separates them is AGV load balance: the Pareto
-solutions are the balanced ones. Sobol indices reach a similar ranking, but they need several
-thousand exact evaluations at ten tasks and give one number per family for the whole population
-rather than per solution.
+1. **Feature engineering.** The features are not hand-picked; they are the travel and handling quantities on the arcs, which is what the physics is written in. Because the model predicts one of those per leg instead of a single aggregate per schedule, it applies unchanged to instances much larger than the ones it was fitted on: fitted at N=16, the leg predictions hold at sizes two orders of magnitude beyond that, where a surrogate taking a fixed-length feature vector cannot be evaluated at all, its input width being fixed at the size it was trained on.
 
-The network is not doing that work, and I do not think it should. Where it earns its place is
-elsewhere.
+2. **Feature importance and landscape.** For a single solution, the analysis splits every leg and every crane handling into binding or having float. That is the operationally useful split, because a leg with float is one whose AGV can be slowed to save energy at no makespan cost, which is what puts a solution on the front in the first place. Doing this over many sampled solutions and grouping by decision type — which AGV a task goes to, where it sits in that AGV's order, its loaded speed, its empty speed — gives the landscape you described. Three properties make it useful: the attribution is **exact for the model**, it resolves **per solution** instead of averaging over a population, and it costs **one pass per schedule**. I can also check it: on any schedule that has been evaluated, recomputing the same split from the true durations agrees with what the surrogate gives. Pooled over sampled solutions the profile comes out assignment > sequence > loaded speed > empty speed, stable across sizes, with the AGV-side families carrying about three quarters of the mass, so these instances are transport-bound — a property the attribution reports directly and that I did not have to assume. One negative belongs with it: that pooled profile barely differs between Pareto-optimal and dominated solutions, so it characterises the instance and not why one solution beat another. That discrimination comes from the per-solution version and from the trade-off scores in point 4.
 
-For the third direction the surrogate sits inside NSGA-II. Each generation produces more
-offspring than it needs, the network ranks them, and only the best fraction goes to the exact
-evaluator, so the exact-evaluation budget per generation is unchanged and every comparison is at
-matched budget. The attribution then chooses where to mutate: it identifies the currently
-binding task, and whether that task is held up by its vehicle or by its crane, which selects
-between reassignment, a sequence swap, and crane reordering. Against random NSGA-II and
-single-population BRKGA the guided version wins at every problem size I tested, and the margin
-grows steadily with size. Against your multi-population variant it wins at every size except one,
-where the two are level. At the largest sizes the classical baselines have effectively not
-converged inside the same budget while the guided search still recovers most of the reference
-front.
+3. **Feedback algorithm.** The search is a surrogate-assisted NSGA-II. Each generation it over-produces offspring, ranks them with the surrogate, and sends only the best through to the exact evaluator, so the number of exact evaluations per generation is unchanged and every comparison I report is at a **matched exact-evaluation budget**. The attribution is then reused to steer the mutation: it says which task is currently binding, so that is where the operator is applied, and whether that task is bound by its transport or by its crane, which selects between reassigning or swapping vehicles and changing crane order. The same object that explains a schedule picks the next move. It outperforms my re-implementations of the metaheuristic baselines on all eleven instances in my test matrix, four of which are your Table 5 loading instances, and the advantage grows with instance size. Those re-implementations are mine rather than yours, so I am checking them against your published optima — Table 1 of the book chapter for the loading instances, and Table 2 of the FSMJ paper for the dual-cycling ones, where your mp-BRKGA results appear beside the MILP optima and I can compare my gap against yours on the same instances. I should add that every arm in my comparison is given the same generation count, well below the 300 generations you tuned mp-BRKGA to, so this is a comparison at equal budget and not against your published configuration.
 
-The part I would most like your reaction to is size transfer. Because the network predicts
-per-leg durations rather than a schedule-level objective, the same fitted model applies
-unchanged to instances far larger than the ones it was trained on. I train once at sixteen tasks
-and the makespan fit stays above 0.98 out to several thousand tasks, while an otherwise
-identical model with a pooled global read-out degrades to worse than predicting the mean. A
-tabular surrogate cannot be used this way at all, because its input width is fixed at training
-size. If the aim is to carry knowledge from small solved instances to large unsolved ones, that
-seems to me the property that matters.
+4. **Pareto-front behaviour.** Doing the attribution at every point of the front, weighted by the local makespan–energy trade-off, ranks which tasks are the bottleneck at that point, and comparing the ends shows how the bottleneck moves. At the makespan end almost everything binding is AGV travel; at the energy end the vehicles are slowed, the cranes serialise behind them, and crane handlings become the binding activities. A small predictor given only an instance's fleet and crane structure then places a new instance on that axis without running the search — with one condition I should state plainly. On your published small set there is nothing to predict: the critical path is transport-bound almost everywhere (transport share 0.88 ± 0.04 between instances), so the predictor only ties a constant baseline there. I had to build a set spanning the fleet-to-crane ratio to test it at all, and on that set it recovers the transport share of unseen instances at r = 0.945, beating the constant baseline by a factor of 2.7. The saturation is itself worth knowing: for this layout, transport binding the critical path looks like a near-invariant property rather than something that varies by instance.
 
-On the point in your second email about the surrogate learning the front's behaviour: running
-the attribution at each point of an approximated front and weighting it by the local
-makespan–energy trade-off gives a compact description of what binds where. The two ends differ
-sharply. At the makespan end almost all binding activity is AGV travel. At the energy end the
-vehicles have slowed, and on some instances the cranes serialise behind them and enter the
-critical path — though not on all of them, so I report it as an instance-level property rather
-than a rule. A small predictor taking only fleet and crane counts then places a new instance on
-that axis without running the search.
+The physics is verified rather than assumed: Eqs (2)–(4) and (10)–(18) agree to zero discrepancy with an independent transcription, and on small instances with exhaustive enumeration of all speed assignments.
 
-Three things are weak, and I would rather flag them than have you find them.
+I would also like to request the data for the DL instances, which Section 5 of the FSMJ paper gives as downloadable from the FAST Manufacturing instance page. That page currently lists only the JSPT, FJSPT and JSPT+SR libraries, so I could not find the container terminal set there. Two parts of it would unblock me:
 
-The mp-BRKGA comparison is against my own re-implementation from the description in the 2022
-paper. With nothing published to calibrate against, everything I say about beating it is a
-statement about my re-implementation. That is the request I care most about below.
+1. **The QC↔LU distance matrix for the DL layout.** Table 4 of the book chapter covers QC1–6 and LU1–6, and the DL instances have 8–16 cranes.
+2. **The DL task lists**, once that geometry exists.
 
-I also built a peak-power-coupled variant after you raised it, in which a fleet-wide
-instantaneous budget couples the vehicles. Three modelling choices in it are mine rather than
-yours — how the budget applies to travel legs rather than to machines, its value, and how
-contention is resolved when two vehicles demand power at once — so I have kept it as an
-exploratory section rather than as a test of your formulation. I would rather settle the
-uncoupled problem properly first, but I am happy to take it further if you would like.
+For the small instances I need nothing further, having reconstructed them from the book chapter: Table 5 gives the loading set directly, Section 5.1 the unloading set by reversing origins and destinations, and the combination column of Table 3 of the book chapter the twenty-six dual-cycling instances. The sizes that reconstruction produces agree with the Q-T column of Table 2 of the FSMJ paper on all twenty-six, so I believe it is faithful, but I would be glad to be corrected if any step is wrong. Above sixteen tasks I am still on instances I generate myself.
 
-The published loading instances turn out to be transport-bound almost uniformly, so they cannot
-discriminate between a predictor of front composition and a constant. I had to build a set with
-varying fleet-to-crane ratios to test that at all, and I report the saturation as a property of
-those instances.
+I would be grateful for your thoughts on the direction as a whole. If you would like the architecture changed, or any of the elements of the paper set up differently — the choice of surrogate, the way the comparisons are run, or what is being reported — please do tell me and I will adjust it.
 
-What would help, roughly in order:
+One point I would particularly welcome your guidance on is the coupled regime with peak power constraints. I have taken the peak-power model from your ITOR paper and transferred it to the terminal: the fleet shares one instantaneous budget, travel legs draw power and crane handling draws none, and when the budget never binds the evaluator provably reduces to the uncoupled one. That regime is where the surrogate earns its place, the makespan there having no closed form, and it is also where the method wins by the clearest margin. Its one weakness is that the combination is not something you have published instances for, so those results stand on instances I generate. Since ITOR is set in job shop scheduling and neither of the terminal papers carries a power constraint, the extension is mine and not yours, and I would rather follow your judgement than my own on it: I am glad to keep the regime in the paper, or to set it aside and hold the work to the uncoupled problem on your published instances.
 
-1. The per-instance C_max and E values from your mp-BRKGA runs. Even a handful of instances
-   would turn a re-implementation into a calibrated baseline.
-2. The DS dual-cycling task lists. I am currently working from the Table 5 loading instances of
-   the book chapter, plus synthetic dual-cycling instances built on the Table 4 distances.
-3. An extended QC↔LU distance matrix. Table 4 covers QC1–6 and LU1–6, and the DL instances have
-   8 to 16 cranes.
-4. The DL task lists, once that geometry exists.
+Any further direction on where you think the work should go next would be very welcome.
 
-I looked for the terminal instances on the page linked from the 2022 paper, but it carries only
-the job-shop sets.
-
-Three things I would like your view on. First, is this the direction you want, or would you
-rather I return to the XGBoost and TreeSHAP pipeline from the plan? I have kept it as the
-baseline everything is measured against, but I do not want to have moved away from your design
-without your agreement. Second, to validate the importance rankings properly I intend to delay
-one activity by a fixed amount on the exact evaluator and score each method against the realised
-change in makespan — the attribution, the classical float ranking, TreeSHAP and Sobol on one
-common measure. Is that the comparison you would want, and is there a reporting standard beyond
-hypervolume, IGD+ and Friedman with Holm-corrected Wilcoxon that I should be using? Third, would
-you rather I push toward larger instances, or keep the claims narrow where they are solid?
-
-I have set the discrete-event simulator aside for now, since the attribution needs a
-deterministic evaluator, but it looks like the right tool for validating the coupled variant
-later.
+The codebase is accessible at this public repository https://github.com/aayushjha1729/e-hgatv2
 
 Kind regards,
 Aayush
