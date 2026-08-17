@@ -1,0 +1,194 @@
+{
+  "config": {
+    "train": [
+      "L01",
+      "L02",
+      "L03",
+      "L04",
+      "L05",
+      "L06",
+      "L08",
+      "L09",
+      "L10",
+      "L11",
+      "L12",
+      "L13"
+    ],
+    "test": [
+      "L28"
+    ],
+    "seed": 1,
+    "peak_power": null,
+    "pool_size": 600,
+    "warm_gens": 15,
+    "payoff_gens": 40,
+    "core_samples": 1500,
+    "core_epochs": 60,
+    "fused_samples": 800,
+    "fused_epochs": 80,
+    "traj_samples": 800,
+    "device": "cpu",
+    "arms": [
+      "transfer",
+      "random",
+      "refit"
+    ],
+    "skip_payoff": false,
+    "out": "experiments/front_transfer/shard_L28_s1.json"
+  },
+  "arms": {
+    "transfer": {
+      "train_metrics": {
+        "r2_makespan": 0.9998892545700073,
+        "mae_makespan": 1.6871272325515747,
+        "r2_energy": 1.0,
+        "mae_energy": 0.0003063420590478927,
+        "mae_overall": 0.8437167406082153
+      },
+      "n_samples": 783,
+      "per_instance": {
+        "L28": {
+          "near_front": {
+            "n_pred": 14,
+            "n_true": 17,
+            "hv_ratio": 0.9968096994814842,
+            "igd_plus": 1.576797385620901,
+            "transport_share_pred": 0.911675439406532,
+            "transport_share_true": 0.939075630252101,
+            "migration_pred": 0.5,
+            "migration_true": 0.7272727272727273
+          },
+          "random_pool": {
+            "n_pred": 5,
+            "n_true": 6,
+            "hv_ratio": 0.9974410658156277,
+            "igd_plus": 1.3425925925926094,
+            "transport_share_pred": 0.9139926739926741,
+            "transport_share_true": 0.9761904761904763,
+            "migration_pred": 0.8,
+            "migration_true": 0.7272727272727273
+          },
+          "payoff": {
+            "guided": {
+              "hv": 323795.087962963,
+              "evaluations": 2460,
+              "front_size": 48
+            },
+            "baseline": {
+              "hv": 263681.1122685185,
+              "evaluations": 2460,
+              "front_size": 22
+            },
+            "hv_ratio_guided_over_baseline": 1.2279798320678643
+          }
+        }
+      }
+    },
+    "random": {
+      "train_metrics": {
+        "r2_makespan": 0.999920129776001,
+        "mae_makespan": 1.6765488386154175,
+        "r2_energy": 1.0,
+        "mae_energy": 0.00028483071946538985,
+        "mae_overall": 0.8384168744087219
+      },
+      "per_instance": {
+        "L28": {
+          "near_front": {
+            "n_pred": 12,
+            "n_true": 17,
+            "hv_ratio": 0.9956483285573027,
+            "igd_plus": 3.1960784313725177,
+            "transport_share_pred": 0.9161243984773396,
+            "transport_share_true": 0.939075630252101,
+            "migration_pred": 0.5,
+            "migration_true": 0.7272727272727273
+          },
+          "random_pool": {
+            "n_pred": 4,
+            "n_true": 6,
+            "hv_ratio": 0.9974410658156277,
+            "igd_plus": 1.3425925925926094,
+            "transport_share_pred": 0.9282051282051282,
+            "transport_share_true": 0.9761904761904763,
+            "migration_pred": 0.8,
+            "migration_true": 0.7272727272727273
+          },
+          "payoff": {
+            "guided": {
+              "hv": 268246.9641203701,
+              "evaluations": 2460,
+              "front_size": 54
+            },
+            "baseline": {
+              "hv": 216239.07060185142,
+              "evaluations": 2460,
+              "front_size": 27
+            },
+            "hv_ratio_guided_over_baseline": 1.2405110851326115
+          }
+        }
+      }
+    },
+    "refit": {
+      "per_instance": {
+        "L28": {
+          "near_front": {
+            "n_pred": 16,
+            "n_true": 17,
+            "hv_ratio": 0.9999629917548417,
+            "igd_plus": 0.07843137254902184,
+            "transport_share_pred": 0.9004120879120879,
+            "transport_share_true": 0.939075630252101,
+            "migration_pred": 1.0,
+            "migration_true": 0.7272727272727273
+          },
+          "random_pool": {
+            "n_pred": 6,
+            "n_true": 6,
+            "hv_ratio": 1.0,
+            "igd_plus": 0.0,
+            "transport_share_pred": 0.9155067155067157,
+            "transport_share_true": 0.9761904761904763,
+            "migration_pred": 1.0,
+            "migration_true": 0.7272727272727273
+          },
+          "payoff": {
+            "guided": {
+              "hv": 418491.7800925921,
+              "evaluations": 2460,
+              "front_size": 51
+            },
+            "baseline": {
+              "hv": 410607.52662037016,
+              "evaluations": 2460,
+              "front_size": 39
+            },
+            "hv_ratio_guided_over_baseline": 1.019201434365112
+          }
+        }
+      },
+      "train_metrics": {
+        "L28": {
+          "r2_makespan": 0.999566376209259,
+          "mae_makespan": 1.698263168334961,
+          "r2_energy": 1.0,
+          "mae_energy": 0.0005615234258584678,
+          "mae_overall": 0.8494123220443726
+        }
+      }
+    }
+  },
+  "naive": {
+    "L28": {
+      "near_front": {
+        "hv_ratio": 0.7319620849342197,
+        "igd_plus": 115.7233651063824
+      },
+      "random_pool": {
+        "hv_ratio": 0.5858359973729625,
+        "igd_plus": 385.6239329453853
+      }
+    }
+  }
+}
