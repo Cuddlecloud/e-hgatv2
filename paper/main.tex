@@ -206,14 +206,10 @@ $(\max,+)$---the \emph{tropical} or \emph{max-plus} semiring~\cite{baccelli1992s
 is the single structural fact the whole method exploits: the longest path is the
 \emph{critical path}, and the objective is determined by the activities lying on it.
 
-This recurrence is the critical path method of Kelley and Walker~\cite{kelley1959cpm}: the
-forward pass is CPM's earliest-start computation and the backward trace of argmax
-predecessors is CPM's critical-path recovery. Given the leg durations of a resolved
-schedule, CPM returns the critical path exactly, at negligible cost, and no learned model
-improves on it. What CPM cannot do is supply the durations. Section~\ref{sec:fused}
-therefore embeds the same recurrence as a differentiable layer over \emph{predicted}
-durations, which is what makes the path available for schedules the exact evaluator has not
-been run on, and makes it a gradient that trains the network that produced them.
+Section~\ref{sec:fused} embeds this recurrence as a differentiable layer over
+\emph{predicted} durations, which is what makes the path available for schedules the exact
+evaluator has not been run on, and makes it a gradient that trains the network that
+produced them.
 
 \subsection{The peak-power-coupled regime}
 \label{sec:coupled}
@@ -781,20 +777,18 @@ network~\eqref{eq:leghead}; TAPE reports which of those predictions the makespan
 on. (The exact critical path, computed from the resolved simulator with no network, is
 retained as a ceiling reference.)
 
-\paragraph{Relation to CPM and to differentiable dynamic programming.} Equation~\eqref{eq:tape}
-restates the slack property of the critical path method~\cite{kelley1959cpm}, and the
-backward routing of the proof is CPM's critical-path trace. On a schedule already passed
-through the exact evaluator the leg durations are known, CPM returns $\pi^\star$ exactly,
-and TAPE returns the same set: the two coincide, and the learned model contributes nothing.
-Differentiating through a dynamic program is likewise
-established~\cite{mensch2018ddp,rush2020torchstruct}, though that line smooths the $\max$ to
-obtain a dense Jacobian, where the hard $\argmax$ retained here is what keeps the
-attribution a binary path indicator. What the present construction adds is the pairing:
-the durations are supplied by the graph network, so $\pi^\star$ is obtained for schedules
-the evaluator has \emph{not} been run on, and the same indicator is the gradient by which
-those durations are learned~\eqref{eq:tapechain}. The novelty claimed is therefore not the
-attribution rule but its availability off the evaluated set, and the exact reference it
-provides for auditing the attention weights (Section~\ref{sec:results}).
+\paragraph{Relation to differentiable dynamic programming.} Differentiating through a
+dynamic program is established~\cite{mensch2018ddp,rush2020torchstruct}, though that line
+smooths the $\max$ to obtain a dense Jacobian, where the hard $\argmax$ retained here is
+what keeps the attribution a binary path indicator; the slack notion it recovers is
+classical~\cite{kelley1959cpm}. What the present construction adds is the pairing: the
+durations are supplied by the graph network, so $\pi^\star$ is obtained for schedules the
+evaluator has \emph{not} been run on, and the same indicator is the gradient by which those
+durations are learned~\eqref{eq:tapechain}. The attribution is therefore exact for the
+model it explains and complete by construction---the predicted makespan is the sum of the
+predicted durations along $\pi^\star$---at the cost of one backward pass, which is what
+makes it usable inside the search rather than only after it
+(Section~\ref{sec:results}).
 
 \paragraph{Selective gradient flow into the surrogate.} TAPE is the \emph{first factor} of
 the chain rule whenever the makespan is differentiated through the network, so it shapes
@@ -1854,10 +1848,11 @@ the across-instance test), and the across-instance and per-instance views now ag
 $95\%$ confidence intervals on $\mathrm{HV}/\mathrm{HV}^\star$ (Student-$t$ over the $S$
 seeds). On the well-separated instances these intervals are \emph{non-overlapping} between
 the graph-guided methods and mp-BRKGA---a conservative significance criterion. For example
-on \textsf{L21}, TAPE attains $1.017\pm0.028$ (CI $[0.989,1.045]$) versus mp-BRKGA
-$0.853\pm0.047$ (CI $[0.806,0.900]$), with the gap far starker on the convergence indicator
-($\mathrm{GD}^+$ $4.8\pm1.8$ vs.\ $37.8\pm11.1$); the same non-overlap holds on
-\textsf{L15} and \textsf{SD-15}. On the near-optimal small instances ($N\le10$) the
+on \textsf{L21}, TAPE attains $0.940\pm0.015$ (CI $[0.925,0.955]$) versus mp-BRKGA
+$0.742\pm0.044$ (CI $[0.698,0.786]$), with the gap far starker on the convergence indicator
+($\mathrm{GD}^+$ $6.7\pm2.4$ vs.\ $79.8\pm19.2$); the same non-overlap holds on
+\textsf{L15} ($0.941\pm0.014$ vs.\ $0.849\pm0.032$) and \textsf{SD-15}
+($0.866\pm0.020$ vs.\ $0.759\pm0.027$). On the near-optimal small instances ($N\le10$) the
 intervals overlap because every method is close to the reference front.
 
 \paragraph{Effect sizes.} Beyond the rank tests we quantify \emph{how large} the advantage
