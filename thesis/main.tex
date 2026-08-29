@@ -820,10 +820,13 @@ of the bottleneck is invariant along the front even though the objective values 
 a further two families are constructed from the first as Section~\ref{sec:families} describes.
 The small set comprises 35 loading instances of 4 to 16 tasks on a six-crane, six-station layout. The large
 dual-cycling set comprises 10 instances of 40 to 160 tasks on a twenty-crane, twenty-station
-layout. Both were transcribed programmatically from the published tables and the authors' solver
+layout; it is referred to throughout as the large dual-cycling set, to distinguish it from the
+26 small mixed instances of Section~\ref{sec:families}, which are dual-cycling in the same
+operational sense but are a different set on a different layout.
+Both were transcribed programmatically from the published tables and the authors' solver
 sources; no value was retyped. The transcription was cross-validated: the distance matrix and
 task lists were parsed independently twice and agreed in every cell, and four published optima
-and five dual-cycling instance pairings matched exactly.
+and five mixed-instance pairings matched exactly.
 
 \paragraph{Fleet sweep.} The parameter of interest is the fleet-to-crane ratio $A/Q$. Because
 every published large instance has $A/Q = 0.50$, the published sets cannot by themselves
@@ -961,7 +964,7 @@ nominal--higher, $C_{\max}^{\star}$ & 23 & 21 & 1 & $-17.26$ \\
 \end{table}
 % ---- END generated: tables/published.tex ----
 
-The loading family is Table~5 as printed, but the unloading and dual-cycling families are reconstructions, so each is checked against the optima published for it.
+The loading family is Table~5 as printed, but the unloading and mixed families are reconstructions, so each is checked against the optima published for it.
 Table~\ref{tab:validation} reports both.
 
 % ---- BEGIN generated: tables/validation.tex (scripts/make_thesis_tables.py) ----
@@ -969,7 +972,7 @@ Table~\ref{tab:validation} reports both.
 \begin{table}[tb]
 \centering
 \small
-\caption[Reconstructed families against the published optima]{The two reconstructed instance families against the mixed-integer optima published for them, at the published fleet size of two vehicles. The unloading family reverses the origins and destinations of Table~5; the dual-cycling family combines the pairs named in Table~3. Ratios below one are expected, since the runs here select among three speeds per leg where the published optima fix one, so they solve a less constrained problem. The final column counts instances whose energy optimum is reproduced exactly, which the speed selection cannot improve upon and which therefore tests the reconstruction directly.}
+\caption[Reconstructed families against the published optima]{The two reconstructed instance families against the mixed-integer optima published for them, at the published fleet size of two vehicles. The unloading family reverses the origins and destinations of Table~5; the mixed family combines the pairs named in the ``comb.\ of'' column of Table~3, and is the 26-instance small set, not the ten large dual-cycling instances of Table~\ref{tab:dl}. Ratios below one are expected, since the runs here select among three speeds per leg where the published optima fix one, so they solve a less constrained problem. The final column counts instances whose energy optimum is reproduced exactly, which the speed selection cannot improve upon and which therefore tests the reconstruction directly.}
 \label{tab:validation}
 \footnotesize
 \begin{tabular}{lrrrrr}
@@ -979,7 +982,7 @@ Family & instances & \multicolumn{2}{c}{$C_{\max}$ ratio} & $E$ ratio & $E$ exac
  & & mean & range & mean & \\
 \midrule
 unloading & 35 & 0.915 & 0.740--0.975 & 0.996 & 18/33 \\
-dual-cycling & 26 & 0.935 & 0.793--1.030 & 0.960 & 11/25 \\
+mixed & 26 & 0.935 & 0.793--1.030 & 0.960 & 11/25 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1268,9 +1271,12 @@ station; and a mixed instance is formed by combining one loading instance with o
 instance. Applying these two constructions to Table~5 yields 35 unloading and 26 mixed instances
 alongside the 35 loading instances already used, on the same layout and with no value retyped.
 
-The pairing that forms the published mixed set is not stated in the source. The pairs used here
-are formed from consecutive instance identifiers, so the mixed family is reported as derived from
-the published task lists rather than as a reproduction of the published set.
+The pairing that forms the mixed set is stated in the source: the ``comb.\ of'' column of
+Table~3 names, for each of the 26 instances, the unloading and loading instance it combines. That
+column is used as printed, so the family reproduces the published set rather than approximating
+it. It pairs by neither adjacency nor position, D04 combining U01 with L02 and D06 combining U02
+with L01, and the reconstruction is confirmed against an independent published quantity: the task
+count of all 26 agrees with the Q--T column of the same table.
 
 Each of the 96 instances was run at nine fleet sizes with ten seeds, and the transport share was
 computed at every point of every resulting front rather than at the two extremes alone. The
@@ -1333,7 +1339,7 @@ ratio, the gap running from $0.09$ to $0.16$ between $A/Q = 1.25$ and $1.75$ and
 at $2.33$; the recurrences differ in where the handling term
 enters the maximum, which is a candidate explanation that was not tested. Below the threshold the
 mixed family carries a positive migration of up to $+0.205$ where the single-cycling families sit
-near zero, so on a dual-cycling instance with few vehicles the makespan-optimal end is the more
+near zero, so on a mixed instance with few vehicles the makespan-optimal end is the more
 travel-heavy of the two. Both are reported as measured regularities and neither is claimed as
 understood.
 
@@ -1390,9 +1396,9 @@ The surrogate tracks that movement closely. Over all 2{,}970 snapshots the media
 difference between the model's migration and the exact value is $0.0026$, and the model is
 therefore reproducing the explanation while the search is still running, not only at its end. The
 agreement is family-dependent and its error distribution is skewed: the median is $0.0014$ on
-loading, $0.0052$ on unloading and $0.0062$ on dual-cycling instances, but the corresponding
+loading, $0.0052$ on unloading and $0.0062$ on mixed instances, but the corresponding
 means are $0.022$, $0.052$ and $0.076$, and the ninetieth percentile reaches $0.347$ on the
-dual-cycling family. The model is thus accurate in the typical case and occasionally far from it,
+mixed family. The model is thus accurate in the typical case and occasionally far from it,
 which is the same pattern Section~\ref{sec:surrogate-eval} reports for finalised solutions and
 has the same cause: where several resources are nearly balanced, a small error in a predicted
 duration changes which activity binds.
@@ -1508,10 +1514,10 @@ suffices for a measurement depending on the two front extremes but places absolu
 below what the method attains, so no claim about front quality should be drawn here. The sweep
 establishes that migration depends on $A/Q$ and locates the transition between $1.0$ and $1.35$
 for four instances, but does not predict it from instance parameters. It is also established on
-the small-instance layout alone: the dual-cycling instances describe a twenty-crane terminal
+the small-instance layout alone: the large dual-cycling instances describe a twenty-crane terminal
 whose distance matrix is not interchangeable, and are observed only at $A/Q = 0.50$, so extending
 the threshold to them is an extrapolation across layouts rather than a measurement. Sweeping the
-fleet on three dual-cycling instances would settle it, at roughly forty core-hours. Finally, the
+fleet on three large dual-cycling instances would settle it, at roughly forty core-hours. Finally, the
 surrogate's agreement with the exact critical set is lowest where migration is largest, since
 Pareto-optimal schedules are those in which resources are nearly balanced and small prediction
 errors alter which activity binds; this bounds the secondary tier only.
@@ -1541,7 +1547,7 @@ scheduling problem are Pareto-optimal, rather than merely to compute them. Its o
 is that such a schedule can be explained exactly, in seconds attributable to named physical
 activities, and that a learned model can produce the same explanation. The instances are the
 published ones throughout: the loading set as printed, the unloading set reversed from it, and
-the dual-cycling set formed by the pairing the source states, each reconstruction checked
+the mixed set formed by the pairing the source states, each reconstruction checked
 against the optima published for it before any result was drawn from it.
 
 Because the makespan is a maximum of sums of activity durations, it is a longest path over the

@@ -398,7 +398,7 @@ def families_table() -> str:
 def validation_table() -> str:
     """Reconstructed families against the optima the source publishes for them.
 
-    Both the unloading and the dual-cycling families are reconstructions: the first reverses the
+    Both the unloading and the mixed families are reconstructions: the first reverses the
     origins and destinations of Table 5, the second combines pairs named in Table 3. Neither can
     be checked from inside this project, so both are compared against the published MILP optima.
     A front computed on a correctly reconstructed instance cannot beat a proven optimum by more
@@ -410,7 +410,7 @@ def validation_table() -> str:
                           "container_transport_tables_1_to_5.json").read_text())["tables"]
     rows_out = []
     for fam, path, key in (("unloading", "validate_unloading", "table_2"),
-                           ("dual-cycling", "validate_mixed", "table_3")):
+                           ("mixed", "validate_mixed", "table_3")):
         f = Path(f"experiments/thesis/{path}.json")
         if not f.exists():
             continue
@@ -443,7 +443,9 @@ def validation_table() -> str:
         r"\caption[Reconstructed families against the published optima]{The two reconstructed "
         r"instance families against the mixed-integer optima published for them, at the "
         r"published fleet size of two vehicles. The unloading family reverses the origins and "
-        r"destinations of Table~5; the dual-cycling family combines the pairs named in Table~3. "
+        r"destinations of Table~5; the mixed family combines the pairs named in the ``comb.\ of'' "
+        r"column of Table~3, and is the 26-instance small set, not the ten large dual-cycling "
+        r"instances of Table~\ref{tab:dl}. "
         r"Ratios below one are expected, since the runs here select among three speeds per leg "
         r"where the published optima fix one, so they solve a less constrained problem. The "
         r"final column counts instances whose energy optimum is reproduced exactly, which the "

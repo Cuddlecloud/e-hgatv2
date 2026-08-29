@@ -2,7 +2,7 @@
 \begin{table}[tb]
 \centering
 \small
-\caption[Reconstructed families against the published optima]{The two reconstructed instance families against the mixed-integer optima published for them, at the published fleet size of two vehicles. The unloading family reverses the origins and destinations of Table~5; the dual-cycling family combines the pairs named in Table~3. Ratios below one are expected, since the runs here select among three speeds per leg where the published optima fix one, so they solve a less constrained problem. The final column counts instances whose energy optimum is reproduced exactly, which the speed selection cannot improve upon and which therefore tests the reconstruction directly.}
+\caption[Reconstructed families against the published optima]{The two reconstructed instance families against the mixed-integer optima published for them, at the published fleet size of two vehicles. The unloading family reverses the origins and destinations of Table~5; the mixed family combines the pairs named in the ``comb.\ of'' column of Table~3, and is the 26-instance small set, not the ten large dual-cycling instances of Table~\ref{tab:dl}. Ratios below one are expected, since the runs here select among three speeds per leg where the published optima fix one, so they solve a less constrained problem. The final column counts instances whose energy optimum is reproduced exactly, which the speed selection cannot improve upon and which therefore tests the reconstruction directly.}
 \label{tab:validation}
 \footnotesize
 \begin{tabular}{lrrrrr}
@@ -12,7 +12,7 @@ Family & instances & \multicolumn{2}{c}{$C_{\max}$ ratio} & $E$ ratio & $E$ exac
  & & mean & range & mean & \\
 \midrule
 unloading & 35 & 0.915 & 0.740--0.975 & 0.996 & 18/33 \\
-dual-cycling & 26 & 0.935 & 0.793--1.030 & 0.960 & 11/25 \\
+mixed & 26 & 0.935 & 0.793--1.030 & 0.960 & 11/25 \\
 \bottomrule
 \end{tabular}
 \end{table}
