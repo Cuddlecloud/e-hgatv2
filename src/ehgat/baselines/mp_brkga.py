@@ -52,6 +52,7 @@ just ``pop_size`` and ``generations``.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from math import ceil
 
 import numpy as np
 
@@ -83,6 +84,7 @@ class MpBRKGAConfig:
     n_exchange: int = 30  # migrate all Pi pops' elites into the pool every n_exchange gens
     seed: int = 0
     screening_factor: int = 1  # k>1 => over-produce k*No offspring, surrogate-screen to No (needs screen_fn)
+    snapshot_every: int = 0  # >0 => also retain archive chromosomes every N generations
 
     def __post_init__(self) -> None:
         if self.screening_factor < 1:
@@ -101,6 +103,12 @@ class MpBRKGAResult:
     chromosomes: tuple[np.ndarray, ...]
     front_history: tuple[tuple[Objectives, ...], ...]
     evaluations: int
+    # (generation, objectives, chromosomes) triples, populated only when
+    # ``MpBRKGAConfig.snapshot_every`` is positive. ``front_history`` keeps objectives at every
+    # generation but discards the chromosomes, so an explanation cannot be recomputed from it
+    # after the fact; this retains what the attribution needs, at the cost of memory, and is
+    # therefore opt-in rather than always on.
+    chrom_snapshots: tuple[tuple[int, tuple[Objectives, ...], tuple[np.ndarray, ...]], ...] = ()
 
 
 def default_mp_config(
@@ -133,6 +141,7 @@ def _breed(
     n_offspring: int,
     n_mutant: int,
     inherit_prob: float,
+    rank_order: np.ndarray,
     screen_fn: "ScreenFn | None" = None,
     screening_factor: int = 1,
 ) -> np.ndarray:
@@ -140,9 +149,16 @@ def _breed(
 
     ``elite_chrom`` is the carried elite block (>= ``n_elite`` rows). For single-objective
     populations it is that population's own best ``Ne``; for multi-objective populations it
-    is the ``Ne`` selected from the migration *pool* (so immigrants can be carried). Per the
-    paper, each offspring crosses one elite parent with one parent drawn from the **entire**
-    population, inheriting elite genes with probability ``inherit_prob``.
+    is the ``Ne`` selected from the migration *pool* (so immigrants can be carried). Each
+    offspring crosses one elite parent with one parent drawn from the **non-elite** portion of
+    the population, inheriting elite genes with probability ``inherit_prob``.
+
+    The non-elite restriction follows the author's own code, where the two parents are drawn
+    from disjoint ranges -- ``P1 = random.randint(0, elite)`` and
+    ``P2 = random.randint(elite, Pmax)`` (mp-BRKGA_DL01.py:263-264) -- so an offspring can
+    never be the child of two elites. He samples from ``popSORT``, freshly ranked this
+    generation, so ``rank_order`` must be the *current* ranking; ``pop``'s own row order is one
+    generation stale and is not a substitute for it.
 
     **Surrogate screening (ablation).** When ``screen_fn`` is given and ``screening_factor``
     ``k>1``, the offspring block is *over-produced* to ``k*No`` crossover children, ranked by
@@ -158,9 +174,13 @@ def _breed(
     k = screening_factor if (screen_fn is not None and screening_factor > 1) else 1
     n_cand = n_offspring * k
     cand = np.empty((n_cand, chrom_len))
+    # Second parent from this generation's non-elites, matching his disjoint P1/P2 ranges.
+    # Guard the degenerate case of an all-elite population by falling back to the whole of it
+    # rather than sampling an empty range.
+    non_elite = rank_order[n_elite:] if n_elite < rank_order.size else rank_order
     for c in range(n_cand):
         ep = elite_chrom[rng.integers(elite_chrom.shape[0])]
-        op = pop[rng.integers(pop.shape[0])]
+        op = pop[non_elite[rng.integers(non_elite.size)]]
         cand[c] = _biased_crossover(rng, ep, op, inherit_prob)
     if k > 1:
         pred = screen_fn(cand)  # surrogate-predicted (makespan, energy) per candidate
@@ -213,8 +233,12 @@ def run_mp_brkga(
     screening of each population's offspring block -- the GNN-enhancement ablation.
     """
     p = config.pop_size
-    n_elite = max(1, round(config.elite_frac * p))
-    n_mutant = max(1, round(config.mutant_frac * p))
+    # ``ceil``, not ``round``, to match the author's own ``math.ceil(eliten*Pmax)`` and
+    # ``math.ceil(Mutrate*Pmax)`` (mp-BRKGA_DL01.py:137-138). At his published ``Pmax = 20N``
+    # the two agree exactly (0.2*20N = 4N and 0.1*20N = 2N are integral), so this changes
+    # nothing at the published configuration; it removes the divergence for any other pop_size.
+    n_elite = max(1, ceil(config.elite_frac * p))
+    n_mutant = max(1, ceil(config.mutant_frac * p))
     n_offspring = p - n_elite - n_mutant
     if n_offspring < 0:
         raise ValueError(
@@ -235,6 +259,7 @@ def run_mp_brkga(
     archive_obj: list[Objectives] = []
     archive_chrom: list[np.ndarray] = []
     history: list[tuple[Objectives, ...]] = []
+    snapshots: list[tuple[int, tuple[Objectives, ...], tuple[np.ndarray, ...]]] = []
     evaluations = 0
 
     for gen in range(config.generations + 1):
@@ -249,15 +274,26 @@ def run_mp_brkga(
                 archive_obj, archive_chrom, [objs[i] for i in f0], [pop[i] for i in f0]
             )
         history.append(tuple(sorted(archive_obj)))
+        if config.snapshot_every and (
+            gen % config.snapshot_every == 0 or gen == config.generations
+        ):
+            order_s = sorted(range(len(archive_obj)), key=lambda i: archive_obj[i])
+            snapshots.append((
+                gen,
+                tuple(archive_obj[i] for i in order_s),
+                tuple(archive_chrom[i].copy() for i in order_s),
+            ))
 
         if gen == config.generations:
             break
 
         # --- single-objective populations: elite = best Ne by their own objective ---
         omega_elite_idx: list[np.ndarray] = []
+        omega_order: list[np.ndarray] = []  # full ranking, needed for the non-elite parent pool
         for o in range(omega):
             scores = np.asarray([obj[o] for obj in omega_objs[o]], dtype=float)
             order = np.argsort(scores, kind="stable")
+            omega_order.append(order)
             omega_elite_idx.append(order[:n_elite])
 
         # Best-Ne (chrom, obj) blocks each Omega pop contributes to the migration pool.
@@ -301,6 +337,7 @@ def run_mp_brkga(
                 _breed(
                     rng, pi_pops[pp], elite_block,
                     n_elite, n_offspring, n_mutant, config.inherit_prob,
+                    rank_order=np.asarray(pi_orders[pp]),
                     screen_fn=screen_fn, screening_factor=config.screening_factor,
                 )
             )
@@ -310,6 +347,7 @@ def run_mp_brkga(
             _breed(
                 rng, omega_pops[o], omega_pops[o][omega_elite_idx[o]],
                 n_elite, n_offspring, n_mutant, config.inherit_prob,
+                rank_order=omega_order[o],
                 screen_fn=screen_fn, screening_factor=config.screening_factor,
             )
             for o in range(omega)
@@ -323,5 +361,6 @@ def run_mp_brkga(
         front=tuple(archive_obj[i] for i in order),
         chromosomes=tuple(archive_chrom[i].copy() for i in order),
         front_history=tuple(history),
+        chrom_snapshots=tuple(snapshots),
         evaluations=evaluations,
     )

@@ -6,8 +6,8 @@ Pareto-(near)optimal* -- and does so without the surrogate-fidelity problem that
 tabular TreeSHAP unsafe here.
 
 The unifying idea: for the small instances the professor specified, the **exact Max-Plus
-evaluator IS the structural causal model** from decision variables -> ``(C_max, E)``. So we
-do not *approximate* importance on a fitted model; we compute it on the true objective:
+evaluator IS the structural causal model** from decision variables -> ``(C_max, E)``. Importance
+is therefore not *approximated* on a fitted model; it is computed on the true objective:
 
 - :func:`grouped_sobol` -- variance-based global sensitivity (Saltelli 2010 first-order +
   Jansen 1999 total-order) over the random-key chromosome, grouped into the four decision
@@ -210,7 +210,7 @@ def critical_path_landscape(
 ) -> CascadeResult:
     """Exact per-task critical-path attribution + downstream cascade over random schedules.
 
-    For each sampled schedule we (1) record, via the exact Max-Plus binding
+    For each sampled schedule the routine (1) records, via the exact Max-Plus binding
     (:func:`critical_path_binding`), whether each task gates the makespan through its AGV
     arc or its QC chain; and (2) accelerate each task to the fastest speed and re-evaluate,
     measuring the marginal ``(C_max, E)`` change and the **downstream cascade size** -- the

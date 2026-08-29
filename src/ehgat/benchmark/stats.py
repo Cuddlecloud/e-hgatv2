@@ -8,7 +8,7 @@ paper-grade statistics for **Claim 2**:
 - post-hoc **pairwise Wilcoxon signed-rank** (attention-vs-random, oracle-vs-random,
   reward-vs-random, attention-vs-oracle, attention-vs-reward) with **Holm-Bonferroni**
   correction within each metric's family (pairs absent from the artifact are skipped);
-- **matched-pairs rank-biserial** effect size (Kerby 2014) for each pairwise test, so we
+- **matched-pairs rank-biserial** effect size (Kerby 2014) for each pairwise test, so the report gives
   report magnitude not just significance;
 - **bootstrap CI** of the paired median difference, in the arms' native units.
 

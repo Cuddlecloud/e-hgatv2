@@ -3,7 +3,7 @@
 For each instance size N: train the frozen E-HGATv2 core + fused TAPE head, sample random
 schedules, and compute the **GNN/TAPE-derived** decision-family importance landscape
 (:func:`~ehgat.explain.gnn_landscape.gnn_landscape`). At the small sizes where the exact
-oracle is affordable we *also* compute the exact landscape and report the rank agreement --
+oracle is affordable the exact landscape is *also* computed and the rank agreement reported --
 the validation that licenses trusting the GNN landscape at the large sizes (DL: 40-160
 tasks) where exact variance-based methods (Sobol) are computationally intractable.
 

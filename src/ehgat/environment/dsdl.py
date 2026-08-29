@@ -39,6 +39,7 @@ Task order is preserved (it defines each QC's ordered task list ``J_k``).
 
 from __future__ import annotations
 
+import csv
 import json
 from dataclasses import dataclass
 from pathlib import Path
@@ -50,6 +51,8 @@ from ehgat.environment.instance import Instance, Task, TaskKind
 
 __all__ = [
     "DsDlRecord",
+    "load_distance_matrix_csv",
+    "load_dl_instances",
     "load_dsdl_dataset",
     "load_dsdl_instance",
     "load_tables_4_5",
@@ -131,8 +134,12 @@ def load_dsdl_instance(
     if not lu_stations:
         raise ValueError(f"{instance_id}: no LU stations available")
 
+    # The vehicle depot is part of the geometry, so an explicitly transcribed start node must be
+    # present in the matrix like any other; absent one, the first station is used as before.
+    agv_start = str(record["agv_start"]) if record.get("agv_start") else lu_stations[0]
+
     # Determine the full node set the instance needs.
-    needed = set(qcs) | set(lu_stations)
+    needed = set(qcs) | set(lu_stations) | {agv_start}
     synthetic = False
     if not needed.issubset(known):
         missing = needed - known
@@ -157,11 +164,59 @@ def load_dsdl_instance(
         tasks=tuple(tasks),
         qcs=qcs,
         num_agvs=num_agvs,
-        agv_start=lu_stations[0],
+        agv_start=agv_start,
         distance=base_distance,
         peak_power=peak_power,
     )
     return DsDlRecord(instance_id=instance_id, instance=instance, synthetic_geometry=synthetic)
+
+
+def load_distance_matrix_csv(path: str | Path) -> DistanceMatrix:
+    """Build a :class:`DistanceMatrix` from a square CSV whose header names the nodes.
+
+    The first column of each row repeats the origin node, so the header order and the row order
+    are checked against each other; a mismatch means the file has been reordered and the
+    resulting matrix would silently transpose pairs of legs.
+    """
+    rows = list(csv.reader(Path(path).open(encoding="utf-8")))
+    if not rows:
+        raise ValueError(f"{path}: empty distance matrix file")
+    nodes = [c.strip() for c in rows[0][1:]]
+    origins = [r[0].strip() for r in rows[1:]]
+    if origins != nodes:
+        raise ValueError(
+            f"{path}: row order {origins[:4]}... does not match column order {nodes[:4]}..."
+        )
+    matrix = np.asarray([[float(v) for v in r[1:]] for r in rows[1:]], dtype=float)
+    if matrix.shape != (len(nodes), len(nodes)):
+        raise ValueError(f"{path}: expected {len(nodes)}x{len(nodes)}, got {matrix.shape}")
+    return DistanceMatrix(nodes, matrix)
+
+
+def load_dl_instances(
+    path: str | Path | None = None,
+    *,
+    matrix_path: str | Path | None = None,
+    peak_power: float | None = None,
+    only: list[str] | None = None,
+) -> list[DsDlRecord]:
+    """Load ``DL01..DL10`` on the author's twenty-crane, twenty-station geometry.
+
+    Both files are produced by ``scripts/transcribe_dl_instances.py`` from the author's own
+    mp-BRKGA sources. The geometry is real, so ``synthetic_geometry`` is False throughout and no
+    synthesis fallback is permitted -- the twelve-node matrix of the book chapter describes a
+    different terminal (its station loop is shorter) and must not be substituted here.
+    """
+    data_dir = Path(__file__).resolve().parents[3] / "data"
+    path = Path(path) if path is not None else data_dir / "dl_instances.json"
+    matrix_path = Path(matrix_path) if matrix_path is not None else data_dir / "dl_distance_matrix.csv"
+    return load_dsdl_dataset(
+        path,
+        distance=load_distance_matrix_csv(matrix_path),
+        peak_power=peak_power,
+        allow_synthetic_geometry=False,
+        only=only,
+    )
 
 
 def _distance_from_table4(table4: dict) -> DistanceMatrix:
@@ -235,6 +290,8 @@ def load_dsdl_dataset(
         payload = {str(r["id"]): r for r in payload}
     out: list[DsDlRecord] = []
     for inst_id, record in payload.items():
+        if inst_id.startswith("_"):  # provenance / README blocks, not instances
+            continue
         if only is not None and inst_id not in only:
             continue
         out.append(

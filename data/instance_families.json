@@ -1,0 +1,6830 @@
+{
+  "L_L01": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 76.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 50.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 59.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 56.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L02": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC3",
+        "handling_time": 68.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 58.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 49.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 70.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L03": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC5",
+        "handling_time": 76.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 49.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 59.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 37.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L04": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 38.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 52.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 70.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 68.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 55.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 48.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L05": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC3",
+        "handling_time": 60.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 60.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 42.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 50.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 64.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 58.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L06": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC5",
+        "handling_time": 41.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 30.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 36.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 63.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 79.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 72.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L07": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC3",
+        "handling_time": 72.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 59.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 56.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 80.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 80.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 52.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 78.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 38.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L08": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC5",
+        "handling_time": 63.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 38.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 62.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 30.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 77.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 79.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 66.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 66.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L09": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC2",
+        "handling_time": 42.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 38.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 47.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 76.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 47.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 37.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 60.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 71.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 68.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 31.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L10": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC4",
+        "handling_time": 54.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 38.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 57.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 47.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 79.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 37.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 55.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 46.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 44.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 31.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L11": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 64.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 63.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 38.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 62.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 51.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 30.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 47.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 77.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 79.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 66.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 75.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 66.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L12": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC3",
+        "handling_time": 56.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 55.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 71.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 48.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 30.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 68.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 60.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 79.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 47.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 62.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 49.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 54.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L13": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 59.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 51.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 55.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 41.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 31.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 64.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 43.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 78.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 41.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 67.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 32.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 80.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 75.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 63.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L14": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC4",
+        "handling_time": 67.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 35.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 33.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 39.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 54.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 31.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 49.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 52.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 66.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 69.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 35.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 38.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 41.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 71.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L15": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC2",
+        "handling_time": 64.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 46.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 77.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 78.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 59.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 37.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 61.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 70.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 57.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 66.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 32.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 45.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 74.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 31.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 40.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 72.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L16": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC3",
+        "handling_time": 69.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 40.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 45.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 43.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 66.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 60.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 50.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 80.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 37.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 78.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 48.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 61.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 75.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 39.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 69.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 43.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L17": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 76.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 37.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 36.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 55.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 57.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 50.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L18": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC4",
+        "handling_time": 64.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 73.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 71.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 47.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 63.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 56.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L19": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC2",
+        "handling_time": 39.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 31.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 51.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 34.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 78.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 60.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 78.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 66.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 59.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L20": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC3",
+        "handling_time": 74.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 38.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 48.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 42.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 65.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 52.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 32.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 44.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 65.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L21": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 71.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 60.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 54.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 54.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 30.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 78.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 72.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 57.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 72.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 64.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 67.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 76.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L22": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC4",
+        "handling_time": 52.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 33.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 77.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 34.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 32.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 79.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 74.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 63.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 80.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 32.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 66.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 33.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L23": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 72.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 62.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 41.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 73.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 56.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 66.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 61.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 67.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 54.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 51.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 47.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 56.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 40.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 33.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 48.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L24": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC4",
+        "handling_time": 47.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 58.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 50.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 70.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 51.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 79.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 30.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 56.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 39.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 56.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 32.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 49.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 67.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 63.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 77.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L25": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 36.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 73.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 74.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 40.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 77.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 58.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 40.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 43.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L26": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC3",
+        "handling_time": 64.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 75.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 45.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 72.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 68.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 77.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 63.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 74.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L27": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC2",
+        "handling_time": 39.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 48.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 51.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 67.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 41.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 56.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 50.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 46.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 56.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 68.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 68.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 77.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L28": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC3",
+        "handling_time": 63.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 42.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 64.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 51.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 43.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 45.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 60.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 30.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 68.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 41.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 47.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 63.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L29": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC3",
+        "handling_time": 46.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 60.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 54.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 71.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 47.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 58.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 50.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 70.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 79.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 30.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 56.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 39.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 32.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 49.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 67.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 63.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L30": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 75.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 39.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 46.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 35.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 69.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 80.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 67.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 44.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 45.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 48.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 77.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 42.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 62.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 36.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 50.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 63.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L31": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 61.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 59.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 71.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 62.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 30.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 30.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 38.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 37.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 55.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 42.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L32": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC2",
+        "handling_time": 79.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 66.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 55.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 45.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 46.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 56.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 77.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 34.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 80.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 67.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L33": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 80.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 43.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 53.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 32.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 47.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 70.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 63.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 52.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 71.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 48.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 57.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 75.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 67.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 43.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 65.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L34": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC2",
+        "handling_time": 45.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 50.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 77.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 34.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 47.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 52.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 43.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 70.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 67.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 66.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 35.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 60.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 56.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 36.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 56.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "L_L35": {
+    "family": "loading",
+    "source": "Table 5 as printed",
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 72.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 59.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 61.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 57.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 53.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 48.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 57.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 40.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 65.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 50.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 58.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 47.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "U_L01": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 76.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 50.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 59.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 56.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L02": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC3",
+        "handling_time": 68.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 58.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 49.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 70.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L03": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC5",
+        "handling_time": 76.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 49.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 59.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 37.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L04": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 38.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 52.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 70.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 68.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 55.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 48.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L05": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC3",
+        "handling_time": 60.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 60.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 42.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 50.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 64.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 58.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L06": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC5",
+        "handling_time": 41.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 30.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 36.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 63.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 79.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 72.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L07": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC3",
+        "handling_time": 72.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 59.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 56.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 80.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 80.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 52.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 78.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 38.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L08": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC5",
+        "handling_time": 63.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 38.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 62.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 30.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 77.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 79.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 66.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 66.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L09": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC2",
+        "handling_time": 42.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 38.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 47.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 76.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 47.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 37.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 60.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 71.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 68.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 31.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L10": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC4",
+        "handling_time": 54.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 38.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 57.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 47.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 79.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 37.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 55.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 46.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 44.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 31.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L11": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 64.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 63.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 38.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 62.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 51.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 30.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 47.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 77.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 79.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 66.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 75.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 66.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L12": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC3",
+        "handling_time": 56.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 55.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 71.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 48.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 30.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 68.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 60.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 79.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 47.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 62.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 49.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 54.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L13": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 59.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 51.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 55.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 41.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 31.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 64.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 43.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 78.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 41.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 67.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 32.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 80.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 75.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 63.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L14": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC4",
+        "handling_time": 67.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 35.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 33.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 39.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 54.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 31.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 49.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 52.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 66.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 69.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 35.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 38.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 41.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 71.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L15": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC2",
+        "handling_time": 64.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 46.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 77.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 78.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 59.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 37.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 61.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 70.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 57.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 66.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 32.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 45.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 74.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 31.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 40.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 72.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L16": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC3",
+        "handling_time": 69.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 40.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 45.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 43.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 66.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 60.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 50.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 80.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 37.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 78.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 48.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 61.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 75.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 39.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 69.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 43.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L17": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 76.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 37.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 36.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 55.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 57.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 50.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L18": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC4",
+        "handling_time": 64.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 73.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 71.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 47.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 63.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 56.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L19": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC2",
+        "handling_time": 39.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 31.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 51.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 34.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 78.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 60.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 78.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 66.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 59.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L20": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC3",
+        "handling_time": 74.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 38.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 48.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 42.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 65.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 52.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 32.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 44.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 65.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L21": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 71.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 60.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 54.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 54.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 30.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 78.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 72.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 57.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 72.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 64.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 67.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 76.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L22": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC4",
+        "handling_time": 52.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 33.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 77.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 34.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 32.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 79.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 74.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 63.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 80.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 32.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 66.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 33.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L23": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 72.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 62.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 41.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 73.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 56.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 66.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 61.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 67.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 54.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 51.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 47.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 56.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 40.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 33.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 48.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L24": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC4",
+        "handling_time": 47.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 58.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 50.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 70.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 51.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 79.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 30.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 56.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 39.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 56.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 32.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 49.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 67.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 63.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 77.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L25": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 36.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 73.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 74.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 40.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 77.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 58.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 40.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 43.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L26": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC3",
+        "handling_time": 64.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 75.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 45.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 72.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 68.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 77.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 63.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 74.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L27": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC2",
+        "handling_time": 39.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 48.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 51.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 67.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 41.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 56.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 50.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 46.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 56.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 68.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 68.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 77.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L28": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC3",
+        "handling_time": 63.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 42.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 64.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 51.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 43.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 45.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 60.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 30.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 68.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 41.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 47.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 63.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L29": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC3",
+        "handling_time": 46.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 60.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 54.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 71.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 47.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 58.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 50.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 70.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 79.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 30.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 56.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 39.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 32.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 49.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 67.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 63.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L30": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 75.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 39.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 46.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 35.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 69.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 80.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 67.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 44.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 45.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 48.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 77.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 42.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 62.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 36.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 50.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 63.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L31": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 61.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 59.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 71.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 62.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 30.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 30.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 38.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 37.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 55.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 42.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L32": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC2",
+        "handling_time": 79.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 66.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 55.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 45.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 46.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 56.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 77.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 34.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 80.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 67.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L33": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 80.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 43.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 53.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 32.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 47.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 70.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 63.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 52.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 71.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 48.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 57.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 75.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 67.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 43.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 65.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L34": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC2",
+        "handling_time": 45.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 50.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 77.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 34.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 47.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 52.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 43.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 70.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 67.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 66.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 35.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 60.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 56.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 36.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 56.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "U_L35": {
+    "family": "unloading",
+    "source": "Table 5 with origins and destinations reversed (Sec 5.1)",
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 72.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 59.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 61.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 57.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 53.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 48.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 57.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 40.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 65.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 50.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 58.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 47.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      }
+    ]
+  },
+  "D01": {
+    "family": "mixed",
+    "source": "Table 3 comb. of = U01&L01",
+    "combination": "U01&L01",
+    "published_qt": "2-8",
+    "num_agvs_published": 2,
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 76.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 50.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 59.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 56.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 76.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 50.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 59.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 56.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "D02": {
+    "family": "mixed",
+    "source": "Table 3 comb. of = U02&L02",
+    "combination": "U02&L02",
+    "published_qt": "2-8",
+    "num_agvs_published": 2,
+    "tasks": [
+      {
+        "qc": "QC3",
+        "handling_time": 68.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 58.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 49.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 70.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 68.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 58.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 49.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 70.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "D03": {
+    "family": "mixed",
+    "source": "Table 3 comb. of = U03&L03",
+    "combination": "U03&L03",
+    "published_qt": "2-8",
+    "num_agvs_published": 2,
+    "tasks": [
+      {
+        "qc": "QC5",
+        "handling_time": 76.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 49.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 59.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 37.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 76.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 49.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 59.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 37.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "D04": {
+    "family": "mixed",
+    "source": "Table 3 comb. of = U01&L02",
+    "combination": "U01&L02",
+    "published_qt": "4-8",
+    "num_agvs_published": 2,
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 76.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 50.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 59.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 56.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 68.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 58.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 49.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 70.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "D05": {
+    "family": "mixed",
+    "source": "Table 3 comb. of = U01&L03",
+    "combination": "U01&L03",
+    "published_qt": "4-8",
+    "num_agvs_published": 2,
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 76.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 50.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 59.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 56.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 76.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 49.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 59.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 37.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "D06": {
+    "family": "mixed",
+    "source": "Table 3 comb. of = U02&L01",
+    "combination": "U02&L01",
+    "published_qt": "4-8",
+    "num_agvs_published": 2,
+    "tasks": [
+      {
+        "qc": "QC3",
+        "handling_time": 68.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 58.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 49.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 70.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 76.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 50.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 59.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 56.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "D07": {
+    "family": "mixed",
+    "source": "Table 3 comb. of = U02&L03",
+    "combination": "U02&L03",
+    "published_qt": "4-8",
+    "num_agvs_published": 2,
+    "tasks": [
+      {
+        "qc": "QC3",
+        "handling_time": 68.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 58.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 49.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 70.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 76.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 49.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 59.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 37.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "D08": {
+    "family": "mixed",
+    "source": "Table 3 comb. of = U03&L01",
+    "combination": "U03&L01",
+    "published_qt": "4-8",
+    "num_agvs_published": 2,
+    "tasks": [
+      {
+        "qc": "QC5",
+        "handling_time": 76.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 49.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 59.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 37.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 76.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 50.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 59.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 56.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "D09": {
+    "family": "mixed",
+    "source": "Table 3 comb. of = U03&L02",
+    "combination": "U03&L02",
+    "published_qt": "4-8",
+    "num_agvs_published": 2,
+    "tasks": [
+      {
+        "qc": "QC5",
+        "handling_time": 76.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 49.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 59.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 37.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 68.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 58.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 49.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 70.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "D10": {
+    "family": "mixed",
+    "source": "Table 3 comb. of = U04&L04",
+    "combination": "U04&L04",
+    "published_qt": "2-12",
+    "num_agvs_published": 2,
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 38.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 52.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 70.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 68.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 55.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 48.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 38.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 52.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 70.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 68.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 55.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 48.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "D11": {
+    "family": "mixed",
+    "source": "Table 3 comb. of = U05&L05",
+    "combination": "U05&L05",
+    "published_qt": "2-12",
+    "num_agvs_published": 2,
+    "tasks": [
+      {
+        "qc": "QC3",
+        "handling_time": 60.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 60.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 42.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 50.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 64.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 58.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 60.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 60.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 42.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 50.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 64.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 58.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "D12": {
+    "family": "mixed",
+    "source": "Table 3 comb. of = U06&L06",
+    "combination": "U06&L06",
+    "published_qt": "2-12",
+    "num_agvs_published": 2,
+    "tasks": [
+      {
+        "qc": "QC5",
+        "handling_time": 41.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 30.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 36.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 63.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 79.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 72.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 41.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 30.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 36.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 63.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 79.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 72.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "D13": {
+    "family": "mixed",
+    "source": "Table 3 comb. of = U04&L05",
+    "combination": "U04&L05",
+    "published_qt": "4-12",
+    "num_agvs_published": 2,
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 38.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 52.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 70.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 68.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 55.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 48.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 60.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 60.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 42.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 50.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 64.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 58.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "D14": {
+    "family": "mixed",
+    "source": "Table 3 comb. of = U04&L06",
+    "combination": "U04&L06",
+    "published_qt": "4-12",
+    "num_agvs_published": 2,
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 38.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 52.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 70.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 68.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 55.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 48.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 41.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 30.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 36.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 63.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 79.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 72.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "D15": {
+    "family": "mixed",
+    "source": "Table 3 comb. of = U05&L04",
+    "combination": "U05&L04",
+    "published_qt": "4-12",
+    "num_agvs_published": 2,
+    "tasks": [
+      {
+        "qc": "QC3",
+        "handling_time": 60.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 60.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 42.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 50.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 64.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 58.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 38.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 52.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 70.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 68.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 55.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 48.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "D16": {
+    "family": "mixed",
+    "source": "Table 3 comb. of = U05&L06",
+    "combination": "U05&L06",
+    "published_qt": "4-12",
+    "num_agvs_published": 2,
+    "tasks": [
+      {
+        "qc": "QC3",
+        "handling_time": 60.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 60.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 42.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 50.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 64.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 58.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 41.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 30.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 36.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 63.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 79.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 72.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "D17": {
+    "family": "mixed",
+    "source": "Table 3 comb. of = U06&L04",
+    "combination": "U06&L04",
+    "published_qt": "4-12",
+    "num_agvs_published": 2,
+    "tasks": [
+      {
+        "qc": "QC5",
+        "handling_time": 41.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 30.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 36.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 63.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 79.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 72.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 38.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 52.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 70.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 68.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 55.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 48.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "D18": {
+    "family": "mixed",
+    "source": "Table 3 comb. of = U06&L05",
+    "combination": "U06&L05",
+    "published_qt": "4-12",
+    "num_agvs_published": 2,
+    "tasks": [
+      {
+        "qc": "QC5",
+        "handling_time": 41.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 30.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 36.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 63.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 79.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 72.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 60.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 60.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 42.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 50.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 64.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 58.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "D19": {
+    "family": "mixed",
+    "source": "Table 3 comb. of = U07&L07",
+    "combination": "U07&L07",
+    "published_qt": "2-16",
+    "num_agvs_published": 2,
+    "tasks": [
+      {
+        "qc": "QC3",
+        "handling_time": 72.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 59.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 56.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 80.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 80.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 52.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 78.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 38.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 72.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 59.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 56.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 80.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 80.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 52.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 78.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 38.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "D20": {
+    "family": "mixed",
+    "source": "Table 3 comb. of = U08&L08",
+    "combination": "U08&L08",
+    "published_qt": "2-16",
+    "num_agvs_published": 2,
+    "tasks": [
+      {
+        "qc": "QC5",
+        "handling_time": 63.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 38.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 62.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 30.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 77.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 79.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 66.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 66.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 63.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 38.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 62.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 30.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 77.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 79.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 66.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 66.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "D21": {
+    "family": "mixed",
+    "source": "Table 3 comb. of = U07&L08",
+    "combination": "U07&L08",
+    "published_qt": "4-16",
+    "num_agvs_published": 2,
+    "tasks": [
+      {
+        "qc": "QC3",
+        "handling_time": 72.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 59.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 56.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 80.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 80.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 52.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 78.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 38.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 63.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 38.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 62.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 30.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 77.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 79.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 66.0,
+        "lu": "LU6",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 66.0,
+        "lu": "LU5",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "D22": {
+    "family": "mixed",
+    "source": "Table 3 comb. of = U08&L07",
+    "combination": "U08&L07",
+    "published_qt": "4-16",
+    "num_agvs_published": 2,
+    "tasks": [
+      {
+        "qc": "QC5",
+        "handling_time": 63.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 38.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 62.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 30.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 77.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 79.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 66.0,
+        "lu": "LU6",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 66.0,
+        "lu": "LU5",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 72.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 59.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 56.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 80.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 80.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 52.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 78.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 38.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "D23": {
+    "family": "mixed",
+    "source": "Table 3 comb. of = U17&L17",
+    "combination": "U17&L17",
+    "published_qt": "3-12",
+    "num_agvs_published": 2,
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 76.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 37.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 36.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 55.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 57.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 50.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 76.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 37.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 36.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 55.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 57.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 50.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "D24": {
+    "family": "mixed",
+    "source": "Table 3 comb. of = U18&L18",
+    "combination": "U18&L18",
+    "published_qt": "3-12",
+    "num_agvs_published": 2,
+    "tasks": [
+      {
+        "qc": "QC4",
+        "handling_time": 64.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 73.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 71.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 47.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 63.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 56.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 64.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 73.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 71.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 47.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 63.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 56.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "D25": {
+    "family": "mixed",
+    "source": "Table 3 comb. of = U17&L18",
+    "combination": "U17&L18",
+    "published_qt": "6-12",
+    "num_agvs_published": 2,
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 76.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 37.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 36.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 55.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 57.0,
+        "lu": "LU1",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 50.0,
+        "lu": "LU2",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 64.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 73.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 71.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 47.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 63.0,
+        "lu": "LU4",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 56.0,
+        "lu": "LU3",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "D26": {
+    "family": "mixed",
+    "source": "Table 3 comb. of = U18&L17",
+    "combination": "U18&L17",
+    "published_qt": "6-12",
+    "num_agvs_published": 2,
+    "tasks": [
+      {
+        "qc": "QC4",
+        "handling_time": 64.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 73.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 71.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 47.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 63.0,
+        "lu": "LU4",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 56.0,
+        "lu": "LU3",
+        "kind": "UNLOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 76.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 37.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 36.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 55.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 57.0,
+        "lu": "LU1",
+        "kind": "LOAD"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 50.0,
+        "lu": "LU2",
+        "kind": "LOAD"
+      }
+    ]
+  },
+  "_provenance": {
+    "loading": "Table 5 as printed",
+    "unloading": "Table 5 reversed, Sec 5.1",
+    "mixed": "Table 3 'combination' column, all 26 verified against the published Q-T",
+    "note": "An earlier build paired consecutive identifiers, which is NOT the published set: its task counts ran 8-32 where the published set has only 8, 12 and 16."
+  }
+}

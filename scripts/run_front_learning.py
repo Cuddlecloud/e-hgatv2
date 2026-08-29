@@ -66,7 +66,7 @@ def _feature_row(dp: "FrontDatapoint") -> list[float]:
 
 # --- per-instance front-data caching -------------------------------------------------
 # Each instance's _compute_front_data (core+fused training, NSGA-II, TAPE) is fully
-# independent and CPU-bound, so we compute one instance per process and fan out across
+# independent and CPU-bound, so one instance is computed per process, fanned out across
 # the VM's many cores (see scripts/run_front_parallel.sh).  Stage 1 writes a cache file
 # per instance; stage 2 pools the caches and fits the cheap predictor.
 
@@ -245,7 +245,7 @@ def _train_predictor(train_data: list[FrontDatapoint]):
     """Train a simple predictor: (instance_features, λ) → (transport_frac, qc_frac).
 
     Uses a small MLP via PyTorch for differentiability, but the model is tiny
-    (2 hidden layers, 32 units) since we're predicting aggregate statistics.
+    (2 hidden layers, 32 units) since the targets are aggregate statistics.
     """
     import torch
     import torch.nn as nn

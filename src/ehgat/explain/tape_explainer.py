@@ -13,7 +13,7 @@ from ehgat.environment.evaluator import build_precedence, evaluate
 from ehgat.environment.instance import Instance, TaskKind
 from ehgat.environment.physics import leg_energy, travel_time
 from ehgat.explain.event_dag import assemble_coupled_event_dag, assemble_event_dag
-from ehgat.explain.tropical_dp import tropical_longest_path
+from ehgat.explain.tropical_dp import tropical_longest_path, tropical_max
 from ehgat.surrogate.graph import AGV_EDGE, NODE_TYPE, QC_EDGE, build_hetero_graph
 
 __all__ = [
@@ -100,7 +100,7 @@ def explain_schedule(
     dag = assemble_event_dag(is_load, agv_prev, qc_prev, empty_t, loaded_t, tau)
 
     x = tropical_longest_path(dag.node_weights, dag.edge_index, dag.edge_weights)
-    makespan = x[dag.completion_nodes].max()
+    makespan = tropical_max(x[dag.completion_nodes])
     energy = (empty_e + loaded_e).sum()
 
     dag.edge_weights.retain_grad()
@@ -152,7 +152,7 @@ def explain_schedule_coupled(
     )
 
     x = tropical_longest_path(dag.node_weights, dag.edge_index, dag.edge_weights)
-    makespan = x[dag.completion_nodes].max()
+    makespan = tropical_max(x[dag.completion_nodes])
     energy = (empty_e + loaded_e).sum()
 
     # Coupled DAG: leg times are node weights; structural edges carry no gradient.

@@ -1,0 +1,298 @@
+{
+  "_source": "Homayouni & Fontes, book chapter 2022, Table 3, 'comb. of' column (p. 177). Each dual-cycling instance combines one unloading instance from data set 2 with one loading instance from data set 1.",
+  "pairs": {
+    "D01": [
+      "U01",
+      "L01"
+    ],
+    "D02": [
+      "U02",
+      "L02"
+    ],
+    "D03": [
+      "U03",
+      "L03"
+    ],
+    "D04": [
+      "U01",
+      "L02"
+    ],
+    "D05": [
+      "U01",
+      "L03"
+    ],
+    "D06": [
+      "U02",
+      "L01"
+    ],
+    "D07": [
+      "U02",
+      "L03"
+    ],
+    "D08": [
+      "U03",
+      "L01"
+    ],
+    "D09": [
+      "U03",
+      "L02"
+    ],
+    "D10": [
+      "U04",
+      "L04"
+    ],
+    "D11": [
+      "U05",
+      "L05"
+    ],
+    "D12": [
+      "U06",
+      "L06"
+    ],
+    "D13": [
+      "U04",
+      "L05"
+    ],
+    "D14": [
+      "U04",
+      "L06"
+    ],
+    "D15": [
+      "U05",
+      "L04"
+    ],
+    "D16": [
+      "U05",
+      "L06"
+    ],
+    "D17": [
+      "U06",
+      "L04"
+    ],
+    "D18": [
+      "U06",
+      "L05"
+    ],
+    "D19": [
+      "U07",
+      "L07"
+    ],
+    "D20": [
+      "U08",
+      "L08"
+    ],
+    "D21": [
+      "U07",
+      "L08"
+    ],
+    "D22": [
+      "U08",
+      "L07"
+    ],
+    "D23": [
+      "U17",
+      "L17"
+    ],
+    "D24": [
+      "U18",
+      "L18"
+    ],
+    "D25": [
+      "U17",
+      "L18"
+    ],
+    "D26": [
+      "U18",
+      "L17"
+    ]
+  },
+  "published_qt": {
+    "D01": "2-8",
+    "D02": "2-8",
+    "D03": "2-8",
+    "D04": "4-8",
+    "D05": "4-8",
+    "D06": "4-8",
+    "D07": "4-8",
+    "D08": "4-8",
+    "D09": "4-8",
+    "D10": "2-12",
+    "D11": "2-12",
+    "D12": "2-12",
+    "D13": "4-12",
+    "D14": "4-12",
+    "D15": "4-12",
+    "D16": "4-12",
+    "D17": "4-12",
+    "D18": "4-12",
+    "D19": "2-16",
+    "D20": "2-16",
+    "D21": "4-16",
+    "D22": "4-16",
+    "D23": "3-12",
+    "D24": "3-12",
+    "D25": "6-12",
+    "D26": "6-12"
+  },
+  "_optima_note": "Table 3 dual-cycling block, read from the printed table. E*/Cmax is the energy-optimal end and C*max/E the makespan-optimal end, so the pair is directly comparable with the two extremes of a computed front. Entries are null where the MILP hit its 36,000s limit: D18 and D22 entirely, and the makespan end of D21, D25 and D26.",
+  "agvs_published": 2,
+  "_construction": "5.4: AGVs are shared, two per instance. Same-index pair (e.g. U01&L01) is one ship so both halves use the SAME QC set; different-index pair is two ships so the QC sets are disjoint and crane counts add. Verified 26/26 against the published Q-T column.",
+  "published_front_extremes": {
+    "D01": {
+      "E_star": 7475,
+      "Cmax_at_E_star": 510,
+      "Cmax_star": 351,
+      "E_at_Cmax_star": 8832
+    },
+    "D02": {
+      "E_star": 7800,
+      "Cmax_at_E_star": 510,
+      "Cmax_star": 350,
+      "E_at_Cmax_star": 9258
+    },
+    "D03": {
+      "E_star": 8125,
+      "Cmax_at_E_star": 491,
+      "Cmax_star": 350,
+      "E_at_Cmax_star": 9442
+    },
+    "D04": {
+      "E_star": 9263,
+      "Cmax_at_E_star": 528,
+      "Cmax_star": 318,
+      "E_at_Cmax_star": 10956
+    },
+    "D05": {
+      "E_star": 9425,
+      "Cmax_at_E_star": 516,
+      "Cmax_star": 346,
+      "E_at_Cmax_star": 11686
+    },
+    "D06": {
+      "E_star": 7800,
+      "Cmax_at_E_star": 354,
+      "Cmax_star": 243,
+      "E_at_Cmax_star": 8749
+    },
+    "D07": {
+      "E_star": 9425,
+      "Cmax_at_E_star": 954,
+      "Cmax_star": 339,
+      "E_at_Cmax_star": 11381
+    },
+    "D08": {
+      "E_star": 8450,
+      "Cmax_at_E_star": 396,
+      "Cmax_star": 277,
+      "E_at_Cmax_star": 9304
+    },
+    "D09": {
+      "E_star": 8450,
+      "Cmax_at_E_star": 792,
+      "Cmax_star": 279,
+      "E_at_Cmax_star": 9860
+    },
+    "D10": {
+      "E_star": 12513,
+      "Cmax_at_E_star": 709,
+      "Cmax_star": 504,
+      "E_at_Cmax_star": 14166
+    },
+    "D11": {
+      "E_star": 10400,
+      "Cmax_at_E_star": 648,
+      "Cmax_star": 443,
+      "E_at_Cmax_star": 12897
+    },
+    "D12": {
+      "E_star": 11700,
+      "Cmax_at_E_star": 751,
+      "Cmax_star": 493,
+      "E_at_Cmax_star": 14230
+    },
+    "D13": {
+      "E_star": 13000,
+      "Cmax_at_E_star": 992,
+      "Cmax_star": 450,
+      "E_at_Cmax_star": 15223
+    },
+    "D14": {
+      "E_star": 13650,
+      "Cmax_at_E_star": 1068,
+      "Cmax_star": 486,
+      "E_at_Cmax_star": 15234
+    },
+    "D15": {
+      "E_star": 11213,
+      "Cmax_at_E_star": 578,
+      "Cmax_star": 367,
+      "E_at_Cmax_star": 13207
+    },
+    "D16": {
+      "E_star": 12675,
+      "Cmax_at_E_star": 1309,
+      "Cmax_star": 453,
+      "E_at_Cmax_star": 15199
+    },
+    "D17": {
+      "E_star": 12675,
+      "Cmax_at_E_star": 805,
+      "Cmax_star": 429,
+      "E_at_Cmax_star": 15156
+    },
+    "D18": {
+      "E_star": null,
+      "Cmax_at_E_star": null,
+      "Cmax_star": null,
+      "E_at_Cmax_star": null
+    },
+    "D19": {
+      "E_star": 16900,
+      "Cmax_at_E_star": 1069,
+      "Cmax_star": 636,
+      "E_at_Cmax_star": 20069
+    },
+    "D20": {
+      "E_star": 17063,
+      "Cmax_at_E_star": 1670,
+      "Cmax_star": 686,
+      "E_at_Cmax_star": 20084
+    },
+    "D21": {
+      "E_star": 18038,
+      "Cmax_at_E_star": 1815,
+      "Cmax_star": null,
+      "E_at_Cmax_star": null
+    },
+    "D22": {
+      "E_star": null,
+      "Cmax_at_E_star": null,
+      "Cmax_star": null,
+      "E_at_Cmax_star": null
+    },
+    "D23": {
+      "E_star": 11050,
+      "Cmax_at_E_star": 657,
+      "Cmax_star": 453,
+      "E_at_Cmax_star": 13837
+    },
+    "D24": {
+      "E_star": 14463,
+      "Cmax_at_E_star": 797,
+      "Cmax_star": 532,
+      "E_at_Cmax_star": 17009
+    },
+    "D25": {
+      "E_star": 15600,
+      "Cmax_at_E_star": 842,
+      "Cmax_star": null,
+      "E_at_Cmax_star": null
+    },
+    "D26": {
+      "E_star": 13650,
+      "Cmax_at_E_star": 646,
+      "Cmax_star": null,
+      "E_at_Cmax_star": null
+    }
+  }
+}

@@ -1,11 +1,11 @@
 """Train-small / evaluate-large size-generalization study (VM only).
 
-The surrogate is INDUCTIVE (shared-weight message passing), so we train the core +
+The surrogate is INDUCTIVE (shared-weight message passing), so the driver trains the core +
 physics-fused head ONCE on a small instance and then run *inference* on a ladder of much
 larger instances -- never retraining at large N. The question is whether the surrogate
 generalizes across scale, and whether the attention/TAPE faithfulness picture survives.
 
-Per eval-N (mean over K random schedules, then over training seeds) we report:
+Per eval-N (mean over K random schedules, then over training seeds) the output reports:
 
 - ``core_r2_makespan``  -- frozen black-box global-readout head. Expected to COLLAPSE at
   large N: a global readout cannot extrapolate makespan magnitude (C_max grows with N).
@@ -19,7 +19,7 @@ Per eval-N (mean over K random schedules, then over training seeds) we report:
 
 Cost note: everything is O(N) per schedule EXCEPT the attention ground truth
 ``marginal_makespan_speedup`` (N leave-one-out evals => O(N^2)). Past ``--rho-max-tasks``
-we subsample that many task indices for the rho computation so the attention metric stays
+that many task indices are subsampled for the rho computation so the attention metric stays
 feasible at N>=5000 (the subsample flag is recorded per row).
 
 Run on the VM::

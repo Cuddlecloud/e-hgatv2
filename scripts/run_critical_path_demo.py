@@ -14,7 +14,7 @@ the makespan is the max-plus longest path: every on-path activity carries a bina
 subgradient ``dC_max/d(duration) = 1`` (:mod:`ehgat.explain.tropical_dp`), so the on-path
 durations sum to the makespan by construction.
 
-For each instance we report the traversal at BOTH front extremes -- the makespan-optimal end
+For each instance the traversal is reported at BOTH front extremes -- the makespan-optimal end
 and the energy-optimal end -- so the migration of the binding bottleneck (the R2/R4 "why is
 this solution Pareto-optimal" knowledge) is visible in the same artifact.
 

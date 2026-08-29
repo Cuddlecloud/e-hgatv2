@@ -67,7 +67,7 @@ def _train_and_transfer(task: tuple[int, int, dict]) -> dict:
     for nt in a["test_tasks"]:
         ti = build_toy_instance(num_tasks=nt, peak_power=a["peak_power"])
         # build_batch runs the exact simulator to attach mk_true/energy_true labels; time it
-        # as the "solver" cost we are amortising. The model forward is the solver-free predict.
+        # as the "solver" cost being amortised. The model forward is the solver-free predict.
         t_sim = time.perf_counter()
         samples = build_samples(ti, a["eval_samples"], seed=10_000 + seed)
         b = build_batch(model, samples, ti)

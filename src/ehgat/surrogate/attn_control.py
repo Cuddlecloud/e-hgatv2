@@ -9,7 +9,7 @@ most one AGV and one QC predecessor (see :func:`ehgat.surrogate.graph.build_hete
 edge and is therefore **degenerate (α ≡ 1)** regardless of the aggregation. The degeneracy
 is a property of the resolved-schedule graph, not of ``aggr='max'``.
 
-To get genuinely non-degenerate attention we must let a token attend over **all** tasks,
+Non-degenerate attention requires that a token attend over **all** tasks,
 not just its resource-predecessor. This model is a **global self-attention (Transformer)
 encoder over the task set** with a learned **readout query** whose attention distribution
 over tasks is the *audited explanation*. That is:

@@ -80,7 +80,7 @@ _MUTATION_OPS = ("speed", "reassign", "swap_agv", "swap_qc")
 # `speed` is the universal makespan<->energy lever (it also tunes AGV travel time, the
 # makespan driver when AGV-bound), so its score is held >= the structural operators' to
 # avoid crowd-out: at high agv_bias the old 0.5 baseline pushed speed BELOW uniform, which
-# starved the operator that generates the very HV spread we optimise. Default 1.0.
+# starved the operator that generates the very HV spread being optimised. Default 1.0.
 _SPEED_WEIGHT = 1.0
 # Channel-B operator-selection sources. ``random`` is the uniform null; ``attention`` /
 # ``oracle`` are *structural priors* that map a bottleneck-type signal to operator scores;

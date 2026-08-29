@@ -6,7 +6,7 @@ The scheduling paper's attention-unfaithfulness result is **confounded**: E-HGAT
 attention is degenerate/thin by design (max-plus aggregation + a 2-way semantic gate), so
 "attention is unfaithful" might just mean "this design sidelined attention." Before staking
 September on the transformer/CRF fork — whose central bet is *"rich attention diverges from
-an exact structured oracle"* — we cheaply test the cousin bet **here**:
+an exact structured oracle"*. The cousin bet is tested cheaply **here**:
 
     Does a genuinely RICH attention model (global self-attention over all tasks) align with
     the exact critical path, or is it *also* unfaithful?
@@ -19,7 +19,7 @@ an exact structured oracle"* — we cheaply test the cousin bet **here**:
 
 Method
 ------
-For each instance we sample resolved schedules, label them with the exact evaluator, train
+For each instance the driver samples resolved schedules, labels them with the exact evaluator, trains
 :class:`~ehgat.surrogate.attn_control.SelfAttnSurrogate` (Transformer over tasks) to predict
 ``(C_max, E)``, then score its readout attention against the exact critical-path oracle with
 the **existing** :func:`~ehgat.benchmark.faithfulness.evaluate_faithfulness`. We also report

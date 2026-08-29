@@ -1,0 +1,4895 @@
+{
+  "source": {
+    "file": "/Users/aayushjha/Downloads/2022'Book Chapter-ContrainerTransport-2.pdf",
+    "chapter_title": "Energy-Efficient Scheduling of Intraterminal Container Transport",
+    "authors": [
+      "S. Mahdi Homayouni",
+      "D. B. M. M. Fontes"
+    ],
+    "extraction_basis": "Authoritative PDF, cross-checked against seven user-supplied screenshots",
+    "missing_value_encoding": "null",
+    "transcription_policy": "Values are preserved exactly as printed; no inferred corrections were applied."
+  },
+  "tables": {
+    "table_1": {
+      "title": "Results for the 35 loading problem instances in data set 1",
+      "source_location": {
+        "pdf_page_1_based": 19,
+        "printed_page": 173
+      },
+      "rows": [
+        {
+          "instance": "L01",
+          "q_t": "2-4",
+          "scenario_n": {
+            "energy_star": 4000,
+            "c_max": 274,
+            "c_max_star": 200,
+            "energy": 4083
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 3900,
+            "c_max": 309
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 175,
+            "energy": 4474
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 12.9,
+            "c_max_star": -12.8,
+            "energy": 9.6
+          }
+        },
+        {
+          "instance": "L02",
+          "q_t": "2-4",
+          "scenario_n": {
+            "energy_star": 4833,
+            "c_max": 437,
+            "c_max_star": 262,
+            "energy": 5083
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 4713,
+            "c_max": 528
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 229,
+            "energy": 5569
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 21,
+            "c_max_star": -12.5,
+            "energy": 9.6
+          }
+        },
+        {
+          "instance": "L03",
+          "q_t": "2-4",
+          "scenario_n": {
+            "energy_star": 5000,
+            "c_max": 420,
+            "c_max_star": 266,
+            "energy": 5417
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 4875,
+            "c_max": 516
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 229,
+            "energy": 5815
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 22.8,
+            "c_max_star": -13.9,
+            "energy": 7.4
+          }
+        },
+        {
+          "instance": "L04",
+          "q_t": "2-6",
+          "scenario_n": {
+            "energy_star": 6500,
+            "c_max": 403,
+            "c_max_star": 323,
+            "energy": 6917
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 6338,
+            "c_max": 443
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 276,
+            "energy": 7482
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 9.8,
+            "c_max_star": -14.5,
+            "energy": 8.2
+          }
+        },
+        {
+          "instance": "L05",
+          "q_t": "2-6",
+          "scenario_n": {
+            "energy_star": 6333,
+            "c_max": 541,
+            "c_max_star": 316,
+            "energy": 6583
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 6175,
+            "c_max": 662
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 274,
+            "energy": 7045
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 22.3,
+            "c_max_star": -13.3,
+            "energy": 7
+          }
+        },
+        {
+          "instance": "L06",
+          "q_t": "2-6",
+          "scenario_n": {
+            "energy_star": 7000,
+            "c_max": 605,
+            "c_max_star": 372,
+            "energy": 7583
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 6825,
+            "c_max": 739
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 322,
+            "energy": 8006
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 22,
+            "c_max_star": -13.5,
+            "energy": 5.6
+          }
+        },
+        {
+          "instance": "L07",
+          "q_t": "2-8",
+          "scenario_n": {
+            "energy_star": 9333,
+            "c_max": 738,
+            "c_max_star": 436,
+            "energy": 9750
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 9100,
+            "c_max": 913
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 384,
+            "energy": 10467
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 23.7,
+            "c_max_star": -11.9,
+            "energy": 7.4
+          }
+        },
+        {
+          "instance": "L08",
+          "q_t": "2-8",
+          "scenario_n": {
+            "energy_star": 9500,
+            "c_max": 787,
+            "c_max_star": 466,
+            "energy": 10250
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 9263,
+            "c_max": 962
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 405,
+            "energy": 10951
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 22.3,
+            "c_max_star": -13.1,
+            "energy": 6.8
+          }
+        },
+        {
+          "instance": "L09",
+          "q_t": "2-10",
+          "scenario_n": {
+            "energy_star": 10917,
+            "c_max": 849,
+            "c_max_star": 465,
+            "energy": 11250
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 10644,
+            "c_max": 1052
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 404,
+            "energy": 12182
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 23.9,
+            "c_max_star": -13,
+            "energy": 8.3
+          }
+        },
+        {
+          "instance": "L10",
+          "q_t": "2-10",
+          "scenario_n": {
+            "energy_star": 11417,
+            "c_max": 889,
+            "c_max_star": 525,
+            "energy": 11833
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 11131,
+            "c_max": 1104
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 449,
+            "energy": 12606
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 24.1,
+            "c_max_star": -14.6,
+            "energy": 6.5
+          }
+        },
+        {
+          "instance": "L11",
+          "q_t": "2-12",
+          "scenario_n": {
+            "energy_star": 12583,
+            "c_max": 578,
+            "c_max_star": 553,
+            "energy": 13083
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 12269,
+            "c_max": 667
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 494,
+            "energy": 14063
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 15.5,
+            "c_max_star": -10.7,
+            "energy": 7.5
+          }
+        },
+        {
+          "instance": "L12",
+          "q_t": "2-12",
+          "scenario_n": {
+            "energy_star": 13250,
+            "c_max": 1064,
+            "c_max_star": 593,
+            "energy": 13750
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 12919,
+            "c_max": 1308
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 504,
+            "energy": 14969
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 22.9,
+            "c_max_star": -15,
+            "energy": 8.9
+          }
+        },
+        {
+          "instance": "L13",
+          "q_t": "2-14",
+          "scenario_n": {
+            "energy_star": 17500,
+            "c_max": 823,
+            "c_max_star": 726,
+            "energy": 17917
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 17063,
+            "c_max": 991
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 610,
+            "energy": 19590
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 20.4,
+            "c_max_star": -16,
+            "energy": 9.3
+          }
+        },
+        {
+          "instance": "L14",
+          "q_t": "2-14",
+          "scenario_n": {
+            "energy_star": 16750,
+            "c_max": 1321,
+            "c_max_star": 721,
+            "energy": 17417
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 16331,
+            "c_max": 1633
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 614,
+            "energy": 19034
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 23.7,
+            "c_max_star": -14.9,
+            "energy": 9.3
+          }
+        },
+        {
+          "instance": "L15",
+          "q_t": "2-16",
+          "scenario_n": {
+            "energy_star": 19333,
+            "c_max": 926,
+            "c_max_star": 814,
+            "energy": 19917
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 18850,
+            "c_max": 1119
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 688,
+            "energy": 21821
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 20.9,
+            "c_max_star": -15.5,
+            "energy": 9.6
+          }
+        },
+        {
+          "instance": "L16",
+          "q_t": "2-16",
+          "scenario_n": {
+            "energy_star": 20667,
+            "c_max": 971,
+            "c_max_star": 847,
+            "energy": 20917
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 20150,
+            "c_max": 1171
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 722,
+            "energy": 22797
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 20.6,
+            "c_max_star": -14.7,
+            "energy": 9
+          }
+        },
+        {
+          "instance": "L17",
+          "q_t": "3-6",
+          "scenario_n": {
+            "energy_star": 6333,
+            "c_max": 350,
+            "c_max_star": 288,
+            "energy": 6583
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 6175,
+            "c_max": 425
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 250,
+            "energy": 7181
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 21.4,
+            "c_max_star": -13.2,
+            "energy": 9.1
+          }
+        },
+        {
+          "instance": "L18",
+          "q_t": "3-6",
+          "scenario_n": {
+            "energy_star": 9000,
+            "c_max": 477,
+            "c_max_star": 406,
+            "energy": 9250
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 8775,
+            "c_max": 565
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 347,
+            "energy": 10087
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 18.3,
+            "c_max_star": -14.6,
+            "energy": 9
+          }
+        },
+        {
+          "instance": "L19",
+          "q_t": "3-9",
+          "scenario_n": {
+            "energy_star": 11333,
+            "c_max": 901,
+            "c_max_star": 510,
+            "energy": 11750
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 11050,
+            "c_max": 1111
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 437,
+            "energy": 12778
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 23.4,
+            "c_max_star": -14.3,
+            "energy": 8.7
+          }
+        },
+        {
+          "instance": "L20",
+          "q_t": "3-9",
+          "scenario_n": {
+            "energy_star": 10250,
+            "c_max": 840,
+            "c_max_star": 465,
+            "energy": 10750
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 9994,
+            "c_max": 1034
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 394,
+            "energy": 11778
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 23.1,
+            "c_max_star": -15.2,
+            "energy": 9.6
+          }
+        },
+        {
+          "instance": "L21",
+          "q_t": "3-12",
+          "scenario_n": {
+            "energy_star": 12500,
+            "c_max": 586,
+            "c_max_star": 554,
+            "energy": 12917
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 12188,
+            "c_max": 698
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 479,
+            "energy": 13817
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 19,
+            "c_max_star": -13.6,
+            "energy": 7
+          }
+        },
+        {
+          "instance": "L22",
+          "q_t": "3-12",
+          "scenario_n": {
+            "energy_star": 15000,
+            "c_max": 1159,
+            "c_max_star": 632,
+            "energy": 15667
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 14625,
+            "c_max": 1429
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": null,
+            "energy": null
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 23.3,
+            "c_max_star": null,
+            "energy": null
+          }
+        },
+        {
+          "instance": "L23",
+          "q_t": "3-15",
+          "scenario_n": {
+            "energy_star": 17417,
+            "c_max": 862,
+            "c_max_star": 734,
+            "energy": 18083
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": null,
+            "c_max": null
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": null,
+            "energy": null
+          },
+          "gaps_percent": {
+            "energy_star": null,
+            "c_max": null,
+            "c_max_star": null,
+            "energy": null
+          }
+        },
+        {
+          "instance": "L24",
+          "q_t": "3-15",
+          "scenario_n": {
+            "energy_star": 17833,
+            "c_max": 1406,
+            "c_max_star": 763,
+            "energy": 18500
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 17388,
+            "c_max": 1733
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": null,
+            "energy": null
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 23.3,
+            "c_max_star": null,
+            "energy": null
+          }
+        },
+        {
+          "instance": "L25",
+          "q_t": "4-8",
+          "scenario_n": {
+            "energy_star": 9500,
+            "c_max": 435,
+            "c_max_star": 407,
+            "energy": 9667
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 9263,
+            "c_max": 520
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 344,
+            "energy": 10559
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 19.7,
+            "c_max_star": -15.3,
+            "energy": 9.2
+          }
+        },
+        {
+          "instance": "L26",
+          "q_t": "4-8",
+          "scenario_n": {
+            "energy_star": 10667,
+            "c_max": 574,
+            "c_max_star": 485,
+            "energy": 10750
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 10400,
+            "c_max": 699
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 418,
+            "energy": 11682
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 21.8,
+            "c_max_star": -13.9,
+            "energy": 8.7
+          }
+        },
+        {
+          "instance": "L27",
+          "q_t": "4-12",
+          "scenario_n": {
+            "energy_star": 15500,
+            "c_max": 1201,
+            "c_max_star": 651,
+            "energy": 15833
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 15113,
+            "c_max": 1489
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": null,
+            "energy": null
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 23.9,
+            "c_max_star": null,
+            "energy": null
+          }
+        },
+        {
+          "instance": "L28",
+          "q_t": "4-12",
+          "scenario_n": {
+            "energy_star": 14500,
+            "c_max": 1155,
+            "c_max_star": 620,
+            "energy": 14833
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 14138,
+            "c_max": 1428
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": null,
+            "energy": null
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 23.6,
+            "c_max_star": null,
+            "energy": null
+          }
+        },
+        {
+          "instance": "L29",
+          "q_t": "4-16",
+          "scenario_n": {
+            "energy_star": 21667,
+            "c_max": 937,
+            "c_max_star": 871,
+            "energy": 21917
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 21125,
+            "c_max": 1141
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": null,
+            "energy": null
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 21.8,
+            "c_max_star": null,
+            "energy": null
+          }
+        },
+        {
+          "instance": "L30",
+          "q_t": "4-16",
+          "scenario_n": {
+            "energy_star": 18000,
+            "c_max": 846,
+            "c_max_star": 742,
+            "energy": 18583
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 17550,
+            "c_max": 1026
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": null,
+            "energy": null
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 21.3,
+            "c_max_star": null,
+            "energy": null
+          }
+        },
+        {
+          "instance": "L31",
+          "q_t": "5-10",
+          "scenario_n": {
+            "energy_star": 14250,
+            "c_max": 587,
+            "c_max_star": 563,
+            "energy": 14417
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 13894,
+            "c_max": 718
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": null,
+            "energy": null
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 22.3,
+            "c_max_star": null,
+            "energy": null
+          }
+        },
+        {
+          "instance": "L32",
+          "q_t": "5-10",
+          "scenario_n": {
+            "energy_star": 12833,
+            "c_max": 1034,
+            "c_max_star": 559,
+            "energy": 13083
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 12513,
+            "c_max": 1275
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": null,
+            "energy": null
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 23.4,
+            "c_max_star": null,
+            "energy": null
+          }
+        },
+        {
+          "instance": "L33",
+          "q_t": "5-15",
+          "scenario_n": {
+            "energy_star": 19417,
+            "c_max": 1503,
+            "c_max_star": 798,
+            "energy": 19667
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 18931,
+            "c_max": 1866
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": null,
+            "energy": null
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 24.1,
+            "c_max_star": null,
+            "energy": null
+          }
+        },
+        {
+          "instance": "L34",
+          "q_t": "5-15",
+          "scenario_n": {
+            "energy_star": 18917,
+            "c_max": 1494,
+            "c_max_star": 781,
+            "energy": 19250
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": null,
+            "c_max": null
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": null,
+            "energy": null
+          },
+          "gaps_percent": {
+            "energy_star": null,
+            "c_max": null,
+            "c_max_star": null,
+            "energy": null
+          }
+        },
+        {
+          "instance": "L35",
+          "q_t": "6-12",
+          "scenario_n": {
+            "energy_star": 18333,
+            "c_max": 788,
+            "c_max_star": 700,
+            "energy": 18667
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 17875,
+            "c_max": 959
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": null,
+            "energy": null
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 21.7,
+            "c_max_star": null,
+            "energy": null
+          }
+        }
+      ],
+      "summary_gaps_percent": {
+        "max": {
+          "energy_star": -2.5,
+          "c_max": 24.1,
+          "c_max_star": -10.7,
+          "energy": 9.6
+        },
+        "mean": {
+          "energy_star": -2.5,
+          "c_max": 21.3,
+          "c_max_star": -13.9,
+          "energy": 8.3
+        },
+        "min": {
+          "energy_star": -2.5,
+          "c_max": 9.8,
+          "c_max_star": -16,
+          "energy": 5.6
+        }
+      }
+    },
+    "table_2": {
+      "title": "Results for the 35 unloading problem instances data set 2",
+      "source_location": {
+        "pdf_page_1_based": 20,
+        "printed_page": 174
+      },
+      "rows": [
+        {
+          "instance": "U01",
+          "q_t": "2-4",
+          "scenario_n": {
+            "energy_star": 4667,
+            "c_max": 226,
+            "c_max_star": 226,
+            "energy": 4667
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 4550,
+            "c_max": 264
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 197,
+            "energy": 4914
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 16.8,
+            "c_max_star": -12.5,
+            "energy": 5.3
+          }
+        },
+        {
+          "instance": "U02",
+          "q_t": "2-4",
+          "scenario_n": {
+            "energy_star": 4833,
+            "c_max": 367,
+            "c_max_star": 217,
+            "energy": 5000
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 4713,
+            "c_max": 458
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 187,
+            "energy": 5343
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 25,
+            "c_max_star": -13.5,
+            "energy": 6.9
+          }
+        },
+        {
+          "instance": "U03",
+          "q_t": "2-4",
+          "scenario_n": {
+            "energy_star": 5000,
+            "c_max": 383,
+            "c_max_star": 226,
+            "energy": 5333
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 4875,
+            "c_max": 479
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 197,
+            "energy": 5644
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 25,
+            "c_max_star": -12.7,
+            "energy": 5.8
+          }
+        },
+        {
+          "instance": "U04",
+          "q_t": "2-6",
+          "scenario_n": {
+            "energy_star": 7083,
+            "c_max": 301,
+            "c_max_star": 301,
+            "energy": 7083
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 6906,
+            "c_max": 360
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 262,
+            "energy": 7490
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 19.4,
+            "c_max_star": -13.2,
+            "energy": 5.7
+          }
+        },
+        {
+          "instance": "U05",
+          "q_t": "2-6",
+          "scenario_n": {
+            "energy_star": 6250,
+            "c_max": 493,
+            "c_max_star": 260,
+            "energy": 6417
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 6094,
+            "c_max": 602
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 226,
+            "energy": 6871
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 22,
+            "c_max_star": -13.1,
+            "energy": 7.1
+          }
+        },
+        {
+          "instance": "U06",
+          "q_t": "2-6",
+          "scenario_n": {
+            "energy_star": 6833,
+            "c_max": 521,
+            "c_max_star": 287,
+            "energy": 7333
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 6663,
+            "c_max": 646
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 269,
+            "energy": 7596
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 24,
+            "c_max_star": -6.3,
+            "energy": 3.6
+          }
+        },
+        {
+          "instance": "U07",
+          "q_t": "2-8",
+          "scenario_n": {
+            "energy_star": 9167,
+            "c_max": 714,
+            "c_max_star": 397,
+            "energy": 9500
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 8938,
+            "c_max": 874
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 343,
+            "energy": 10225
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 22.5,
+            "c_max_star": -13.6,
+            "energy": 7.6
+          }
+        },
+        {
+          "instance": "U08",
+          "q_t": "2-8",
+          "scenario_n": {
+            "energy_star": 9333,
+            "c_max": 709,
+            "c_max_star": 394,
+            "energy": 10000
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 9100,
+            "c_max": 875
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 356,
+            "energy": 10621
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 23.5,
+            "c_max_star": -9.5,
+            "energy": 6.2
+          }
+        },
+        {
+          "instance": "U09",
+          "q_t": "2-10",
+          "scenario_n": {
+            "energy_star": 11000,
+            "c_max": 825,
+            "c_max_star": 433,
+            "energy": 1125
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 10725,
+            "c_max": 1031
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 369,
+            "energy": 12190
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 25,
+            "c_max_star": -14.8,
+            "energy": 8.4
+          }
+        },
+        {
+          "instance": "U10",
+          "q_t": "2-10",
+          "scenario_n": {
+            "energy_star": 11333,
+            "c_max": 854,
+            "c_max_star": 446,
+            "energy": 11667
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 11050,
+            "c_max": 1062
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 383,
+            "energy": 12615
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 24.4,
+            "c_max_star": -14,
+            "energy": 8.1
+          }
+        },
+        {
+          "instance": "U11",
+          "q_t": "2-12",
+          "scenario_n": {
+            "energy_star": 13000,
+            "c_max": 760,
+            "c_max_star": 524,
+            "energy": 13250
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 12675,
+            "c_max": 894
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 465,
+            "energy": 14238
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 17.5,
+            "c_max_star": -11.2,
+            "energy": 7.5
+          }
+        },
+        {
+          "instance": "U12",
+          "q_t": "2-12",
+          "scenario_n": {
+            "energy_star": 13250,
+            "c_max": 1006,
+            "c_max_star": 527,
+            "energy": 13583
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 12919,
+            "c_max": 1243
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 457,
+            "energy": 14667
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 23.6,
+            "c_max_star": -13.2,
+            "energy": 8
+          }
+        },
+        {
+          "instance": "U13",
+          "q_t": "2-14",
+          "scenario_n": {
+            "energy_star": 17667,
+            "c_max": 819,
+            "c_max_star": 717,
+            "energy": 18000
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 17225,
+            "c_max": 979
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 610,
+            "energy": 19569
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 19.6,
+            "c_max_star": -15,
+            "energy": 8.7
+          }
+        },
+        {
+          "instance": "U14",
+          "q_t": "2-14",
+          "scenario_n": {
+            "energy_star": 17000,
+            "c_max": 1275,
+            "c_max_star": 667,
+            "energy": 17417
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 16575,
+            "c_max": 1594
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 565,
+            "energy": 19010
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 25,
+            "c_max_star": -15.3,
+            "energy": 9.1
+          }
+        },
+        {
+          "instance": "U15",
+          "q_t": "2-16",
+          "scenario_n": {
+            "energy_star": 20333,
+            "c_max": 914,
+            "c_max_star": 797,
+            "energy": 20417
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 19825,
+            "c_max": 1599
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 684,
+            "energy": 22082
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 74.8,
+            "c_max_star": -14.2,
+            "energy": 8.2
+          }
+        },
+        {
+          "instance": "U16",
+          "q_t": "2-16",
+          "scenario_n": {
+            "energy_star": 20750,
+            "c_max": 1550,
+            "c_max_star": 808,
+            "energy": 21000
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 20231,
+            "c_max": 1937
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 678,
+            "energy": 22912
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 25,
+            "c_max_star": -16.2,
+            "energy": 9.1
+          }
+        },
+        {
+          "instance": "U17",
+          "q_t": "3-6",
+          "scenario_n": {
+            "energy_star": 7083,
+            "c_max": 290,
+            "c_max_star": 290,
+            "energy": 7083
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 6906,
+            "c_max": 349
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 251,
+            "energy": 7490
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 20.1,
+            "c_max_star": -13.7,
+            "energy": 5.7
+          }
+        },
+        {
+          "instance": "U18",
+          "q_t": "3-6",
+          "scenario_n": {
+            "energy_star": 9167,
+            "c_max": 692,
+            "c_max_star": 379,
+            "energy": 9333
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 8938,
+            "c_max": 865
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 327,
+            "energy": 9979
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 25,
+            "c_max_star": -13.8,
+            "energy": 6.9
+          }
+        },
+        {
+          "instance": "U19",
+          "q_t": "3-9",
+          "scenario_n": {
+            "energy_star": 11083,
+            "c_max": 825,
+            "c_max_star": 445,
+            "energy": 11500
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 10806,
+            "c_max": 1021
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 382,
+            "energy": 12034
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 23.7,
+            "c_max_star": -14.2,
+            "energy": 4.6
+          }
+        },
+        {
+          "instance": "U20",
+          "q_t": "3-9",
+          "scenario_n": {
+            "energy_star": 10000,
+            "c_max": 750,
+            "c_max_star": 408,
+            "energy": 10500
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 9750,
+            "c_max": 937
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 342,
+            "energy": 11360
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 25,
+            "c_max_star": -16.2,
+            "energy": 8.2
+          }
+        },
+        {
+          "instance": "U21",
+          "q_t": "3-12",
+          "scenario_n": {
+            "energy_star": 13000,
+            "c_max": 593,
+            "c_max_star": 521,
+            "energy": 13167
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 12675,
+            "c_max": 708
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 450,
+            "energy": 14536
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 19.4,
+            "c_max_star": -13.7,
+            "energy": 10.4
+          }
+        },
+        {
+          "instance": "U22",
+          "q_t": "3-12",
+          "scenario_n": {
+            "energy_star": 14750,
+            "c_max": 1094,
+            "c_max_star": 583,
+            "energy": 15417
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 14381,
+            "c_max": 1365
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 489,
+            "energy": 16819
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 24.8,
+            "c_max_star": -16.2,
+            "energy": 9.1
+          }
+        },
+        {
+          "instance": "U23",
+          "q_t": "3-15",
+          "scenario_n": {
+            "energy_star": 17667,
+            "c_max": 791,
+            "c_max_star": 697,
+            "energy": 17917
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 17225,
+            "c_max": 967
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": null,
+            "energy": null
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 22.3,
+            "c_max_star": null,
+            "energy": null
+          }
+        },
+        {
+          "instance": "U24",
+          "q_t": "3-15",
+          "scenario_n": {
+            "energy_star": 18083,
+            "c_max": 1350,
+            "c_max_star": 700,
+            "energy": 18333
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 17631,
+            "c_max": 1688
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": null,
+            "energy": null
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 25,
+            "c_max_star": null,
+            "energy": null
+          }
+        },
+        {
+          "instance": "U25",
+          "q_t": "4-8",
+          "scenario_n": {
+            "energy_star": 10667,
+            "c_max": 441,
+            "c_max_star": 419,
+            "energy": 10750
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 10400,
+            "c_max": 532
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 353,
+            "energy": 11610
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 20.8,
+            "c_max_star": -15.9,
+            "energy": 8
+          }
+        },
+        {
+          "instance": "U26",
+          "q_t": "4-8",
+          "scenario_n": {
+            "energy_star": 10917,
+            "c_max": 825,
+            "c_max_star": 425,
+            "energy": 11333
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 10644,
+            "c_max": 1031
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": 363,
+            "energy": 12326
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 25,
+            "c_max_star": -14.5,
+            "energy": 8.8
+          }
+        },
+        {
+          "instance": "U27",
+          "q_t": "4-12",
+          "scenario_n": {
+            "energy_star": 15333,
+            "c_max": 606,
+            "c_max_star": 592,
+            "energy": 15750
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 14950,
+            "c_max": 750
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": null,
+            "energy": null
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 23.8,
+            "c_max_star": null,
+            "energy": null
+          }
+        },
+        {
+          "instance": "U28",
+          "q_t": "4-12",
+          "scenario_n": {
+            "energy_star": 14417,
+            "c_max": 1105,
+            "c_max_star": 559,
+            "energy": 14750
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 14056,
+            "c_max": 1365
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": null,
+            "energy": null
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 23.6,
+            "c_max_star": null,
+            "energy": null
+          }
+        },
+        {
+          "instance": "U29",
+          "q_t": "4-16",
+          "scenario_n": {
+            "energy_star": 21833,
+            "c_max": 1625,
+            "c_max_star": 825,
+            "energy": 22000
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": null,
+            "c_max": null
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": null,
+            "energy": null
+          },
+          "gaps_percent": {
+            "energy_star": null,
+            "c_max": null,
+            "c_max_star": null,
+            "energy": null
+          }
+        },
+        {
+          "instance": "U30",
+          "q_t": "4-16",
+          "scenario_n": {
+            "energy_star": 18583,
+            "c_max": 737,
+            "c_max_star": 720,
+            "energy": 18917
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 18119,
+            "c_max": 908
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": null,
+            "energy": null
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 23.3,
+            "c_max_star": null,
+            "energy": null
+          }
+        },
+        {
+          "instance": "U31",
+          "q_t": "5-10",
+          "scenario_n": {
+            "energy_star": 15333,
+            "c_max": 575,
+            "c_max_star": 575,
+            "energy": 15333
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 14950,
+            "c_max": 719
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": null,
+            "energy": null
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 25,
+            "c_max_star": null,
+            "energy": null
+          }
+        },
+        {
+          "instance": "U32",
+          "q_t": "5-10",
+          "scenario_n": {
+            "energy_star": 12750,
+            "c_max": 754,
+            "c_max_star": 513,
+            "energy": 13167
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 12431,
+            "c_max": 923
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": null,
+            "energy": null
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 22.4,
+            "c_max_star": null,
+            "energy": null
+          }
+        },
+        {
+          "instance": "U33",
+          "q_t": "5-15",
+          "scenario_n": {
+            "energy_star": 18917,
+            "c_max": 781,
+            "c_max_star": 733,
+            "energy": 19500
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 18444,
+            "c_max": 946
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": null,
+            "energy": null
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 21.1,
+            "c_max_star": null,
+            "energy": null
+          }
+        },
+        {
+          "instance": "U34",
+          "q_t": "5-15",
+          "scenario_n": {
+            "energy_star": 18917,
+            "c_max": 1494,
+            "c_max_star": 781,
+            "energy": 19250
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": null,
+            "c_max": null
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": null,
+            "energy": null
+          },
+          "gaps_percent": {
+            "energy_star": null,
+            "c_max": null,
+            "c_max_star": null,
+            "energy": null
+          }
+        },
+        {
+          "instance": "U35",
+          "q_t": "6-12",
+          "scenario_n": {
+            "energy_star": 19667,
+            "c_max": 742,
+            "c_max_star": 742,
+            "energy": 19667
+          },
+          "scenario_l_tilde_n": {
+            "energy_star": 19175,
+            "c_max": 927
+          },
+          "scenario_n_tilde_h": {
+            "c_max_star": null,
+            "energy": null
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": 25,
+            "c_max_star": null,
+            "energy": null
+          }
+        }
+      ],
+      "summary_gaps_percent": {
+        "max": {
+          "energy_star": -2.5,
+          "c_max": 74.8,
+          "c_max_star": -6.3,
+          "energy": 10.4
+        },
+        "mean": {
+          "energy_star": -2.5,
+          "c_max": 24.5,
+          "c_max_star": -13.6,
+          "energy": 7.4
+        },
+        "min": {
+          "energy_star": -2.5,
+          "c_max": 16.8,
+          "c_max_star": -16.2,
+          "energy": 3.6
+        }
+      }
+    },
+    "table_3": {
+      "title": "Results for the 26 problem instances with dual-cycling strategy",
+      "source_location": {
+        "pdf_page_1_based": 23,
+        "printed_page": 177
+      },
+      "rows": [
+        {
+          "instance": "D01",
+          "combination": "U01&L01",
+          "q_t": "2-8",
+          "unloading_instance": {
+            "energy_star": 4550,
+            "c_max_star": 197
+          },
+          "loading_instance": {
+            "energy_star": 3900,
+            "c_max_star": 175
+          },
+          "dual_cycling": {
+            "energy_star": 7475,
+            "c_max": 510,
+            "c_max_star": 351,
+            "energy": 8832
+          },
+          "gaps_percent": {
+            "energy_star": -11.5,
+            "c_max": -10.9,
+            "c_max_star": -5.6,
+            "energy": -5.9
+          }
+        },
+        {
+          "instance": "D02",
+          "combination": "U02&L02",
+          "q_t": "2-8",
+          "unloading_instance": {
+            "energy_star": 4713,
+            "c_max_star": 187
+          },
+          "loading_instance": {
+            "energy_star": 4713,
+            "c_max_star": 229
+          },
+          "dual_cycling": {
+            "energy_star": 7800,
+            "c_max": 510,
+            "c_max_star": 350,
+            "energy": 9258
+          },
+          "gaps_percent": {
+            "energy_star": -17.2,
+            "c_max": -48.3,
+            "c_max_star": -15.9,
+            "energy": -15.2
+          }
+        },
+        {
+          "instance": "D03",
+          "combination": "U03&L03",
+          "q_t": "2-8",
+          "unloading_instance": {
+            "energy_star": 4875,
+            "c_max_star": 197
+          },
+          "loading_instance": {
+            "energy_star": 4875,
+            "c_max_star": 229
+          },
+          "dual_cycling": {
+            "energy_star": 8125,
+            "c_max": 491,
+            "c_max_star": 350,
+            "energy": 9442
+          },
+          "gaps_percent": {
+            "energy_star": -16.7,
+            "c_max": -50.7,
+            "c_max_star": -17.8,
+            "energy": -17.6
+          }
+        },
+        {
+          "instance": "D04",
+          "combination": "U01&L02",
+          "q_t": "4-8",
+          "unloading_instance": {
+            "energy_star": 4550,
+            "c_max_star": 197
+          },
+          "loading_instance": {
+            "energy_star": 4713,
+            "c_max_star": 229
+          },
+          "dual_cycling": {
+            "energy_star": 9263,
+            "c_max": 528,
+            "c_max_star": 318,
+            "energy": 10956
+          },
+          "gaps_percent": {
+            "energy_star": 0,
+            "c_max": -33.3,
+            "c_max_star": -25.4,
+            "energy": 4.5
+          }
+        },
+        {
+          "instance": "D05",
+          "combination": "U01&L03",
+          "q_t": "4-8",
+          "unloading_instance": {
+            "energy_star": 4550,
+            "c_max_star": 197
+          },
+          "loading_instance": {
+            "energy_star": 4875,
+            "c_max_star": 229
+          },
+          "dual_cycling": {
+            "energy_star": 9425,
+            "c_max": 516,
+            "c_max_star": 346,
+            "energy": 11686
+          },
+          "gaps_percent": {
+            "energy_star": 0,
+            "c_max": -33.8,
+            "c_max_star": -18.8,
+            "energy": 8.9
+          }
+        },
+        {
+          "instance": "D06",
+          "combination": "U02&L01",
+          "q_t": "4-8",
+          "unloading_instance": {
+            "energy_star": 4713,
+            "c_max_star": 187
+          },
+          "loading_instance": {
+            "energy_star": 3900,
+            "c_max_star": 175
+          },
+          "dual_cycling": {
+            "energy_star": 7800,
+            "c_max": 354,
+            "c_max_star": 243,
+            "energy": 8749
+          },
+          "gaps_percent": {
+            "energy_star": -9.4,
+            "c_max": -53.8,
+            "c_max_star": -32.9,
+            "energy": -10.9
+          }
+        },
+        {
+          "instance": "D07",
+          "combination": "U02&L03",
+          "q_t": "4-8",
+          "unloading_instance": {
+            "energy_star": 4713,
+            "c_max_star": 187
+          },
+          "loading_instance": {
+            "energy_star": 4875,
+            "c_max_star": 229
+          },
+          "dual_cycling": {
+            "energy_star": 9425,
+            "c_max": 954,
+            "c_max_star": 339,
+            "energy": 11381
+          },
+          "gaps_percent": {
+            "energy_star": -1.7,
+            "c_max": -2.1,
+            "c_max_star": -18.6,
+            "energy": 2
+          }
+        },
+        {
+          "instance": "D08",
+          "combination": "U03&L01",
+          "q_t": "4-8",
+          "unloading_instance": {
+            "energy_star": 4875,
+            "c_max_star": 197
+          },
+          "loading_instance": {
+            "energy_star": 3900,
+            "c_max_star": 175
+          },
+          "dual_cycling": {
+            "energy_star": 8450,
+            "c_max": 396,
+            "c_max_star": 277,
+            "energy": 9304
+          },
+          "gaps_percent": {
+            "energy_star": -3.7,
+            "c_max": -49.8,
+            "c_max_star": -25.6,
+            "energy": -8
+          }
+        },
+        {
+          "instance": "D09",
+          "combination": "U03&L02",
+          "q_t": "4-8",
+          "unloading_instance": {
+            "energy_star": 4875,
+            "c_max_star": 197
+          },
+          "loading_instance": {
+            "energy_star": 4713,
+            "c_max_star": 229
+          },
+          "dual_cycling": {
+            "energy_star": 8450,
+            "c_max": 792,
+            "c_max_star": 279,
+            "energy": 9860
+          },
+          "gaps_percent": {
+            "energy_star": -11.9,
+            "c_max": -21.4,
+            "c_max_star": -34.5,
+            "energy": -12.1
+          }
+        },
+        {
+          "instance": "D10",
+          "combination": "U04&L04",
+          "q_t": "2-12",
+          "unloading_instance": {
+            "energy_star": 6906,
+            "c_max_star": 262
+          },
+          "loading_instance": {
+            "energy_star": 6338,
+            "c_max_star": 276
+          },
+          "dual_cycling": {
+            "energy_star": 12513,
+            "c_max": 709,
+            "c_max_star": 504,
+            "energy": 14166
+          },
+          "gaps_percent": {
+            "energy_star": -5.5,
+            "c_max": -11.7,
+            "c_max_star": -6.3,
+            "energy": -5.4
+          }
+        },
+        {
+          "instance": "D11",
+          "combination": "U05&L05",
+          "q_t": "2-12",
+          "unloading_instance": {
+            "energy_star": 6094,
+            "c_max_star": 226
+          },
+          "loading_instance": {
+            "energy_star": 6175,
+            "c_max_star": 274
+          },
+          "dual_cycling": {
+            "energy_star": 10400,
+            "c_max": 648,
+            "c_max_star": 443,
+            "energy": 12897
+          },
+          "gaps_percent": {
+            "energy_star": -15.2,
+            "c_max": -48.7,
+            "c_max_star": -11.3,
+            "energy": -7.3
+          }
+        },
+        {
+          "instance": "D12",
+          "combination": "U06&L06",
+          "q_t": "2-12",
+          "unloading_instance": {
+            "energy_star": 6663,
+            "c_max_star": 269
+          },
+          "loading_instance": {
+            "energy_star": 6825,
+            "c_max_star": 322
+          },
+          "dual_cycling": {
+            "energy_star": 11700,
+            "c_max": 751,
+            "c_max_star": 493,
+            "energy": 14230
+          },
+          "gaps_percent": {
+            "energy_star": -13.3,
+            "c_max": -45.8,
+            "c_max_star": -16.6,
+            "energy": -8.8
+          }
+        },
+        {
+          "instance": "D13",
+          "combination": "U04&L05",
+          "q_t": "4-12",
+          "unloading_instance": {
+            "energy_star": 6906,
+            "c_max_star": 262
+          },
+          "loading_instance": {
+            "energy_star": 6175,
+            "c_max_star": 274
+          },
+          "dual_cycling": {
+            "energy_star": 13000,
+            "c_max": 992,
+            "c_max_star": 450,
+            "energy": 15223
+          },
+          "gaps_percent": {
+            "energy_star": -0.6,
+            "c_max": -2.9,
+            "c_max_star": -16.1,
+            "energy": 4.7
+          }
+        },
+        {
+          "instance": "D14",
+          "combination": "U04&L06",
+          "q_t": "4-12",
+          "unloading_instance": {
+            "energy_star": 6906,
+            "c_max_star": 262
+          },
+          "loading_instance": {
+            "energy_star": 6825,
+            "c_max_star": 322
+          },
+          "dual_cycling": {
+            "energy_star": 13650,
+            "c_max": 1068,
+            "c_max_star": 486,
+            "energy": 15234
+          },
+          "gaps_percent": {
+            "energy_star": -0.6,
+            "c_max": 4.6,
+            "c_max_star": -16.7,
+            "energy": 4.8
+          }
+        },
+        {
+          "instance": "D15",
+          "combination": "U05&L04",
+          "q_t": "4-12",
+          "unloading_instance": {
+            "energy_star": 6094,
+            "c_max_star": 226
+          },
+          "loading_instance": {
+            "energy_star": 6338,
+            "c_max_star": 276
+          },
+          "dual_cycling": {
+            "energy_star": 11213,
+            "c_max": 578,
+            "c_max_star": 367,
+            "energy": 13207
+          },
+          "gaps_percent": {
+            "energy_star": -9.8,
+            "c_max": -44.6,
+            "c_max_star": -27,
+            "energy": -8
+          }
+        },
+        {
+          "instance": "D16",
+          "combination": "U05&L06",
+          "q_t": "4-12",
+          "unloading_instance": {
+            "energy_star": 6094,
+            "c_max_star": 226
+          },
+          "loading_instance": {
+            "energy_star": 6825,
+            "c_max_star": 322
+          },
+          "dual_cycling": {
+            "energy_star": 12675,
+            "c_max": 1309,
+            "c_max_star": 453,
+            "energy": 15199
+          },
+          "gaps_percent": {
+            "energy_star": -1.9,
+            "c_max": 3.6,
+            "c_max_star": -17.3,
+            "energy": 9.2
+          }
+        },
+        {
+          "instance": "D17",
+          "combination": "U06&L04",
+          "q_t": "4-12",
+          "unloading_instance": {
+            "energy_star": 6663,
+            "c_max_star": 269
+          },
+          "loading_instance": {
+            "energy_star": 6338,
+            "c_max_star": 276
+          },
+          "dual_cycling": {
+            "energy_star": 12675,
+            "c_max": 805,
+            "c_max_star": 429,
+            "energy": 15156
+          },
+          "gaps_percent": {
+            "energy_star": -2.5,
+            "c_max": -26.1,
+            "c_max_star": -21.4,
+            "energy": 0.5
+          }
+        },
+        {
+          "instance": "D18",
+          "combination": "U06&L05",
+          "q_t": "4-12",
+          "unloading_instance": {
+            "energy_star": 6663,
+            "c_max_star": 269
+          },
+          "loading_instance": {
+            "energy_star": 6175,
+            "c_max_star": 274
+          },
+          "dual_cycling": {
+            "energy_star": null,
+            "c_max": null,
+            "c_max_star": null,
+            "energy": null
+          },
+          "gaps_percent": {
+            "energy_star": null,
+            "c_max": null,
+            "c_max_star": null,
+            "energy": null
+          }
+        },
+        {
+          "instance": "D19",
+          "combination": "U07&L07",
+          "q_t": "2-16",
+          "unloading_instance": {
+            "energy_star": 8938,
+            "c_max_star": 343
+          },
+          "loading_instance": {
+            "energy_star": 9100,
+            "c_max_star": 384
+          },
+          "dual_cycling": {
+            "energy_star": 16900,
+            "c_max": 1069,
+            "c_max_star": 636,
+            "energy": 20069
+          },
+          "gaps_percent": {
+            "energy_star": -6.3,
+            "c_max": -40.2,
+            "c_max_star": -12.5,
+            "energy": -3
+          }
+        },
+        {
+          "instance": "D20",
+          "combination": "U08&L08",
+          "q_t": "2-16",
+          "unloading_instance": {
+            "energy_star": 9100,
+            "c_max_star": 356
+          },
+          "loading_instance": {
+            "energy_star": 9263,
+            "c_max_star": 405
+          },
+          "dual_cycling": {
+            "energy_star": 17063,
+            "c_max": 1670,
+            "c_max_star": 686,
+            "energy": 20084
+          },
+          "gaps_percent": {
+            "energy_star": -7.1,
+            "c_max": -9.1,
+            "c_max_star": -9.9,
+            "energy": -6.9
+          }
+        },
+        {
+          "instance": "D21",
+          "combination": "U07&L08",
+          "q_t": "4-16",
+          "unloading_instance": {
+            "energy_star": 8938,
+            "c_max_star": 343
+          },
+          "loading_instance": {
+            "energy_star": 9263,
+            "c_max_star": 405
+          },
+          "dual_cycling": {
+            "energy_star": 18038,
+            "c_max": 1815,
+            "c_max_star": null,
+            "energy": null
+          },
+          "gaps_percent": {
+            "energy_star": -0.9,
+            "c_max": -1.1,
+            "c_max_star": null,
+            "energy": null
+          }
+        },
+        {
+          "instance": "D22",
+          "combination": "U08&L07",
+          "q_t": "4-16",
+          "unloading_instance": {
+            "energy_star": 9100,
+            "c_max_star": 356
+          },
+          "loading_instance": {
+            "energy_star": 9100,
+            "c_max_star": 384
+          },
+          "dual_cycling": {
+            "energy_star": 18100,
+            "c_max": 1090,
+            "c_max_star": null,
+            "energy": null
+          },
+          "gaps_percent": {
+            "energy_star": null,
+            "c_max": null,
+            "c_max_star": null,
+            "energy": null
+          }
+        },
+        {
+          "instance": "D23",
+          "combination": "U17&L17",
+          "q_t": "3-12",
+          "unloading_instance": {
+            "energy_star": 6906,
+            "c_max_star": 251
+          },
+          "loading_instance": {
+            "energy_star": 6175,
+            "c_max_star": 250
+          },
+          "dual_cycling": {
+            "energy_star": 11050,
+            "c_max": 657,
+            "c_max_star": 453,
+            "energy": 13837
+          },
+          "gaps_percent": {
+            "energy_star": -15.5,
+            "c_max": -15,
+            "c_max_star": -9.7,
+            "energy": -5.7
+          }
+        },
+        {
+          "instance": "D24",
+          "combination": "U18&L18",
+          "q_t": "3-12",
+          "unloading_instance": {
+            "energy_star": 8938,
+            "c_max_star": 327
+          },
+          "loading_instance": {
+            "energy_star": 8775,
+            "c_max_star": 347
+          },
+          "dual_cycling": {
+            "energy_star": 14463,
+            "c_max": 797,
+            "c_max_star": 532,
+            "energy": 17009
+          },
+          "gaps_percent": {
+            "energy_star": -18.3,
+            "c_max": -43.9,
+            "c_max_star": -21,
+            "energy": 7.3
+          }
+        },
+        {
+          "instance": "D25",
+          "combination": "U17&L18",
+          "q_t": "6-12",
+          "unloading_instance": {
+            "energy_star": 6906,
+            "c_max_star": 251
+          },
+          "loading_instance": {
+            "energy_star": 8775,
+            "c_max_star": 347
+          },
+          "dual_cycling": {
+            "energy_star": 15600,
+            "c_max": 842,
+            "c_max_star": null,
+            "energy": null
+          },
+          "gaps_percent": {
+            "energy_star": -0.5,
+            "c_max": -22.9,
+            "c_max_star": null,
+            "energy": null
+          }
+        },
+        {
+          "instance": "D26",
+          "combination": "U18&L17",
+          "q_t": "6-12",
+          "unloading_instance": {
+            "energy_star": 8938,
+            "c_max_star": 327
+          },
+          "loading_instance": {
+            "energy_star": 6175,
+            "c_max_star": 250
+          },
+          "dual_cycling": {
+            "energy_star": 13650,
+            "c_max": 646,
+            "c_max_star": null,
+            "energy": null
+          },
+          "gaps_percent": {
+            "energy_star": -9.7,
+            "c_max": -41.4,
+            "c_max_star": null,
+            "energy": null
+          }
+        }
+      ],
+      "summary_gaps_percent": {
+        "max": {
+          "energy_star": 0,
+          "c_max": 4.6,
+          "c_max_star": -5.6,
+          "energy": 9.2
+        },
+        "mean": {
+          "energy_star": -7.5,
+          "c_max": -27.1,
+          "c_max_star": -18.1,
+          "energy": -3.5
+        },
+        "min": {
+          "energy_star": -18.3,
+          "c_max": -53.8,
+          "c_max_star": -34.5,
+          "energy": -17.6
+        }
+      }
+    },
+    "table_4": {
+      "title": "Travelling distance (in m) between QCs and LUs in the designed CT layout",
+      "source_location": {
+        "pdf_page_1_based": 27,
+        "printed_page": 181
+      },
+      "unit": "m",
+      "row_labels": [
+        "QC1",
+        "QC2",
+        "QC3",
+        "QC4",
+        "QC5",
+        "QC6",
+        "LU1",
+        "LU2",
+        "LU3",
+        "LU4",
+        "LU5",
+        "LU6"
+      ],
+      "column_labels": [
+        "QC1",
+        "QC2",
+        "QC3",
+        "QC4",
+        "QC5",
+        "QC6",
+        "LU1",
+        "LU2",
+        "LU3",
+        "LU4",
+        "LU5",
+        "LU6"
+      ],
+      "matrix": [
+        [
+          0,
+          50,
+          100,
+          150,
+          200,
+          250,
+          150,
+          200,
+          250,
+          300,
+          350,
+          400
+        ],
+        [
+          250,
+          0,
+          50,
+          100,
+          150,
+          200,
+          200,
+          150,
+          200,
+          250,
+          300,
+          350
+        ],
+        [
+          300,
+          250,
+          0,
+          50,
+          100,
+          150,
+          250,
+          200,
+          150,
+          200,
+          250,
+          300
+        ],
+        [
+          350,
+          300,
+          250,
+          0,
+          50,
+          100,
+          300,
+          250,
+          200,
+          150,
+          200,
+          250
+        ],
+        [
+          400,
+          350,
+          300,
+          250,
+          0,
+          50,
+          350,
+          300,
+          250,
+          200,
+          150,
+          200
+        ],
+        [
+          450,
+          400,
+          350,
+          350,
+          250,
+          0,
+          400,
+          350,
+          300,
+          250,
+          200,
+          150
+        ],
+        [
+          150,
+          200,
+          250,
+          300,
+          350,
+          400,
+          0,
+          250,
+          300,
+          350,
+          400,
+          450
+        ],
+        [
+          200,
+          150,
+          200,
+          250,
+          300,
+          350,
+          50,
+          0,
+          250,
+          300,
+          350,
+          400
+        ],
+        [
+          250,
+          200,
+          150,
+          200,
+          250,
+          300,
+          100,
+          50,
+          0,
+          250,
+          300,
+          350
+        ],
+        [
+          300,
+          250,
+          200,
+          150,
+          200,
+          250,
+          150,
+          100,
+          50,
+          0,
+          250,
+          300
+        ],
+        [
+          350,
+          300,
+          250,
+          200,
+          150,
+          200,
+          200,
+          150,
+          100,
+          50,
+          0,
+          250
+        ],
+        [
+          400,
+          350,
+          300,
+          250,
+          200,
+          150,
+          250,
+          200,
+          150,
+          100,
+          50,
+          0
+        ]
+      ]
+    },
+    "table_5": {
+      "title": "Data set for loading small-sized problem instances",
+      "source_location": {
+        "pdf_pages_1_based": [
+          28,
+          29,
+          30
+        ],
+        "printed_pages": [
+          182,
+          183,
+          184
+        ]
+      },
+      "coordinate_encoding": "Each coordinate is [x, y], preserving its printed order within the QC row.",
+      "instances": [
+        {
+          "instance": "L01",
+          "q_t": "2-4",
+          "qc_assignments": [
+            {
+              "qc": 1,
+              "coordinates": [
+                [
+                  76,
+                  1
+                ],
+                [
+                  50,
+                  1
+                ]
+              ]
+            },
+            {
+              "qc": 2,
+              "coordinates": [
+                [
+                  59,
+                  1
+                ],
+                [
+                  56,
+                  1
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L02",
+          "q_t": "2-4",
+          "qc_assignments": [
+            {
+              "qc": 3,
+              "coordinates": [
+                [
+                  68,
+                  3
+                ],
+                [
+                  58,
+                  3
+                ]
+              ]
+            },
+            {
+              "qc": 4,
+              "coordinates": [
+                [
+                  49,
+                  3
+                ],
+                [
+                  70,
+                  3
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L03",
+          "q_t": "2-4",
+          "qc_assignments": [
+            {
+              "qc": 5,
+              "coordinates": [
+                [
+                  76,
+                  5
+                ],
+                [
+                  49,
+                  5
+                ]
+              ]
+            },
+            {
+              "qc": 6,
+              "coordinates": [
+                [
+                  59,
+                  5
+                ],
+                [
+                  37,
+                  5
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L04",
+          "q_t": "2-6",
+          "qc_assignments": [
+            {
+              "qc": 1,
+              "coordinates": [
+                [
+                  38,
+                  2
+                ],
+                [
+                  52,
+                  2
+                ],
+                [
+                  70,
+                  1
+                ]
+              ]
+            },
+            {
+              "qc": 2,
+              "coordinates": [
+                [
+                  68,
+                  1
+                ],
+                [
+                  55,
+                  1
+                ],
+                [
+                  48,
+                  2
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L05",
+          "q_t": "2-6",
+          "qc_assignments": [
+            {
+              "qc": 3,
+              "coordinates": [
+                [
+                  60,
+                  3
+                ],
+                [
+                  60,
+                  3
+                ],
+                [
+                  42,
+                  3
+                ]
+              ]
+            },
+            {
+              "qc": 4,
+              "coordinates": [
+                [
+                  50,
+                  4
+                ],
+                [
+                  64,
+                  4
+                ],
+                [
+                  58,
+                  4
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L06",
+          "q_t": "2-6",
+          "qc_assignments": [
+            {
+              "qc": 5,
+              "coordinates": [
+                [
+                  41,
+                  5
+                ],
+                [
+                  30,
+                  6
+                ],
+                [
+                  36,
+                  5
+                ]
+              ]
+            },
+            {
+              "qc": 6,
+              "coordinates": [
+                [
+                  63,
+                  6
+                ],
+                [
+                  79,
+                  6
+                ],
+                [
+                  72,
+                  5
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L07",
+          "q_t": "2-8",
+          "qc_assignments": [
+            {
+              "qc": 3,
+              "coordinates": [
+                [
+                  72,
+                  3
+                ],
+                [
+                  59,
+                  4
+                ],
+                [
+                  56,
+                  4
+                ],
+                [
+                  80,
+                  3
+                ]
+              ]
+            },
+            {
+              "qc": 4,
+              "coordinates": [
+                [
+                  80,
+                  4
+                ],
+                [
+                  52,
+                  3
+                ],
+                [
+                  78,
+                  4
+                ],
+                [
+                  38,
+                  3
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L08",
+          "q_t": "2-8",
+          "qc_assignments": [
+            {
+              "qc": 5,
+              "coordinates": [
+                [
+                  63,
+                  6
+                ],
+                [
+                  38,
+                  5
+                ],
+                [
+                  62,
+                  6
+                ],
+                [
+                  30,
+                  5
+                ]
+              ]
+            },
+            {
+              "qc": 6,
+              "coordinates": [
+                [
+                  77,
+                  6
+                ],
+                [
+                  79,
+                  5
+                ],
+                [
+                  66,
+                  6
+                ],
+                [
+                  66,
+                  5
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L09",
+          "q_t": "2-10",
+          "qc_assignments": [
+            {
+              "qc": 2,
+              "coordinates": [
+                [
+                  42,
+                  2
+                ],
+                [
+                  38,
+                  2
+                ],
+                [
+                  47,
+                  3
+                ],
+                [
+                  76,
+                  2
+                ],
+                [
+                  47,
+                  2
+                ]
+              ]
+            },
+            {
+              "qc": 3,
+              "coordinates": [
+                [
+                  37,
+                  2
+                ],
+                [
+                  60,
+                  3
+                ],
+                [
+                  71,
+                  3
+                ],
+                [
+                  68,
+                  2
+                ],
+                [
+                  31,
+                  3
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L10",
+          "q_t": "2-10",
+          "qc_assignments": [
+            {
+              "qc": 4,
+              "coordinates": [
+                [
+                  54,
+                  4
+                ],
+                [
+                  38,
+                  5
+                ],
+                [
+                  57,
+                  4
+                ],
+                [
+                  47,
+                  4
+                ],
+                [
+                  79,
+                  5
+                ]
+              ]
+            },
+            {
+              "qc": 5,
+              "coordinates": [
+                [
+                  37,
+                  5
+                ],
+                [
+                  55,
+                  4
+                ],
+                [
+                  46,
+                  5
+                ],
+                [
+                  44,
+                  4
+                ],
+                [
+                  31,
+                  5
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L11",
+          "q_t": "2-12",
+          "qc_assignments": [
+            {
+              "qc": 1,
+              "coordinates": [
+                [
+                  64,
+                  1
+                ],
+                [
+                  63,
+                  1
+                ],
+                [
+                  38,
+                  2
+                ],
+                [
+                  62,
+                  1
+                ],
+                [
+                  51,
+                  1
+                ],
+                [
+                  30,
+                  2
+                ]
+              ]
+            },
+            {
+              "qc": 2,
+              "coordinates": [
+                [
+                  47,
+                  2
+                ],
+                [
+                  77,
+                  1
+                ],
+                [
+                  79,
+                  2
+                ],
+                [
+                  66,
+                  2
+                ],
+                [
+                  75,
+                  2
+                ],
+                [
+                  66,
+                  1
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L12",
+          "q_t": "2-12",
+          "qc_assignments": [
+            {
+              "qc": 3,
+              "coordinates": [
+                [
+                  56,
+                  4
+                ],
+                [
+                  55,
+                  3
+                ],
+                [
+                  71,
+                  3
+                ],
+                [
+                  48,
+                  4
+                ],
+                [
+                  30,
+                  3
+                ],
+                [
+                  68,
+                  3
+                ]
+              ]
+            },
+            {
+              "qc": 4,
+              "coordinates": [
+                [
+                  60,
+                  3
+                ],
+                [
+                  79,
+                  3
+                ],
+                [
+                  47,
+                  4
+                ],
+                [
+                  62,
+                  4
+                ],
+                [
+                  49,
+                  4
+                ],
+                [
+                  54,
+                  4
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L13",
+          "q_t": "2-14",
+          "qc_assignments": [
+            {
+              "qc": 1,
+              "coordinates": [
+                [
+                  59,
+                  2
+                ],
+                [
+                  51,
+                  1
+                ],
+                [
+                  55,
+                  3
+                ],
+                [
+                  41,
+                  2
+                ],
+                [
+                  31,
+                  2
+                ],
+                [
+                  64,
+                  2
+                ],
+                [
+                  43,
+                  3
+                ]
+              ]
+            },
+            {
+              "qc": 2,
+              "coordinates": [
+                [
+                  78,
+                  1
+                ],
+                [
+                  41,
+                  3
+                ],
+                [
+                  67,
+                  2
+                ],
+                [
+                  32,
+                  3
+                ],
+                [
+                  80,
+                  2
+                ],
+                [
+                  75,
+                  3
+                ],
+                [
+                  63,
+                  1
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L14",
+          "q_t": "2-14",
+          "qc_assignments": [
+            {
+              "qc": 4,
+              "coordinates": [
+                [
+                  67,
+                  5
+                ],
+                [
+                  35,
+                  4
+                ],
+                [
+                  33,
+                  4
+                ],
+                [
+                  39,
+                  3
+                ],
+                [
+                  54,
+                  5
+                ],
+                [
+                  31,
+                  3
+                ],
+                [
+                  49,
+                  4
+                ]
+              ]
+            },
+            {
+              "qc": 5,
+              "coordinates": [
+                [
+                  52,
+                  3
+                ],
+                [
+                  66,
+                  5
+                ],
+                [
+                  69,
+                  3
+                ],
+                [
+                  35,
+                  5
+                ],
+                [
+                  38,
+                  5
+                ],
+                [
+                  41,
+                  4
+                ],
+                [
+                  71,
+                  5
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L15",
+          "q_t": "2-16",
+          "qc_assignments": [
+            {
+              "qc": 2,
+              "coordinates": [
+                [
+                  64,
+                  2
+                ],
+                [
+                  46,
+                  1
+                ],
+                [
+                  77,
+                  3
+                ],
+                [
+                  78,
+                  1
+                ],
+                [
+                  59,
+                  2
+                ],
+                [
+                  37,
+                  1
+                ],
+                [
+                  61,
+                  2
+                ],
+                [
+                  70,
+                  2
+                ]
+              ]
+            },
+            {
+              "qc": 3,
+              "coordinates": [
+                [
+                  57,
+                  1
+                ],
+                [
+                  66,
+                  2
+                ],
+                [
+                  32,
+                  2
+                ],
+                [
+                  45,
+                  1
+                ],
+                [
+                  74,
+                  1
+                ],
+                [
+                  31,
+                  2
+                ],
+                [
+                  40,
+                  3
+                ],
+                [
+                  72,
+                  3
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L16",
+          "q_t": "2-16",
+          "qc_assignments": [
+            {
+              "qc": 3,
+              "coordinates": [
+                [
+                  69,
+                  2
+                ],
+                [
+                  40,
+                  3
+                ],
+                [
+                  45,
+                  2
+                ],
+                [
+                  43,
+                  4
+                ],
+                [
+                  66,
+                  3
+                ],
+                [
+                  60,
+                  2
+                ],
+                [
+                  50,
+                  2
+                ],
+                [
+                  80,
+                  4
+                ]
+              ]
+            },
+            {
+              "qc": 4,
+              "coordinates": [
+                [
+                  37,
+                  3
+                ],
+                [
+                  78,
+                  4
+                ],
+                [
+                  48,
+                  2
+                ],
+                [
+                  61,
+                  2
+                ],
+                [
+                  75,
+                  3
+                ],
+                [
+                  39,
+                  4
+                ],
+                [
+                  69,
+                  3
+                ],
+                [
+                  43,
+                  2
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L17",
+          "q_t": "3-6",
+          "qc_assignments": [
+            {
+              "qc": 1,
+              "coordinates": [
+                [
+                  76,
+                  1
+                ],
+                [
+                  37,
+                  1
+                ]
+              ]
+            },
+            {
+              "qc": 2,
+              "coordinates": [
+                [
+                  36,
+                  2
+                ],
+                [
+                  55,
+                  2
+                ]
+              ]
+            },
+            {
+              "qc": 3,
+              "coordinates": [
+                [
+                  57,
+                  1
+                ],
+                [
+                  50,
+                  2
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L18",
+          "q_t": "3-6",
+          "qc_assignments": [
+            {
+              "qc": 4,
+              "coordinates": [
+                [
+                  64,
+                  3
+                ],
+                [
+                  73,
+                  3
+                ]
+              ]
+            },
+            {
+              "qc": 5,
+              "coordinates": [
+                [
+                  71,
+                  4
+                ],
+                [
+                  47,
+                  4
+                ]
+              ]
+            },
+            {
+              "qc": 6,
+              "coordinates": [
+                [
+                  63,
+                  4
+                ],
+                [
+                  56,
+                  3
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L19",
+          "q_t": "3-9",
+          "qc_assignments": [
+            {
+              "qc": 2,
+              "coordinates": [
+                [
+                  39,
+                  2
+                ],
+                [
+                  31,
+                  3
+                ],
+                [
+                  51,
+                  4
+                ]
+              ]
+            },
+            {
+              "qc": 3,
+              "coordinates": [
+                [
+                  34,
+                  3
+                ],
+                [
+                  78,
+                  2
+                ],
+                [
+                  60,
+                  4
+                ]
+              ]
+            },
+            {
+              "qc": 4,
+              "coordinates": [
+                [
+                  78,
+                  4
+                ],
+                [
+                  66,
+                  3
+                ],
+                [
+                  59,
+                  2
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L20",
+          "q_t": "3-9",
+          "qc_assignments": [
+            {
+              "qc": 3,
+              "coordinates": [
+                [
+                  74,
+                  3
+                ],
+                [
+                  38,
+                  3
+                ],
+                [
+                  48,
+                  3
+                ]
+              ]
+            },
+            {
+              "qc": 4,
+              "coordinates": [
+                [
+                  42,
+                  4
+                ],
+                [
+                  65,
+                  4
+                ],
+                [
+                  52,
+                  5
+                ]
+              ]
+            },
+            {
+              "qc": 5,
+              "coordinates": [
+                [
+                  32,
+                  5
+                ],
+                [
+                  44,
+                  5
+                ],
+                [
+                  65,
+                  3
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L21",
+          "q_t": "3-12",
+          "qc_assignments": [
+            {
+              "qc": 1,
+              "coordinates": [
+                [
+                  71,
+                  1
+                ],
+                [
+                  60,
+                  1
+                ],
+                [
+                  54,
+                  2
+                ],
+                [
+                  54,
+                  1
+                ]
+              ]
+            },
+            {
+              "qc": 2,
+              "coordinates": [
+                [
+                  30,
+                  2
+                ],
+                [
+                  78,
+                  1
+                ],
+                [
+                  72,
+                  2
+                ],
+                [
+                  57,
+                  2
+                ]
+              ]
+            },
+            {
+              "qc": 3,
+              "coordinates": [
+                [
+                  72,
+                  3
+                ],
+                [
+                  64,
+                  3
+                ],
+                [
+                  67,
+                  2
+                ],
+                [
+                  76,
+                  3
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L22",
+          "q_t": "3-12",
+          "qc_assignments": [
+            {
+              "qc": 4,
+              "coordinates": [
+                [
+                  52,
+                  5
+                ],
+                [
+                  33,
+                  6
+                ],
+                [
+                  77,
+                  4
+                ],
+                [
+                  34,
+                  5
+                ]
+              ]
+            },
+            {
+              "qc": 5,
+              "coordinates": [
+                [
+                  32,
+                  6
+                ],
+                [
+                  79,
+                  5
+                ],
+                [
+                  74,
+                  5
+                ],
+                [
+                  63,
+                  4
+                ]
+              ]
+            },
+            {
+              "qc": 6,
+              "coordinates": [
+                [
+                  80,
+                  6
+                ],
+                [
+                  32,
+                  6
+                ],
+                [
+                  66,
+                  4
+                ],
+                [
+                  33,
+                  4
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L23",
+          "q_t": "3-15",
+          "qc_assignments": [
+            {
+              "qc": 1,
+              "coordinates": [
+                [
+                  72,
+                  2
+                ],
+                [
+                  62,
+                  3
+                ],
+                [
+                  41,
+                  1
+                ],
+                [
+                  73,
+                  2
+                ],
+                [
+                  56,
+                  1
+                ]
+              ]
+            },
+            {
+              "qc": 2,
+              "coordinates": [
+                [
+                  66,
+                  2
+                ],
+                [
+                  61,
+                  3
+                ],
+                [
+                  67,
+                  1
+                ],
+                [
+                  54,
+                  1
+                ],
+                [
+                  51,
+                  2
+                ]
+              ]
+            },
+            {
+              "qc": 3,
+              "coordinates": [
+                [
+                  47,
+                  2
+                ],
+                [
+                  56,
+                  3
+                ],
+                [
+                  40,
+                  1
+                ],
+                [
+                  33,
+                  3
+                ],
+                [
+                  48,
+                  3
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L24",
+          "q_t": "3-15",
+          "qc_assignments": [
+            {
+              "qc": 4,
+              "coordinates": [
+                [
+                  47,
+                  5
+                ],
+                [
+                  58,
+                  6
+                ],
+                [
+                  50,
+                  4
+                ],
+                [
+                  70,
+                  4
+                ],
+                [
+                  51,
+                  4
+                ]
+              ]
+            },
+            {
+              "qc": 5,
+              "coordinates": [
+                [
+                  79,
+                  6
+                ],
+                [
+                  30,
+                  5
+                ],
+                [
+                  56,
+                  5
+                ],
+                [
+                  39,
+                  4
+                ],
+                [
+                  56,
+                  5
+                ]
+              ]
+            },
+            {
+              "qc": 6,
+              "coordinates": [
+                [
+                  32,
+                  4
+                ],
+                [
+                  49,
+                  6
+                ],
+                [
+                  67,
+                  5
+                ],
+                [
+                  63,
+                  4
+                ],
+                [
+                  77,
+                  6
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L25",
+          "q_t": "4-8",
+          "qc_assignments": [
+            {
+              "qc": 1,
+              "coordinates": [
+                [
+                  36,
+                  1
+                ],
+                [
+                  73,
+                  1
+                ]
+              ]
+            },
+            {
+              "qc": 2,
+              "coordinates": [
+                [
+                  74,
+                  2
+                ],
+                [
+                  40,
+                  2
+                ]
+              ]
+            },
+            {
+              "qc": 3,
+              "coordinates": [
+                [
+                  77,
+                  1
+                ],
+                [
+                  58,
+                  2
+                ]
+              ]
+            },
+            {
+              "qc": 4,
+              "coordinates": [
+                [
+                  40,
+                  2
+                ],
+                [
+                  43,
+                  1
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L26",
+          "q_t": "4-8",
+          "qc_assignments": [
+            {
+              "qc": 3,
+              "coordinates": [
+                [
+                  64,
+                  3
+                ],
+                [
+                  75,
+                  3
+                ]
+              ]
+            },
+            {
+              "qc": 4,
+              "coordinates": [
+                [
+                  45,
+                  3
+                ],
+                [
+                  72,
+                  4
+                ]
+              ]
+            },
+            {
+              "qc": 5,
+              "coordinates": [
+                [
+                  68,
+                  4
+                ],
+                [
+                  77,
+                  4
+                ]
+              ]
+            },
+            {
+              "qc": 6,
+              "coordinates": [
+                [
+                  63,
+                  3
+                ],
+                [
+                  74,
+                  4
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L27",
+          "q_t": "4-12",
+          "qc_assignments": [
+            {
+              "qc": 2,
+              "coordinates": [
+                [
+                  39,
+                  3
+                ],
+                [
+                  48,
+                  4
+                ],
+                [
+                  51,
+                  3
+                ]
+              ]
+            },
+            {
+              "qc": 3,
+              "coordinates": [
+                [
+                  67,
+                  5
+                ],
+                [
+                  41,
+                  3
+                ],
+                [
+                  56,
+                  4
+                ]
+              ]
+            },
+            {
+              "qc": 4,
+              "coordinates": [
+                [
+                  50,
+                  3
+                ],
+                [
+                  46,
+                  5
+                ],
+                [
+                  56,
+                  4
+                ]
+              ]
+            },
+            {
+              "qc": 5,
+              "coordinates": [
+                [
+                  68,
+                  4
+                ],
+                [
+                  68,
+                  3
+                ],
+                [
+                  77,
+                  5
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L28",
+          "q_t": "4-12",
+          "qc_assignments": [
+            {
+              "qc": 3,
+              "coordinates": [
+                [
+                  63,
+                  3
+                ],
+                [
+                  42,
+                  4
+                ],
+                [
+                  64,
+                  3
+                ]
+              ]
+            },
+            {
+              "qc": 4,
+              "coordinates": [
+                [
+                  51,
+                  4
+                ],
+                [
+                  43,
+                  3
+                ],
+                [
+                  45,
+                  4
+                ]
+              ]
+            },
+            {
+              "qc": 5,
+              "coordinates": [
+                [
+                  60,
+                  5
+                ],
+                [
+                  30,
+                  5
+                ],
+                [
+                  68,
+                  4
+                ]
+              ]
+            },
+            {
+              "qc": 6,
+              "coordinates": [
+                [
+                  41,
+                  5
+                ],
+                [
+                  47,
+                  5
+                ],
+                [
+                  63,
+                  4
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L29",
+          "q_t": "4-16",
+          "qc_assignments": [
+            {
+              "qc": 3,
+              "coordinates": [
+                [
+                  46,
+                  3
+                ],
+                [
+                  60,
+                  4
+                ],
+                [
+                  54,
+                  3
+                ],
+                [
+                  71,
+                  5
+                ]
+              ]
+            },
+            {
+              "qc": 4,
+              "coordinates": [
+                [
+                  47,
+                  5
+                ],
+                [
+                  58,
+                  3
+                ],
+                [
+                  50,
+                  4
+                ],
+                [
+                  70,
+                  3
+                ]
+              ]
+            },
+            {
+              "qc": 5,
+              "coordinates": [
+                [
+                  79,
+                  3
+                ],
+                [
+                  30,
+                  5
+                ],
+                [
+                  56,
+                  4
+                ],
+                [
+                  39,
+                  4
+                ]
+              ]
+            },
+            {
+              "qc": 6,
+              "coordinates": [
+                [
+                  32,
+                  4
+                ],
+                [
+                  49,
+                  3
+                ],
+                [
+                  67,
+                  5
+                ],
+                [
+                  63,
+                  3
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L30",
+          "q_t": "4-16",
+          "qc_assignments": [
+            {
+              "qc": 1,
+              "coordinates": [
+                [
+                  75,
+                  1
+                ],
+                [
+                  39,
+                  2
+                ],
+                [
+                  46,
+                  1
+                ],
+                [
+                  35,
+                  1
+                ]
+              ]
+            },
+            {
+              "qc": 2,
+              "coordinates": [
+                [
+                  69,
+                  2
+                ],
+                [
+                  80,
+                  2
+                ],
+                [
+                  67,
+                  1
+                ],
+                [
+                  44,
+                  2
+                ]
+              ]
+            },
+            {
+              "qc": 3,
+              "coordinates": [
+                [
+                  45,
+                  3
+                ],
+                [
+                  48,
+                  2
+                ],
+                [
+                  77,
+                  3
+                ],
+                [
+                  42,
+                  3
+                ]
+              ]
+            },
+            {
+              "qc": 4,
+              "coordinates": [
+                [
+                  62,
+                  3
+                ],
+                [
+                  36,
+                  3
+                ],
+                [
+                  50,
+                  3
+                ],
+                [
+                  63,
+                  2
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L31",
+          "q_t": "5-10",
+          "qc_assignments": [
+            {
+              "qc": 1,
+              "coordinates": [
+                [
+                  61,
+                  1
+                ],
+                [
+                  59,
+                  1
+                ]
+              ]
+            },
+            {
+              "qc": 2,
+              "coordinates": [
+                [
+                  71,
+                  2
+                ],
+                [
+                  62,
+                  1
+                ]
+              ]
+            },
+            {
+              "qc": 3,
+              "coordinates": [
+                [
+                  30,
+                  2
+                ],
+                [
+                  30,
+                  1
+                ]
+              ]
+            },
+            {
+              "qc": 4,
+              "coordinates": [
+                [
+                  38,
+                  2
+                ],
+                [
+                  37,
+                  2
+                ]
+              ]
+            },
+            {
+              "qc": 5,
+              "coordinates": [
+                [
+                  55,
+                  1
+                ],
+                [
+                  42,
+                  1
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L32",
+          "q_t": "5-10",
+          "qc_assignments": [
+            {
+              "qc": 2,
+              "coordinates": [
+                [
+                  79,
+                  3
+                ],
+                [
+                  66,
+                  3
+                ]
+              ]
+            },
+            {
+              "qc": 3,
+              "coordinates": [
+                [
+                  55,
+                  3
+                ],
+                [
+                  45,
+                  3
+                ]
+              ]
+            },
+            {
+              "qc": 4,
+              "coordinates": [
+                [
+                  46,
+                  4
+                ],
+                [
+                  56,
+                  4
+                ]
+              ]
+            },
+            {
+              "qc": 5,
+              "coordinates": [
+                [
+                  77,
+                  4
+                ],
+                [
+                  34,
+                  4
+                ]
+              ]
+            },
+            {
+              "qc": 6,
+              "coordinates": [
+                [
+                  80,
+                  4
+                ],
+                [
+                  67,
+                  4
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L33",
+          "q_t": "5-15",
+          "qc_assignments": [
+            {
+              "qc": 1,
+              "coordinates": [
+                [
+                  80,
+                  2
+                ],
+                [
+                  43,
+                  2
+                ],
+                [
+                  53,
+                  3
+                ]
+              ]
+            },
+            {
+              "qc": 2,
+              "coordinates": [
+                [
+                  32,
+                  3
+                ],
+                [
+                  47,
+                  2
+                ],
+                [
+                  70,
+                  3
+                ]
+              ]
+            },
+            {
+              "qc": 3,
+              "coordinates": [
+                [
+                  63,
+                  4
+                ],
+                [
+                  52,
+                  4
+                ],
+                [
+                  71,
+                  4
+                ]
+              ]
+            },
+            {
+              "qc": 4,
+              "coordinates": [
+                [
+                  48,
+                  4
+                ],
+                [
+                  57,
+                  3
+                ],
+                [
+                  75,
+                  4
+                ]
+              ]
+            },
+            {
+              "qc": 5,
+              "coordinates": [
+                [
+                  67,
+                  4
+                ],
+                [
+                  43,
+                  3
+                ],
+                [
+                  65,
+                  4
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L34",
+          "q_t": "5-15",
+          "qc_assignments": [
+            {
+              "qc": 2,
+              "coordinates": [
+                [
+                  45,
+                  2
+                ],
+                [
+                  50,
+                  3
+                ],
+                [
+                  77,
+                  2
+                ]
+              ]
+            },
+            {
+              "qc": 3,
+              "coordinates": [
+                [
+                  34,
+                  3
+                ],
+                [
+                  47,
+                  2
+                ],
+                [
+                  52,
+                  3
+                ]
+              ]
+            },
+            {
+              "qc": 4,
+              "coordinates": [
+                [
+                  43,
+                  4
+                ],
+                [
+                  70,
+                  3
+                ],
+                [
+                  67,
+                  4
+                ]
+              ]
+            },
+            {
+              "qc": 5,
+              "coordinates": [
+                [
+                  66,
+                  4
+                ],
+                [
+                  35,
+                  4
+                ],
+                [
+                  60,
+                  4
+                ]
+              ]
+            },
+            {
+              "qc": 6,
+              "coordinates": [
+                [
+                  56,
+                  4
+                ],
+                [
+                  36,
+                  3
+                ],
+                [
+                  56,
+                  4
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "instance": "L35",
+          "q_t": "6-12",
+          "qc_assignments": [
+            {
+              "qc": 1,
+              "coordinates": [
+                [
+                  72,
+                  1
+                ],
+                [
+                  59,
+                  3
+                ]
+              ]
+            },
+            {
+              "qc": 2,
+              "coordinates": [
+                [
+                  61,
+                  2
+                ],
+                [
+                  57,
+                  1
+                ]
+              ]
+            },
+            {
+              "qc": 3,
+              "coordinates": [
+                [
+                  53,
+                  3
+                ],
+                [
+                  48,
+                  3
+                ]
+              ]
+            },
+            {
+              "qc": 4,
+              "coordinates": [
+                [
+                  57,
+                  1
+                ],
+                [
+                  40,
+                  2
+                ]
+              ]
+            },
+            {
+              "qc": 5,
+              "coordinates": [
+                [
+                  65,
+                  3
+                ],
+                [
+                  50,
+                  1
+                ]
+              ]
+            },
+            {
+              "qc": 6,
+              "coordinates": [
+                [
+                  58,
+                  2
+                ],
+                [
+                  47,
+                  3
+                ]
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "source_anomalies_preserved": [
+    {
+      "location": "Table 2, U09, scenario_n.energy",
+      "printed_value": 1125,
+      "note": "The table visibly prints 1125; it was not inferred or normalized to 11125."
+    },
+    {
+      "location": "Table 4, row QC6, column QC4",
+      "printed_value": 350,
+      "note": "The value is preserved exactly as printed, despite the surrounding progression."
+    }
+  ],
+  "validation": {
+    "status": "passed",
+    "checks": {
+      "table_1_instance_rows": 35,
+      "table_2_instance_rows": 35,
+      "table_3_instance_rows": 26,
+      "table_4_dimensions": [
+        12,
+        12
+      ],
+      "table_5_instances": 35,
+      "table_5_qc_assignment_rows": 106,
+      "table_5_coordinates": 368
+    }
+  }
+}

@@ -1,0 +1,5683 @@
+{
+  "_provenance": "Parsed from the author's mp-BRKGA_DL01..DL10 sources by scripts/transcribe_dl_instances.py. Distance matrix in dl_distance_matrix.csv (20 quay cranes by 20 loading/unloading stations, one-way station loop). Speed levels follow Scenario 3: time factors 1.25/1.0/0.83, empty power 7.8/10/13.2 kW, loaded power 11.7/15/19.8 kW.",
+  "DL01": {
+    "num_agvs": 4,
+    "agv_start": "LU1",
+    "qcs": [
+      "QC1",
+      "QC2",
+      "QC3",
+      "QC4",
+      "QC5",
+      "QC6",
+      "QC7",
+      "QC8"
+    ],
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 44.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 54.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 51.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 49.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 59.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 42.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 80.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 49.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 65.0,
+        "kind": "LOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 61.0,
+        "kind": "UNLOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 65.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 69.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 70.0,
+        "kind": "LOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 80.0,
+        "kind": "UNLOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 43.0,
+        "kind": "LOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 65.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 74.0,
+        "kind": "LOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 48.0,
+        "kind": "LOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 80.0,
+        "kind": "UNLOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 70.0,
+        "kind": "LOAD",
+        "lu": "LU1"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 73.0,
+        "kind": "LOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 63.0,
+        "kind": "LOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 69.0,
+        "kind": "UNLOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 60.0,
+        "kind": "LOAD",
+        "lu": "LU1"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 45.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 69.0,
+        "kind": "UNLOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 43.0,
+        "kind": "LOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 62.0,
+        "kind": "UNLOAD",
+        "lu": "LU1"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 75.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 61.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 78.0,
+        "kind": "LOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 66.0,
+        "kind": "UNLOAD",
+        "lu": "LU1"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 48.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 43.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 55.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 77.0,
+        "kind": "LOAD",
+        "lu": "LU1"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 65.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 49.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 45.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 45.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      }
+    ],
+    "_provenance": {
+      "source": "mp-BRKGA_DL01.py",
+      "num_qcs": 8,
+      "tasks_per_qc": 5,
+      "scenario": 3,
+      "velocity_empty": 6.0,
+      "velocity_loaded": 3.0
+    }
+  },
+  "DL02": {
+    "num_agvs": 4,
+    "agv_start": "LU2",
+    "qcs": [
+      "QC1",
+      "QC2",
+      "QC3",
+      "QC4",
+      "QC5",
+      "QC6",
+      "QC7",
+      "QC8"
+    ],
+    "tasks": [
+      {
+        "qc": "QC1",
+        "handling_time": 44.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 54.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 51.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 49.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 59.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 57.0,
+        "kind": "LOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 63.0,
+        "kind": "UNLOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 64.0,
+        "kind": "LOAD",
+        "lu": "LU1"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 42.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC1",
+        "handling_time": 46.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 42.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 80.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 49.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 65.0,
+        "kind": "LOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 61.0,
+        "kind": "UNLOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 77.0,
+        "kind": "LOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 57.0,
+        "kind": "LOAD",
+        "lu": "LU1"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 62.0,
+        "kind": "LOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 56.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 73.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 65.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 69.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 70.0,
+        "kind": "LOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 80.0,
+        "kind": "UNLOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 43.0,
+        "kind": "LOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 42.0,
+        "kind": "LOAD",
+        "lu": "LU1"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 79.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 41.0,
+        "kind": "UNLOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 79.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 40.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 65.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 74.0,
+        "kind": "LOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 48.0,
+        "kind": "LOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 80.0,
+        "kind": "UNLOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 70.0,
+        "kind": "LOAD",
+        "lu": "LU1"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 42.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 63.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 41.0,
+        "kind": "LOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 52.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 56.0,
+        "kind": "LOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 73.0,
+        "kind": "LOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 63.0,
+        "kind": "LOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 69.0,
+        "kind": "UNLOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 60.0,
+        "kind": "LOAD",
+        "lu": "LU1"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 45.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 50.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 76.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 60.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 74.0,
+        "kind": "LOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 40.0,
+        "kind": "UNLOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 69.0,
+        "kind": "UNLOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 43.0,
+        "kind": "LOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 62.0,
+        "kind": "UNLOAD",
+        "lu": "LU1"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 75.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 61.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 62.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 41.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 63.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 46.0,
+        "kind": "LOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 72.0,
+        "kind": "UNLOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 78.0,
+        "kind": "LOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 66.0,
+        "kind": "UNLOAD",
+        "lu": "LU1"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 48.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 43.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 55.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 62.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 52.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 77.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 78.0,
+        "kind": "LOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 46.0,
+        "kind": "LOAD",
+        "lu": "LU1"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 77.0,
+        "kind": "LOAD",
+        "lu": "LU1"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 65.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 49.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 45.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 45.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 45.0,
+        "kind": "LOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 50.0,
+        "kind": "UNLOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 65.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 59.0,
+        "kind": "LOAD",
+        "lu": "LU1"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 65.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      }
+    ],
+    "_provenance": {
+      "source": "mp-BRKGA_DL02.py",
+      "num_qcs": 8,
+      "tasks_per_qc": 10,
+      "scenario": 3,
+      "velocity_empty": 6.0,
+      "velocity_loaded": 3.0
+    }
+  },
+  "DL03": {
+    "num_agvs": 5,
+    "agv_start": "LU3",
+    "qcs": [
+      "QC2",
+      "QC3",
+      "QC4",
+      "QC5",
+      "QC6",
+      "QC7",
+      "QC8",
+      "QC9",
+      "QC10",
+      "QC11"
+    ],
+    "tasks": [
+      {
+        "qc": "QC2",
+        "handling_time": 50.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 80.0,
+        "kind": "UNLOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 64.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 66.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 51.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 48.0,
+        "kind": "UNLOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 67.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 77.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 79.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 56.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 43.0,
+        "kind": "LOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 43.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 76.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 56.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 66.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 53.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 59.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 65.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 50.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 69.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 46.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 73.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 49.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 58.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 49.0,
+        "kind": "LOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 63.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 77.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 74.0,
+        "kind": "LOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 61.0,
+        "kind": "UNLOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 51.0,
+        "kind": "LOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 58.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 68.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 42.0,
+        "kind": "LOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 60.0,
+        "kind": "LOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 73.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 66.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 46.0,
+        "kind": "UNLOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 54.0,
+        "kind": "UNLOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 76.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 58.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 57.0,
+        "kind": "UNLOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 47.0,
+        "kind": "LOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 73.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 42.0,
+        "kind": "UNLOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 48.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 57.0,
+        "kind": "UNLOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 78.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 55.0,
+        "kind": "UNLOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 74.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 53.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      }
+    ],
+    "_provenance": {
+      "source": "mp-BRKGA_DL03.py",
+      "num_qcs": 10,
+      "tasks_per_qc": 5,
+      "scenario": 3,
+      "velocity_empty": 6.0,
+      "velocity_loaded": 3.0
+    }
+  },
+  "DL04": {
+    "num_agvs": 5,
+    "agv_start": "LU4",
+    "qcs": [
+      "QC2",
+      "QC3",
+      "QC4",
+      "QC5",
+      "QC6",
+      "QC7",
+      "QC8",
+      "QC9",
+      "QC10",
+      "QC11"
+    ],
+    "tasks": [
+      {
+        "qc": "QC2",
+        "handling_time": 50.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 80.0,
+        "kind": "UNLOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 64.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 66.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 51.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 45.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 51.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 62.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 50.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC2",
+        "handling_time": 55.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 48.0,
+        "kind": "UNLOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 67.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 77.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 79.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 56.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 53.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 50.0,
+        "kind": "UNLOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 68.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 40.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 48.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 43.0,
+        "kind": "LOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 43.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 76.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 56.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 66.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 79.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 53.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 57.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 76.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 43.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 53.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 59.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 65.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 50.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 69.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 76.0,
+        "kind": "UNLOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 40.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 52.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 55.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 71.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 46.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 73.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 49.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 58.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 49.0,
+        "kind": "LOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 56.0,
+        "kind": "LOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 70.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 74.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 61.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 57.0,
+        "kind": "LOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 63.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 77.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 74.0,
+        "kind": "LOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 61.0,
+        "kind": "UNLOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 51.0,
+        "kind": "LOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 65.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 80.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 48.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 59.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 48.0,
+        "kind": "UNLOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 58.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 68.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 42.0,
+        "kind": "LOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 60.0,
+        "kind": "LOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 73.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 77.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 47.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 77.0,
+        "kind": "LOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 41.0,
+        "kind": "UNLOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 62.0,
+        "kind": "LOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 66.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 46.0,
+        "kind": "UNLOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 54.0,
+        "kind": "UNLOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 76.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 58.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 63.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 72.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 50.0,
+        "kind": "LOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 54.0,
+        "kind": "UNLOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 73.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 57.0,
+        "kind": "UNLOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 47.0,
+        "kind": "LOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 73.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 42.0,
+        "kind": "UNLOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 48.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 44.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 61.0,
+        "kind": "UNLOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 77.0,
+        "kind": "UNLOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 48.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 49.0,
+        "kind": "UNLOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 57.0,
+        "kind": "UNLOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 78.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 55.0,
+        "kind": "UNLOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 74.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 53.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 65.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 41.0,
+        "kind": "UNLOAD",
+        "lu": "LU2"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 46.0,
+        "kind": "LOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 40.0,
+        "kind": "UNLOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 49.0,
+        "kind": "LOAD",
+        "lu": "LU9"
+      }
+    ],
+    "_provenance": {
+      "source": "mp-BRKGA_DL04.py",
+      "num_qcs": 10,
+      "tasks_per_qc": 10,
+      "scenario": 3,
+      "velocity_empty": 6.0,
+      "velocity_loaded": 3.0
+    }
+  },
+  "DL05": {
+    "num_agvs": 6,
+    "agv_start": "LU5",
+    "qcs": [
+      "QC3",
+      "QC4",
+      "QC5",
+      "QC6",
+      "QC7",
+      "QC8",
+      "QC9",
+      "QC10",
+      "QC11",
+      "QC12",
+      "QC13",
+      "QC14"
+    ],
+    "tasks": [
+      {
+        "qc": "QC3",
+        "handling_time": 66.0,
+        "kind": "LOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 64.0,
+        "kind": "UNLOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 76.0,
+        "kind": "LOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 75.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 75.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 78.0,
+        "kind": "UNLOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 62.0,
+        "kind": "LOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 71.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 67.0,
+        "kind": "UNLOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 47.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 55.0,
+        "kind": "LOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 78.0,
+        "kind": "LOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 73.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 77.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 70.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 78.0,
+        "kind": "LOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 40.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 50.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 74.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 41.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 68.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 66.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 77.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 53.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 45.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 76.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 61.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 61.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 62.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 66.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 68.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 64.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 51.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 56.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 63.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 58.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 54.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 71.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 50.0,
+        "kind": "LOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 51.0,
+        "kind": "UNLOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 70.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 76.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 47.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 40.0,
+        "kind": "UNLOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 54.0,
+        "kind": "LOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 48.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 75.0,
+        "kind": "LOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 72.0,
+        "kind": "LOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 78.0,
+        "kind": "LOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 65.0,
+        "kind": "LOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 76.0,
+        "kind": "LOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 66.0,
+        "kind": "UNLOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 48.0,
+        "kind": "LOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 67.0,
+        "kind": "UNLOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 68.0,
+        "kind": "LOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 51.0,
+        "kind": "LOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 47.0,
+        "kind": "LOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 50.0,
+        "kind": "LOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 62.0,
+        "kind": "LOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 68.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      }
+    ],
+    "_provenance": {
+      "source": "mp-BRKGA_DL05.py",
+      "num_qcs": 12,
+      "tasks_per_qc": 5,
+      "scenario": 3,
+      "velocity_empty": 6.0,
+      "velocity_loaded": 3.0
+    }
+  },
+  "DL06": {
+    "num_agvs": 6,
+    "agv_start": "LU6",
+    "qcs": [
+      "QC3",
+      "QC4",
+      "QC5",
+      "QC6",
+      "QC7",
+      "QC8",
+      "QC9",
+      "QC10",
+      "QC11",
+      "QC12",
+      "QC13",
+      "QC14"
+    ],
+    "tasks": [
+      {
+        "qc": "QC3",
+        "handling_time": 66.0,
+        "kind": "LOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 64.0,
+        "kind": "UNLOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 76.0,
+        "kind": "LOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 75.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 75.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 44.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 45.0,
+        "kind": "LOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 43.0,
+        "kind": "LOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 65.0,
+        "kind": "UNLOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC3",
+        "handling_time": 46.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 78.0,
+        "kind": "UNLOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 62.0,
+        "kind": "LOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 71.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 67.0,
+        "kind": "UNLOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 47.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 48.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 68.0,
+        "kind": "LOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 78.0,
+        "kind": "LOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 44.0,
+        "kind": "LOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 75.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 55.0,
+        "kind": "LOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 78.0,
+        "kind": "LOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 73.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 77.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 70.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 71.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 59.0,
+        "kind": "LOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 56.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 69.0,
+        "kind": "UNLOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 66.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 78.0,
+        "kind": "LOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 40.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 50.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 74.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 41.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 53.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 70.0,
+        "kind": "LOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 47.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 62.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 49.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 68.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 66.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 77.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 53.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 45.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 57.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 68.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 70.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 80.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 74.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 76.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 61.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 61.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 62.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 66.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 40.0,
+        "kind": "LOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 53.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 44.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 48.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 50.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 68.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 64.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 51.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 56.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 63.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 68.0,
+        "kind": "UNLOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 69.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 51.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 40.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 60.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 58.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 54.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 71.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 50.0,
+        "kind": "LOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 51.0,
+        "kind": "UNLOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 70.0,
+        "kind": "LOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 71.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 41.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 61.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 54.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 70.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 76.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 47.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 40.0,
+        "kind": "UNLOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 54.0,
+        "kind": "LOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 63.0,
+        "kind": "LOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 73.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 52.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 41.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 71.0,
+        "kind": "LOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 48.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 75.0,
+        "kind": "LOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 72.0,
+        "kind": "LOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 78.0,
+        "kind": "LOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 65.0,
+        "kind": "LOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 43.0,
+        "kind": "UNLOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 54.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 72.0,
+        "kind": "LOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 52.0,
+        "kind": "LOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 53.0,
+        "kind": "LOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 76.0,
+        "kind": "LOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 66.0,
+        "kind": "UNLOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 48.0,
+        "kind": "LOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 67.0,
+        "kind": "UNLOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 68.0,
+        "kind": "LOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 69.0,
+        "kind": "LOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 80.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 71.0,
+        "kind": "UNLOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 68.0,
+        "kind": "UNLOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 42.0,
+        "kind": "LOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 51.0,
+        "kind": "LOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 47.0,
+        "kind": "LOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 50.0,
+        "kind": "LOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 62.0,
+        "kind": "LOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 68.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 53.0,
+        "kind": "UNLOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 71.0,
+        "kind": "UNLOAD",
+        "lu": "LU3"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 68.0,
+        "kind": "UNLOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 80.0,
+        "kind": "LOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 47.0,
+        "kind": "UNLOAD",
+        "lu": "LU12"
+      }
+    ],
+    "_provenance": {
+      "source": "mp-BRKGA_DL06.py",
+      "num_qcs": 12,
+      "tasks_per_qc": 10,
+      "scenario": 3,
+      "velocity_empty": 6.0,
+      "velocity_loaded": 3.0
+    }
+  },
+  "DL07": {
+    "num_agvs": 7,
+    "agv_start": "LU7",
+    "qcs": [
+      "QC4",
+      "QC5",
+      "QC6",
+      "QC7",
+      "QC8",
+      "QC9",
+      "QC10",
+      "QC11",
+      "QC12",
+      "QC13",
+      "QC14",
+      "QC15",
+      "QC16",
+      "QC17"
+    ],
+    "tasks": [
+      {
+        "qc": "QC4",
+        "handling_time": 45.0,
+        "kind": "UNLOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 79.0,
+        "kind": "LOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 73.0,
+        "kind": "LOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 54.0,
+        "kind": "UNLOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 78.0,
+        "kind": "LOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 70.0,
+        "kind": "LOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 58.0,
+        "kind": "UNLOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 72.0,
+        "kind": "LOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 63.0,
+        "kind": "UNLOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 76.0,
+        "kind": "LOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 62.0,
+        "kind": "UNLOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 47.0,
+        "kind": "LOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 58.0,
+        "kind": "UNLOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 75.0,
+        "kind": "UNLOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 44.0,
+        "kind": "LOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 79.0,
+        "kind": "UNLOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 69.0,
+        "kind": "LOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 57.0,
+        "kind": "LOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 72.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 51.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 54.0,
+        "kind": "LOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 41.0,
+        "kind": "LOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 59.0,
+        "kind": "LOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 71.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 65.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 79.0,
+        "kind": "UNLOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 41.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 70.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 73.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 48.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 49.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 78.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 68.0,
+        "kind": "LOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 74.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 48.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 59.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 79.0,
+        "kind": "LOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 64.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 49.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 77.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 78.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 62.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 51.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 50.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 69.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 59.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 48.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 41.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 74.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 72.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 69.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 71.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 66.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 51.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 70.0,
+        "kind": "UNLOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 58.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 78.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 48.0,
+        "kind": "LOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 54.0,
+        "kind": "LOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 51.0,
+        "kind": "UNLOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 67.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 64.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 73.0,
+        "kind": "LOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 72.0,
+        "kind": "UNLOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 66.0,
+        "kind": "LOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 73.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 51.0,
+        "kind": "LOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 80.0,
+        "kind": "LOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 70.0,
+        "kind": "UNLOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 62.0,
+        "kind": "LOAD",
+        "lu": "LU14"
+      }
+    ],
+    "_provenance": {
+      "source": "mp-BRKGA_DL07.py",
+      "num_qcs": 14,
+      "tasks_per_qc": 5,
+      "scenario": 3,
+      "velocity_empty": 6.0,
+      "velocity_loaded": 3.0
+    }
+  },
+  "DL08": {
+    "num_agvs": 7,
+    "agv_start": "LU8",
+    "qcs": [
+      "QC4",
+      "QC5",
+      "QC6",
+      "QC7",
+      "QC8",
+      "QC9",
+      "QC10",
+      "QC11",
+      "QC12",
+      "QC13",
+      "QC14",
+      "QC15",
+      "QC16",
+      "QC17"
+    ],
+    "tasks": [
+      {
+        "qc": "QC4",
+        "handling_time": 45.0,
+        "kind": "UNLOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 79.0,
+        "kind": "LOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 73.0,
+        "kind": "LOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 54.0,
+        "kind": "UNLOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 78.0,
+        "kind": "LOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 80.0,
+        "kind": "LOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 75.0,
+        "kind": "LOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 68.0,
+        "kind": "LOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 73.0,
+        "kind": "UNLOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC4",
+        "handling_time": 55.0,
+        "kind": "LOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 70.0,
+        "kind": "LOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 58.0,
+        "kind": "UNLOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 72.0,
+        "kind": "LOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 63.0,
+        "kind": "UNLOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 76.0,
+        "kind": "LOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 58.0,
+        "kind": "LOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 73.0,
+        "kind": "UNLOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 78.0,
+        "kind": "LOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 72.0,
+        "kind": "UNLOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 50.0,
+        "kind": "UNLOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 62.0,
+        "kind": "UNLOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 47.0,
+        "kind": "LOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 58.0,
+        "kind": "UNLOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 75.0,
+        "kind": "UNLOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 44.0,
+        "kind": "LOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 76.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 43.0,
+        "kind": "LOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 73.0,
+        "kind": "UNLOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 59.0,
+        "kind": "LOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 64.0,
+        "kind": "UNLOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 79.0,
+        "kind": "UNLOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 69.0,
+        "kind": "LOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 57.0,
+        "kind": "LOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 72.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 51.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 53.0,
+        "kind": "LOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 50.0,
+        "kind": "UNLOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 42.0,
+        "kind": "LOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 56.0,
+        "kind": "LOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 52.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 54.0,
+        "kind": "LOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 41.0,
+        "kind": "LOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 59.0,
+        "kind": "LOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 71.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 65.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 55.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 55.0,
+        "kind": "UNLOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 78.0,
+        "kind": "LOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 73.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 55.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 79.0,
+        "kind": "UNLOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 41.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 70.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 73.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 48.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 60.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 48.0,
+        "kind": "LOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 77.0,
+        "kind": "LOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 63.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 63.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 49.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 78.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 68.0,
+        "kind": "LOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 74.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 48.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 70.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 51.0,
+        "kind": "LOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 43.0,
+        "kind": "UNLOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 48.0,
+        "kind": "LOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 64.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 59.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 79.0,
+        "kind": "LOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 64.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 49.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 77.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 56.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 62.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 40.0,
+        "kind": "LOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 70.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 71.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 78.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 62.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 51.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 50.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 69.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 51.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 57.0,
+        "kind": "LOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 78.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 76.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 49.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 59.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 48.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 41.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 74.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 72.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 72.0,
+        "kind": "LOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 61.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 49.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 59.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 46.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 69.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 71.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 66.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 51.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 70.0,
+        "kind": "UNLOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 59.0,
+        "kind": "UNLOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 68.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 57.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 76.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 69.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 58.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 78.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 48.0,
+        "kind": "LOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 54.0,
+        "kind": "LOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 51.0,
+        "kind": "UNLOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 69.0,
+        "kind": "LOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 52.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 64.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 74.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 74.0,
+        "kind": "LOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 67.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 64.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 73.0,
+        "kind": "LOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 72.0,
+        "kind": "UNLOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 66.0,
+        "kind": "LOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 78.0,
+        "kind": "LOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 76.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 65.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 44.0,
+        "kind": "LOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 79.0,
+        "kind": "UNLOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 73.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 51.0,
+        "kind": "LOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 80.0,
+        "kind": "LOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 70.0,
+        "kind": "UNLOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 62.0,
+        "kind": "LOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 56.0,
+        "kind": "LOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 71.0,
+        "kind": "UNLOAD",
+        "lu": "LU4"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 52.0,
+        "kind": "UNLOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 63.0,
+        "kind": "LOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 78.0,
+        "kind": "UNLOAD",
+        "lu": "LU15"
+      }
+    ],
+    "_provenance": {
+      "source": "mp-BRKGA_DL08.py",
+      "num_qcs": 14,
+      "tasks_per_qc": 10,
+      "scenario": 3,
+      "velocity_empty": 6.0,
+      "velocity_loaded": 3.0
+    }
+  },
+  "DL09": {
+    "num_agvs": 8,
+    "agv_start": "LU9",
+    "qcs": [
+      "QC5",
+      "QC6",
+      "QC7",
+      "QC8",
+      "QC9",
+      "QC10",
+      "QC11",
+      "QC12",
+      "QC13",
+      "QC14",
+      "QC15",
+      "QC16",
+      "QC17",
+      "QC18",
+      "QC19",
+      "QC20"
+    ],
+    "tasks": [
+      {
+        "qc": "QC5",
+        "handling_time": 42.0,
+        "kind": "LOAD",
+        "lu": "LU20"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 47.0,
+        "kind": "LOAD",
+        "lu": "LU19"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 66.0,
+        "kind": "UNLOAD",
+        "lu": "LU18"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 44.0,
+        "kind": "LOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 73.0,
+        "kind": "LOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 76.0,
+        "kind": "LOAD",
+        "lu": "LU19"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 46.0,
+        "kind": "LOAD",
+        "lu": "LU18"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 46.0,
+        "kind": "UNLOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 53.0,
+        "kind": "LOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 69.0,
+        "kind": "LOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 48.0,
+        "kind": "UNLOAD",
+        "lu": "LU18"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 73.0,
+        "kind": "LOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 65.0,
+        "kind": "UNLOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 46.0,
+        "kind": "LOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 78.0,
+        "kind": "LOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 44.0,
+        "kind": "LOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 68.0,
+        "kind": "UNLOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 62.0,
+        "kind": "UNLOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 71.0,
+        "kind": "UNLOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 59.0,
+        "kind": "UNLOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 56.0,
+        "kind": "UNLOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 48.0,
+        "kind": "LOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 48.0,
+        "kind": "UNLOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 49.0,
+        "kind": "UNLOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 68.0,
+        "kind": "UNLOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 48.0,
+        "kind": "LOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 70.0,
+        "kind": "UNLOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 58.0,
+        "kind": "UNLOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 73.0,
+        "kind": "UNLOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 58.0,
+        "kind": "LOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 56.0,
+        "kind": "LOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 75.0,
+        "kind": "LOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 50.0,
+        "kind": "LOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 45.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 71.0,
+        "kind": "UNLOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 78.0,
+        "kind": "LOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 70.0,
+        "kind": "UNLOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 68.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 41.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 43.0,
+        "kind": "LOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 44.0,
+        "kind": "UNLOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 73.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 55.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 48.0,
+        "kind": "LOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 55.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 63.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 47.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 43.0,
+        "kind": "LOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 46.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 64.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 49.0,
+        "kind": "UNLOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 45.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 41.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 77.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 59.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 78.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 48.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 47.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 40.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 75.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 62.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 59.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 73.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 56.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 71.0,
+        "kind": "UNLOAD",
+        "lu": "LU20"
+      },
+      {
+        "qc": "QC18",
+        "handling_time": 41.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC18",
+        "handling_time": 43.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC18",
+        "handling_time": 74.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC18",
+        "handling_time": 43.0,
+        "kind": "UNLOAD",
+        "lu": "LU20"
+      },
+      {
+        "qc": "QC18",
+        "handling_time": 60.0,
+        "kind": "UNLOAD",
+        "lu": "LU19"
+      },
+      {
+        "qc": "QC19",
+        "handling_time": 60.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC19",
+        "handling_time": 66.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC19",
+        "handling_time": 49.0,
+        "kind": "LOAD",
+        "lu": "LU20"
+      },
+      {
+        "qc": "QC19",
+        "handling_time": 51.0,
+        "kind": "UNLOAD",
+        "lu": "LU19"
+      },
+      {
+        "qc": "QC19",
+        "handling_time": 77.0,
+        "kind": "LOAD",
+        "lu": "LU18"
+      },
+      {
+        "qc": "QC20",
+        "handling_time": 73.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC20",
+        "handling_time": 63.0,
+        "kind": "UNLOAD",
+        "lu": "LU20"
+      },
+      {
+        "qc": "QC20",
+        "handling_time": 50.0,
+        "kind": "LOAD",
+        "lu": "LU19"
+      },
+      {
+        "qc": "QC20",
+        "handling_time": 42.0,
+        "kind": "LOAD",
+        "lu": "LU18"
+      },
+      {
+        "qc": "QC20",
+        "handling_time": 56.0,
+        "kind": "LOAD",
+        "lu": "LU17"
+      }
+    ],
+    "_provenance": {
+      "source": "mp-BRKGA_DL09.py",
+      "num_qcs": 16,
+      "tasks_per_qc": 5,
+      "scenario": 3,
+      "velocity_empty": 6.0,
+      "velocity_loaded": 3.0
+    }
+  },
+  "DL10": {
+    "num_agvs": 8,
+    "agv_start": "LU10",
+    "qcs": [
+      "QC5",
+      "QC6",
+      "QC7",
+      "QC8",
+      "QC9",
+      "QC10",
+      "QC11",
+      "QC12",
+      "QC13",
+      "QC14",
+      "QC15",
+      "QC16",
+      "QC17",
+      "QC18",
+      "QC19",
+      "QC20"
+    ],
+    "tasks": [
+      {
+        "qc": "QC5",
+        "handling_time": 42.0,
+        "kind": "LOAD",
+        "lu": "LU20"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 47.0,
+        "kind": "LOAD",
+        "lu": "LU19"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 66.0,
+        "kind": "UNLOAD",
+        "lu": "LU18"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 44.0,
+        "kind": "LOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 73.0,
+        "kind": "LOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 74.0,
+        "kind": "UNLOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 49.0,
+        "kind": "LOAD",
+        "lu": "LU20"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 41.0,
+        "kind": "UNLOAD",
+        "lu": "LU19"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 75.0,
+        "kind": "UNLOAD",
+        "lu": "LU18"
+      },
+      {
+        "qc": "QC5",
+        "handling_time": 43.0,
+        "kind": "LOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 76.0,
+        "kind": "LOAD",
+        "lu": "LU19"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 46.0,
+        "kind": "LOAD",
+        "lu": "LU18"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 46.0,
+        "kind": "UNLOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 53.0,
+        "kind": "LOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 69.0,
+        "kind": "LOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 60.0,
+        "kind": "LOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 42.0,
+        "kind": "LOAD",
+        "lu": "LU19"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 42.0,
+        "kind": "LOAD",
+        "lu": "LU18"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 41.0,
+        "kind": "UNLOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC6",
+        "handling_time": 40.0,
+        "kind": "UNLOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 48.0,
+        "kind": "UNLOAD",
+        "lu": "LU18"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 73.0,
+        "kind": "LOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 65.0,
+        "kind": "UNLOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 46.0,
+        "kind": "LOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 78.0,
+        "kind": "LOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 52.0,
+        "kind": "UNLOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 47.0,
+        "kind": "LOAD",
+        "lu": "LU18"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 43.0,
+        "kind": "LOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 46.0,
+        "kind": "UNLOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC7",
+        "handling_time": 41.0,
+        "kind": "UNLOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 44.0,
+        "kind": "LOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 68.0,
+        "kind": "UNLOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 62.0,
+        "kind": "UNLOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 71.0,
+        "kind": "UNLOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 59.0,
+        "kind": "UNLOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 79.0,
+        "kind": "LOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 48.0,
+        "kind": "LOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 60.0,
+        "kind": "UNLOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 54.0,
+        "kind": "UNLOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC8",
+        "handling_time": 76.0,
+        "kind": "UNLOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 56.0,
+        "kind": "UNLOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 48.0,
+        "kind": "LOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 48.0,
+        "kind": "UNLOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 49.0,
+        "kind": "UNLOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 68.0,
+        "kind": "UNLOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 64.0,
+        "kind": "LOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 42.0,
+        "kind": "UNLOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 62.0,
+        "kind": "LOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 59.0,
+        "kind": "UNLOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC9",
+        "handling_time": 42.0,
+        "kind": "LOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 48.0,
+        "kind": "LOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 70.0,
+        "kind": "UNLOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 58.0,
+        "kind": "UNLOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 73.0,
+        "kind": "UNLOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 58.0,
+        "kind": "LOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 73.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 78.0,
+        "kind": "LOAD",
+        "lu": "LU15"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 70.0,
+        "kind": "LOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 48.0,
+        "kind": "UNLOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC10",
+        "handling_time": 79.0,
+        "kind": "UNLOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 56.0,
+        "kind": "LOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 75.0,
+        "kind": "LOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 50.0,
+        "kind": "LOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 45.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 71.0,
+        "kind": "UNLOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 42.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 45.0,
+        "kind": "UNLOAD",
+        "lu": "LU14"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 60.0,
+        "kind": "LOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 40.0,
+        "kind": "UNLOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC11",
+        "handling_time": 62.0,
+        "kind": "LOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 78.0,
+        "kind": "LOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 70.0,
+        "kind": "UNLOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 68.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 41.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 43.0,
+        "kind": "LOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 60.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 58.0,
+        "kind": "LOAD",
+        "lu": "LU13"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 41.0,
+        "kind": "UNLOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 63.0,
+        "kind": "LOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC12",
+        "handling_time": 47.0,
+        "kind": "UNLOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 44.0,
+        "kind": "UNLOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 73.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 55.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 48.0,
+        "kind": "LOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 55.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 48.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 73.0,
+        "kind": "LOAD",
+        "lu": "LU12"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 46.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 80.0,
+        "kind": "UNLOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC13",
+        "handling_time": 67.0,
+        "kind": "LOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 63.0,
+        "kind": "UNLOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 47.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 43.0,
+        "kind": "LOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 46.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 64.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 56.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 50.0,
+        "kind": "LOAD",
+        "lu": "LU11"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 50.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 50.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC14",
+        "handling_time": 40.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 49.0,
+        "kind": "UNLOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 45.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 41.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 77.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 59.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 40.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 68.0,
+        "kind": "LOAD",
+        "lu": "LU10"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 74.0,
+        "kind": "LOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 51.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC15",
+        "handling_time": 54.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 78.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 48.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 47.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 40.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 75.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 55.0,
+        "kind": "UNLOAD",
+        "lu": "LU20"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 46.0,
+        "kind": "UNLOAD",
+        "lu": "LU9"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 58.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 50.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC16",
+        "handling_time": 63.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 62.0,
+        "kind": "UNLOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 59.0,
+        "kind": "LOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 73.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 56.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 71.0,
+        "kind": "UNLOAD",
+        "lu": "LU20"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 40.0,
+        "kind": "UNLOAD",
+        "lu": "LU19"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 40.0,
+        "kind": "LOAD",
+        "lu": "LU8"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 80.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 47.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC17",
+        "handling_time": 75.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC18",
+        "handling_time": 41.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC18",
+        "handling_time": 43.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC18",
+        "handling_time": 74.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC18",
+        "handling_time": 43.0,
+        "kind": "UNLOAD",
+        "lu": "LU20"
+      },
+      {
+        "qc": "QC18",
+        "handling_time": 60.0,
+        "kind": "UNLOAD",
+        "lu": "LU19"
+      },
+      {
+        "qc": "QC18",
+        "handling_time": 69.0,
+        "kind": "LOAD",
+        "lu": "LU18"
+      },
+      {
+        "qc": "QC18",
+        "handling_time": 61.0,
+        "kind": "UNLOAD",
+        "lu": "LU7"
+      },
+      {
+        "qc": "QC18",
+        "handling_time": 78.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC18",
+        "handling_time": 57.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC18",
+        "handling_time": 47.0,
+        "kind": "UNLOAD",
+        "lu": "LU20"
+      },
+      {
+        "qc": "QC19",
+        "handling_time": 60.0,
+        "kind": "LOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC19",
+        "handling_time": 66.0,
+        "kind": "UNLOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC19",
+        "handling_time": 49.0,
+        "kind": "LOAD",
+        "lu": "LU20"
+      },
+      {
+        "qc": "QC19",
+        "handling_time": 51.0,
+        "kind": "UNLOAD",
+        "lu": "LU19"
+      },
+      {
+        "qc": "QC19",
+        "handling_time": 77.0,
+        "kind": "LOAD",
+        "lu": "LU18"
+      },
+      {
+        "qc": "QC19",
+        "handling_time": 69.0,
+        "kind": "LOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC19",
+        "handling_time": 74.0,
+        "kind": "UNLOAD",
+        "lu": "LU6"
+      },
+      {
+        "qc": "QC19",
+        "handling_time": 45.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC19",
+        "handling_time": 60.0,
+        "kind": "UNLOAD",
+        "lu": "LU20"
+      },
+      {
+        "qc": "QC19",
+        "handling_time": 56.0,
+        "kind": "LOAD",
+        "lu": "LU19"
+      },
+      {
+        "qc": "QC20",
+        "handling_time": 73.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC20",
+        "handling_time": 63.0,
+        "kind": "UNLOAD",
+        "lu": "LU20"
+      },
+      {
+        "qc": "QC20",
+        "handling_time": 50.0,
+        "kind": "LOAD",
+        "lu": "LU19"
+      },
+      {
+        "qc": "QC20",
+        "handling_time": 42.0,
+        "kind": "LOAD",
+        "lu": "LU18"
+      },
+      {
+        "qc": "QC20",
+        "handling_time": 56.0,
+        "kind": "LOAD",
+        "lu": "LU17"
+      },
+      {
+        "qc": "QC20",
+        "handling_time": 69.0,
+        "kind": "LOAD",
+        "lu": "LU16"
+      },
+      {
+        "qc": "QC20",
+        "handling_time": 70.0,
+        "kind": "LOAD",
+        "lu": "LU5"
+      },
+      {
+        "qc": "QC20",
+        "handling_time": 56.0,
+        "kind": "LOAD",
+        "lu": "LU20"
+      },
+      {
+        "qc": "QC20",
+        "handling_time": 59.0,
+        "kind": "UNLOAD",
+        "lu": "LU19"
+      },
+      {
+        "qc": "QC20",
+        "handling_time": 56.0,
+        "kind": "LOAD",
+        "lu": "LU18"
+      }
+    ],
+    "_provenance": {
+      "source": "mp-BRKGA_DL10.py",
+      "num_qcs": 16,
+      "tasks_per_qc": 10,
+      "scenario": 3,
+      "velocity_empty": 6.0,
+      "velocity_loaded": 3.0
+    }
+  }
+}

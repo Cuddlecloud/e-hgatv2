@@ -157,9 +157,23 @@ def _compose_makespan(
     )
     x = batched_longest_path(node_weights, b.edge_weights, b.schedule)
     comp_vals = x[b.comp_nodes]
-    makespan = torch.full((b.num_samples,), _NEG_INF, dtype=x.dtype, device=x.device)
-    makespan = makespan.scatter_reduce(0, b.comp_batch, comp_vals, reduce="amax", include_self=True)
-    return x, makespan
+    # Select each sample's maximal completion node by index rather than reducing with
+    # ``amax``. The two agree in value, but ``scatter_reduce(amax)`` divides the incoming
+    # gradient equally among tied maxima, which emits fractional attributions and breaks
+    # parity with the per-graph path (see ``tropical_max``). Ties resolve to the lowest
+    # index within the sample, matching the first-maximum convention used per graph.
+    with torch.no_grad():
+        peak = torch.full((b.num_samples,), _NEG_INF, dtype=x.dtype, device=x.device)
+        peak = peak.scatter_reduce(0, b.comp_batch, comp_vals.detach(), reduce="amax",
+                                   include_self=True)
+        pos = torch.arange(comp_vals.numel(), device=x.device)
+        sentinel = torch.full_like(pos, comp_vals.numel())
+        cand = torch.where(comp_vals.detach() == peak[b.comp_batch], pos, sentinel)
+        sel = torch.full((b.num_samples,), comp_vals.numel(), dtype=pos.dtype, device=x.device)
+        sel = sel.scatter_reduce(0, b.comp_batch, cand, reduce="amin", include_self=True)
+    if int(sel.max().item()) >= comp_vals.numel():
+        raise ValueError("a batched sample has no completion node to reduce over")
+    return x, comp_vals[sel]
 
 
 def _forward_batch(

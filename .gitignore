@@ -53,3 +53,22 @@ paper/*.synctex.gz
 
 # Local vector store
 data/chromadb/
+
+# The *.pdf rule above is for the reference papers; the thesis's own figures and the compiled
+# document are source and deliverable respectively, so they are re-included explicitly.
+!thesis/figs/*.pdf
+!thesis/main.pdf
+
+# Third-party material and scratch, withheld from a PUBLIC remote:
+#   large/      the advisor's own mp-BRKGA solver sources, supplied for this work
+#   output/     a .tex/.log reconstruction of the advisor's published paper
+#   outputs/    duplicate of data/Container_Transport_Parsed_Tables under a session UUID
+# The first two are not ours to publish. Remove these lines to include them.
+large/
+output/
+outputs/
+thesis/*.log
+thesis/*.blg
+thesis/*.aux
+thesis/*.out
+thesis/*.toc

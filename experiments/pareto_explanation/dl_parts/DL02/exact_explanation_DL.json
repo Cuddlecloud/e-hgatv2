@@ -1,0 +1,1010 @@
+{
+  "tier": "required (advisor prescribed core item 3)",
+  "front_source": "mp-BRKGA, exact evaluation, no surrogate",
+  "explanation_source": "tape_explainer.explain_schedule (exact oracle, no network)",
+  "coupled": false,
+  "results": [
+    {
+      "instance": "DL02",
+      "n": 80,
+      "num_agvs": 4,
+      "num_qcs": 8,
+      "aq_ratio": 0.5,
+      "front_size": 23,
+      "evaluations": 646400,
+      "generations": 100,
+      "pop_size": 1600,
+      "seed": 0,
+      "rho_transport_makespan_end": 0.9437429231696254,
+      "rho_transport_energy_end": 0.9499447669335198,
+      "migration": 0.006201843763894432,
+      "traversals": [
+        {
+          "label": "makespan_optimal",
+          "makespan": 4195.027777777777,
+          "energy": 213425.0,
+          "decomposition_total": 4195.027777777778,
+          "path_len": 37,
+          "closes": true,
+          "travel_total": 3959.027777777778,
+          "handling_total": 236.0,
+          "rho_transport": 0.9437429231696254,
+          "rho_handling": 0.056257076830374564,
+          "shares_close": true,
+          "activities": [
+            {
+              "task": 61,
+              "activity": "empty_leg",
+              "duration": 131.94444444444443,
+              "dcmax": 1.0,
+              "completion": 281.94444444444446,
+              "agv": 3,
+              "qc": "QC7"
+            },
+            {
+              "task": 61,
+              "activity": "loaded_leg",
+              "duration": 150.0,
+              "dcmax": 1.0,
+              "completion": 281.94444444444446,
+              "agv": 3,
+              "qc": "QC7"
+            },
+            {
+              "task": 14,
+              "activity": "loaded_leg",
+              "duration": 66.66666666666667,
+              "dcmax": 1.0,
+              "completion": 451.2777777777778,
+              "agv": 0,
+              "qc": "QC2"
+            },
+            {
+              "task": 14,
+              "activity": "qc_handling",
+              "duration": 61.0,
+              "dcmax": 1.0,
+              "completion": 451.2777777777778,
+              "agv": 0,
+              "qc": "QC2"
+            },
+            {
+              "task": 11,
+              "activity": "empty_leg",
+              "duration": 41.66666666666667,
+              "dcmax": 1.0,
+              "completion": 469.44444444444446,
+              "agv": 3,
+              "qc": "QC2"
+            },
+            {
+              "task": 63,
+              "activity": "empty_leg",
+              "duration": 197.91666666666669,
+              "dcmax": 1.0,
+              "completion": 1025.5277777777778,
+              "agv": 0,
+              "qc": "QC7"
+            },
+            {
+              "task": 63,
+              "activity": "loaded_leg",
+              "duration": 333.3333333333333,
+              "dcmax": 1.0,
+              "completion": 1025.5277777777778,
+              "agv": 0,
+              "qc": "QC7"
+            },
+            {
+              "task": 78,
+              "activity": "empty_leg",
+              "duration": 62.5,
+              "dcmax": 1.0,
+              "completion": 1340.138888888889,
+              "agv": 0,
+              "qc": "QC8"
+            },
+            {
+              "task": 78,
+              "activity": "loaded_leg",
+              "duration": 236.11111111111111,
+              "dcmax": 1.0,
+              "completion": 1340.138888888889,
+              "agv": 0,
+              "qc": "QC8"
+            },
+            {
+              "task": 55,
+              "activity": "empty_leg",
+              "duration": 52.083333333333336,
+              "dcmax": 1.0,
+              "completion": 1457.7222222222222,
+              "agv": 0,
+              "qc": "QC6"
+            },
+            {
+              "task": 55,
+              "activity": "loaded_leg",
+              "duration": 62.5,
+              "dcmax": 1.0,
+              "completion": 1457.7222222222222,
+              "agv": 0,
+              "qc": "QC6"
+            },
+            {
+              "task": 64,
+              "activity": "empty_leg",
+              "duration": 31.25,
+              "dcmax": 1.0,
+              "completion": 1865.3055555555554,
+              "agv": 0,
+              "qc": "QC7"
+            },
+            {
+              "task": 64,
+              "activity": "loaded_leg",
+              "duration": 383.3333333333333,
+              "dcmax": 1.0,
+              "completion": 1865.3055555555554,
+              "agv": 0,
+              "qc": "QC7"
+            },
+            {
+              "task": 7,
+              "activity": "empty_leg",
+              "duration": 62.5,
+              "dcmax": 1.0,
+              "completion": 1978.4722222222222,
+              "agv": 0,
+              "qc": "QC1"
+            },
+            {
+              "task": 7,
+              "activity": "loaded_leg",
+              "duration": 41.666666666666664,
+              "dcmax": 1.0,
+              "completion": 1978.4722222222222,
+              "agv": 0,
+              "qc": "QC1"
+            },
+            {
+              "task": 65,
+              "activity": "empty_leg",
+              "duration": 72.91666666666667,
+              "dcmax": 1.0,
+              "completion": 2354.9444444444443,
+              "agv": 0,
+              "qc": "QC7"
+            },
+            {
+              "task": 65,
+              "activity": "loaded_leg",
+              "duration": 305.55555555555554,
+              "dcmax": 1.0,
+              "completion": 2354.9444444444443,
+              "agv": 0,
+              "qc": "QC7"
+            },
+            {
+              "task": 65,
+              "activity": "qc_handling",
+              "duration": 62.0,
+              "dcmax": 1.0,
+              "completion": 2354.9444444444443,
+              "agv": 0,
+              "qc": "QC7"
+            },
+            {
+              "task": 62,
+              "activity": "loaded_leg",
+              "duration": 55.55555555555556,
+              "dcmax": 1.0,
+              "completion": 2458.5,
+              "agv": 3,
+              "qc": "QC7"
+            },
+            {
+              "task": 62,
+              "activity": "qc_handling",
+              "duration": 48.0,
+              "dcmax": 1.0,
+              "completion": 2458.5,
+              "agv": 3,
+              "qc": "QC7"
+            },
+            {
+              "task": 70,
+              "activity": "empty_leg",
+              "duration": 48.61111111111111,
+              "dcmax": 1.0,
+              "completion": 2867.444444444445,
+              "agv": 3,
+              "qc": "QC8"
+            },
+            {
+              "task": 70,
+              "activity": "loaded_leg",
+              "duration": 283.3333333333333,
+              "dcmax": 1.0,
+              "completion": 2867.444444444445,
+              "agv": 3,
+              "qc": "QC8"
+            },
+            {
+              "task": 44,
+              "activity": "empty_leg",
+              "duration": 20.833333333333332,
+              "dcmax": 1.0,
+              "completion": 2981.2777777777783,
+              "agv": 3,
+              "qc": "QC5"
+            },
+            {
+              "task": 44,
+              "activity": "loaded_leg",
+              "duration": 125.0,
+              "dcmax": 1.0,
+              "completion": 2981.2777777777783,
+              "agv": 3,
+              "qc": "QC5"
+            },
+            {
+              "task": 26,
+              "activity": "empty_leg",
+              "duration": 50.0,
+              "dcmax": 1.0,
+              "completion": 3198.6111111111118,
+              "agv": 3,
+              "qc": "QC3"
+            },
+            {
+              "task": 26,
+              "activity": "loaded_leg",
+              "duration": 133.33333333333334,
+              "dcmax": 1.0,
+              "completion": 3198.6111111111118,
+              "agv": 3,
+              "qc": "QC3"
+            },
+            {
+              "task": 57,
+              "activity": "empty_leg",
+              "duration": 62.5,
+              "dcmax": 1.0,
+              "completion": 3286.7777777777783,
+              "agv": 3,
+              "qc": "QC6"
+            },
+            {
+              "task": 57,
+              "activity": "loaded_leg",
+              "duration": 41.666666666666664,
+              "dcmax": 1.0,
+              "completion": 3286.7777777777783,
+              "agv": 3,
+              "qc": "QC6"
+            },
+            {
+              "task": 1,
+              "activity": "empty_leg",
+              "duration": 93.75,
+              "dcmax": 1.0,
+              "completion": 3505.0277777777783,
+              "agv": 3,
+              "qc": "QC1"
+            },
+            {
+              "task": 1,
+              "activity": "loaded_leg",
+              "duration": 187.5,
+              "dcmax": 1.0,
+              "completion": 3505.0277777777783,
+              "agv": 3,
+              "qc": "QC1"
+            },
+            {
+              "task": 28,
+              "activity": "empty_leg",
+              "duration": 6.944444444444445,
+              "dcmax": 1.0,
+              "completion": 3674.305555555556,
+              "agv": 3,
+              "qc": "QC3"
+            },
+            {
+              "task": 28,
+              "activity": "loaded_leg",
+              "duration": 83.33333333333333,
+              "dcmax": 1.0,
+              "completion": 3674.305555555556,
+              "agv": 3,
+              "qc": "QC3"
+            },
+            {
+              "task": 79,
+              "activity": "empty_leg",
+              "duration": 55.55555555555556,
+              "dcmax": 1.0,
+              "completion": 4049.1944444444453,
+              "agv": 3,
+              "qc": "QC8"
+            },
+            {
+              "task": 79,
+              "activity": "loaded_leg",
+              "duration": 333.3333333333333,
+              "dcmax": 1.0,
+              "completion": 4049.1944444444453,
+              "agv": 3,
+              "qc": "QC8"
+            },
+            {
+              "task": 79,
+              "activity": "qc_handling",
+              "duration": 65.0,
+              "dcmax": 1.0,
+              "completion": 4049.1944444444453,
+              "agv": 3,
+              "qc": "QC8"
+            },
+            {
+              "task": 30,
+              "activity": "empty_leg",
+              "duration": 62.5,
+              "dcmax": 1.0,
+              "completion": 4195.027777777778,
+              "agv": 0,
+              "qc": "QC4"
+            },
+            {
+              "task": 30,
+              "activity": "loaded_leg",
+              "duration": 83.33333333333334,
+              "dcmax": 1.0,
+              "completion": 4195.027777777778,
+              "agv": 0,
+              "qc": "QC4"
+            }
+          ]
+        },
+        {
+          "label": "energy_optimal",
+          "makespan": 6512.805555555557,
+          "energy": 184581.25,
+          "decomposition_total": 6512.805555555557,
+          "path_len": 69,
+          "closes": true,
+          "travel_total": 6186.805555555556,
+          "handling_total": 326.0,
+          "rho_transport": 0.9499447669335198,
+          "rho_handling": 0.05005523306648013,
+          "shares_close": true,
+          "activities": [
+            {
+              "task": 27,
+              "activity": "empty_leg",
+              "duration": 41.66666666666667,
+              "dcmax": 1.0,
+              "completion": 91.66666666666667,
+              "agv": 2,
+              "qc": "QC3"
+            },
+            {
+              "task": 27,
+              "activity": "loaded_leg",
+              "duration": 50.0,
+              "dcmax": 1.0,
+              "completion": 91.66666666666667,
+              "agv": 2,
+              "qc": "QC3"
+            },
+            {
+              "task": 6,
+              "activity": "empty_leg",
+              "duration": 34.72222222222222,
+              "dcmax": 1.0,
+              "completion": 193.05555555555554,
+              "agv": 2,
+              "qc": "QC1"
+            },
+            {
+              "task": 6,
+              "activity": "loaded_leg",
+              "duration": 66.66666666666667,
+              "dcmax": 1.0,
+              "completion": 193.05555555555554,
+              "agv": 2,
+              "qc": "QC1"
+            },
+            {
+              "task": 1,
+              "activity": "empty_leg",
+              "duration": 33.333333333333336,
+              "dcmax": 1.0,
+              "completion": 413.8888888888889,
+              "agv": 2,
+              "qc": "QC1"
+            },
+            {
+              "task": 1,
+              "activity": "loaded_leg",
+              "duration": 187.5,
+              "dcmax": 1.0,
+              "completion": 413.8888888888889,
+              "agv": 2,
+              "qc": "QC1"
+            },
+            {
+              "task": 33,
+              "activity": "empty_leg",
+              "duration": 50.0,
+              "dcmax": 1.0,
+              "completion": 547.2222222222223,
+              "agv": 2,
+              "qc": "QC4"
+            },
+            {
+              "task": 33,
+              "activity": "loaded_leg",
+              "duration": 83.33333333333333,
+              "dcmax": 1.0,
+              "completion": 547.2222222222223,
+              "agv": 2,
+              "qc": "QC4"
+            },
+            {
+              "task": 16,
+              "activity": "empty_leg",
+              "duration": 6.944444444444445,
+              "dcmax": 1.0,
+              "completion": 677.8333333333334,
+              "agv": 2,
+              "qc": "QC2"
+            },
+            {
+              "task": 16,
+              "activity": "loaded_leg",
+              "duration": 66.66666666666667,
+              "dcmax": 1.0,
+              "completion": 677.8333333333334,
+              "agv": 2,
+              "qc": "QC2"
+            },
+            {
+              "task": 2,
+              "activity": "empty_leg",
+              "duration": 41.666666666666664,
+              "dcmax": 1.0,
+              "completion": 795.8333333333334,
+              "agv": 2,
+              "qc": "QC1"
+            },
+            {
+              "task": 2,
+              "activity": "loaded_leg",
+              "duration": 133.33333333333334,
+              "dcmax": 1.0,
+              "completion": 795.8333333333334,
+              "agv": 2,
+              "qc": "QC1"
+            },
+            {
+              "task": 42,
+              "activity": "empty_leg",
+              "duration": 33.333333333333336,
+              "dcmax": 1.0,
+              "completion": 954.1666666666667,
+              "agv": 2,
+              "qc": "QC5"
+            },
+            {
+              "task": 42,
+              "activity": "loaded_leg",
+              "duration": 125.0,
+              "dcmax": 1.0,
+              "completion": 954.1666666666667,
+              "agv": 2,
+              "qc": "QC5"
+            },
+            {
+              "task": 68,
+              "activity": "empty_leg",
+              "duration": 0.0,
+              "dcmax": 1.0,
+              "completion": 1348.8333333333335,
+              "agv": 2,
+              "qc": "QC7"
+            },
+            {
+              "task": 68,
+              "activity": "loaded_leg",
+              "duration": 316.6666666666667,
+              "dcmax": 1.0,
+              "completion": 1348.8333333333335,
+              "agv": 2,
+              "qc": "QC7"
+            },
+            {
+              "task": 23,
+              "activity": "empty_leg",
+              "duration": 66.66666666666667,
+              "dcmax": 1.0,
+              "completion": 1400.0000000000002,
+              "agv": 2,
+              "qc": "QC3"
+            },
+            {
+              "task": 20,
+              "activity": "qc_handling",
+              "duration": 65.0,
+              "dcmax": 1.0,
+              "completion": 1402.5000000000002,
+              "agv": 1,
+              "qc": "QC3"
+            },
+            {
+              "task": 77,
+              "activity": "empty_leg",
+              "duration": 83.33333333333334,
+              "dcmax": 1.0,
+              "completion": 2050.8333333333335,
+              "agv": 3,
+              "qc": "QC8"
+            },
+            {
+              "task": 77,
+              "activity": "loaded_leg",
+              "duration": 500.0,
+              "dcmax": 1.0,
+              "completion": 2050.8333333333335,
+              "agv": 3,
+              "qc": "QC8"
+            },
+            {
+              "task": 64,
+              "activity": "empty_leg",
+              "duration": 52.083333333333336,
+              "dcmax": 1.0,
+              "completion": 2572.0833333333335,
+              "agv": 3,
+              "qc": "QC7"
+            },
+            {
+              "task": 64,
+              "activity": "loaded_leg",
+              "duration": 479.1666666666667,
+              "dcmax": 1.0,
+              "completion": 2572.0833333333335,
+              "agv": 3,
+              "qc": "QC7"
+            },
+            {
+              "task": 67,
+              "activity": "empty_leg",
+              "duration": 31.25,
+              "dcmax": 1.0,
+              "completion": 3125.3333333333335,
+              "agv": 3,
+              "qc": "QC7"
+            },
+            {
+              "task": 67,
+              "activity": "loaded_leg",
+              "duration": 500.0,
+              "dcmax": 1.0,
+              "completion": 3125.3333333333335,
+              "agv": 3,
+              "qc": "QC7"
+            },
+            {
+              "task": 8,
+              "activity": "empty_leg",
+              "duration": 33.333333333333336,
+              "dcmax": 1.0,
+              "completion": 3290.3333333333335,
+              "agv": 3,
+              "qc": "QC1"
+            },
+            {
+              "task": 8,
+              "activity": "loaded_leg",
+              "duration": 166.66666666666666,
+              "dcmax": 1.0,
+              "completion": 3290.3333333333335,
+              "agv": 3,
+              "qc": "QC1"
+            },
+            {
+              "task": 63,
+              "activity": "empty_leg",
+              "duration": 75.0,
+              "dcmax": 1.0,
+              "completion": 3866.3333333333335,
+              "agv": 3,
+              "qc": "QC7"
+            },
+            {
+              "task": 63,
+              "activity": "loaded_leg",
+              "duration": 500.0,
+              "dcmax": 1.0,
+              "completion": 3866.3333333333335,
+              "agv": 3,
+              "qc": "QC7"
+            },
+            {
+              "task": 9,
+              "activity": "empty_leg",
+              "duration": 31.25,
+              "dcmax": 1.0,
+              "completion": 4088.0833333333335,
+              "agv": 3,
+              "qc": "QC1"
+            },
+            {
+              "task": 9,
+              "activity": "loaded_leg",
+              "duration": 187.5,
+              "dcmax": 1.0,
+              "completion": 4088.0833333333335,
+              "agv": 3,
+              "qc": "QC1"
+            },
+            {
+              "task": 7,
+              "activity": "empty_leg",
+              "duration": 31.25,
+              "dcmax": 1.0,
+              "completion": 4199.833333333334,
+              "agv": 3,
+              "qc": "QC1"
+            },
+            {
+              "task": 7,
+              "activity": "loaded_leg",
+              "duration": 62.5,
+              "dcmax": 1.0,
+              "completion": 4199.833333333334,
+              "agv": 3,
+              "qc": "QC1"
+            },
+            {
+              "task": 46,
+              "activity": "empty_leg",
+              "duration": 83.33333333333334,
+              "dcmax": 1.0,
+              "completion": 4350.722222222223,
+              "agv": 3,
+              "qc": "QC5"
+            },
+            {
+              "task": 46,
+              "activity": "loaded_leg",
+              "duration": 55.55555555555556,
+              "dcmax": 1.0,
+              "completion": 4350.722222222223,
+              "agv": 3,
+              "qc": "QC5"
+            },
+            {
+              "task": 4,
+              "activity": "empty_leg",
+              "duration": 66.66666666666667,
+              "dcmax": 1.0,
+              "completion": 4441.38888888889,
+              "agv": 3,
+              "qc": "QC1"
+            },
+            {
+              "task": 4,
+              "activity": "loaded_leg",
+              "duration": 100.0,
+              "dcmax": 1.0,
+              "completion": 4441.38888888889,
+              "agv": 3,
+              "qc": "QC1"
+            },
+            {
+              "task": 39,
+              "activity": "empty_leg",
+              "duration": 0.0,
+              "dcmax": 1.0,
+              "completion": 4559.88888888889,
+              "agv": 3,
+              "qc": "QC4"
+            },
+            {
+              "task": 39,
+              "activity": "loaded_leg",
+              "duration": 62.5,
+              "dcmax": 1.0,
+              "completion": 4559.88888888889,
+              "agv": 3,
+              "qc": "QC4"
+            },
+            {
+              "task": 34,
+              "activity": "empty_leg",
+              "duration": 62.5,
+              "dcmax": 1.0,
+              "completion": 4719.722222222223,
+              "agv": 3,
+              "qc": "QC4"
+            },
+            {
+              "task": 34,
+              "activity": "loaded_leg",
+              "duration": 83.33333333333333,
+              "dcmax": 1.0,
+              "completion": 4719.722222222223,
+              "agv": 3,
+              "qc": "QC4"
+            },
+            {
+              "task": 5,
+              "activity": "empty_leg",
+              "duration": 27.77777777777778,
+              "dcmax": 1.0,
+              "completion": 4803.944444444444,
+              "agv": 3,
+              "qc": "QC1"
+            },
+            {
+              "task": 5,
+              "activity": "loaded_leg",
+              "duration": 69.44444444444444,
+              "dcmax": 1.0,
+              "completion": 4803.944444444444,
+              "agv": 3,
+              "qc": "QC1"
+            },
+            {
+              "task": 22,
+              "activity": "empty_leg",
+              "duration": 41.666666666666664,
+              "dcmax": 1.0,
+              "completion": 4941.944444444444,
+              "agv": 3,
+              "qc": "QC3"
+            },
+            {
+              "task": 22,
+              "activity": "loaded_leg",
+              "duration": 83.33333333333334,
+              "dcmax": 1.0,
+              "completion": 4941.944444444444,
+              "agv": 3,
+              "qc": "QC3"
+            },
+            {
+              "task": 62,
+              "activity": "empty_leg",
+              "duration": 41.66666666666667,
+              "dcmax": 1.0,
+              "completion": 4969.166666666667,
+              "agv": 3,
+              "qc": "QC7"
+            },
+            {
+              "task": 62,
+              "activity": "loaded_leg",
+              "duration": 55.55555555555556,
+              "dcmax": 1.0,
+              "completion": 4969.166666666667,
+              "agv": 3,
+              "qc": "QC7"
+            },
+            {
+              "task": 54,
+              "activity": "empty_leg",
+              "duration": 8.333333333333334,
+              "dcmax": 1.0,
+              "completion": 5121.833333333333,
+              "agv": 3,
+              "qc": "QC6"
+            },
+            {
+              "task": 54,
+              "activity": "loaded_leg",
+              "duration": 83.33333333333334,
+              "dcmax": 1.0,
+              "completion": 5121.833333333333,
+              "agv": 3,
+              "qc": "QC6"
+            },
+            {
+              "task": 54,
+              "activity": "qc_handling",
+              "duration": 61.0,
+              "dcmax": 1.0,
+              "completion": 5121.833333333333,
+              "agv": 3,
+              "qc": "QC6"
+            },
+            {
+              "task": 56,
+              "activity": "loaded_leg",
+              "duration": 83.33333333333334,
+              "dcmax": 1.0,
+              "completion": 5246.166666666666,
+              "agv": 1,
+              "qc": "QC6"
+            },
+            {
+              "task": 56,
+              "activity": "qc_handling",
+              "duration": 41.0,
+              "dcmax": 1.0,
+              "completion": 5246.166666666666,
+              "agv": 1,
+              "qc": "QC6"
+            },
+            {
+              "task": 37,
+              "activity": "empty_leg",
+              "duration": 8.333333333333334,
+              "dcmax": 1.0,
+              "completion": 5357.999999999999,
+              "agv": 1,
+              "qc": "QC4"
+            },
+            {
+              "task": 37,
+              "activity": "loaded_leg",
+              "duration": 62.5,
+              "dcmax": 1.0,
+              "completion": 5357.999999999999,
+              "agv": 1,
+              "qc": "QC4"
+            },
+            {
+              "task": 40,
+              "activity": "empty_leg",
+              "duration": 31.25,
+              "dcmax": 1.0,
+              "completion": 5504.583333333332,
+              "agv": 1,
+              "qc": "QC5"
+            },
+            {
+              "task": 40,
+              "activity": "loaded_leg",
+              "duration": 83.33333333333334,
+              "dcmax": 1.0,
+              "completion": 5504.583333333332,
+              "agv": 1,
+              "qc": "QC5"
+            },
+            {
+              "task": 40,
+              "activity": "qc_handling",
+              "duration": 73.0,
+              "dcmax": 1.0,
+              "completion": 5504.583333333332,
+              "agv": 1,
+              "qc": "QC5"
+            },
+            {
+              "task": 49,
+              "activity": "loaded_leg",
+              "duration": 83.33333333333333,
+              "dcmax": 1.0,
+              "completion": 5627.916666666665,
+              "agv": 2,
+              "qc": "QC5"
+            },
+            {
+              "task": 49,
+              "activity": "qc_handling",
+              "duration": 40.0,
+              "dcmax": 1.0,
+              "completion": 5627.916666666665,
+              "agv": 2,
+              "qc": "QC5"
+            },
+            {
+              "task": 14,
+              "activity": "empty_leg",
+              "duration": 27.77777777777778,
+              "dcmax": 1.0,
+              "completion": 5722.3611111111095,
+              "agv": 2,
+              "qc": "QC2"
+            },
+            {
+              "task": 14,
+              "activity": "loaded_leg",
+              "duration": 66.66666666666667,
+              "dcmax": 1.0,
+              "completion": 5722.3611111111095,
+              "agv": 2,
+              "qc": "QC2"
+            },
+            {
+              "task": 30,
+              "activity": "empty_leg",
+              "duration": 41.66666666666667,
+              "dcmax": 1.0,
+              "completion": 5830.694444444443,
+              "agv": 2,
+              "qc": "QC4"
+            },
+            {
+              "task": 30,
+              "activity": "loaded_leg",
+              "duration": 66.66666666666667,
+              "dcmax": 1.0,
+              "completion": 5830.694444444443,
+              "agv": 2,
+              "qc": "QC4"
+            },
+            {
+              "task": 38,
+              "activity": "empty_leg",
+              "duration": 27.77777777777778,
+              "dcmax": 1.0,
+              "completion": 5925.138888888888,
+              "agv": 2,
+              "qc": "QC4"
+            },
+            {
+              "task": 38,
+              "activity": "loaded_leg",
+              "duration": 66.66666666666667,
+              "dcmax": 1.0,
+              "completion": 5925.138888888888,
+              "agv": 2,
+              "qc": "QC4"
+            },
+            {
+              "task": 59,
+              "activity": "empty_leg",
+              "duration": 41.66666666666667,
+              "dcmax": 1.0,
+              "completion": 6083.472222222222,
+              "agv": 2,
+              "qc": "QC6"
+            },
+            {
+              "task": 59,
+              "activity": "loaded_leg",
+              "duration": 116.66666666666667,
+              "dcmax": 1.0,
+              "completion": 6083.472222222222,
+              "agv": 2,
+              "qc": "QC6"
+            },
+            {
+              "task": 69,
+              "activity": "empty_leg",
+              "duration": 8.333333333333334,
+              "dcmax": 1.0,
+              "completion": 6512.805555555555,
+              "agv": 2,
+              "qc": "QC7"
+            },
+            {
+              "task": 69,
+              "activity": "loaded_leg",
+              "duration": 375.0,
+              "dcmax": 1.0,
+              "completion": 6512.805555555555,
+              "agv": 2,
+              "qc": "QC7"
+            },
+            {
+              "task": 69,
+              "activity": "qc_handling",
+              "duration": 46.0,
+              "dcmax": 1.0,
+              "completion": 6512.805555555555,
+              "agv": 2,
+              "qc": "QC7"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "failures": []
+}

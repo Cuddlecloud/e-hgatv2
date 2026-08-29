@@ -1,8 +1,8 @@
 """Parallel scaling study for the physics-fused TAPE under peak-power coupling.
 
-Each (N, peak_power, seed) configuration is an **independent** train+evaluate job, so we
+Each (N, peak_power, seed) configuration is an **independent** train+evaluate job, so the driver
 fan them across a CPU process pool (one BLAS thread per worker to avoid oversubscription).
-For every config we report the clean ablation:
+For every config the output reports the clean ablation:
 
 - frozen-core **black-box MLP** head ``r2_makespan`` (the baseline that collapses), vs
 - the **physics-fused tropical** head ``r2_makespan`` / ``r2_energy``, plus

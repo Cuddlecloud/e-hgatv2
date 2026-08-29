@@ -28,7 +28,7 @@ FIGS = ROOT / "paper" / "figs"
 FIGS.mkdir(parents=True, exist_ok=True)
 
 METHODS = ["E-HGATv2-TAPE", "E-HGATv2-attn", "NSGA-II (random)", "mp-BRKGA", "single-pop BRKGA"]
-SHORT = {"E-HGATv2-TAPE": "TAPE (ours)", "E-HGATv2-attn": "Attention",
+SHORT = {"E-HGATv2-TAPE": "TAPE", "E-HGATv2-attn": "Attention",
          "NSGA-II (random)": "Random", "mp-BRKGA": "mp-BRKGA", "single-pop BRKGA": "sp-BRKGA"}
 Q05 = {2: 1.960, 3: 2.343, 4: 2.569, 5: 2.728}
 

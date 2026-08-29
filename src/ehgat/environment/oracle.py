@@ -11,7 +11,7 @@ remove it with a **smart per-structure speed Pareto DP**:
 For a fixed *structure* (AGV assignment + per-AGV order + per-QC order) the leg
 *distances* are constant; only each leg's time/energy depends on its speed level.
 The timing recurrence (see ``evaluator.py``) is monotone in every AGV-free-time and
-QC-finish-time, so we sweep tasks in topological order carrying a Pareto set of
+QC-finish-time, so tasks are swept in topological order carrying a Pareto set of
 states ``(makespan, energy, [agv_free_a], [qc_finish_q])`` and prune dominated
 states. Because the recurrence is monotone, a dominated state can never lead to a
 non-dominated completion, so pruning is *exact*. Once a resource has no remaining

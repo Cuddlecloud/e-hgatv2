@@ -8,7 +8,7 @@ attention heuristic collapses into noise.
 This module provides a *violent failsafe*: every tensor entering a ``cat`` or linear
 projection must be validated for (1) exact trailing-dimension size and (2) the exact
 ordered semantic feature signature it was stamped with at construction time. On any
-mismatch we raise :class:`SemanticTensorError` with a descriptive message.
+mismatch raises :class:`SemanticTensorError` with a descriptive message.
 
 Checks use explicit ``raise`` (not bare ``assert``) so they are NOT stripped under
 ``python -O``. The helpers are torch-agnostic: they only require a ``.shape`` attribute,

@@ -14,7 +14,7 @@ from __future__ import annotations
 import torch
 from torch import Tensor
 
-__all__ = ["TropicalMaxPlus", "tropical_longest_path", "tropical_makespan"]
+__all__ = ["TropicalMaxPlus", "tropical_longest_path", "tropical_makespan", "tropical_max"]
 
 _NEG_INF = -1.0e30
 
@@ -106,6 +106,29 @@ def tropical_longest_path(node_weights: Tensor, edge_index: Tensor, edge_weights
     return TropicalMaxPlus.apply(node_weights, edge_index.long(), edge_weights)
 
 
+def tropical_max(values: Tensor) -> Tensor:
+    """Tie-consistent max reduction over completion values.
+
+    ``Tensor.max`` divides the incoming gradient equally among tied maxima, so a schedule
+    whose makespan is attained by two terminals attributes $1/2$ to each and every
+    activity on both paths inherits a fractional share. Selecting the maximiser by
+    ``argmax`` and indexing routes the whole subgradient along one path, which preserves
+    the zero-or-one attribution the tropical layer is defined to produce and matches the
+    tie-breaking convention of the recurrence itself.
+    """
+    if values.numel() == 0:
+        raise ValueError("tropical_max requires at least one completion value")
+    return values[int(torch.argmax(values.detach()).item())]
+
+
 def tropical_makespan(node_weights: Tensor, edge_index: Tensor, edge_weights: Tensor) -> Tensor:
-    """Scalar max over terminal completion values, with tropical subgradients."""
-    return tropical_longest_path(node_weights, edge_index, edge_weights).max()
+    """Scalar max over terminal completion values, with tropical subgradients.
+
+    The terminal reduction selects a single maximiser by ``argmax`` rather than calling
+    ``Tensor.max``. The two agree in value, but ``Tensor.max`` divides the incoming
+    gradient equally among tied maxima, which would emit fractional attributions and
+    break the guarantee that every activity is attributed exactly zero or one. Indexing
+    by ``argmax`` routes the whole subgradient to the first maximal terminal, matching
+    the tie-breaking convention the recurrence above already follows.
+    """
+    return tropical_max(tropical_longest_path(node_weights, edge_index, edge_weights))

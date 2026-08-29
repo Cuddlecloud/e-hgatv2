@@ -43,7 +43,7 @@ from ehgat.explain.event_dag import (
     assemble_event_dag,
     extract_precedence,
 )
-from ehgat.explain.tropical_dp import tropical_longest_path
+from ehgat.explain.tropical_dp import tropical_longest_path, tropical_max
 from ehgat.surrogate.ehgatv2 import EDGE_DIM, EHGATv2
 from ehgat.surrogate.graph import AGV_EDGE, NODE_TYPE, QC_EDGE
 
@@ -54,7 +54,7 @@ _T_TRAVEL_COL = 0  # EDGE_FEATURES index of Travel_Time (= empty_t + loaded_t)
 _E_EMPTY_COL = 1  # EDGE_FEATURES index of Empty_Energy
 _E_LOADED_COL = 2  # EDGE_FEATURES index of Loaded_Energy
 
-# Physics-unrolled coupling: per AGV travel leg we feed the wait head a small **contention
+# Physics-unrolled coupling: per AGV travel leg the wait head receives a small **contention
 # vector** read off the previous iterate's tentative timing -- (own power, concurrent power
 # demand over the leg's active interval, budget excess, #overlapping legs). Two legs per
 # task (empty, loaded) => 2 * 4 features. This is the signal a single static pass is missing
@@ -389,7 +389,7 @@ class FusedEHGATv2(nn.Module):
     ) -> Tensor:
         """Per-task ``[N, 2*4]`` contention vector from one iterate's tentative leg timing.
 
-        For each of the ``2N`` AGV legs we read its active interval ``[end - dur, end]`` and
+        For each of the ``2N`` AGV legs the active interval ``[end - dur, end]`` is read and
         power, then summarise the budget pressure it sees as the simulator does -- the **peak
         instantaneous concurrent power** over the leg's interval (bounded by fleet concurrency,
         so the feature scale is stable in ``N``), the concurrent power of *other* legs at that
@@ -425,7 +425,7 @@ class FusedEHGATv2(nn.Module):
         if not self.coupled:
             dag = assemble_event_dag(is_load, agv_prev, qc_prev, empty_t, loaded_t, node_delay)
             completion = tropical_longest_path(dag.node_weights, dag.edge_index, dag.edge_weights)
-            makespan = completion[dag.completion_nodes].max()
+            makespan = tropical_max(completion[dag.completion_nodes])
             zeros = empty_t.new_zeros(n)
             return FusedPrediction(
                 makespan=makespan, energy=energy, node_delay=node_delay, empty_t=empty_t,
@@ -455,7 +455,7 @@ class FusedEHGATv2(nn.Module):
                     completion[e_idx].detach(), completion[l_idx].detach(),
                     empty_eff.detach(), loaded_eff.detach(), p_empty, p_loaded,
                 )
-        makespan = completion[dag.completion_nodes].max()
+        makespan = tropical_max(completion[dag.completion_nodes])
         wait_empty, wait_loaded = waits[:, 0], waits[:, 1]
         return FusedPrediction(
             makespan=makespan,

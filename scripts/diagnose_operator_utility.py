@@ -7,7 +7,7 @@ each mutation operator -- and whether that utility is conditional on the task's 
 bottleneck type (the oracle's core premise).
 
 For a set of realistic parents (random feasible schedules + the non-dominated front of a
-large random pool), and for every task, we apply each operator and record the
+large random pool), and for every task, each operator is applied and the following recorded:
 Pareto-dominance credit (`operator_reward`) of the child vs the parent on exact objectives.
 We then ask three questions:
 
