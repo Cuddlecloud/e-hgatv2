@@ -26,7 +26,7 @@ def migration_table() -> str:
     correction are parenthesised; the test statistics themselves are summarised in the text,
     being identical to three decimal places across almost every significant cell.
     """
-    d = json.loads(Path("experiments/thesis/migration_stats.json").read_text())["instances"]
+    d = json.loads(_check(Path("experiments/thesis/migration_stats.json")).read_text())["instances"]
     # every instance is swept over nine fleet sizes, but the ratios differ per instance because
     # the crane count does; the column index is the fleet size, which is common to all.
     ncol = max(len(v) for v in d.values())
@@ -75,6 +75,8 @@ def migration_table() -> str:
 
 
 _SUPERSEDED = ("thesis_DL_full.json", "thesis_L_full.json")
+# published_validation.json is derived; scripts/build_published_validation.py
+# regenerates it from the current campaign and refuses a superseded input.
 
 
 def _check(path: Path) -> Path:
@@ -87,7 +89,35 @@ def _check(path: Path) -> Path:
     if path.name in _SUPERSEDED:
         raise SystemExit(f"REFUSING to read superseded artifact {path.name}; see "
                          f"experiments/superseded/ for why and what replaced it")
+    _check_not_stale(path)
     return path
+
+
+def _check_not_stale(path: Path) -> None:
+    """Refuse a derived artifact older than the campaign it was computed from.
+
+    published_validation.json is computed from a campaign rather than being a campaign output.
+    When the small set was re-run it kept the previous fronts, thirteen of thirty-five best
+    makespans had moved, and Table 4.1 reported a comparison against fronts the document no
+    longer contained -- for a while, undetected, because nothing related the two files. Any
+    artifact naming its input in "runs" or "source" is now required to be newer than it.
+    """
+    try:
+        doc = json.loads(path.read_text())
+    except (OSError, ValueError):
+        return
+    if not isinstance(doc, dict):
+        return
+    src = doc.get("runs") or doc.get("source")
+    if not isinstance(src, str):
+        return
+    src_path = Path(src)
+    if not src_path.exists():
+        raise SystemExit(f"{path.name} was derived from {src}, which no longer exists; "
+                         f"regenerate it before building tables")
+    if src_path.stat().st_mtime > path.stat().st_mtime:
+        raise SystemExit(f"{path.name} is older than {src} it was derived from; "
+                         f"regenerate it before building tables")
 
 def _closure_note(excluded: int, total: int) -> str:
     """Caption clause recording how the decomposition check fell out for a table.
@@ -114,7 +144,7 @@ def dl_table() -> str:
     # the scaled-budget run: the earlier file trained the fused head on a constant 1200 samples
     # regardless of instance size, which is under four samples per leg at N=160 and measured a
     # starved model rather than the architecture
-    _dl = Path("experiments/thesis/thesis_dl_scaled.json")
+    _dl = _check(Path("experiments/thesis/thesis_dl_scaled.json"))
     if not _dl.exists():
         _dl = Path("experiments/thesis/thesis_DL_full.json")
     rows = json.loads(_dl.read_text())
@@ -223,7 +253,7 @@ def traversal_table() -> str:
 
 def calibration_table() -> str:
     """Surrogate calibration and faithfulness over the sweep -- the over-requirements tier."""
-    d = json.loads(Path("experiments/thesis/thesis_sweep540.json").read_text())
+    d = json.loads(_check(Path("experiments/thesis/thesis_sweep540.json")).read_text())
     rows = d["per_seed"]
     by: dict[str, list] = {}
     for r in rows:
@@ -312,7 +342,7 @@ def small_set_table() -> str:
 
 def published_table() -> str:
     """The comparison against the published fixed-speed optima, generated rather than typed."""
-    d = json.loads(Path("experiments/thesis/published_validation.json").read_text())
+    d = json.loads(_check(Path("experiments/thesis/published_validation.json")).read_text())
     S = d["summary"]
     label = {
         "scenario_n.c_max":            r"nominal, $C_{\max}$",

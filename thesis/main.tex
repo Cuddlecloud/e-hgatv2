@@ -210,8 +210,9 @@ TreeSHAP \citep{lundberg2020}, to surrogate models of the objective. In a schedu
 carries a specific limitation: the attribution lands on \emph{decision variables}, on positions
 in a chromosome and on discrete speed settings, not on \emph{physical quantities}. Being told
 that the twenty-seventh gene of a chromosome matters does not tell an operator what to do. Being
-told that the loaded trip from crane three to yard station one lies on the critical path and
-contributes $55.6$ seconds does.
+told that a particular loaded trip to its quay crane lies on the critical path and contributes
+$55.6$ of the $175.0$ seconds does; that is the first line of the worked example in
+Table~\ref{tab:traversal}.
 
 \section{Novelty}
 
@@ -956,10 +957,10 @@ $1.56$ seconds respectively.
 \toprule
 Published column & comparable & at or below & exact & mean gap (s) \\
 \midrule
-nominal, $C_{\max}$ & 35 & 35 & 0 & $-365.75$ \\
-nominal, $C_{\max}^{\star}$ & 35 & 35 & 0 & $-98.69$ \\
-lower--nominal, $C_{\max}$ & 33 & 33 & 0 & $-530.13$ \\
-nominal--higher, $C_{\max}^{\star}$ & 23 & 21 & 1 & $-17.26$ \\
+nominal, $C_{\max}$ & 35 & 35 & 0 & $-365.50$ \\
+nominal, $C_{\max}^{\star}$ & 35 & 35 & 0 & $-98.45$ \\
+lower--nominal, $C_{\max}$ & 33 & 33 & 0 & $-529.76$ \\
+nominal--higher, $C_{\max}^{\star}$ & 23 & 21 & 1 & $-16.16$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -990,7 +991,7 @@ mixed & 26 & 0.935 & 0.793--1.030 & 0.960 & 11/25 \\
 % ---- END generated: tables/validation.tex ----
 
 
-The closest correspondence is with the normal-higher scenario, at a mean gap of $-17.26$ seconds,
+The closest correspondence is with the normal-higher scenario, at a mean gap of $-16.16$ seconds,
 and on L01 the agreement is exact: the makespan-optimal end is $175.00$ against a published
 $175$. That this is the nearest column is the expected outcome, since that scenario permits the
 highest fixed speed and is therefore the fixed-speed problem closest to the present one. The
@@ -1195,7 +1196,9 @@ Section~\ref{sec:degenerate} at the same ratio, which is the confirmation that s
 Migration then increases sharply and saturates. L07 moves from $-0.088$ at $A/Q = 1.00$ to
 $-0.660$ at $1.50$, thereafter remaining near $-0.64$ for every larger fleet. L21 attains
 $-0.658$ by $A/Q = 1.00$ and holds within $0.02$ of $-0.66$ across the remaining six ratios,
-peaking at $-0.665$. L28 crosses at $A/Q = 1.25$ and L35 at $1.33$, both later than L07 and L21.
+peaking at $-0.665$. Taking the crossing as the first ratio at which an instance reaches half
+its own saturation, L21 crosses earliest at $A/Q = 1.00$, L35 at $1.33$, and L01, L07, L15 and
+L28 all at $1.50$.
 The threshold is therefore instance-dependent rather than universal, which is to be expected:
 whether cranes can become binding depends on handling times and layout geometry, not on the ratio
 alone.
@@ -1513,8 +1516,8 @@ unloading, was not established.
 \paragraph{Scope of the claim.} All runs use 100 generations against the published $300$, which
 suffices for a measurement depending on the two front extremes but places absolute front quality
 below what the method attains, so no claim about front quality should be drawn here. The sweep
-establishes that migration depends on $A/Q$ and locates the transition between $1.0$ and $1.35$
-for four instances, but does not predict it from instance parameters. It is also established on
+establishes that migration depends on $A/Q$ and locates the transition between $1.0$ and $1.5$
+across the six swept instances, but does not predict it from instance parameters. It is also established on
 the small-instance layout alone: the large dual-cycling instances describe a twenty-crane terminal
 whose distance matrix is not interchangeable, and are observed only at $A/Q = 0.50$, so extending
 the threshold to them is an extrapolation across layouts rather than a measurement. Sweeping the
