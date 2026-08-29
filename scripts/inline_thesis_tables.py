@@ -20,8 +20,8 @@ from pathlib import Path
 
 THESIS = Path("thesis/main.tex")
 TABLES = Path("thesis/tables")
-NAMES = ("traversal", "dl", "migration", "calibration", "smallset", "published", "validation",
-         "families")
+NAMES = ("traversal", "migration_traversal", "dl", "migration", "calibration", "smallset",
+         "published", "validation", "families")
 
 
 def main() -> None:

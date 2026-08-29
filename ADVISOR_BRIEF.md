@@ -1,11 +1,91 @@
 # Advisor Brief — Prof. Mahdi Homayouni (verbatim requirements)
 
-> Authoritative record of the advisor's stated direction for this thesis. This is an
-> **OR paper first**: the results must be demonstrably valuable to an OR advisor —
+> **READ EMAIL 3 FIRST. It supersedes everything below it.** The summary and Emails 1–2
+> are kept as history, not as instructions. Measuring the thesis against them produces
+> false gaps: they call for R3 scalability, amortization and the peak-power–coupled
+> regime, and Email 3 retires all three explicitly.
+
+---
+
+## Email 3 — 20 August 2026, "Re: Summer thesis supervision request" (CURRENT DIRECTION)
+
+Transcribed from the message; the visible text ends mid-sentence in the final paragraph.
+
+> I really appreciate your efforts during the design and experiment process. My main concern
+> is not whether the work contains useful results, but that the current draft combines **too
+> many** different ideas and becomes unnecessarily hard to follow for a bachelor thesis. One
+> thing came to my mind immediately was that you imported all the papers I sent you and the
+> ideas and tried to mix them all together. This is not bad, but it became "over-engineered"
+> and thus hard to be understood.
+>
+> Particularly, you were not supposed to mix "the QC + SA-AGV bi-objective scheduling problem"
+> with "power-constrained scheduling idea from manufacturing" just to complicate the problem
+> (I'll explain this to you when we meet in-person).
+>
+> I highly advise that you narrow down the thesis on one clear core idea. You don't need to
+> redo anything, but you need to revise the text. Based on the current draft and the results,
+> the strongest and most understandable focus would be:
+>   1. solve the original scheduling problem (without power constraints),
+>   2. use the surrogate as a supporting tool,
+>   3. and explain why selected solutions are Pareto-optimal.
+>
+> Feedback loop into the algorithm is a great idea and I definitely invite you to work on it.
+> But, we must do it in steps. Therefore, the surrogate model will have a secondary role as a
+> post-hoc explanation tool for finalized solutions, or as a way to compare how explanations
+> change during the search. The second idea may need new experiments, and thus, I would ask
+> you do it if time allows. The post-hoc explanation is already over the requirements of this
+> thesis.
+>
+> And finally, I expect you to be able to explain and understand every single detail and step
+> in the whole methodology. So, keep it simple but scientific.
+>
+> I already added a few comments to your PDF. Remember that AI usually write it bad and you
+> must direct it to write correctly. For example, the introduction must explain why this
+> specific problem (e.g., explaining the Pareto-optimal solutions) is significant to be
+> studied, and how novel it is. Also, what is the main contribution of the thesis. And, for a
+> bachelor thesis, it must not be too complicated that is not understandable easily.
+
+### What Email 3 requires, and where the thesis answers it
+
+| requirement | where |
+|---|---|
+| 1. the original scheduling problem, **no power constraints** | throughout; the coupled regime is excluded and named as future work in Ch. 5 |
+| 2. surrogate as a **supporting tool** | §4.7 calibration and faithfulness; the exact oracle is the yardstick |
+| 3. **explain why solutions are Pareto-optimal** | §4.2 worked example, §4.3–§4.5 the migration result |
+| surrogate role (a): post-hoc explanation of finalised solutions | §4.7 — he calls this "already over the requirements" |
+| surrogate role (b): how explanations change during the search | §4.6 — the "if time allows" item, done |
+| significance / novelty / contribution, separately, in the introduction | §1.1, §1.2, §1.3 |
+| "keep it simple but scientific"; explainable in every detail | one core idea stated in §1.3; everything else subordinated to it |
+
+### What Email 3 retires
+
+Do not reintroduce these, and do not score the thesis against them:
+
+- **Peak-power–coupled regime.** Named as the specific thing that should not have been mixed in.
+  Note that the `SD-N` instance series in `paper/main.tex` is entangled with it
+  (`toy10_pp30` → `"SD-10-C"` in `scripts/emit_r3_numbers.py`), so material from that paper's
+  §5.5 cannot be ported into the thesis without dragging the coupled strand back in.
+- **R3 scalability against stalling non-GNN baselines**, and **R4 amortization.** Superseded by
+  "use the surrogate as a supporting tool" in a "secondary role".
+- **The feedback loop / attribution-guided search.** Explicitly deferred by him: "we must do it
+  in steps."
+
+### Standing cautions from Email 3
+
+- `SD-N` names are synthetic toys, not published instances (`toy10` → `"SD-10"`). Worked examples
+  in the thesis must use the published sets.
+- "AI usually write it bad and you must direct it to write correctly" — he is reading for
+  over-complication and for text that asserts more than the evidence supports.
+
+---
+
+## HISTORY BELOW — superseded by Email 3
+
+> Superseded framing, kept for the record: the results were once expected to show
 > scalability and amortization benefits for R3 where standard non-GNN methods (random
 > NSGA-II, mp-BRKGA) stall, the same in the peak-power–coupled regime, and R1 satisfied
 > by natively encoding the problem features. The interpretability / attention-faithfulness
-> / Viterbi track is a **separate later fork** (TMLR/ICLR), not this paper.
+> / Viterbi track is a separate later fork (TMLR/ICLR), not this paper.
 
 ## What the OR paper must demonstrate (owner's summary of the brief)
 1. **R3 scalability** — guided optimization retains its advantage as N grows, where
