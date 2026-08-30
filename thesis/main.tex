@@ -324,7 +324,9 @@ $\mathrm{qc}(j)$, $\mathrm{lu}(j)$ & the crane and yard station to which task $j
 $\mathrm{qcprev}(j)$ & the predecessor of $j$ in its crane's sequence \\
 $Q$, $|\mathcal{A}|$ & number of quay cranes and of vehicles \\
 $\tau_j$ & quay-crane handling time of task $j$ \\
-$\alpha$, $v_\ell$, $P_\ell$ & speed multiplier, speed and power draw at level $\ell$ \\
+$\ell$ & speed level: lower, nominal or higher (Table~\ref{tab:speed}) \\
+$\alpha_\ell$, $v_\ell$, $P_\ell$ & speed multiplier, speed and power draw at level $\ell$ \\
+$d_k$ & length of leg $k$; $k$ indexes legs, never speed levels \\
 \midrule
 $t^{\text{empty}}_j$, $t^{\text{loaded}}_j$ & empty and loaded leg durations of task $j$ \\
 $e^{\text{empty}}_j$, $e^{\text{loaded}}_j$ & empty and loaded leg energies of task $j$ \\
@@ -347,7 +349,8 @@ Section~\ref{sec:maxplus} is manifest. The mixed-integer programme of \citet{fon
 formulates the same problem and supplies the published optima used for verification in
 Chapter~\ref{sec:evaluation}.
 
-\paragraph{Physics of a leg.} Three speed levels $\alpha \in \{0.8, 1.0, 1.2\}$ scale a nominal
+\paragraph{Physics of a leg.} Three speed levels, with multipliers
+$\alpha_\ell \in \{0.8, 1.0, 1.2\}$, scale a nominal
 speed; empty and loaded legs have distinct nominal speeds and power draws
 (Table~\ref{tab:speed}). For a leg of length $d$ travelled at level $\ell$,
 \begin{equation}
@@ -437,7 +440,7 @@ sensitivity is thus piecewise constant, equal to one on the critical path and ze
 
 Second, as an immediate corollary, the durations of the on-path activities sum to the makespan:
 \begin{equation}
-\Cmax = \sum_{\text{on-path legs } \ell} d_\ell \;+\; \sum_{\text{on-path tasks } j} \tau_j.
+\Cmax = \sum_{\text{on-path legs } k} d_k \;+\; \sum_{\text{on-path tasks } j} \tau_j.
 \label{eq:decomposition}
 \end{equation}
 This is an identity, not an approximation, and it is the property that the architecture of
@@ -642,14 +645,14 @@ signal. Figure~\ref{fig:layer} shows one layer.
 \begin{figure}[!htb]
 \centering
 \begin{tikzpicture}[node distance=7mm and 14mm]
-\node[io] (hin) {$h^{(\ell-1)}_j$\\$+$ arc feats $u_{ij}$};
+\node[io] (hin) {$h^{(m-1)}_j$\\$+$ arc feats $u_{ij}$};
 \node[core, above right=5mm and 14mm of hin] (agv)
   {GATv2$^{\mathrm{agv}}$\\$\mathrm{aggr}=\max$\\$\alpha \equiv 1$};
 \node[core, below right=5mm and 14mm of hin] (qc)
   {GATv2$^{\mathrm{qc}}$\\$\mathrm{aggr}=\max$\\$\alpha \equiv 1$};
 \node[head, right=14mm of hin, xshift=32mm] (sem)
   {semantic attention\\over relations\\$\beta^{\mathrm{agv}}_j, \beta^{\mathrm{qc}}_j$};
-\node[io, right=of sem] (hout) {$h^{(\ell)}_j$};
+\node[io, right=of sem] (hout) {$h^{(m)}_j$};
 \draw[fl] (hin) to[out=55,  in=180] (agv);
 \draw[fl] (hin) to[out=-55, in=180] (qc);
 \draw[fl] (agv) to[out=0, in=125] (sem);
@@ -767,7 +770,7 @@ objectives. An arc-level head maps the concatenated endpoint embeddings of a tas
 arc to its empty and loaded travel times and leg energies, and a node-level head maps a task
 embedding to its crane handling delay; the makespan is composed from these
 by~\eqref{eq:tropical} and the energy by exact summation, a linear head for which
-$\partial E / \partial e_\ell = 1$ identically. Because a max-plus output constrains only the
+$\partial E / \partial e_k = 1$ identically. Because a max-plus output constrains only the
 attributes on the currently active path, training on the makespan alone would leave off-path
 attributes unidentified, so the local attributes are supervised directly against their exact
 physical values. Training is therefore two-stage rather than end-to-end: the core is trained
@@ -792,8 +795,8 @@ with the makespan.
 The measure adopted here weights by duration. Define
 \begin{equation}
 \rho_{\text{transport}} =
-\frac{\sum_{\text{on-path legs}} d_\ell}
-     {\sum_{\text{on-path legs}} d_\ell + \sum_{\text{on-path tasks}} \tau_j},
+\frac{\sum_{\text{on-path legs}} d_k}
+     {\sum_{\text{on-path legs}} d_k + \sum_{\text{on-path tasks}} \tau_j},
 \qquad
 \rho_{\text{handling}} = 1 - \rho_{\text{transport}}.
 \label{eq:rho}
