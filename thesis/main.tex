@@ -121,14 +121,14 @@ two conflicting objectives, the makespan of the workload and the energy consumed
 The solution is not a single schedule but a Pareto front of non-dominated compromises from which
 an operator must select. The literature is substantially richer in methods that compute fronts
 than in methods that explain them, and the explainability techniques usually transferred from
-machine learning attribute outcomes to decision variables rather than to physical quantities on
+machine learning attribute outcomes to decision variables and not to physical quantities on
 which an operator can act.
 
 This thesis explains Pareto-optimal schedules in terms of the physical activities that produce
 them. The account rests on a structural observation: once a schedule is fixed, its makespan is
 the longest chain of activities that must happen in sequence, so only the activities on that
 chain can affect it, and their durations add up to the makespan exactly. The sensitivity of the
-makespan to any activity is therefore one or zero rather than something in between, and the
+makespan to any activity is therefore one or zero, never an intermediate value, and the
 resulting explanation balances by construction. Formally this is linearity over the $(\max,+)$
 semiring, and it makes the explanation checkable rather than merely plausible. The method built on
 it is a heterogeneous graph attention network, E-HGATv2, which encodes the schedule as a typed
@@ -137,7 +137,7 @@ differentiable max-plus dynamic-programming layer composes into the makespan, it
 pass routing the subgradient exclusively through the argmax edge of each recurrence.
 
 From this decomposition the thesis defines the duration-weighted critical share $\rho$, the
-fraction of the makespan contributed by vehicle travel rather than crane handling, and uses its
+fraction of the makespan contributed by vehicle travel as against crane handling, and uses its
 shift between the ends of a front to quantify why the compromises differ. The principal finding
 is that the binding bottleneck migrates between travel and handling, and that whether it does is
 governed by the fleet-to-crane ratio $A/Q$. Across 540 replicates spanning six instances, nine
@@ -188,11 +188,11 @@ reports the magnitude of the trade-off; it does not report its cause.
 
 \section{Significance}
 
-Two questions are worth separating: whether a front can be computed, and whether it can be
-understood. The first is settled for this problem; the second is what this thesis addresses, and
-it matters for a practical reason. A front is not a recommendation. It is a menu, and the
-operator who must choose from it is choosing between schedules that may fail for entirely
-different reasons. If one compromise is slow because too few vehicles are covering a long yard,
+Whether a front can be computed and whether it can be understood are distinct questions. The
+first is settled for this problem; the second is the subject of this thesis, and it matters for a
+practical reason. A front is a menu and not a recommendation, and the operator
+who must choose from it is choosing between schedules that may fail for entirely different
+reasons. If one compromise is slow because too few vehicles are covering a long yard,
 buying a vehicle helps; if another is slow because a single crane has too many containers queued
 against it, buying a vehicle changes nothing and the tasks must be rebalanced. The two look alike
 on the front, because the front records only the makespan and the energy, never the reason. An
@@ -216,15 +216,15 @@ Table~\ref{tab:traversal}.
 
 \section{Novelty}
 
-What makes the problem tractable here is a structural property rather than a new technique.
+What makes the problem tractable here is a structural property, not a new technique.
 \citet{rudin2019} argues that where a model's structure permits an explanation that is correct by
 construction, explaining an opaque model after the fact is the inferior choice. This problem
 permits exactly that. The makespan of a fixed schedule is the largest total along any chain of
 activities that must happen in order, which is to say it is the length of a longest path through
-the schedule. Two consequences follow. Only the activities on that path can affect the makespan
-at all, so the sensitivity of the makespan to any activity is either one or zero, never something
-in between. And the durations of the activities on that path add up to the makespan exactly. The
-explanation is therefore not fitted or approximated; it is read off the structure, and it
+the schedule. From this, two things follow. Only the activities on that path can affect the
+makespan at all, so the sensitivity of the makespan to any activity is either one or zero, never something
+in between. And the durations of the activities on that path add up to the makespan exactly. The explanation
+is therefore neither fitted nor approximated; it is read off the structure, and it
 balances by construction. Formally this is linearity over the $(\max,+)$ semiring
 \citep{baccelli1992}, developed in Section~\ref{sec:maxplus}.
 
@@ -238,7 +238,7 @@ not established. The novelty is in what the network is asked to predict. It does
 makespan. It predicts the \emph{local physical quantities} of a schedule, the duration of each
 vehicle trip and each crane lift, and a max-plus layer then composes those into the makespan
 using the same recurrence the exact evaluator uses. Differentiating the model with respect to its
-own predictions therefore returns the critical path itself rather than an estimate of it, and the
+own predictions therefore returns the critical path itself and not an estimate of it, and the
 answer is expressed in seconds attributable to named activities rather than in units of an
 internal representation.
 
@@ -246,12 +246,12 @@ internal representation.
 
 This thesis has one core idea: \emph{a Pareto-optimal schedule can be explained exactly, in
 seconds attributable to named physical activities, and a learned model can produce that same
-explanation}. Everything reported here serves that idea.
+explanation}. Every result reported below is subordinate to it.
 
 The explanation itself is exact rather than estimated. For a given schedule the method identifies
 which vehicle trips and crane lifts actually determine the makespan, and how many seconds each
 contributes. Because those durations add up to the makespan exactly, the explanation can be
-checked rather than merely believed, and it is checked on every schedule reported, so an
+verified and not simply believed, and it is verified on every schedule reported, so an
 inconsistency appears as a failed test rather than as a plausible figure. This holds because a
 fixed schedule's makespan is the longest chain of activities that must run in sequence, which
 makes the sensitivity to any one activity either one or zero.
@@ -269,7 +269,7 @@ is limited by the cranes and the energy-optimal end by the vehicles, so two sche
 is choosing between fail for different reasons and call for different interventions. Whether this
 occurs is governed by the number of vehicles per crane, which is established by a statistically
 tested sweep (Section~\ref{sec:migration}) and reproduced on three instance families. This is
-evidence for the core idea rather than a second contribution: without it, explaining a schedule
+evidence for the core idea, not a second contribution: without it, explaining a schedule
 would be a demonstration on one solution instead of a statement about the front.
 
 Chapter~\ref{sec:motivation} states the problem, its formulation, the solution method and the
@@ -490,7 +490,7 @@ their durations sum to $\Cmax$ by Eq.~\eqref{eq:decomposition}.}
 
 Fronts are produced by the mp-BRKGA of \citet{fontes2023}, reimplemented against the authors'
 own solver source. The reimplementation was diffed against that source operator by operator
-before any result was produced, and the correspondence is stated exactly rather than assumed. The
+before any result was produced, and the correspondence is stated exactly, not assumed. The
 objective is identical, not approximately so: his is split across a per-task completion array and
 a per-vehicle availability array, ours takes a single maximum over completions, and the asymmetry
 of~\eqref{eq:load} and~\eqref{eq:unload} makes the two equal, which
@@ -523,7 +523,7 @@ participates in producing any front reported here.
 Exact evaluation costs well under a millisecond at these sizes, so a surrogate is not required to
 render search tractable. Its purpose is that a model predicting the per-activity structure of a
 schedule can be differentiated with respect to its own predictions, yielding an explanation
-derived from a learned representation rather than from the exact recurrence, which the two can
+derived from a learned representation instead of from the exact recurrence, which the two can
 then be compared on. Establishing that the explanation is learnable is a precondition for any
 setting in which the exact recurrence is unavailable.
 
@@ -538,11 +538,11 @@ rather than to physical activities. Second, the recurrences
 which is message passing \citep{gilmer2017}: a graph network is constrained to the locality a
 multilayer perceptron would have to learn. Third, the two relations enter \eqref{eq:load} and
 \eqref{eq:unload} differently and therefore cannot share parameters, and the quantities that
-matter, travel time and leg energy, are properties of arcs rather than nodes, which forces edge
+matter, travel time and leg energy, are properties of arcs and not of nodes, which forces edge
 conditioning.
 
 These jointly specify a heterogeneous, edge-conditioned message-passing network. The attentional
-variant is adopted in the corrected GATv2 form of \citet{brody2022} rather than the original GAT
+variant is adopted in the corrected GATv2 form of \citet{brody2022} in preference to the original GAT
 \citep{velickovic2018}, whose attention is monotonic in the key and therefore cannot rank
 neighbours conditioned on the query. Cross-relation fusion follows the semantic attention of
 \citet{wang2019han}; Section~\ref{sec:arch} explains why that cross-relation attention, and not
@@ -607,7 +607,7 @@ The graph is therefore precisely the precedence DAG of Figure~\ref{fig:dag}, so 
 representation is isomorphic to the combinatorial structure of the objective. Two aspects are
 consequential: each task has at most one incoming arc of each type, with the architectural
 implication of Section~\ref{sec:arch}, and travel time and energy reside on arcs, so the model
-must condition its messages on edge attributes rather than on node states alone.
+must condition its messages on edge attributes and not on node states alone.
 
 \section{The E-HGATv2 architecture}
 \label{sec:arch}
@@ -618,15 +618,15 @@ information reach a task from predecessors up to $L$ positions away in either ch
 surrogate has three such layers, a hidden dimension of $64$ and four attention heads per layer,
 and each layer performs two operations.
 
-\paragraph{What attention is here.} A layer has to combine several incoming messages into one.
-The plainest combination weights them equally. \emph{Attention} instead learns the weights
+\paragraph{Attentional aggregation.} A layer must combine several incoming messages into one.
+The simplest such combination weights them uniformly. \emph{Attention} instead learns the weights
 \citep{bahdanau2015}: for each candidate it scores the pair of descriptions at the two ends of
 the connection, normalises those scores across the candidates being combined so that they sum to
 one, and returns the weighted average; a \emph{head} is one such weighting, and computing four
 in parallel and concatenating them lets a layer attend on four different grounds at once. The
 weights are thus a learned answer to which of the available candidates matters for this task,
-recorded in a form that can afterwards be read. Two properties of the normalisation govern
-everything below. It is taken over a particular set of candidates, so what an attention is
+recorded in a form that can afterwards be inspected. Two properties of the normalisation bear on
+the argument that follows. It is taken over a particular set of candidates, so what an attention is
 informative \emph{about} is fixed by what that set contains; and when the set holds a single
 candidate its weight is forced to one, carrying no information whatever. This network attends
 twice per layer, over two different sets, and only one of the two escapes that degeneracy.
@@ -637,7 +637,7 @@ on the arc attributes computes a message for every node from its predecessors un
 aggregation is \texttt{max} rather than the customary attention-weighted sum. This choice mirrors
 the semiring: the recurrences of Section~\ref{sec:maxplus} reduce a node's same-resource
 predecessors under a maximum, and the aggregator is therefore selected to match the algebra of
-the problem rather than for its smoothness.
+the problem, not for its smoothness.
 
 \paragraph{Cross-relation fusion by semantic attention.} The two relation messages are combined
 by a learned attention over relations, in the manner of \citet{wang2019han}. This is where the
@@ -766,11 +766,11 @@ attribution is the indicator of the critical path.}
 \end{figure}
 
 Equation~\eqref{eq:decomposition} then holds for
-the model's own predicted durations exactly as it holds for the exact ones, which is what permits
-the model's explanation and the exact explanation to be compared on identical terms. The layer
+the model's own predicted durations exactly as it holds for the exact ones, so that the model's
+explanation and the exact explanation may be compared on identical terms. The layer
 belongs to the family of differentiable optimisation layers \citep{amos2017, pogancic2020}, and
 is distinguished by the fact that the embedded computation is a dynamic programme whose
-subgradient is available in closed form rather than an optimisation requiring implicit
+subgradient is available in closed form, not an optimisation requiring implicit
 differentiation.
 
 Ties in~\eqref{eq:tropical} are resolved by the first maximum in edge order, following the
@@ -786,18 +786,18 @@ by~\eqref{eq:tropical} and the energy by exact summation, a linear head for whic
 $\partial E / \partial e_k = 1$ identically. Because a max-plus output constrains only the
 attributes on the currently active path, training on the makespan alone would leave off-path
 attributes unidentified, so the local attributes are supervised directly against their exact
-physical values. Training is therefore two-stage rather than end-to-end: the core is trained
+physical values. Training is therefore two-stage and not end-to-end: the core is trained
 first, then frozen with cached embeddings while the heads are fitted. One consequence should be
 read with care. The arc features the encoder aggregates include the per-leg energies themselves,
 so predicting total energy is close to reading a sum of inputs, and the near-unit coefficient of
-determination in Section~\ref{sec:surrogate-eval} is a property of the architecture rather than
+determination in Section~\ref{sec:surrogate-eval} is a property of the architecture and not
 evidence of learning.
 
 \section{The duration-weighted critical share}
 \label{sec:rho}
 
 Comparing explanations across schedules requires a scalar. The natural candidate is the
-proportion of the critical path attributable to vehicle travel rather than crane handling.
+proportion of the critical path attributable to vehicle travel as against crane handling.
 
 Counting on-path activities of each kind is inadequate. Legs and handlings are not
 commensurable: a task may contribute a critical handling while its vehicle
@@ -889,8 +889,8 @@ learned component; \texttt{surrogate} holds the graph construction and the encod
 target is produced by the exact evaluator, which runs \eqref{eq:load}--\eqref{eq:cmax} in
 topological order in $O(N)$ and returns both the objective pair and the per-task quantities the
 projection heads are supervised on. Random-key vectors are sampled uniformly, decoded and
-evaluated, so the data is generated self-supervised. This is what makes the physics anchoring of
-Section~\ref{sec:tropical} possible, and it is why the evaluator's agreement with the source work
+evaluated, so the data is generated self-supervised. The physics anchoring of
+Section~\ref{sec:tropical} depends on this, and it is why the evaluator's agreement with the source work
 is a precondition for every other result.
 
 \paragraph{The autograd function.} The max-plus layer is a \texttt{torch.autograd.Function}
@@ -902,7 +902,7 @@ then relaxes~\eqref{eq:tropical} in that order, and stores the maximising predec
 The backward pass then walks the stored selections in reverse, accumulating the incoming
 gradient into exactly one predecessor per node. The \texttt{argmax} used in the forward pass is
 what implements the tie convention: it returns the first maximal index, so a tie yields one valid
-subgradient rather than a blend of several.
+subgradient and not a blend of several.
 
 Chapter~\ref{sec:limitations} records a case in which downstream analysis code violated this
 convention and the decomposition consequently failed to close.
@@ -910,7 +910,7 @@ convention and the decomposition consequently failed to close.
 \paragraph{Assertions, testing and execution.} Node and arc feature tensors are validated at
 every entry point against declared semantic signatures, and the decomposition
 identity~\eqref{eq:decomposition} is asserted on every traversal at a relative tolerance of
-$10^{-6}$, so an inconsistency raises rather than being averaged into a table. The suite comprises
+$10^{-6}$, so an inconsistency raises instead of being averaged into a table. The suite comprises
 29 unit-test modules and 239 tests, all passing, including the equivalence of the max-plus
 evaluator with an exhaustive enumeration of all 1248 schedule structures on a five-task instance
 and the mp-BRKGA operator semantics against the authors' source. Campaigns ran on a rented cloud
@@ -1047,16 +1047,16 @@ Order & Task & Activity & Duration (s) & $\partial C_{\max}$ & Resource \\
 \end{table}
 % ---- END generated: tables/traversal.tex ----
 
-Two properties of this traversal are of note. Every on-path activity belongs to the same vehicle,
+The traversal exhibits two properties. Every on-path activity belongs to the same vehicle,
 which establishes that the schedule is vehicle-limited and that the pertinent intervention is
-fleet capacity rather than crane rebalancing. The division between travel and handling is
+fleet capacity and not crane rebalancing. The division between travel and handling is
 quantified rather than asserted: $\rho = 0.714$ indicates that slightly over seventy per cent of
 the makespan consists of vehicle movement and the remainder of crane handling. This constitutes
-the form of statement the thesis set out to produce.
+the form of statement this thesis aims to produce.
 
 That table explains one schedule. The claim the rest of this chapter makes is about a
 \emph{pair} of them, so Table~\ref{tab:migration-traversal} gives both ends of one front at the
-same granularity. The two critical paths of L21 differ in kind rather than in length: four of the
+same granularity. The two critical paths of L21 differ in kind, not in length: four of the
 ten activities binding the makespan-optimal schedule are crane handlings, against one of fifteen
 at the energy-optimal end, where the path is almost entirely vehicle travel. Reading the two
 blocks against each other is what the aggregate measure summarises. Prioritising energy slows
@@ -1175,7 +1175,7 @@ The explanation lies in the third column. Every one of the ten published large i
 $A/Q = 0.50$ exactly, twice as many cranes as vehicles. With vehicles thus scarce, the schedule is
 transport-bound wherever it lies on the front: slowing it to conserve energy slows the vehicles,
 which already constituted the binding resource, so no transfer occurs. There is no bottleneck to
-migrate because only one candidate was ever available. This motivates the sweep rather than
+migrate because only one candidate was ever available. This motivates the sweep instead of
 excusing the result, and it yields a testable prediction: migration should appear once vehicles
 are sufficiently numerous for cranes to become competitive.
 
@@ -1276,7 +1276,7 @@ $-0.658$ by $A/Q = 1.00$ and holds within $0.02$ of $-0.66$ across the remaining
 peaking at $-0.665$. Taking the crossing as the first ratio at which an instance reaches half
 its own saturation, L21 crosses earliest at $A/Q = 1.00$, L35 at $1.33$, and L01, L07, L15 and
 L28 all at $1.50$.
-The threshold is therefore instance-dependent rather than universal, which is to be expected:
+The threshold is therefore instance-dependent, not universal, which is to be expected:
 whether cranes can become binding depends on handling times and layout geometry, not on the ratio
 alone.
 
@@ -1307,7 +1307,7 @@ Table~\ref{tab:smallset} groups its 350 replicates by ratio. The proportion whos
 migration exceeds $0.1$ in magnitude rises monotonically from none at $A/Q = 0.33$ to $56\%$ at
 $A/Q = 1.00$. Because the published configurations reach only $A/Q = 1.00$, this campaign
 observes the sub-threshold side alone, and it corroborates the ratio dependence on the whole set
-rather than on the six instances of the sweep. It also shows that the onset is gradual from
+and not on the six instances of the sweep. It also shows that the onset is gradual from
 about $A/Q = 0.4$ rather than a step at unity.
 
 % ---- BEGIN generated: tables/smallset.tex (scripts/make_thesis_tables.py) ----
@@ -1336,7 +1336,7 @@ $A/Q$ & $n$ & mean migration & mean $|$migration$|$ & $|$migration$| > 0.1$ \\
 
 Several cells report a standard deviation of exactly zero across ten seeds, notably L01 throughout
 and L21 at the lowest ratio. In those cells every seed recovers the same two extreme schedules,
-which is unsurprising for a four-task instance and indicates saturation of the search rather than
+which is unsurprising for a four-task instance and indicates saturation of the search and not
 of the measure.
 
 \section{The three instance families}
@@ -1354,13 +1354,13 @@ alongside the 35 loading instances already used, on the same layout and with no 
 
 The pairing that forms the mixed set is stated in the source: the ``comb.\ of'' column of
 Table~3 names, for each of the 26 instances, the unloading and loading instance it combines. That
-column is used as printed, so the family reproduces the published set rather than approximating
+column is used as printed, so the family reproduces the published set instead of approximating
 it. It pairs by neither adjacency nor position, D04 combining U01 with L02 and D06 combining U02
 with L01, and the reconstruction is confirmed against an independent published quantity: the task
 count of all 26 agrees with the Q--T column of the same table.
 
 Each of the 96 instances was run at nine fleet sizes with ten seeds, and the transport share was
-computed at every point of every resulting front rather than at the two extremes alone. The
+computed at every point of every resulting front, not at the two extremes alone. The
 campaign comprises 8,640 replicates and 657,899 front points; no replicate failed to complete
 and the decomposition closes at every point. Table~\ref{tab:families} reports migration by ratio
 for each family and Figure~\ref{fig:families} plots it.
@@ -1424,7 +1424,7 @@ near zero, so on a mixed instance with few vehicles the makespan-optimal end is 
 travel-heavy of the two. Both are reported as measured regularities and neither is claimed as
 understood.
 
-Because the share is computed at every front point rather than at the two ends, the explanation
+Because the share is computed at every front point and not only at the two ends, the explanation
 can also be read as a profile along the front. Figure~\ref{fig:profile} shows one front from each
 family.
 The transition from a crane-bound to a vehicle-bound critical path occurs across the front rather
@@ -1451,8 +1451,8 @@ monotonically.}
 Every result to this point explains \emph{finalised} solutions. Two questions remain open, and
 they are the two roles the surrogate can take beyond post-hoc explanation. Whether the
 explanation of a front is settled once the front is, or still moving while the search converges;
-and whether the learned model tracks that movement, which is what any later use of it inside the
-search would require.
+and whether the learned model tracks that movement, on which any later use of it inside the
+search would depend.
 
 Both are answered by snapshotting the solver's archive every ten generations. Six instances from
 each of the three families are run at three fleet sizes with five seeds, giving 54 cells, 270
@@ -1468,8 +1468,8 @@ one hundred, reaching its final value to within
 $0.02$ only by generation forty; below the threshold it moves from $-0.009$ to $-0.048$ and
 settles by generation thirty. An explanation read from an unconverged front therefore understates
 the effect by more than half, because the early archive holds few structurally distinct schedules
-and its two extremes lie close together. This is a caution rather than a defect: it establishes
-that explaining \emph{finalised} solutions, which is what Section~\ref{sec:migration} does, is the
+and its two extremes lie close together. This is a caution, not a defect: it establishes
+that explaining \emph{finalised} solutions, as Section~\ref{sec:migration} does, is the
 defensible use, and it gives the feedback loop of Chapter~\ref{sec:limitations} a precondition,
 since guidance drawn from an early generation would act on an explanation that has not converged.
 
@@ -1540,8 +1540,8 @@ measured. On the cells of largest migration the discrepancy is also largest, rea
 $0.187$ on L21 at $A/Q = 1.00$, so the reproduction is weakest precisely where the
 phenomenon is strongest.
 
-That anti-correlation is the honest summary of the secondary result, and it is the reason the two
-tiers are reported separately throughout. The exact explanation of
+That anti-correlation qualifies the secondary result, and is the reason the two tiers are
+reported separately throughout. The exact explanation of
 Tables~\ref{tab:traversal}--\ref{tab:migration} does not degrade when the surrogate does.
 
 \section{Discussion}
@@ -1550,7 +1550,7 @@ The results support a specific and bounded claim. For this problem the reason a 
 Pareto-optimal can be stated exactly, in seconds attributable to named physical activities, with
 the attribution summing to the objective by construction. This is stronger than a feature
 attribution over decision variables, and it is available because the objective possesses
-$(\max,+)$ structure that the max-plus layer preserves rather than because of any technique
+$(\max,+)$ structure that the max-plus layer preserves, and not because of any technique
 imported from machine learning. The architectural lesson is narrow but transferable: the encoder
 was not the obstacle to faithful attribution, the pooled regression head was, and replacing that
 head with the problem's own recurrence removes the obstacle without sacrificing the learned
@@ -1597,7 +1597,7 @@ establishes that migration depends on $A/Q$ and locates the transition between $
 across the six swept instances, but does not predict it from instance parameters. It is also established on
 the small-instance layout alone: the large dual-cycling instances describe a twenty-crane terminal
 whose distance matrix is not interchangeable, and are observed only at $A/Q = 0.50$, so extending
-the threshold to them is an extrapolation across layouts rather than a measurement. Sweeping the
+the threshold to them is an extrapolation across layouts, not a measurement. Sweeping the
 fleet on three large dual-cycling instances would settle it, at roughly forty core-hours. Finally, the
 surrogate's agreement with the exact critical set is lowest where migration is largest, since
 Pareto-optimal schedules are those in which resources are nearly balanced and small prediction
@@ -1606,7 +1606,7 @@ errors alter which activity binds; this bounds the secondary tier only.
 \paragraph{Further work.} Two implemented components are excluded. A power-coupled regime, in
 which a terminal-wide budget couples the vehicles, is the one setting in which the surrogate
 would predict a quantity with no closed form, the waiting time induced by power contention, and
-therefore where a learned component becomes necessary rather than merely sufficient; it is the
+therefore where a learned component becomes necessary and not merely sufficient; it is the
 strongest candidate for future work but needs a separate problem statement, originating as it
 does in a different literature. Its three-velocity configuration and power coefficients are
 retained here, belonging to the original problem. The natural continuation is to feed the explanation back into the search, which divides into two
@@ -1615,7 +1615,7 @@ carried out in Section~\ref{sec:evolution} and shows that an explanation read fr
 front is biased towards zero. The larger is attribution-guided search proper, biasing mutation
 towards the activities currently on the critical path, in the spirit of decision-focused learning
 \citep{elmachtoub2022}. That step is deliberately not attempted here: it should follow once the
-explanation is established, which is what this thesis does, and Section~\ref{sec:evolution} gives
+explanation is established, as this thesis does, and Section~\ref{sec:evolution} gives
 it a precondition, since guidance drawn from an early generation would be acting on an
 explanation that has not yet converged.
 
@@ -1624,7 +1624,7 @@ explanation that has not yet converged.
 \label{sec:conclusion}
 
 This thesis set out to explain why particular solutions to a bi-objective container-terminal
-scheduling problem are Pareto-optimal, rather than merely to compute them. Its one core idea
+scheduling problem are Pareto-optimal, and not simply to compute them. Its one core idea
 is that such a schedule can be explained exactly, in seconds attributable to named physical
 activities, and that a learned model can produce the same explanation. The instances are the
 published ones throughout: the loading set as printed, the unloading set reversed from it, and
@@ -1639,7 +1639,7 @@ differentiable max-plus dynamic programme, whose backward pass routes the subgra
 recorded argmax edge, restores the property, and differentiating the composition returns the
 critical path itself rather than an estimate of it. From that decomposition the duration-weighted
 critical share $\rho$ summarises an explanation as one number, the fraction of the makespan spent
-moving rather than lifting.
+moving as against lifting.
 
 The empirical result is that the bottleneck migrates, and that whether it does is governed by the
 fleet-to-crane ratio. Across 540 statistically tested replicates migration is significantly
@@ -1658,7 +1658,7 @@ ones at up to 160 tasks. That is what licenses the method beyond the cases exami
 recurrence is available for a resolved schedule, but it requires one, whereas the model predicts
 the durations and can therefore explain a candidate that has not been evaluated. Every setting in
 which the explanation is wanted before evaluation, or in which no closed form exists, rests on the
-learned component rather than on the oracle.
+learned component and not on the oracle.
 
 % ======================================================================================
 % A bibliography is set single-spaced with a small gap between entries; the one-and-a-half
