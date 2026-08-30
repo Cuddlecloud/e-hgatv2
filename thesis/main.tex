@@ -618,6 +618,19 @@ information reach a task from predecessors up to $L$ positions away in either ch
 surrogate has three such layers, a hidden dimension of $64$ and four attention heads per layer,
 and each layer performs two operations.
 
+\paragraph{What attention is here.} A layer has to combine several incoming messages into one.
+The plainest combination weights them equally. \emph{Attention} instead learns the weights
+\citep{bahdanau2015}: for each candidate it scores the pair of descriptions at the two ends of
+the connection, normalises those scores across the candidates being combined so that they sum to
+one, and returns the weighted average; a \emph{head} is one such weighting, and computing four
+in parallel and concatenating them lets a layer attend on four different grounds at once. The
+weights are thus a learned answer to which of the available candidates matters for this task,
+recorded in a form that can afterwards be read. Two properties of the normalisation govern
+everything below. It is taken over a particular set of candidates, so what an attention is
+informative \emph{about} is fixed by what that set contains; and when the set holds a single
+candidate its weight is forced to one, carrying no information whatever. This network attends
+twice per layer, over two different sets, and only one of the two escapes that degeneracy.
+
 \paragraph{Within-relation propagation under a max-plus reduction.} For each relation
 $R \in \{\text{AGV}, \text{QC}\}$ separately, a GATv2 convolution \citep{brody2022} conditioned
 on the arc attributes computes a message for every node from its predecessors under $R$. The
