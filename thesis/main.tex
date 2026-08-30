@@ -190,13 +190,13 @@ reports the magnitude of the trade-off; it does not report its cause.
 
 Whether a front can be computed and whether it can be understood are distinct questions. The
 first is settled for this problem; the second is the subject of this thesis, and it matters for a
-practical reason. A front is a menu, and the operator choosing from it is choosing between schedules that may
-fail for entirely different reasons. If one compromise is slow because too few vehicles are covering a long yard,
-buying a vehicle helps; if another is slow because a single crane has too many containers queued
-against it, buying a vehicle changes nothing and the tasks must be rebalanced. The two look alike
-on the front, because the front records only the makespan and the energy, never the reason. An
-operator told which resource is binding at the point they are considering can act; an operator
-given the two numbers alone can only guess.
+practical reason. Two schedules adjacent on a front may be slow for unrelated reasons. One may be slow because
+too few vehicles cover a long yard, in which case adding a vehicle shortens it; another may be
+slow because a single crane holds too many queued containers, in which case adding a vehicle
+changes nothing and the tasks require rebalancing. The front separates neither case from the
+other, recording the makespan and the energy but no account of what produced them. The
+interventions available to a terminal operator are physical, so a selection made from the
+objective values alone omits the information the decision requires.
 
 The gap is not specific to container terminals. \citet{bengio2021} survey the integration of
 machine learning with combinatorial optimisation and identify the interpretation of optimiser
@@ -205,13 +205,13 @@ indirect: fronts are visualised, which conveys the shape of a trade-off but not 
 solutions are clustered, which groups compromises without saying what distinguishes them; or a
 preference is elicited and one solution recommended, which replaces one unanswered question with
 another. Recent work applies post-hoc attribution, principally SHAP \citep{lundberg2017} and
-TreeSHAP \citep{lundberg2020}, to surrogate models of the objective. In a scheduling context that
-carries a specific limitation: the attribution lands on \emph{decision variables}, on positions
-in a chromosome and on discrete speed settings, not on \emph{physical quantities}. Being told
-that the twenty-seventh gene of a chromosome matters does not tell an operator what to do. Being
-told that a particular loaded trip to its quay crane lies on the critical path and contributes
-$55.6$ of the $175.0$ seconds does; that is the first line of the worked example in
-Table~\ref{tab:traversal}.
+TreeSHAP \citep{lundberg2020}, to surrogate models of the objective. In a scheduling context this places the
+attribution on \emph{decision variables}, on positions in a chromosome and on discrete speed
+settings, where the operator's interventions apply to \emph{physical quantities}. A chromosome
+position identifies no vehicle, crane or leg and so supports no operational decision, whereas an
+attribution to a named activity locates both the activity and its cost: in the worked example of
+Table~\ref{tab:traversal}, the loaded leg of task $2$ contributes $55.556$ of the $175.000$
+seconds of the critical path of L01.
 
 \section{Novelty}
 
@@ -685,8 +685,8 @@ that arc's criticality. The informative attention is therefore the cross-relatio
 \label{sec:tropical}
 
 The architecture described so far could be completed in the conventional manner, by pooling node
-embeddings and regressing $(\Cmax, E)$ with a multilayer perceptron. Doing so defeats the purpose
-of the exercise. A pooled regression head mixes every node embedding into every output, so the
+embeddings and regressing $(\Cmax, E)$ with a multilayer perceptron. That choice would forfeit
+the property the method depends on. A pooled regression head mixes every node embedding into every output, so the
 Jacobian of the predicted makespan with respect to the input features is dense. An attribution
 read from it distributes credit across activities that are provably irrelevant, because
 Section~\ref{sec:maxplus} establishes that only the activities of one path can affect $\Cmax$ at
@@ -1054,8 +1054,8 @@ That table explains one schedule. The claim the rest of this chapter makes is ab
 pair of them, so Table~\ref{tab:migration-traversal} gives both ends of one front at the
 same granularity. The two critical paths of L21 differ in kind, not in length: four of the
 ten activities binding the makespan-optimal schedule are crane handlings, against one of fifteen
-at the energy-optimal end, where the path is almost entirely vehicle travel. Reading the two
-blocks against each other is what the aggregate measure summarises. Prioritising energy slows
+at the energy-optimal end, where the path is almost entirely vehicle travel. The aggregate measure summarises the
+difference between the two blocks. Prioritising energy slows
 every leg, which lengthens travel until it dominates a path that the cranes had previously
 gated, and the share moves from $0.464$ to $0.901$ in consequence. Section~\ref{sec:migration}
 establishes that this happens systematically; the table shows what is being counted.
@@ -1536,7 +1536,7 @@ phenomenon is strongest.
 
 That anti-correlation qualifies the secondary result, and is the reason the two tiers are
 reported separately throughout. The exact explanation of
-Tables~\ref{tab:traversal}--\ref{tab:migration} does not degrade when the surrogate does.
+Tables~\ref{tab:traversal}--\ref{tab:migration} is unaffected by the surrogate's error.
 
 \section{Discussion}
 
