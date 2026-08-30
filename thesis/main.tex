@@ -116,43 +116,47 @@
 \chapter*{Abstract}
 \addcontentsline{toc}{section}{Abstract}
 
-Container terminals schedule quay cranes and speed-adjustable automated guided vehicles against
-two conflicting objectives, the makespan of the workload and the energy consumed by the vehicles.
-The solution is not a single schedule but a Pareto front of non-dominated compromises from which
-an operator must select. The literature is substantially richer in methods that compute fronts
-than in methods that explain them, and the explainability techniques usually transferred from
-machine learning attribute outcomes to decision variables, whereas an operator acts on physical
-quantities.
+Container terminals must schedule quay cranes jointly with speed-adjustable automated guided
+vehicles under two conflicting objectives: the makespan of the workload and the energy expended
+in vehicle travel. No schedule optimises both, so the solution of the problem is a Pareto front
+of non-dominated compromises from which an operator selects. Methods for computing such fronts
+are considerably better developed than methods for accounting for them, and the explanatory
+techniques ordinarily imported from machine learning attribute an outcome to decision variables,
+whereas the interventions available to an operator are physical.
 
-This thesis explains Pareto-optimal schedules in terms of the physical activities that produce
-them. The account rests on a structural observation: once a schedule is fixed, its makespan is
-the longest chain of activities that must happen in sequence, so only the activities on that
-chain can affect it, and their durations add up to the makespan exactly. The sensitivity of the
-makespan to any activity is therefore one or zero, never an intermediate value, and the
-resulting explanation balances by construction. Formally this is linearity over the $(\max,+)$
-semiring, and it makes the explanation checkable rather than merely plausible. The method built on
-it is a heterogeneous graph attention network, E-HGATv2, which encodes the schedule as a typed
-precedence graph and predicts per-leg travel durations and per-task handling delays, which a
-differentiable max-plus dynamic-programming layer composes into the makespan, its custom backward
-pass routing the subgradient exclusively through the argmax edge of each recurrence.
+This thesis attributes the objective values of a Pareto-optimal schedule to the physical
+activities that produce them. The construction rests on a structural property of the objective:
+for a fixed schedule the makespan is the longest chain of activities constrained to occur in
+sequence, so the objective depends upon the activities of that chain alone, and their durations
+sum to it exactly. The partial derivative of the makespan with respect to any activity duration
+is consequently zero or one and never an intermediate value, and the resulting attribution
+balances by construction rather than by calibration. Formally the objective is linear over the
+$(\max,+)$ semiring, which renders the attribution verifiable rather than merely plausible. The
+method is a heterogeneous graph attention network, E-HGATv2, which represents a schedule as a
+typed precedence graph and predicts the duration of each vehicle leg and each crane handling
+operation; a differentiable max-plus dynamic-programming layer composes those predictions into
+the makespan, its backward pass routing the subgradient exclusively along the argmax edge of
+each recurrence, so that differentiating the network returns a critical path rather than an
+estimate of one.
 
 From this decomposition the thesis defines the duration-weighted critical share $\rho$, the
-fraction of the makespan contributed by vehicle travel and not by crane handling, and uses its
-shift between the ends of a front to quantify why the compromises differ. The principal finding
-is that the binding bottleneck migrates between travel and handling, and that whether it does is
-governed by the fleet-to-crane ratio $A/Q$. Across 540 replicates spanning six instances, nine
-fleet sizes and ten seeds, migration is significantly non-zero in 45 of 54 instance--fleet cells
-under a Holm-corrected Wilcoxon signed-rank test, attaining $0.665$ at $A/Q = 2.67$ and vanishing
-below $A/Q \approx 1$ where both ends are transport-bound. A second campaign of 8{,}640
-replicates reproduces the threshold on three instance families and resolves the explanation at
-all 657{,}899 points of the fronts it produces. Where the transfer occurs, cranes bind at the
-makespan-optimal end and vehicles at the energy-optimal end, which accounts for its absence on
-the ten published large instances, each having $A/Q = 0.50$. The surrogate reproduces the exact
-explanation to a mean absolute error of $0.026$ in the share and a critical-leg agreement of
-$0.898$ on the small instances and $0.924$ on the published large ones, and it does so at every
-generation of a search as well as at its end. That agreement is what carries the method beyond
-the cases examined here, since the exact recurrence can only be applied to a schedule that has
-already been evaluated whereas the model predicts the durations it needs.
+fraction of the makespan contributed by vehicle travel rather than by crane handling, and
+quantifies the difference between the compromises on a front by the shift in $\rho$ between its
+two ends. The principal finding is that the binding bottleneck migrates between travel and
+handling, and that the occurrence of the migration is governed by the fleet-to-crane ratio $A/Q$.
+Over 540 replicates spanning six instances, nine fleet sizes and ten seeds, migration is
+significantly non-zero in 45 of 54 instance--fleet cells under a Holm-corrected Wilcoxon
+signed-rank test; it attains $0.665$ at $A/Q = 2.67$ and vanishes below $A/Q \approx 1$, where
+both ends of the front are transport-bound. A second campaign of 8{,}640 replicates reproduces
+the threshold on three instance families and resolves the attribution at all 657{,}899 points of
+the fronts obtained. Where the transfer occurs, cranes bind at the makespan-optimal end and
+vehicles at the energy-optimal end, which accounts for its absence on the ten published large
+instances, each of which has $A/Q = 0.50$. The network reproduces the exact attribution to a mean
+absolute error of $0.026$ in the share, with critical-leg agreement of $0.898$ on the small
+instances and $0.924$ on the published large ones, and does so at every generation of a search as
+well as at its termination. That agreement is what extends the method beyond the cases examined
+here, since the exact recurrence presupposes a schedule that has already been evaluated whereas
+the network predicts the durations it requires.
 
 % ======================================================================================
 \setcounter{tocdepth}{1}
@@ -164,110 +168,109 @@ already been evaluated whereas the model predicts the durations it needs.
 
 A container terminal mediates between maritime and inland transport, and its throughput is
 governed by the coordination of its equipment. Quay cranes transfer containers between vessel and
-quay; automated guided vehicles transport them between quay and storage yard. Scheduling the two
-resources jointly dominates scheduling them in sequence, because an idle crane represents
-unrecovered capital and an idle vehicle represents wasted energy. Contemporary terminals
-increasingly deploy vehicles whose travel speed is selectable, which introduces a second
-objective: a vehicle driven faster completes its leg sooner but consumes disproportionately more
-energy, since power grows super-linearly in speed.
+quay; automated guided vehicles convey them between quay and storage yard. Scheduling the two
+resources jointly dominates scheduling them in succession, since an idle crane and an idle
+vehicle represent respectively unrecovered capital and expended energy. Terminals increasingly
+deploy vehicles whose travel speed is selectable, which introduces a second objective: a vehicle
+driven faster completes its leg sooner but consumes disproportionately more energy, power growing
+super-linearly in speed.
 
-The problem consequently admits no single optimum. It admits a Pareto front: a set of schedules,
-none of which improves upon another in one objective without conceding the other.
+The problem therefore admits no single optimum but a Pareto front: a set of schedules, none of
+which improves upon another in one objective without conceding the other.
 \citet{homayouni2021} introduce the joint scheduling of quay cranes and speed-adjustable vehicles,
 and \citet{fontes2023} formulate it as a bi-objective mixed-integer linear program and solve it
 with a multi-population biased random-key genetic algorithm, reporting fronts for benchmark
-instances of increasing size. Their contribution concerns the efficient computation of the front.
+instances of increasing size. Both contributions concern the efficient computation of the front.
 
-The subsequent question has received less attention. An operator receives a front and must
-select from it. Selection presupposes understanding, and understanding a schedule requires knowing what
-limits it. Two schedules on the same front may be limited by entirely different resources: one
-may be constrained by vehicles traversing a long yard-to-quay distance, another by a single
-overloaded crane whose task queue no increase in fleet size will shorten. These situations
-require distinct operational responses, and the front alone does not distinguish them. The front
-reports the magnitude of the trade-off; it does not report its cause.
+The question that follows has received less attention. An operator is presented with a front and
+must select from it, and a selection requires knowing what limits each candidate. Two schedules
+on one front may be limited by different resources: one by vehicles traversing a long
+yard-to-quay distance, another by a single overloaded crane whose task queue no enlargement of
+the fleet will shorten. The two cases admit different operational responses, and the objective
+values alone do not distinguish them. A front records the magnitude of a trade-off without
+identifying its cause.
 
 \section{Significance}
 
-Whether a front can be computed and whether it can be understood are distinct questions. The
-first is settled for this problem; the second is the subject of this thesis, and it matters for a
-practical reason. Two schedules adjacent on a front may be slow for unrelated reasons. One may be slow because
-too few vehicles cover a long yard, in which case adding a vehicle shortens it; another may be
-slow because a single crane holds too many queued containers, in which case adding a vehicle
-changes nothing and the tasks require rebalancing. The front separates neither case from the
-other, recording the makespan and the energy but no account of what produced them. The
-interventions available to a terminal operator are physical, so a selection made from the
-objective values alone omits the information the decision requires.
+Whether a front can be computed and whether it can be accounted for are distinct questions, of
+which the first is settled for this problem and the second is the subject of this thesis. The
+distinction carries practical content. The interventions available to a terminal operator are
+physical -- enlarging the fleet, rebalancing the task queue of a crane, revising a speed policy
+-- and each addresses a different limiting resource, so a selection made from the objective
+values alone omits the information the decision requires.
 
-The gap is not specific to container terminals. \citet{bengio2021} survey the integration of
-machine learning with combinatorial optimisation and identify the interpretation of optimiser
-output as a persistent weakness. Within multi-objective optimisation the usual devices are
-indirect: fronts are visualised, which conveys the shape of a trade-off but not its cause;
-solutions are clustered, which groups compromises without saying what distinguishes them; or a
-preference is elicited and one solution recommended, which replaces one unanswered question with
-another. Recent work applies post-hoc attribution, principally SHAP \citep{lundberg2017} and
-TreeSHAP \citep{lundberg2020}, to surrogate models of the objective. In a scheduling context this places the
-attribution on \emph{decision variables}, on positions in a chromosome and on discrete speed
-settings, where the operator's interventions apply to \emph{physical quantities}. A chromosome
-position identifies no vehicle, crane or leg and so supports no operational decision, whereas an
-attribution to a named activity locates both the activity and its cost: in the worked example of
-Table~\ref{tab:traversal}, the loaded leg of task $2$ contributes $55.556$ of the $175.000$
-seconds of the critical path of L01.
+The deficiency is not confined to container terminals. \citet{bengio2021} survey the integration
+of machine learning with combinatorial optimisation and identify the interpretation of optimiser
+output as a persistent weakness. The devices customary in multi-objective optimisation are
+indirect: fronts are visualised, which conveys the shape of a trade-off but not its origin;
+solutions are clustered, which groups compromises without characterising what separates them; or
+a preference is elicited and a single solution recommended, which presupposes the understanding
+it was to supply. Recent work applies post-hoc attribution, principally SHAP
+\citep{lundberg2017} and TreeSHAP \citep{lundberg2020}, to surrogate models of the objective. In
+a scheduling context such attribution lands upon \emph{decision variables}, upon positions in a
+chromosome and discrete speed settings, whereas the operator acts upon \emph{physical
+quantities}. A chromosome position identifies no vehicle, crane or leg and therefore supports no
+operational decision, whereas an attribution to a named activity locates both the activity and
+its cost: in the worked example of Table~\ref{tab:traversal}, the loaded leg of task $2$
+contributes $55.556$ of the $175.000$ seconds of the critical path of L01.
 
 \section{Novelty}
 
-The tractability of the problem rests on a structural property of its objective.
-\citet{rudin2019} argues that where a model's structure permits an explanation correct by
-construction, explaining an opaque model after the fact is the inferior choice; this problem
-admits such an explanation. The makespan of a fixed schedule is the largest total along any
-chain of activities that must run in order, that is, the length of a longest path through the
-schedule. Two consequences follow. The objective depends only on the activities of that path, so
-the sensitivity of the makespan to any activity takes the value one or the value zero. Their
-durations also sum to the makespan exactly. The explanation is therefore read off the structure
-and balances by construction. Formally this is linearity over the $(\max,+)$ semiring
-\citep{baccelli1992}, developed in Section~\ref{sec:maxplus}.
+The tractability of the question rests on a structural property of the objective.
+\citet{rudin2019} argues that where the structure of a model admits an explanation correct by
+construction, explaining an opaque model after the fact is the inferior alternative; the present
+problem admits such an explanation. The makespan of a fixed schedule is the greatest total along
+any chain of activities constrained to occur in order, that is, the length of a longest path
+through the schedule. Two consequences follow. The objective depends upon the activities of that
+path alone, so its partial derivative with respect to any activity duration is zero or one; and
+those durations sum to the makespan exactly. The explanation is therefore read from the structure
+and balances by construction. Formally the objective is linear over the $(\max,+)$ semiring
+\citep{baccelli1992}, as developed in Section~\ref{sec:maxplus}.
 
-The two ingredients this thesis combines are each established. Graph neural networks have been
-applied to scheduling and routing, as policies \citep{kool2019, zhang2020} and as surrogates, and
-differentiable optimisation layers embed a combinatorial computation inside a network so that
-gradients pass through it \citep{amos2017, pogancic2020}, with the decision-focused learning
-literature studying prediction whose loss is defined through a downstream optimiser
+The two components combined here are individually established. Graph neural networks have been
+applied to scheduling and routing both as policies \citep{kool2019, zhang2020} and as surrogates,
+and differentiable optimisation layers embed a combinatorial computation within a network so that
+gradients traverse it \citep{amos2017, pogancic2020}, the decision-focused learning literature
+studying prediction whose loss is defined through a downstream optimiser
 \citep{elmachtoub2022}. Their combination for this problem class is, to the author's knowledge,
-not established. The novelty is in what the network is asked to predict. It does not predict the
-makespan. It predicts the local physical quantities of a schedule, the duration of each
-vehicle trip and each crane lift, and a max-plus layer then composes those into the makespan
-using the same recurrence the exact evaluator uses. Differentiating the model with respect to its
-own predictions therefore recovers the critical path itself, and the
-answer is expressed in seconds attributable to named activities rather than in units of an
-internal representation.
+not established. The novelty lies in the quantity the network is required to predict. It does not
+predict the makespan. It predicts the local physical quantities of a schedule, the duration of
+each vehicle trip and each crane lift, which a max-plus layer composes into the makespan by the
+same recurrence the exact evaluator employs. Differentiating the network with respect to its own
+predictions therefore recovers the critical path itself, and the result is expressed in seconds
+attributable to named activities rather than in units of an internal representation.
 
 \section{Contribution}
 
-This thesis has one core idea: \emph{a Pareto-optimal schedule can be explained exactly, in
-seconds attributable to named physical activities, and a learned model can produce that same
-explanation}. Every result reported below is subordinate to it.
+The thesis advances a single proposition: \emph{that a Pareto-optimal schedule admits an exact
+explanation in seconds attributable to named physical activities, and that a learned model can
+produce the same explanation}. Every result reported below is subordinate to that proposition.
 
-The explanation itself is exact rather than estimated. For a given schedule the method identifies
-which vehicle trips and crane lifts actually determine the makespan, and how many seconds each
-contributes. Because those durations add up to the makespan exactly, the explanation admits verification,
-and it is verified on every schedule reported, so an inconsistency surfaces as a failed test. This holds because a
-fixed schedule's makespan is the longest chain of activities that must run in sequence, which
-makes the sensitivity to any one activity either one or zero.
+The explanation is exact rather than estimated. For a given schedule the method identifies which
+vehicle trips and crane lifts determine the makespan, and how many seconds each contributes.
+Because those durations sum to the makespan exactly, the explanation admits verification; it is
+verified on every schedule reported, so that an inconsistency would surface as a failed test. The
+property holds because the makespan of a fixed schedule is the longest chain of activities
+constrained to run in sequence, which restricts the sensitivity to any one activity to zero or
+one.
 
-The learned surrogate, E-HGATv2, is the supporting tool. It is not asked to predict the
-makespan; it predicts the duration of each trip and each lift, and a differentiable max-plus
-layer composes those into the makespan using the same recurrence the exact evaluator uses.
-Differentiating the model with respect to its own predictions therefore returns a critical path
-rather than an estimate of one, expressed in the same physical units. Whether it agrees with the
-exact answer is measured throughout and reported in Section~\ref{sec:surrogate-eval}.
+The learned model, E-HGATv2, is not asked to predict the makespan. It predicts the duration of
+each trip and each lift, and a differentiable max-plus layer composes those into the makespan by
+the recurrence the exact evaluator uses. Differentiating the model with respect to its own
+predictions therefore returns a critical path rather than an estimate of one, expressed in the
+same physical units. Its agreement with the exact result is measured throughout and reported in
+Section~\ref{sec:surrogate-eval}. That agreement is what carries the method beyond the instances
+examined here, since the exact recurrence presupposes a schedule that has already been evaluated
+whereas the model predicts the durations it requires.
 
-That the explanation is worth having at all is established by a single empirical fact: the answer
-is not the same everywhere on a front. With enough vehicles the makespan-optimal end of a front
-is limited by the cranes and the energy-optimal end by the vehicles, so two schedules an operator
-is choosing between fail for different reasons and call for different interventions. Whether this
-occurs is governed by the number of vehicles per crane, which is established by a statistically
-tested sweep (Section~\ref{sec:migration}) and reproduced on three instance families. It is offered
-as evidence for the core idea: without it, explaining a schedule would demonstrate the method on
-one solution while saying nothing about the front.
+That the explanation is worth obtaining is established by one empirical fact: the answer is not
+uniform along a front. Given a sufficient fleet, the makespan-optimal end of a front is limited
+by the cranes and the energy-optimal end by the vehicles, so two schedules between which an
+operator is choosing are limited for different reasons and admit different interventions. Whether
+this occurs is governed by the number of vehicles per crane, which is established by a
+statistically tested sweep (Section~\ref{sec:migration}) and reproduced on three instance
+families. It is offered as evidence for the proposition: without it, explaining a schedule would
+demonstrate the method on one solution while establishing nothing about the front.
 
 Chapter~\ref{sec:motivation} states the problem, its formulation, the solution method and the
 relevant background. Chapter~\ref{sec:method} describes the surrogate architecture, the max-plus
@@ -310,7 +313,9 @@ a resolved schedule satisfies.
 \centering
 \footnotesize
 \caption[Notation]{Notation. The upper block is problem data, the middle block schedule
-variables, and the lower block quantities introduced by this thesis.}
+variables, and the lower block quantities introduced by this thesis. The three speed levels and
+their constants are given; which level each leg runs at is part of the decision, as
+Section~\ref{sec:entities} states.}
 \label{tab:notation}
 \begin{tabular}{ll}
 \toprule
@@ -321,8 +326,9 @@ $\mathrm{qc}(j)$, $\mathrm{lu}(j)$ & the crane and yard station to which task $j
 $\mathrm{qcprev}(j)$ & the predecessor of $j$ in its crane's sequence \\
 $Q$, $|\mathcal{A}|$ & number of quay cranes and of vehicles \\
 $\tau_j$ & quay-crane handling time of task $j$ \\
-$\ell$ & speed level: lower, nominal or higher (Table~\ref{tab:speed}) \\
-$\alpha_\ell$, $v_\ell$, $P_\ell$ & speed multiplier, speed and power draw at level $\ell$ \\
+$\ell$ & one of three settings at which a leg may be driven; selected per leg \\
+$\alpha_\ell$, $v_\ell$, $P_\ell$ & speed multiplier, speed and power draw at level $\ell$
+                                 (Table~\ref{tab:speed}) \\
 $d_k$ & length of leg $k$; $k$ indexes legs, never speed levels \\
 \midrule
 $t^{\text{empty}}_j$, $t^{\text{loaded}}_j$ & empty and loaded leg durations of task $j$ \\
@@ -340,11 +346,12 @@ $\rho_{\text{transport}}$ & duration-weighted critical share, Eq.~\eqref{eq:rho}
 $A/Q$ & fleet-to-crane ratio, the sweep parameter \\
 \bottomrule
 \end{tabular}
-\end{table} This is the
-form the implementation computes and the form in which the max-plus structure of
-Section~\ref{sec:maxplus} is manifest. The mixed-integer programme of \citet{fontes2023}
-formulates the same problem and supplies the published optima used for verification in
-Chapter~\ref{sec:evaluation}.
+\end{table}
+
+The recurrences of Section~\ref{sec:objectives} are the form in which the implementation computes
+the objective, and the form in which the max-plus structure of Section~\ref{sec:maxplus} is
+manifest. The mixed-integer programme of \citet{fontes2023} formulates the same problem and
+supplies the published optima used for verification in Chapter~\ref{sec:evaluation}.
 
 \paragraph{Physics of a leg.} Three speed levels, with multipliers
 $\alpha_\ell \in \{0.8, 1.0, 1.2\}$, scale a nominal
@@ -430,12 +437,13 @@ path in the directed acyclic graph whose vertices are activities (empty legs, lo
 crane handlings) and whose arcs are the precedences above. The construction is the disjunctive
 graph familiar from job-shop scheduling \citep{carlier1989}, specialised to two resource types.
 
-Two consequences follow, and this thesis rests upon both.
+Two consequences follow, upon both of which the thesis depends.
 
-First, the objective depends only on the activities of one path. Perturbing the duration of an
-on-path activity changes $\Cmax$ by the same amount; perturbing an off-path activity leaves
-$\Cmax$ unchanged until the perturbation is large enough to alter the longest path. The
-sensitivity is thus piecewise constant, equal to one on the critical path and zero elsewhere.
+First, the objective depends upon the activities of one path alone. Perturbing the duration of an
+on-path activity alters $\Cmax$ by the same amount, whereas perturbing an off-path activity
+leaves $\Cmax$ unchanged until the perturbation becomes large enough to displace the longest
+path. The sensitivity is therefore piecewise constant, equal to one on the critical path and zero
+elsewhere.
 
 Second, as an immediate corollary, the durations of the on-path activities sum to the makespan:
 \begin{equation}
@@ -487,28 +495,31 @@ their durations sum to $\Cmax$ by Eq.~\eqref{eq:decomposition}.}
 \section{The multi-population biased random-key genetic algorithm}
 \label{sec:mpbrkga}
 
-Fronts are produced by the mp-BRKGA of \citet{fontes2023}, reimplemented against the authors'
-own solver source. The reimplementation was diffed against that source operator by operator
-before any result was produced, so the correspondence below is stated from that comparison. The
-objective is identical to within floating-point equality: his is split across a per-task completion array and
-a per-vehicle availability array, ours takes a single maximum over completions, and the asymmetry
-of~\eqref{eq:load} and~\eqref{eq:unload} makes the two equal, which
-Chapter~\ref{sec:evaluation} confirms on 2400 random schedules at exactly zero difference. The
-elite and mutant counts use his \texttt{ceil} rounding, and the second crossover parent is drawn
-from the non-elites as in his disjoint parent ranges. One representational difference remains:
-his mutants store integer speed and vehicle indices directly in blocks two to four, whereas ours
-stores random keys that the decoder buckets into the same levels. The induced distribution over
-decoded mutants is therefore the same, and was checked to be so, but the chromosome encoding
-differs and a seed-for-seed reproduction of his trajectory is not possible. Following the biased random-key paradigm \citep{goncalves2011} a solution is
-a vector of $4N$ keys, one block of task priorities, two of empty- and loaded-leg speed levels
-and one of vehicle assignments, which a decoder maps to a schedule that is then evaluated
+Fronts are produced by the mp-BRKGA of \citet{fontes2023}, reimplemented against the authors' own
+solver source. Following the biased random-key paradigm \citep{goncalves2011}, a solution is a
+vector of $4N$ keys comprising one block of task priorities, two of empty- and loaded-leg speed
+levels and one of vehicle assignments, which a decoder maps to a schedule that is then evaluated
 exactly. The method evolves $\Omega + \Pi$ populations concurrently: each single-objective
 population ranks by one objective and so drives one extreme of the front, while each
 multi-objective population ranks by non-dominated sorting with crowding distance
-\citep{deb2002}. Each generation replaces a population by its elite fraction, offspring from
-biased parameterised uniform crossover inheriting from the elite parent with probability
+\citep{deb2002}. Each generation replaces a population by its elite fraction, offspring obtained
+from biased parameterised uniform crossover inheriting from the elite parent with probability
 $p_e = 0.7$, and fresh mutants; elites migrate between populations so that boundary specialists
 propagate inward.
+
+The reimplementation was compared with that source operator by operator before any result was
+produced, and the correspondence recorded here follows from that comparison. The objective is
+identical to within floating-point equality: theirs is split across a per-task completion array
+and a per-vehicle availability array, whereas the implementation used here takes a single maximum
+over completions, and the asymmetry of~\eqref{eq:load} and~\eqref{eq:unload} renders the two
+equal, as Chapter~\ref{sec:evaluation} confirms on 2400 random schedules at exactly zero
+difference. The elite and mutant counts adopt their \texttt{ceil} rounding, and the second
+crossover parent is drawn from the non-elites, as in their disjoint parent ranges. One
+representational difference remains: their mutants store integer speed and vehicle indices
+directly in blocks two to four, whereas those used here store random keys which the decoder
+buckets into the same levels. The induced distribution over decoded mutants is consequently
+identical, and was verified to be so, but the chromosome encoding differs, and a seed-for-seed
+reproduction of their trajectory is therefore not possible.
 
 The published configuration is $P = 20N$ per population, elite fraction $0.2$, mutant fraction
 $0.1$, $p_e = 0.7$, $\Omega = \Pi = 2$ and $n_{ex} = 30$, adopted here with the reduced
@@ -519,12 +530,13 @@ participates in producing any front reported here.
 \section{Selection of the surrogate model class}
 \label{sec:whygnn}
 
-Exact evaluation costs well under a millisecond at these sizes, so a surrogate is not required to
-render search tractable. Its purpose is that a model predicting the per-activity structure of a
-schedule can be differentiated with respect to its own predictions, yielding an explanation
-derived from a learned representation instead of from the exact recurrence, which the two can
-then be compared on. Establishing that the explanation is learnable is a precondition for any
-setting in which the exact recurrence is unavailable.
+Exact evaluation costs well under a millisecond at these sizes, so the model is not introduced in
+order to render the search tractable. Its purpose is that a model predicting the per-activity
+structure of a schedule may be differentiated with respect to its own predictions, which yields
+an explanation derived from a learned representation rather than from the exact recurrence and
+permits the two to be compared. The exact recurrence presupposes a schedule whose durations are
+already resolved; the model predicts them, and therefore applies wherever that presupposition
+fails.
 
 Three properties of the input determine the model class. First, a resolved schedule is a typed
 precedence graph, not a vector. Any model consuming a fixed-length feature vector must serialise
