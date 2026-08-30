@@ -1117,7 +1117,7 @@ Order & Task & Activity & Duration (s) & $\partial C_{\max}$ & Resource \\
 
 \begin{figure}[tb]
 \centering
-\includegraphics[width=0.78\textwidth]{figs/fig_front.pdf}
+\includegraphics[width=0.72\textwidth]{figs/fig_front.pdf}
 \caption[One explained front]{One explained front, for L21 at $A/Q = 1.67$ and seed $0$, whose ten-seed cell mean
 appears in Table~\ref{tab:migration}. (a) All sixty non-dominated points on the objective
 plane, each shaded by its duration-weighted transport share, so that the figure reports not
@@ -1191,7 +1191,7 @@ the threshold.
 
 \begin{figure}[tb]
 \centering
-\includegraphics[width=0.80\textwidth]{figs/fig_dl.pdf}
+\includegraphics[width=0.74\textwidth]{figs/fig_dl.pdf}
 \caption[The published large dual-cycling set]{The published large dual-cycling set, over five seeds per instance. (a) Transport share
 at the two ends of every DL front, ordered by instance size. Both ends lie above $0.87$, and the
 separation between them is the migration. (b) Migration for the DL set at its native
@@ -1214,7 +1214,7 @@ rising sharply near unity, and saturating thereafter.
 \begin{table}[tb]
 \centering
 \small
-\caption[Bottleneck migration across the fleet-to-crane ratio]{Bottleneck migration across the fleet size, for the six swept instances. Migration is the signed shift of the duration-weighted transport share, $\rho_{\mathrm{mk}} - \rho_{\mathrm{en}}$, on the exact critical path, each cell the mean over ten seeds. Beneath each cell the model's own migration is given, and beneath that the ratio $A/Q$ followed by the mean absolute difference $|\\Delta\\rho|$ between the two. The ratio differs between instances because the crane count does. Parenthesised cells are those not significant at $\alpha = 0.05$ under a one-sample Wilcoxon signed-rank test against zero, Holm-corrected within each instance's nine fleet sizes. Migration is negligible left of $A/Q \approx 1$ and saturates to its right.}
+\caption[Bottleneck migration across the fleet-to-crane ratio]{Bottleneck migration across the fleet size, for the six swept instances. Migration is the signed shift of the duration-weighted transport share, $\rho_{\mathrm{mk}} - \rho_{\mathrm{en}}$, on the exact critical path, each cell the mean over ten seeds. Beneath each cell the model's own migration is given, and beneath that the ratio $A/Q$ followed by the mean absolute difference $|\Delta\rho|$ between the two. The ratio differs between instances because the crane count does. Parenthesised cells are those not significant at $\alpha = 0.05$ under a one-sample Wilcoxon signed-rank test against zero, Holm-corrected within each instance's nine fleet sizes. Migration is negligible left of $A/Q \approx 1$ and saturates to its right.}
 \label{tab:migration}
 \footnotesize
 \setlength{\tabcolsep}{4pt}
@@ -1249,7 +1249,7 @@ L35 & $-0.012$ & ($+0.007$) & ($-0.006$) & ($+0.027$) & ($-0.021$) & $-0.076$ & 
 
 \begin{figure}[tb]
 \centering
-\includegraphics[width=0.78\textwidth]{figs/fig_migration.pdf}
+\includegraphics[width=0.72\textwidth]{figs/fig_migration.pdf}
 \caption[Migration against the fleet-to-crane ratio]{Migration against the fleet-to-crane ratio for the six swept instances, each cell the
 mean over ten seeds. Series are distinguished by marker and dash pattern so that they remain
 separable in greyscale. Open circles mark cells that fail significance after Holm correction;
@@ -1404,7 +1404,7 @@ $A/Q$ & loading & unloading & mixed \\
 
 \begin{figure}[tb]
 \centering
-\includegraphics[width=0.78\textwidth]{figs/fig_families.pdf}
+\includegraphics[width=0.72\textwidth]{figs/fig_families.pdf}
 \caption[Migration on the three instance families]{Migration against the fleet-to-crane ratio on the three instance families, with the
 shaded band one standard deviation across instances and seeds. The threshold is reproduced
 independently on each: migration is negligible below $A/Q \approx 1$, turns sharply negative
@@ -1436,7 +1436,7 @@ neighbouring objective values is not resolved here.
 
 \begin{figure}[tb]
 \centering
-\includegraphics[width=0.78\textwidth]{figs/fig_profile.pdf}
+\includegraphics[width=0.72\textwidth]{figs/fig_profile.pdf}
 \caption[The transport share along a front]{The transport share at every point of one front from
 each family, plotted against the makespan of that point. The dotted rule at
 $\rho_{\mathrm{transport}} = 0.5$ separates the crane-bound from the vehicle-bound regime. The
@@ -1491,7 +1491,7 @@ sufficient for this particular measurement, whatever it costs in absolute front 
 
 \begin{figure}[tb]
 \centering
-\includegraphics[width=0.78\textwidth]{figs/fig_evolution.pdf}
+\includegraphics[width=0.72\textwidth]{figs/fig_evolution.pdf}
 \caption[The explanation during the search]{Migration against generation, over 270 replicates
 with the solver's archive snapshotted every ten generations, grouped by side of the
 fleet-to-crane threshold with the band one standard deviation over replicates. Above the
@@ -1666,7 +1666,7 @@ learned component and not on the oracle.
 % is added at chapter level and under the heading the class actually prints, so that the list
 % is not indented under the final chapter and does not appear under a different name.
 \begingroup
-\singlespacing\footnotesize
+\singlespacing\scriptsize
 \setlength{\bibsep}{0pt}
 \cleardoublepage
 \addcontentsline{toc}{chapter}{Bibliography}

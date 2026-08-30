@@ -38,7 +38,7 @@ def migration_table() -> str:
         r"the duration-weighted transport share, $\rho_{\mathrm{mk}} - \rho_{\mathrm{en}}$, on "
         r"the exact critical path, each cell the mean over ten seeds. Beneath each cell the model's "
         r"own migration is given, and beneath that the ratio $A/Q$ followed by the mean "
-        r"absolute difference $|\\Delta\\rho|$ between the two. The ratio differs between "
+        r"absolute difference $|\Delta\rho|$ between the two. The ratio differs between "
         r"instances because the crane count does. "
         r"Parenthesised cells are those not significant at $\alpha = 0.05$ under a one-sample "
         r"Wilcoxon signed-rank test against zero, Holm-corrected within each instance's nine "
