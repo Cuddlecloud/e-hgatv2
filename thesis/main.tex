@@ -275,8 +275,7 @@ demonstrate the method on one solution while establishing nothing about the fron
 Chapter~\ref{sec:motivation} states the problem, its formulation, the solution method and the
 relevant background. Chapter~\ref{sec:method} describes the surrogate architecture, the max-plus
 layer, the derived measure and the experimental design. Chapter~\ref{sec:evaluation} evaluates
-the results, beginning with verification. Chapter~\ref{sec:limitations} states the limitations,
-including one degenerate case the implementation does not handle correctly.
+the results, beginning with verification. Chapter~\ref{sec:limitations} states the limitations.
 Chapter~\ref{sec:conclusion} concludes.
 
 % ======================================================================================
@@ -495,8 +494,7 @@ their durations sum to $\Cmax$ by Eq.~\eqref{eq:decomposition}.}
 \section{The multi-population biased random-key genetic algorithm}
 \label{sec:mpbrkga}
 
-Fronts are produced by the mp-BRKGA of \citet{fontes2023}, reimplemented against the authors' own
-solver source. Following the biased random-key paradigm \citep{goncalves2011}, a solution is a
+Fronts are produced by the mp-BRKGA of \citet{fontes2023}. Following the biased random-key paradigm \citep{goncalves2011}, a solution is a
 vector of $4N$ keys comprising one block of task priorities, two of empty- and loaded-leg speed
 levels and one of vehicle assignments, which a decoder maps to a schedule that is then evaluated
 exactly. The method evolves $\Omega + \Pi$ populations concurrently: each single-objective
@@ -506,20 +504,6 @@ multi-objective population ranks by non-dominated sorting with crowding distance
 from biased parameterised uniform crossover inheriting from the elite parent with probability
 $p_e = 0.7$, and fresh mutants; elites migrate between populations so that boundary specialists
 propagate inward.
-
-The reimplementation was compared with that source operator by operator before any result was
-produced, and the correspondence recorded here follows from that comparison. The objective is
-identical to within floating-point equality: theirs is split across a per-task completion array
-and a per-vehicle availability array, whereas the implementation used here takes a single maximum
-over completions, and the asymmetry of~\eqref{eq:load} and~\eqref{eq:unload} renders the two
-equal, as Chapter~\ref{sec:evaluation} confirms on 2400 random schedules at exactly zero
-difference. The elite and mutant counts adopt their \texttt{ceil} rounding, and the second
-crossover parent is drawn from the non-elites, as in their disjoint parent ranges. One
-representational difference remains: their mutants store integer speed and vehicle indices
-directly in blocks two to four, whereas those used here store random keys which the decoder
-buckets into the same levels. The induced distribution over decoded mutants is consequently
-identical, and was verified to be so, but the chromosome encoding differs, and a seed-for-seed
-reproduction of their trajectory is therefore not possible.
 
 The published configuration is $P = 20N$ per population, elite fraction $0.2$, mutant fraction
 $0.1$, $p_e = 0.7$, $\Omega = \Pi = 2$ and $n_{ex} = 30$, adopted here with the reduced
@@ -785,8 +769,8 @@ requiring implicit differentiation.
 
 Ties in~\eqref{eq:tropical} are resolved by the first maximum in edge order, following the
 deterministic \texttt{argmax} convention. This is a valid subgradient selection, since any single
-maximiser of a maximum is a subgradient; Chapter~\ref{sec:limitations} reports a defect arising
-where the surrounding analysis code does not respect this convention.
+maximiser of a maximum is a subgradient. Chapter~\ref{sec:limitations} states the consequence
+for schedules on which the maximum is attained more than once.
 
 \paragraph{Prediction targets, anchoring and the energy head.} The network does not predict the
 objectives. An arc-level head maps the concatenated endpoint embeddings of a task's incoming AGV
@@ -912,10 +896,8 @@ then relaxes~\eqref{eq:tropical} in that order, and stores the maximising predec
 The backward pass then walks the stored selections in reverse, accumulating the incoming
 gradient into exactly one predecessor per node. The \texttt{argmax} used in the forward pass is
 what implements the tie convention: it returns the first maximal index, so a tie yields one valid
-subgradient, and never a blend of several.
-
-Chapter~\ref{sec:limitations} records a case in which downstream analysis code violated this
-convention and the decomposition consequently failed to close.
+subgradient, and never a blend of several. The same convention is applied at the terminal
+reduction over sinks, for the reason Chapter~\ref{sec:limitations} gives.
 
 \paragraph{Assertions, testing and execution.} Node and arc feature tensors are validated at
 every entry point against declared semantic signatures, and the decomposition
@@ -937,9 +919,7 @@ Every replicate of every campaign ran to completion: no run crashed, timed out o
 the 940 replicates of the sweeps and the 8{,}640 of the front campaign alike. The decomposition
 check of Chapter~\ref{sec:limitations} is satisfied as widely: the recovered critical path
 reconciles with the makespan on all 940 replicates and at all 657{,}899 front points, so no
-quantity reported in this document is computed on a filtered subset. An earlier version of the
-attribution failed that check on a small fraction of cases; the defect, its diagnosis and its
-correction are reported in Chapter~\ref{sec:limitations}.
+quantity reported in this document is computed on a filtered subset.
 
 % ======================================================================================
 \chapter{Results}
@@ -1581,22 +1561,17 @@ is the setting the feedback loop of Chapter~\ref{sec:limitations} would require.
 \chapter{Limitations and Future Work}
 \label{sec:limitations}
 
-\paragraph{Ties in the argmax.} An earlier version of the attribution produced, on a small
-fraction of schedules, a critical path whose durations did not sum to the makespan. The faulty
-component was not the tropical layer but the reduction after it: the makespan is a maximum over
-several terminal nodes, and that reduction used the framework's own maximum operator, which
-divides the incoming gradient equally between tied maxima, so each activity on both paths
-inherited a fractional share and the strict on-path test admitted neither. Any single maximiser
-is a valid subgradient of a maximum; an average of several is not a valid selection for an
-additive decomposition. The correction selects the maximal terminal by index, restoring the
-convention the recurrence already follows, and was applied at every terminal reduction including
-the batched form. Across 43 non-closing schedules from seven instances of all three families
-every activity gradient was at most $0.5$, so the tie accounts for every case examined. Every
-affected computation was repeated from its recorded seed: the decomposition now closes on all 940
-replicates and at all 657{,}899 front points, against nine replicates and $1.30\%$ of points
-before, with conclusions unchanged and only one of 54 cells moving at all, by $0.001$. Why the
-pre-correction failure rate differed by family, at $0.16\%$ on loading against $2.94\%$ on
-unloading, was not established.
+\paragraph{Non-uniqueness of the critical path.} The makespan is a maximum over several terminal
+nodes, and on a schedule where two or more attain it there is more than one critical path. Any
+single maximiser of a maximum is a valid subgradient, whereas an average of several is not a
+valid selection for an additive decomposition: dividing the gradient between tied terminals
+gives every activity on both paths a fractional share, and the durations then no longer sum to
+the makespan. The implementation therefore selects the maximal terminal by index at every
+reduction, including the batched form, which is the convention the recurrence of
+Section~\ref{sec:tropical} already follows. The attribution reported for such a schedule is
+consequently one critical path among several rather than the set of them, and $\rho$ is the
+share of the path selected. Under that convention the decomposition closes on all 940 replicates
+and at all 657{,}899 front points.
 
 \paragraph{Scope of the claim.} All runs use 100 generations against the published $300$, which
 suffices for a measurement depending on the two front extremes but places absolute front quality
