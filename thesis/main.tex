@@ -130,18 +130,16 @@ for a fixed schedule the makespan is the longest chain of activities constrained
 sequence, so the objective depends upon the activities of that chain alone, and their durations
 sum to it exactly. The partial derivative of the makespan with respect to any activity duration
 is consequently zero or one and never an intermediate value, and the resulting attribution
-balances by construction rather than by calibration. Formally the objective is linear over the
-$(\max,+)$ semiring, which renders the attribution verifiable rather than merely plausible. The
+balances by construction. Formally the objective is linear over the $(\max,+)$ semiring, which
+makes the attribution verifiable. The
 method is a heterogeneous graph attention network, E-HGATv2, which represents a schedule as a
 typed precedence graph and predicts the duration of each vehicle leg and each crane handling
 operation; a differentiable max-plus dynamic-programming layer composes those predictions into
 the makespan, its backward pass routing the subgradient exclusively along the argmax edge of
-each recurrence, so that differentiating the network returns a critical path rather than an
-estimate of one.
+each recurrence, so that differentiating the network returns the critical path itself.
 
 From this decomposition the thesis defines the duration-weighted critical share $\rho$, the
-fraction of the makespan contributed by vehicle travel rather than by crane handling, and
-quantifies the difference between the compromises on a front by the shift in $\rho$ between its
+fraction of the makespan spent in vehicle travel, and quantifies the difference between the compromises on a front by the shift in $\rho$ between its
 two ends. The principal finding is that the binding bottleneck migrates between travel and
 handling, and that the occurrence of the migration is governed by the fleet-to-crane ratio $A/Q$.
 Over 540 replicates spanning six instances, nine fleet sizes and ten seeds, migration is
@@ -257,8 +255,8 @@ one.
 The learned model, E-HGATv2, is not asked to predict the makespan. It predicts the duration of
 each trip and each lift, and a differentiable max-plus layer composes those into the makespan by
 the recurrence the exact evaluator uses. Differentiating the model with respect to its own
-predictions therefore returns a critical path rather than an estimate of one, expressed in the
-same physical units. Its agreement with the exact result is measured throughout and reported in
+predictions therefore returns the critical path itself, expressed in the same physical
+units. Its agreement with the exact result is measured throughout and reported in
 Section~\ref{sec:surrogate-eval}. That agreement is what carries the method beyond the instances
 examined here, since the exact recurrence presupposes a schedule that has already been evaluated
 whereas the model predicts the durations it requires.
@@ -1597,10 +1595,7 @@ steps of unequal size. The smaller, comparing how the explanation changes across
 carried out in Section~\ref{sec:evolution} and shows that an explanation read from an unconverged
 front is biased towards zero. The larger is attribution-guided search proper, biasing mutation
 towards the activities currently on the critical path, in the spirit of decision-focused learning
-\citep{elmachtoub2022}. That step is deliberately not attempted here: it should follow once the
-explanation is established, as this thesis does, and Section~\ref{sec:evolution} gives
-it a precondition, since guidance drawn from an early generation would be acting on an
-explanation that has not yet converged.
+\citep{elmachtoub2022}. 
 
 % ======================================================================================
 \chapter{Conclusion}
@@ -1620,7 +1615,7 @@ A conventional surrogate cannot express this: a pooled regression head produces 
 and therefore assigns credit to provably irrelevant activities. Replacing that head with a
 differentiable max-plus dynamic programme, whose backward pass routes the subgradient through the
 recorded argmax edge, restores the property, and differentiating the composition returns the
-critical path itself rather than an estimate of it. From that decomposition the duration-weighted
+critical path itself. From that decomposition the duration-weighted
 critical share $\rho$ summarises an explanation as one number, the fraction of the makespan spent
 moving on the vehicles.
 
